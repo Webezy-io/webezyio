@@ -1,0 +1,4 @@
+pluggy<1.0,>=0.3
+protobuf
+grpcio
+grpcio-tools

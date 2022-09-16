@@ -1,0 +1,12 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+
+package domain.OtherPackage.v1;
+
+
+
+message OtherMsg {
+	repeated string testother = 1;
+}
+

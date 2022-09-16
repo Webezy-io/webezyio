@@ -1,0 +1,211 @@
+syntax = "proto3";
+import "google/protobuf/struct.proto";
+
+package webezy.core.v1;
+
+message WebezyConfig {
+    string host = 1;
+    int32 port = 2;
+}
+
+message WebezyJson {
+    string domain = 1;
+    Project project = 2;
+    map<string, ServiceDescriptor> services = 3;
+    map<string, PackageDescriptor> packages = 4;
+    WebezyConfig config = 5;
+}
+
+
+message FileDescriptor {
+    string uri = 1;
+    // Name of file, relative to root of source tree.
+    string name = 2;
+    // Name of the package
+    string package = 3;
+    string syntax = 4;
+    // Mapping from services’ names to their ServiceDescriptor.
+    map<string,ServiceDescriptor> services_by_name = 5;
+    optional string content = 6;
+    repeated string dependencies = 7;
+    repeated Descriptor messages = 8;
+}
+
+enum Language {
+    UNKNOWN_LANGUAGE = 0;
+    PYTHON = 1;
+    TYPESCRIPT = 2;
+}
+
+message WebezyServer {
+    Language language = 2;
+}
+
+message WebezyClient {
+    string out_dir = 1;
+    Language language = 2;
+}
+
+message Project {
+    optional string id = 1;
+    // Unique URI identifier ex' /organizations/xxxx/resources/SomeType/SomeKind/SomeResource:0.0.1
+    string uri = 2;
+    // Resource entity name ex' SomeResource
+    string name = 3;
+    string package_name = 4;
+    // Version of the resource ex' 0.0.1 
+    string version = 5;           
+    // The resource Type ex' SomeType
+    string type = 6;
+    // Some resource kind under specific type ex' SomeKind
+    string kind = 7;
+    // Array of properties
+    repeated google.protobuf.Struct properties = 8;
+    repeated string files = 9;
+    repeated string services = 10;
+    string server_language = 11;
+    WebezyServer server = 12;
+    repeated WebezyClient clients = 13;
+}
+
+message ProjectDescriptor {
+    Project project = 1;
+    repeated ServiceDescriptor services = 2;
+}
+
+message EnumValueDescriptor {
+    string uri = 1;
+    string name = 2;
+    int32 number = 3;
+    int32 index = 4;
+}
+
+message Enum {
+    string uri = 1;
+    string name = 2;
+    string full_name = 3;
+    repeated EnumValueDescriptor values = 4;
+}
+
+message FieldDescriptor {
+    enum Label {
+        // 0 is reserved for errors
+        LABEL_UNKNOWN = 0;
+        LABEL_OPTIONAL = 1;
+        LABEL_REQUIRED = 2;
+        LABEL_REPEATED = 3;
+    }
+    enum Type {
+        // 0 is reserved for errors.
+        TYPE_UNKNOWN = 0;
+        // Order is weird for historical reasons.
+        TYPE_DOUBLE = 1;
+        TYPE_FLOAT = 2;
+        // Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
+        // negative values are likely.
+        TYPE_INT64 = 3;
+        TYPE_UINT64 = 4;
+        // Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
+        // negative values are likely.
+        TYPE_INT32 = 5;
+        TYPE_FIXED64 = 6;
+        TYPE_FIXED32 = 7;
+        TYPE_BOOL = 8;
+        TYPE_STRING = 9;
+        // Tag-delimited aggregate.
+        // Group type is deprecated and not supported in proto3. However, Proto3
+        // implementations should still be able to parse the group wire format and
+        // treat group fields as unknown fields.
+        TYPE_GROUP = 10;
+        TYPE_MESSAGE = 11;  // Length-delimited aggregate.
+    
+        // New in version 2.
+        TYPE_BYTES = 12;
+        TYPE_UINT32 = 13;
+        TYPE_ENUM = 14;
+        TYPE_SFIXED32 = 15;
+        TYPE_SFIXED64 = 16;
+        TYPE_SINT32 = 17;  // Uses ZigZag encoding.
+        TYPE_SINT64 = 18;  // Uses ZigZag encoding.
+      }
+    string uri = 1;
+    string name = 2;
+    string full_name = 3;
+    int32 index = 4;
+    Type field_type = 5;
+    Label label = 6;
+    Enum enum_type = 7;
+    string type = 8;
+    string kind = 9;
+    // If the field type is another message an valid URI for the Descriptor
+    optional string message_type = 10;
+    map<string, google.protobuf.Value> extensions = 11;
+}   
+
+enum Options{
+    UNKNOWN_EXTENSION = 0;
+    FileOptions = 1;
+    MessageOptions = 2;
+    FieldOptions = 3;
+}
+
+// Descriptors essentially contain exactly the information found in a .proto file, in types that make this information accessible in Python.
+message Descriptor {
+    string uri = 1;
+    // Name of this protocol message type.
+    string name = 2;
+    // Fully-qualified name of this protocol message type, which will include protocol “package” name and the name of any enclosing types.
+    string full_name = 3;
+    // Field descriptors for all fields in this type.
+    repeated FieldDescriptor fields = 4;
+    string type = 5;
+    string kind = 6;
+    string description = 7;
+    repeated string extensions = 8;
+    Options extension_type = 9;
+}
+
+// Describes a service.
+message ServiceDescriptor {
+    string uri = 1;
+    string name = 2;
+    string full_name = 3;
+    repeated MethodDescriptor methods = 4;
+    string client_impl = 5;
+    string server_impl = 6;
+    string version = 7;
+    repeated string dependencies = 8;
+    string description = 9;
+}
+
+message PackageDescriptor {
+    string uri = 1;
+    string name = 2;
+    string package = 3;
+    repeated Descriptor messages = 4;
+    string version = 5;
+    repeated string dependencies = 6;
+    repeated Enum enums = 7;
+    map<string, google.protobuf.Value> extensions = 8;
+    
+}
+
+message MethodDescriptor {
+    string uri = 1;
+    string name = 2;
+    string full_name = 3;
+    string type = 4;
+    string kind = 5;
+    // ServiceDescriptor containing_service = 3; 
+    // Input and output type names.  These are resolved in the same way as
+    // FieldDescriptorProto.type_name, but must refer to a message type.
+    string input_type = 6;
+    string output_type = 7;
+    // Identifies if client streams multiple client messages
+    bool client_streaming = 8;
+    // Identifies if server streams multiple server messages
+    bool server_streaming = 9;
+    string description = 10;
+
+}
+
