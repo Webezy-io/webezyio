@@ -38,7 +38,6 @@ class WebezyArchitect():
         self._webezy.registerCommand(CommandMap._ADD_RESOURCE,self._add_resource)
         self._webezy.registerHook(CommandMap._ADD_RESOURCE,'log',self._logger)
 
-
     def SetDomain(self,domain):
         self._domain = domain
         self._webezy.execute(CommandMap._ADD_RESOURCE, {'domain':domain})

@@ -14,7 +14,8 @@ from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson,P
                                              PackageDescriptor,Descriptor as WZDescriptor,\
                                              MethodDescriptor as WZMethodDescriptor,\
                                              Options,FieldDescriptor as WZFieldDescriptor,\
-                                             Enum as WZEnumDescriptor, ServiceDescriptor as WZServiceDescriptor
+                                             Enum as WZEnumDescriptor, ServiceDescriptor as WZServiceDescriptor,\
+                                             WebezyContext as WZContext,WebezyFileContext as WZFileContext,WebezyMethodContext as WZMethodContext
 
 class ResourceTypes(Enum):
     project = 'projects'
@@ -335,3 +336,7 @@ def construct_full_name(resource_type:ResourceTypes,resource_kind:ResourceKinds,
 
     return full_name
 
+
+
+def proto_to_dict(proto):
+    return MessageToDict(proto)

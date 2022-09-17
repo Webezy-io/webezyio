@@ -1,4 +1,5 @@
 import logging
+import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers,file_system
 
@@ -14,6 +15,7 @@ def init_project_structure(wz_json:helpers.WZJson):
         file_system.join_path(wz_json.path,'services'),
         # Protos
         file_system.join_path(wz_json.path,'protos'),
+        file_system.join_path(wz_json.path,'services','protos'),
         # Bin
         file_system.join_path(wz_json.path,'bin')]
 
@@ -25,8 +27,10 @@ def init_project_structure(wz_json:helpers.WZJson):
         file_system.join_path(wz_json.path,'services','__init__.py'),
         file_system.join_path(wz_json.path,'clients','python','__init__.py'),
         file_system.join_path(wz_json.path,'protos','__init__.py')]
-
-    file_system.wFile(file_system.join_path(wz_json.path,'bin','init.sh'),bash_script)
+    # Bin files
+    file_system.wFile(file_system.join_path(wz_json.path,'bin','init.sh'),bash_init_script)
+    file_system.wFile(file_system.join_path(wz_json.path,'bin','run-server.sh'),bash_run_server_script)
+    # file_system.wFile(file_system.join_path(wz_json.path,'.webezy','contxt.json'),'{"files":[]}')
 
     for file in files:
         file_system.wFile(file,'')
@@ -35,20 +39,169 @@ def init_project_structure(wz_json:helpers.WZJson):
 
 
 @builder.hookimpl
-def write_services(wz_json:helpers.WZJson):
-    pass
+def write_services(wz_json:helpers.WZJson,wz_context:helpers.WZContext):
+    for svc in wz_json.services:
+        service_code = helpers.WZServicePy(wz_json.project.get('packageName'),svc,wz_json.services[svc].get('dependencies'),wz_json.services[svc],context=wz_context).to_str()
+        file_system.wFile(file_system.join_path(wz_json.path,'services',f'{svc}.py'),service_code,overwrite=True)
 
 
 @builder.hookimpl
 def compile_protos(wz_json:helpers.WZJson):
-    pass
+    # Running ./bin/init.sh script for compiling protos
+    subprocess.run(['bash',file_system.join_path(wz_json.path,'bin','init.sh')])
+    # Moving .py files to ./services/protos dir
+    for file in file_system.walkFiles(file_system.join_path(wz_json.path,'protos')):
+        if '.py' in file:
+            file_system.mv(file_system.join_path(wz_json.path,'protos',file),file_system.join_path(wz_json.path,'services','protos',file))
 
 @builder.hookimpl
 def write_clients(wz_json:helpers.WZJson):
-    pass
+    for f in file_system.walkFiles(file_system.join_path(wz_json.path,'services','protos')):
+        if '.py' in f:
+            file_system.copyFile(file_system.join_path(wz_json.path,'services','protos',f),file_system.join_path(wz_json.path,'clients','python',f))
 
 
-bash_script = '#!/bin/bash\n\n\
+@builder.hookimpl
+def write_server(wz_json: helpers.WZJson):
+    imports = ['_ONE_DAY_IN_SECONDS = 60 * 60 * 24','from concurrent import futures','import time','import grpc']
+    services_bindings = []
+    svcs=[]
+    for svc in wz_json.services:
+        svcs.append(svc)
+        imports.append(f'import {svc}_pb2_grpc')
+        services_bindings.append(f'{svc}_pb2_grpc.add_{svc}Servicer_to_server({svc}.{svc}(),server)')
+    svcs = ', '.join(svcs)
+    imports.append(f'import {svcs}')
+    services_bindings = '\n\t'.join(services_bindings)
+    imports = '\n'.join(imports)
+    server_code = f'"""Webezy.io Generated Server Code"""\n\
+{imports}\n\n\
+def serve(host="0.0.0.0:50051"):\n\
+\tserver = grpc.server(futures.ThreadPoolExecutor(max_workers=10))\n\
+\t{services_bindings}\n\
+\tserver.add_insecure_port(host)\n\
+\tserver.start()\n\
+\tprint("[*] Started webezyio server at -> %s" % (host))\n\
+\ttry:\n\
+\t\twhile True:\n\
+\t\t\ttime.sleep(_ONE_DAY_IN_SECONDS)\n\
+\texcept KeyboardInterrupt:\n\
+\t\tserver.stop(0)\n\n\
+if __name__ == "__main__":\n\
+\tserve()'
+    file_system.wFile(file_system.join_path(wz_json.path,'server','server.py'),server_code,overwrite=True)
+
+
+@builder.hookimpl
+def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    for svc in wz_json.services:
+        try:
+            svcFile = file_system.rFile(file_system.join_path(wz_json.path,'services',f'{svc}.py'))
+            is_init = False
+            for l in svcFile:
+                if '__init__' in l:
+                    is_init = True
+                    break
+            # Non RPC functions should have # @skip line above func name
+            function_code_inlines = helpers.parse_code_file(svcFile,'@skip')
+            # Parse all rpc's in file by default # @rpc seperator
+            rpc_code_inlines = helpers.parse_code_file(svcFile)
+            for f in wz_context.files:
+
+                if svc in f.get('file'):
+                    # Iterating all regular functions
+                    for func in function_code_inlines:
+                        func_code = []
+                        for l in func:
+                            if '@rpc @@webezyio' in l:
+                                break
+
+                            func_code.append(l)
+
+                        wz_context.set_method_code(svc,func_code[0].split('def ')[1].split('(')[0],''.join(func_code))
+                    methods_i = 0
+                    # Iterating all RPC's functions
+                    for m in f.get('methods'):
+                        if m['type'] == 'rpc':
+                            # Checking if edit to method has happened - meaning canot find in webezy.json all context methods
+                            if next((r for r in wz_json.services[svc]['methods'] if r['name'] == m['name']),None) == None:
+                                # Getting method details from webezy.json
+                                new_method = wz_json.services[svc]['methods'][methods_i]
+                                # Building new context with old func code
+                                new_rpc_context = {'name':new_method.get('name'),'type':'rpc','code':''.join(rpc_code_inlines[methods_i][1:])}
+                                # Editing inplace the RPC context
+                                wz_context.edit_rpc(svc,m.get('name'),new_rpc_context)
+                            else:
+                                # Setting new context
+                                wz_context.set_rpc_code(svc,m.get('name'),''.join(rpc_code_inlines[methods_i][1:]))
+                            
+                            methods_i += 1
+            
+        except Exception as e:
+            logging.exception(e)
+
+    file_system.wFile(file_system.join_path(wz_json.path,'.webezy','context.json'),wz_context.dump(),True,True)
+
+@builder.hookimpl
+def override_generated_classes(wz_json: helpers.WZJson):
+    
+    for f in file_system.walkFiles(file_system.join_path(wz_json.path,'services','protos')):
+        name = f.split('_pb2')
+        if '_grpc' not in name:
+            file_content = file_system.rFile(file_system.join_path(wz_json.path,'services','protos',f))
+            file_content.insert(5,'\nfrom typing import overload, Iterator, List\n')
+            if len(name) > 1:
+                name = name[0]
+                
+                # svc_proto = next((svc for svc in wz_json.services if svc == name),None)
+                pkg_proto = next((pkg for pkg in wz_json.packages if pkg.split('/')[-1].split('.')[0] == name),None)
+                if pkg_proto is not None:
+                    pkg_proto_name = pkg_proto.split('/')[-1].split('.')[0]
+
+                    for m in wz_json.packages[pkg_proto].get('messages'):
+                        index = 0
+                        for l in file_content:
+                            message_name = m['name']
+                            if f'{message_name} = _reflection' in l:
+                                temp_fields = []
+                                init_fields = []
+                                for field in m['fields']:
+                                    fName = field['name']
+                                    fType = parse_proto_type_to_py(field['fieldType'].split('_')[-1].lower(),field['label'].split('_')[-1].lower(),field.get('messageType'),field.get('enumType'))
+                                    temp_fields.append(f'{fName} = {fType} # type: {fType}')
+                                    init_fields.append(f'{fName}={fType}')
+                                temp_fields = '\n\t'.join(temp_fields)
+                                init_fields = ', '.join(init_fields)
+                                file_content.insert(index,f'\n@overload\nclass {message_name}:\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\tpass\n')
+                                break
+                            index+=1
+                    file_system.wFile(file_system.join_path(wz_json.path,'services','protos',f),''.join(file_content),True)
+
+
+def parse_proto_type_to_py(type,label,messageType=None,enumType=None):
+    temp_type = 'None'
+    if 'int' in type:
+        temp_type= 'int'
+    elif type == 'float' or type == 'double':
+        temp_type= 'float'
+    elif type == 'string':
+        temp_type= 'str'
+    elif type == 'byte':
+        temp_type= 'bytes'
+    elif type == 'message' or type == 'enum':
+        temp_type= '{0}__pb2.{1}'.format(messageType.split('.')[1],messageType.split('.')[-1])
+    elif type == 'enum':
+        temp_type= '{0}__pb2.{1}'.format(enumType.split('.')[1],enumType.split('.')[-1])
+    elif type == 'bool':
+        temp_type= 'bool'
+
+    if label == 'repeated':
+        temp_type = f'List[{temp_type}]'
+
+    return temp_type
+
+
+bash_init_script = '#!/bin/bash\n\n\
 declare -a services=("protos")\n\
 echo "Init started for proto files"\n\
 pwd\n\
@@ -59,12 +212,8 @@ for SERVICE in "${services[@]}"; do\n\
     python3 -m grpc_tools.protoc --proto_path=$SERVICE/ --python_out=$DESTDIR --grpc_python_out=$DESTDIR $SERVICE/*.proto\n\
 done\n\
 statuscode=$?\n\
-echo "Exit code for protoc -> "$statuscode\n\
-cd $DESTDIR\n\
-for FILE in *; do\n\
-    filename=$FILE\n\
-    search="import"\n\
-    replace="from . import"\n\
-    sed -i".bak" -e "4,20s/^$search/$replace/gi" $filename\n\
-    rm -f *.bak\n\
-done'
+echo "Exit code for protoc -> "$statuscode'
+
+bash_run_server_script = '#!/bin/bash\n\n\
+PYTHONPATH=./services/protos:./services python3 server/server.py'
+

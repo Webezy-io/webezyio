@@ -209,3 +209,17 @@ message MethodDescriptor {
 
 }
 
+message WebezyContext {
+    repeated WebezyFileContext files = 1;
+}
+
+message WebezyFileContext {
+    string file = 1;
+    repeated WebezyMethodContext methods = 2;
+}
+
+message WebezyMethodContext {
+    string name = 1;
+    string code = 2;
+    string type = 3;
+}

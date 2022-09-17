@@ -1,0 +1,8 @@
+{
+    "python.analysis.extraPaths": [
+        "/Users/amitshmulevitch/Projects/a-b-z/core",
+        "/Users/amitshmulevitch/Projects/a-b-z/testing",
+        "/Users/amitshmulevitch/Projects/wz/webezyio/webezyio/tests/architect/services/protos",
+        "/Users/amitshmulevitch/Projects/wz/webezyio/webezyio/tests/architect/services"
+    ]
+}

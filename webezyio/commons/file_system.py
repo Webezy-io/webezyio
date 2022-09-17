@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 import os
 import json as JSON
+import shutil
 
 def mv(old_path,new_path):
     if check_if_file_exists(old_path):
@@ -13,6 +14,13 @@ def mkdir(path):
     else:
         logging.warning("Directory is already exists ! {0}"
             .format(path))
+
+def walkFiles(path):
+    for p in os.walk(path):
+        return p[2]
+
+def copyFile(file,new_file):
+    shutil.copy2(file,new_file)
 
 def wFile(path,content,overwrite=False,json=False):
     if check_if_file_exists(path) == True:
@@ -43,6 +51,7 @@ def wFile(path,content,overwrite=False,json=False):
                 file.close()
 
 def rFile(path,json=False):
+    logging.debug(f"Reading file -> {path}")
     if check_if_file_exists(path) == True:
         if json:
             f = open(path)

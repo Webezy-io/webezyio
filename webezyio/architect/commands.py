@@ -25,7 +25,6 @@ class SetDomain(ICommand):
     def execute(self,webezyJson,*args,**kwargs):
         self._builder.set_domain(webezyJson,args,**kwargs)
 
-
 class AddResource(ICommand):
     def __init__(self, builder:Builder):
         self._builder = builder
