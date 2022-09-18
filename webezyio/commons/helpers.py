@@ -27,9 +27,43 @@ def wzJsonToMessage(wz_json) -> WebezyJson:
     return ParseDict(wz_json, WebezyJson())
 
 
+class WZProject():
+    """webezyio top level object that defines the required meta data properties."""
+
+    
+    def __init__(self,webezy_json_path:str,project_name:str,domain:str,) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Project` representation.
+
+        Parameters
+        ----------
+            webezy_json_path (str): Absoulute path of Webezy JSON file.
+            project_name (str): A project name, can include hyphens or
+                 underscores but not blank spaces.
+            domain (Str): A company domain name,
+                it is not the full domain your company holds 
+                for e.x all `webezy.io` projects are inputed on gRPC
+                as `webezy` without any suffix or prefix.
+        """
+
 class WZField():
+    """webezyio field level object that defines the required meta data properties."""
 
     def __init__(self,name,type:_FIELD_TYPES,label:_FIELD_LABELS,message_type=None,enum_type=None,extensions=None,description=None) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.FieldDescriptor` representation.
+
+        Parameters
+        ----------
+            name (str): A field name, `MUST` not include blank space and hyphens.
+            type (:module:`webezyio.commons.helpers._FIELD_TYPES`): One of the available field types.
+            label (:module:`webezyio.commons.helpers._FIELD_LABELS`): One of the available labels,
+                `LABEL_REPEATED` - will compile generated class field as array / list type
+            message_type (str): `MUST` be included when field type is `TYPE_MESSAGE` and should be 
+                passed as full name for the message the field represent.
+            enum_type (str): Same as `message_type` field just with enums binding.
+            extensions (dict): A dict value for extensions of field.
+            description (str):  A field description.
+        """
+
         self._name = name 
         self._field_type = type
         self._label = label
@@ -99,8 +133,18 @@ class WZRPC():
 
 
 class WZService():
+    """webezyio service level object that defines the required meta data properties."""
 
     def __init__(self,name,methods:List[WZRPC]=[],dependencies:List[str]=[],description=None) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.ServiceDescriptor` representation.
+
+        Parameters
+        ----------
+            name (str): A service name, `MUST` not include blank space and hyphens.
+            methods (:module:`List[webezyio.commons.helpers.WZRPC]`): A list of RPC methods.
+            dependencies (List[str]): List of service dependencies (Other packages).
+            description (str): A service description.
+        """
         self._name = name
         self._methods = methods
         self._dependencies = dependencies
@@ -118,8 +162,18 @@ class WZService():
 
 
 class WZMessage():
+    """webezyio message level object that defines the required meta data properties."""
 
     def __init__(self,name,fields:List[WZField]=None,description:str=None,extension_type:_EXTENSIONS_TYPE=None) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Descriptor` representation.
+
+        Parameters
+        ----------
+            name (str): A message name, `MUST` not include blank space and hyphens.
+            fields (:module:`List[webezyio.commons.helpers.WZField]`): A list of message fields.
+            description (str): A message description.
+            extension_type (:module:`webezyio.commons.protos.webezy_pb2.Options`): A message extension option.
+        """
         self._name = name
         self._fields = fields
         self._description = description
@@ -144,8 +198,16 @@ class WZMessage():
 
 
 class WZEnumValue():
+    """webezyio enum value level object that defines the required meta data properties."""
 
-    def __init__(self,name,number:int) -> None:
+    def __init__(self,name:str,number:int) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.EnumValue` representation.
+
+        Parameters
+        ----------
+            name (str): A enum key.
+            number (int): A enum value.
+        """
         self._name = name 
         self._number = number
 
@@ -168,6 +230,30 @@ class WZEnumValue():
     @property
     def number(self):
         return self._number
+
+class WZEnum():
+    """webezyio enum level object that defines the required meta data properties."""
+
+    def __init__(self,name,enum_values:List[WZEnumValue]=[]) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Enum` representation.
+
+        Parameters
+        ----------
+            name (str): A enum name.
+            enum_values (:module:`List[webezyio.commons.helpers.WZEnumValue]`): A list of enum values.
+        """
+        self._name = name
+        self._enum_values = enum_values
+
+    def to_tuple(self):
+        enums_values = []
+        for ev in self._enum_values:
+            enums_values.append(ev.to_dict())
+        return self._name, enums_values
+
+    @property
+    def name(self):
+        return self._name
 
 class WZContext():
 
@@ -225,25 +311,18 @@ class WZContext():
     def files(self):
         return self._files
 
-class WZEnum():
-
-    def __init__(self,name,enum_values:List[WZEnumValue]=[]) -> None:
-        self._name = name
-        self._enum_values = enum_values
-
-    def to_tuple(self):
-        enums_values = []
-        for ev in self._enum_values:
-            enums_values.append(ev.to_dict())
-        return self._name, enums_values
-
-    @property
-    def name(self):
-        return self._name
-
 class WZPackage():
+    """webezyio package level object that defines the required meta data properties."""
 
     def __init__(self,name,messages:List[WZMessage]=[],enums:List[WZEnum]=[]):
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.PackageDescriptor` representation.
+
+        Parameters
+        ----------
+            name (str): A package name.
+            messages (List[:module:`webezyio.commons.helpers.WZMessage`]): A list of package messages.
+            enums (List[:module:`webezyio.commons.helpers.WZEnum`]): A list of package enums.
+        """
         self._name = name
         self._messages = messages
         self._enums= enums
@@ -297,14 +376,17 @@ class WZJson():
 
     @property
     def domain(self):
+        """str: Project domain."""
         return self._domain
 
     @property
     def project(self):
+        """:obj:`dict` Project dictionary."""
         return self._project
 
     @property
     def services(self):
+        """:obj:`List[dict]` Project domain."""
         return self._services
     
     @property

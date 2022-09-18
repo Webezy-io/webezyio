@@ -73,7 +73,6 @@ _HOST = 'localhost'
 _PORT = 50051
 
 """Messages And Enums"""
-
 # Enums value array
 _ENUMS_VALUES = [_helpers.WZEnumValue("UNKNWON",0),_helpers.WZEnumValue("TEST",1)]
 # [Enum] SampleEnum
