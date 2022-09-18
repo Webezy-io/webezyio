@@ -1,7 +1,7 @@
 import logging
 
 from webezyio.commons.resources import get_blank_webezy_json
-from webezyio.commons.file_system import rFile, wFile, get_current_location, join_path, check_if_file_exists
+from webezyio.commons.file_system import mkdir, rFile, wFile, get_current_location, join_path, check_if_file_exists
 
 class Core:
 
@@ -13,6 +13,8 @@ class Core:
             logging.debug("Writing new webezy json {1}".format(args[0][0],destination_path))
             wzJson = get_blank_webezy_json(True)
             wFile(destination_path,wzJson,json=True)
+            # destination_path = destination_path.replace('webezy.json','.webezy')
+            # mkdir(destination_path)
         else:
             logging.debug("Getting webezy json {0}".format(args[0][0]))
             try:
@@ -31,7 +33,7 @@ class Core:
 class Builder:
 
     def log(self,hook,command_name,*args,**kwargs):
-        logging.info(f"[EXCUTE-HOOK-{hook.upper()}] {command_name} : {args}")
+        logging.debug(f"[EXCUTE-HOOK-{hook.upper()}] {command_name} : {args}")
    
     def add_resource(self,webezyJson,*args,**kwargs):
         request = args[0][0][0]

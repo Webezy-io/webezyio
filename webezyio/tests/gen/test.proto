@@ -1,0 +1,8 @@
+syntax = "proto3";
+import "gen.proto";
+
+
+message Test {
+    option (webezy.WebezyResource) = false;
+    string str = 1;
+}

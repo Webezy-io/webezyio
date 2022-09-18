@@ -1,23 +1,26 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers,file_system
+from webezyio.commons import helpers,file_system, resources
 
 @builder.hookimpl
-def init_project_structure(wz_json:helpers.WZJson):
+def pre_build(wz_json:helpers.WZJson, wz_context: helpers.WZContext):
+    logging.debug("Starting webezyio build process %s plugin" % (__name__))
+
+@builder.hookimpl
+def post_build(wz_json:helpers.WZJson, wz_context: helpers.WZContext):
+    # TODO add postbuild validation of generated code
+    logging.debug("Finished webezyio build process %s plugin" % (__name__))
+
+@builder.hookimpl
+def init_project_structure(wz_json:helpers.WZJson, wz_context: helpers.WZContext):
     directories = [
         # Clients
-        file_system.join_path(wz_json.path,'clients'),
         file_system.join_path(wz_json.path,'clients','python'),
-        # Server
-        file_system.join_path(wz_json.path,'server'),
         # Services
         file_system.join_path(wz_json.path,'services'),
         # Protos
-        file_system.join_path(wz_json.path,'protos'),
-        file_system.join_path(wz_json.path,'services','protos'),
-        # Bin
-        file_system.join_path(wz_json.path,'bin')]
+        file_system.join_path(wz_json.path,'services','protos')]
 
     for dir in directories:
         file_system.mkdir(dir)
@@ -29,7 +32,8 @@ def init_project_structure(wz_json:helpers.WZJson):
         file_system.join_path(wz_json.path,'protos','__init__.py')]
     # Bin files
     file_system.wFile(file_system.join_path(wz_json.path,'bin','init.sh'),bash_init_script)
-    file_system.wFile(file_system.join_path(wz_json.path,'bin','run-server.sh'),bash_run_server_script)
+    if wz_json.get_server_language() == 'python':
+        file_system.wFile(file_system.join_path(wz_json.path,'bin','run-server.sh'),bash_run_server_script)
     # file_system.wFile(file_system.join_path(wz_json.path,'.webezy','contxt.json'),'{"files":[]}')
 
     for file in files:
@@ -46,8 +50,9 @@ def write_services(wz_json:helpers.WZJson,wz_context:helpers.WZContext):
 
 
 @builder.hookimpl
-def compile_protos(wz_json:helpers.WZJson):
+def compile_protos(wz_json:helpers.WZJson, wz_context: helpers.WZContext):
     # Running ./bin/init.sh script for compiling protos
+    logging.info("Running ./bin/init.sh script for 'protoc' compiler")
     subprocess.run(['bash',file_system.join_path(wz_json.path,'bin','init.sh')])
     # Moving .py files to ./services/protos dir
     for file in file_system.walkFiles(file_system.join_path(wz_json.path,'protos')):
@@ -55,14 +60,16 @@ def compile_protos(wz_json:helpers.WZJson):
             file_system.mv(file_system.join_path(wz_json.path,'protos',file),file_system.join_path(wz_json.path,'services','protos',file))
 
 @builder.hookimpl
-def write_clients(wz_json:helpers.WZJson):
+def write_clients(wz_json:helpers.WZJson, wz_context: helpers.WZContext):
     for f in file_system.walkFiles(file_system.join_path(wz_json.path,'services','protos')):
         if '.py' in f:
             file_system.copyFile(file_system.join_path(wz_json.path,'services','protos',f),file_system.join_path(wz_json.path,'clients','python',f))
 
+    client = helpers.WZClientPy(wz_json.project.get('packageName'),wz_json.services,wz_json.packages,wz_context)
+    file_system.wFile(file_system.join_path(wz_json.path,'clients','python','client.py'),client.__str__(),overwrite=True)
 
 @builder.hookimpl
-def write_server(wz_json: helpers.WZJson):
+def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     imports = ['_ONE_DAY_IN_SECONDS = 60 * 60 * 24','from concurrent import futures','import time','import grpc']
     services_bindings = []
     svcs=[]
@@ -138,12 +145,12 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                             methods_i += 1
             
         except Exception as e:
-            logging.exception(e)
+            logging.debug(e)
 
     file_system.wFile(file_system.join_path(wz_json.path,'.webezy','context.json'),wz_context.dump(),True,True)
 
 @builder.hookimpl
-def override_generated_classes(wz_json: helpers.WZJson):
+def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     
     for f in file_system.walkFiles(file_system.join_path(wz_json.path,'services','protos')):
         name = f.split('_pb2')
@@ -178,6 +185,24 @@ def override_generated_classes(wz_json: helpers.WZJson):
                     file_system.wFile(file_system.join_path(wz_json.path,'services','protos',f),''.join(file_content),True)
 
 
+@builder.hookimpl
+def init_context(wz_json: helpers.WZJson,wz_context: helpers.WZContext):
+    files = []
+
+    path = wz_json.project.get('uri')
+    for svc in wz_json.services:
+        methods = []
+        for rpc in wz_json.services[svc].get('methods'):
+            rpc_name = rpc.get('name')
+            methods.append(resources.WZMethodContext(name=rpc_name,code=f'\t\t# TODO - add code\n\t\tsuper().{rpc_name}(request, context) # Remove when ready\n\n',type='rpc'))
+        files.append(resources.WZFileContext(file=f'./services/{svc}.py',methods=methods))
+    context = resources.proto_to_dict(resources.WZContext(files=files))
+    logging.debug("Writing new context")
+    file_system.mkdir(file_system.join_path(path,'.webezy'))
+    file_system.wFile(file_system.join_path(path,'.webezy','context.json'),context,json=True,overwrite=True)
+    wz_json = helpers.WZContext(context)
+    return context
+
 def parse_proto_type_to_py(type,label,messageType=None,enumType=None):
     temp_type = 'None'
     if 'int' in type:
@@ -203,12 +228,9 @@ def parse_proto_type_to_py(type,label,messageType=None,enumType=None):
 
 bash_init_script = '#!/bin/bash\n\n\
 declare -a services=("protos")\n\
-echo "Init started for proto files"\n\
-pwd\n\
+echo "[WEBEZYIO] init.sh starting protoc compiler"\n\
 DESTDIR="./protos"\n\
 for SERVICE in "${services[@]}"; do\n\
-    # mkdir -p $DESTDIR\n\
-    echo $SERVICE\n\
     python3 -m grpc_tools.protoc --proto_path=$SERVICE/ --python_out=$DESTDIR --grpc_python_out=$DESTDIR $SERVICE/*.proto\n\
 done\n\
 statuscode=$?\n\

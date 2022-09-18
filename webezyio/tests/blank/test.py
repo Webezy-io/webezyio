@@ -1,6 +1,6 @@
 from pprint import pprint
 from webezyio import WebezyArchitect,_helpers,_resources
-from webezyio import WebezyBuilder,WebezyPy,WebezyTs
+from webezyio import WebezyBuilder,WebezyPy,WebezyTs,WebezyProto,WebezyBase
 
 """
 Webezy Builder - Programaticlly build Webezy.io projects
@@ -72,104 +72,176 @@ _SERVER_LANGUAGE = 'python'
 _HOST = 'localhost'
 _PORT = 50051
 
-# Messages
-
-# Field array 1
-_FIELDS_SAMPLE = [
-   _helpers.WZField("test","TYPE_BOOL",'LABEL_OPTIONAL').to_dict(),
-   _helpers.WZField("testother","TYPE_STRING",'LABEL_OPTIONAL').to_dict(),
-   _helpers.WZField("testotherfield","TYPE_INT32",'LABEL_OPTIONAL').to_dict(),
-   _helpers.WZField("testparent","TYPE_MESSAGE",'LABEL_OPTIONAL',
-                    _resources.construct_full_name(_resources.ResourceTypes.descriptor,
-                                                   _resources.ResourceKinds.message,_DOMAIN,parent_name='OtherPackage',name='OtherMsg')).to_dict(),]
-# Field array 2
-_FIELDS_OTHER = [
-   _helpers.WZField("testother","TYPE_STRING","LABEL_REPEATED").to_dict()]
+"""Messages And Enums"""
 
 # Enums value array
-_ENUMS_VALUES = [_helpers.WZEnumValue("UNKNWON",0).to_dict(),_helpers.WZEnumValue("OTHER",1).to_dict()]
-# Enums array
-_ENUMS = [('SampleEnum',_ENUMS_VALUES)]
-# Mesage 1
-_MESSAGES_SAMPLE = [('SampleMsg',_FIELDS_SAMPLE,),('OtherMsg',_FIELDS_OTHER)]
-# Mesage 2
-_MESSAGES_OTHER = [('OtherMsg',_FIELDS_OTHER,)]
+_ENUMS_VALUES = [_helpers.WZEnumValue("UNKNWON",0),_helpers.WZEnumValue("TEST",1)]
+# [Enum] SampleEnum
+SampleEnum = _helpers.WZEnum('SampleEnum',enum_values=_ENUMS_VALUES)
+
+# [Field] BoolExtend
+BoolExtend = _helpers.WZField('BoolExtend',type='TYPE_BOOL',label='LABEL_REPEATED')
+# [Message] ExtensionMessage
+ExtensionMessage = _helpers.WZMessage(name='ExtensionMessage',
+                                      fields=[BoolExtend],
+                                      extension_type=_resources.Options.FieldOptions)
+
+# [Field] ExtendedField
+ExtendedField=_helpers.WZField('ExtendedField',
+                              type='TYPE_BOOL',
+                              label='LABEL_OPTIONAL',
+                              extensions={f'{ExtensionMessage.name}.{BoolExtend.name}':True})
+# [Field] Timestamp
+Timestamp = _helpers.WZField('Timestamp',
+                              type='TYPE_MESSAGE',
+                              label='LABEL_OPTIONAL',
+                              message_type='google.protobuf.Timestamp')
+# [Field] Integer
+Integer = _helpers.WZField('Integer',
+                           type='TYPE_INT32',
+                           label='LABEL_OPTIONAL')
+# [Field] ChildMessage
+ChildMessage = _helpers.WZField('ChildMessage',
+                                 type='TYPE_MESSAGE',
+                                 label='LABEL_OPTIONAL',
+                                 message_type=_resources.construct_full_name(
+                                              _resources.ResourceTypes.descriptor,
+                                              _resources.ResourceKinds.message,
+                                              _DOMAIN,
+                                              parent_name='OtherPackage',
+                                              name='OtherMessage'))
+# [Message] SampleMessage
+SampleMessage = _helpers.WZMessage(name='SampleMessage',
+                                   fields=[ExtendedField,Timestamp,Integer,ChildMessage],
+                                   description='Some description in sample message')
+
+
+# [Field] StringField
+StringField = _helpers.WZField('StringField',
+                              type='TYPE_STRING',
+                              label='LABEL_OPTIONAL')
+# [Message] OtherMessage
+OtherMessage = _helpers.WZMessage(name='OtherMessage',
+                                 fields=[StringField],
+                                 description='Some description in other message')
+
+"""Packages"""
 
 # Declaring packages, RPC's and services
-_PACKAGES = [
-   ("SamplePackage", _MESSAGES_SAMPLE, _ENUMS),("OtherPackage", _MESSAGES_OTHER, [])]
-# RPC's
-_RPC = [
-   ("SampleRPC",[
-      (True,f'{_DOMAIN}.SamplePackage.v1.{_MESSAGES_SAMPLE[0][0]}'), # Input (stream, full_name)
-      (False,f'{_DOMAIN}.OtherPackage.v1.{_MESSAGES_OTHER[0][0]}')] # Output (stream, full_name)
-   ),
-   ("OtherRPCv2",[
-      (True,f'{_DOMAIN}.SamplePackage.v1.{_MESSAGES_SAMPLE[0][0]}'), # Input (stream, full_name)
-      (True,f'{_DOMAIN}.OtherPackage.v1.{_MESSAGES_OTHER[0][0]}')] # Output (stream, full_name)
-   ),
-]
-# Services
-_SERVICES = [("SampleService", _RPC, [f"{_DOMAIN}.SamplePackage.v1"]),("OtherService", _RPC, [f"{_DOMAIN}.SamplePackage.v1"])]
+# [Package] SamplePackage
+SamplePackage = _helpers.WZPackage('SamplePackage',
+                                    messages=[SampleMessage, ExtensionMessage],
+                                    enums=[SampleEnum])
+# [Package] OtherPackage
+OtherPackage = _helpers.WZPackage('OtherPackage',
+                                 messages=[OtherMessage],
+                                 enums=[])
 
-"""Architect flow start"""
+"""RPC's"""
 
-# Init Builder
-ARCHITECT = WebezyArchitect(path=_PATH, domain=_DOMAIN, project_name=_PROJECT_NAME)
-# Init Project
-ARCHITECT.AddProject(server_language=_SERVER_LANGUAGE, clients=[])
+# [RPC] SampleRPC
+SampleRPC = _helpers.WZRPC(name='SampleRPC',
+                  client_stream=False,
+                  server_stream=False,
+                  in_type=f'{_DOMAIN}.{SamplePackage.name}.v1.{SampleMessage.name}',
+                  out_type=f'{_DOMAIN}.{SamplePackage.name}.v1.{SampleMessage.name}',
+                  description='SampleRPC - Some description for RPC')
+# [RPC] TestRPC
+TestRPC =  _helpers.WZRPC(name='TestRPC',
+                  client_stream=True,
+                  server_stream=False,
+                  in_type=f'{_DOMAIN}.{OtherPackage.name}.v1.{OtherMessage.name}',
+                  out_type=f'{_DOMAIN}.{OtherPackage.name}.v1.{OtherMessage.name}',
+                  description='TestRPC - Some description for RPC')
+# [RPC] OtherRPC
+OtherRPC =  _helpers.WZRPC(name='OtherRPC',
+                  client_stream=True,
+                  server_stream=False,
+                  in_type=f'{_DOMAIN}.{OtherPackage.name}.v1.{OtherMessage.name}',
+                  out_type=f'{_DOMAIN}.{SamplePackage.name}.v1.{SampleMessage.name}',
+                  description='OtherRPC - Some description for RPC')
 
-# Configs
-ARCHITECT.SetConfig({'host': _HOST, 'port': _PORT})
-# TODO add plugins
-packages_map = {}
-messages_map = {}
-# Adding packages
-for p in _PACKAGES:
-   packages_map[p[0]] = ARCHITECT.AddPackage(p[0],[])
-   messages_map[p[0]] = {} 
-   # Adding messages
-   for m in p[1]:
-      messages_map[p[0]][m[0]] = ARCHITECT.AddMessage(packages_map[p[0]], m[0], m[1])
-   # Adding enums
-   for e in p[2]:
-      messages_map[p[0]][e[0]] = ARCHITECT.AddEnum(packages_map[p[0]], e[0], e[1])
-services_map = {}
-rpc_map = {}
-# Adding services
-for s in _SERVICES:
-   services_map[s[0]] = ARCHITECT.AddService(s[0],[])
-   rpc_map[s[0]] = {} 
-   # Adding RPC's
-   for r in s[1]:
-      rpc_map[s[0]][r[0]] = ARCHITECT.AddRPC(services_map[s[0]], r[0], r[1])
-      # ARCHITECT.undo()
-# Saving webezy json
-ARCHITECT.Save()
+"""Services"""
 
-"""Builder workflow"""
+SampleService = _helpers.WZService('SampleService',methods=[SampleRPC,TestRPC,OtherRPC],dependencies=[f'{_DOMAIN}.SamplePackage.v1'])
 
 def main():
-   # Init builder class with webezy.json file
-   wzcoder = WebezyBuilder(path=_PATH)
-   # Init project structure
-   wzcoder.InitProjectStructure()
-   # Rebuild .webezy/context.json
-   wzcoder.RebuildContext()
-   # Build protos file
-   wzcoder.BuildProtos()
-   # Build services files
-   wzcoder.BuildServices()
-   # Build server file
-   wzcoder.BuildServer()
-   # Run executable for protoc
-   wzcoder.CompileProtos()
-   # Write readme file
-   wzcoder.WriteReadme()
-   # Override any generated class
-   wzcoder.OverrideGeneratedClasses()
-   # Build clients
-   wzcoder.BuildClients()
 
+   """Architect flow start"""
+
+   # Init Builder
+   ARCHITECT = WebezyArchitect(path=_PATH, domain=_DOMAIN, project_name=_PROJECT_NAME)
+   # Init Project
+   ARCHITECT.AddProject(server_language=_SERVER_LANGUAGE, clients=[])
+
+   # Configs
+   ARCHITECT.SetConfig({'host': _HOST, 'port': _PORT})
+   
+   # SamplePackage
+   name, messages, enums = SamplePackage.to_tuple()
+
+   SAMPLEPACKAGE = ARCHITECT.AddPackage(name,[])
+   for msg in messages:
+      msg_name, fields, description, options  = msg
+      ARCHITECT.AddMessage(SAMPLEPACKAGE, msg_name, fields, description, options)
+   
+   for enum in enums:
+      enum_name, enum_values  = enum
+      ARCHITECT.AddEnum(SAMPLEPACKAGE, enum_name, enum_values)
+   
+   # OtherPackage
+   name, messages, enums = OtherPackage.to_tuple()
+
+   OTHERPACKAGE = ARCHITECT.AddPackage(name,[])
+   for msg in messages:
+      msg_name, fields, description, options  = msg
+      ARCHITECT.AddMessage(OTHERPACKAGE, msg_name, fields, description, options)
+   
+   for enum in enums:
+      enum_name, enum_values  = enum
+      ARCHITECT.AddEnum(OTHERPACKAGE, enum_name, enum_values)
+
+   # SampleService
+   service_name, methods, dependencies = SampleService.to_tuple()
+   
+   SAMPLESERVICE = ARCHITECT.AddService(service_name,dependencies)
+   for rpc in methods:
+      rpc_name, in_out, description = rpc
+      ARCHITECT.AddRPC(SAMPLESERVICE,rpc_name,in_out,description)
+   
+   ARCHITECT.Save()
+   
+   """Builder workflow"""
+   
+   # Init builder class with webezy.json file
+   wzBuilder = WebezyBuilder(path=_PATH)
+   # Prebuild hook
+   prebuild = wzBuilder.PreBuild()
+   # Init project structure hook
+   init = wzBuilder.InitProjectStructure()
+   # Webezy Context hook
+   context = wzBuilder.RebuildContext()
+   # Protos file hook
+   protos = wzBuilder.BuildProtos()
+   # Services impl code hook
+   services = wzBuilder.BuildServices()
+   # Server code hook
+   server = wzBuilder.BuildServer()
+   # Compile protos hook (protoc)
+   compile = wzBuilder.CompileProtos()
+   # Readme hook
+   readme = wzBuilder.WriteReadme()
+   # Override default proto generated class hook (python only)
+   protoclass = wzBuilder.OverrideGeneratedClasses()
+   # clients writing hook
+   clients = wzBuilder.BuildClients()
+   # Postbuild hook
+   postbuild = wzBuilder.PostBuild()
+   
+   print("Build process done")
+   # Or all at once
+   # build = wzBuilder.BuildAll()
+
+   
 if __name__ == "__main__":
    main()

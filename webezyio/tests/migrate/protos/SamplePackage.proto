@@ -1,0 +1,29 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "OtherPackage.proto";
+import "google/protobuf/descriptor.proto";
+package domain.SamplePackage.v1;
+
+
+
+// [webezyio] - Some description in sample message
+message SampleMessage {
+	bool ExtendedField = 1 [(ExtensionMessage.BoolExtend) = true];
+	google.protobuf.Timestamp Timestamp = 2;
+	int32 Integer = 3;
+	domain.OtherPackage.v1.OtherMessage ChildMessage = 4;
+}
+
+// [webezyio] - None
+message ExtensionMessage {
+	extend google.protobuf.FieldOptions {
+		repeated bool BoolExtend = 55556;
+	}
+}
+
+enum SampleEnum {
+	UNKNWON = 0;
+	TEST = 1;
+}

@@ -218,8 +218,19 @@ message WebezyFileContext {
     repeated WebezyMethodContext methods = 2;
 }
 
-message WebezyMethodContext {
+message WebezyMethodContext {  
     string name = 1;
     string code = 2;
     string type = 3;
+}
+
+message WzResourceWrapper {
+    oneof Resource {
+        Project project = 1;
+        ServiceDescriptor service = 2;
+        PackageDescriptor package = 3;
+        MethodDescriptor method = 4;
+        Descriptor message = 5;
+        Enum enum = 6;
+    }
 }

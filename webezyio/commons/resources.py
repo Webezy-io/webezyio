@@ -5,7 +5,9 @@ from enum import Enum
 
 import grpc
 from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.json_format import MessageToDict
+from google.protobuf.json_format import MessageToDict,ParseDict
+from google.protobuf.descriptor import Descriptor
+from google.protobuf.descriptor_pb2 import DescriptorProto,FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor,Descriptor,MethodDescriptor,\
                                        FieldDescriptor,ServiceDescriptor,EnumDescriptor
 
@@ -15,7 +17,9 @@ from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson,P
                                              MethodDescriptor as WZMethodDescriptor,\
                                              Options,FieldDescriptor as WZFieldDescriptor,\
                                              Enum as WZEnumDescriptor, ServiceDescriptor as WZServiceDescriptor,\
-                                             WebezyContext as WZContext,WebezyFileContext as WZFileContext,WebezyMethodContext as WZMethodContext
+                                             WebezyContext as WZContext,WebezyFileContext as WZFileContext,WebezyMethodContext as WZMethodContext,\
+                                             WzResourceWrapper
+
 
 class ResourceTypes(Enum):
     project = 'projects'
@@ -121,14 +125,15 @@ def generate_package(path,domain,name,dependencies=[],json=False):
 
     return package if json == False else MessageToDict(package)
 
-def generate_message(path,domain,package,name,fields=[],option=Options.UNKNOWN_EXTENSION,json=False):
+def generate_message(path,domain,package,name,fields=[],option=Options.UNKNOWN_EXTENSION,description=None,json=False):
     path = path.split('/webezy.json')[0]
-    
     temp_fields = []
     msg_fName = get_message_full_name(domain,package.name,name)
     msg_uri = get_uri_message(path,msg_fName)
-    
-    index = 0
+    if option is None:
+        option = Options.UNKNOWN_EXTENSION
+
+    index = 0 if option ==Options.UNKNOWN_EXTENSION else 55555
     for f in fields:
         if next((n for n in temp_fields if n.name == f.get('name')),None) is None:
             index += 1
@@ -142,7 +147,8 @@ def generate_message(path,domain,package,name,fields=[],option=Options.UNKNOWN_E
                 label=f.get('label'),enum_type=f.get('enum_type'),type=ResourceTypes.descriptor.value,kind=ResourceKinds.field.value,message_type=f.get('message_type'),extensions=f.get('extensions')))
         else:
             logging.error(f"Connot insert field {f.get('name')} already exists under {name} message")
-    msg = WZDescriptor(uri=msg_uri,name=name,full_name=msg_fName,fields=temp_fields,type=ResourceTypes.descriptor.value,kind=ResourceKinds.message.value,extension_type=Options.Name(option))
+
+    msg = WZDescriptor(uri=msg_uri,name=name,full_name=msg_fName,fields=temp_fields,type=ResourceTypes.descriptor.value,kind=ResourceKinds.message.value,extension_type=Options.Name(option),description=description)
     
     return msg if json == False else MessageToDict(msg)
 
@@ -162,13 +168,13 @@ def generate_enum(path,domain,package,name,enum_values,json=False):
     ENUM = WZEnumDescriptor(uri=e_uri,name=name,full_name=e_fName,values=temp_values)
     return ENUM if json == False else MessageToDict(ENUM)
 
-def generate_rpc(path,name,client_streaming,server_streaming,in_type,out_type,json=False):
-    RPC = WZMethodDescriptor(uri=get_uri_rpc(path,name),name=name,full_name=get_method_full_name(name),type=ResourceTypes.descriptor.value,kind=ResourceKinds.method.value,input_type=in_type,output_type=out_type,client_streaming=client_streaming,server_streaming=server_streaming)
+def generate_rpc(path,name,client_streaming,server_streaming,in_type,out_type,description=None,json=False):
+    RPC = WZMethodDescriptor(uri=get_uri_rpc(path,name),name=name,full_name=get_method_full_name(name),type=ResourceTypes.descriptor.value,kind=ResourceKinds.method.value,input_type=in_type,output_type=out_type,client_streaming=client_streaming,server_streaming=server_streaming,description=description)
     return RPC if json == False else MessageToDict(RPC)
 
 
 def parse_proto(proto_path) -> FileDescriptor:
-    logging.debug(f"Parsing proto file -> {proto_path}")
+    logging.info(f"Parsing proto file -> {proto_path}")
     proto = grpc.protos(proto_path)
     return proto.DESCRIPTOR
 
@@ -194,7 +200,7 @@ def list_fields(fields) -> List[FieldDescriptor]:
     return fields
 
 def find_message(full_name:str,pool:DescriptorPool) -> Descriptor:
-    return pool.FindMessageTypeByName(full_name)
+    return pool.FindMessageTypeByName(full_name=full_name)
 
 def find_method(full_name:str,pool:DescriptorPool) -> MethodDescriptor:
     return pool.FindMethodByName(full_name) 
@@ -222,6 +228,7 @@ def get_uri_client(path,language):
     return uri
 
 def get_uri_service(path,name,language):
+    kind = None
     if language == 'python':
         kind = ResourceKinds.service_srvr_py
     elif language == 'typescript':
