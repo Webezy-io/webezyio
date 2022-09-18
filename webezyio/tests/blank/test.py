@@ -80,7 +80,7 @@ _ENUMS_VALUES = [_helpers.WZEnumValue("UNKNWON",0),_helpers.WZEnumValue("TEST",1
 SampleEnum = _helpers.WZEnum('SampleEnum',enum_values=_ENUMS_VALUES)
 
 # [Field] BoolExtend
-BoolExtend = _helpers.WZField('BoolExtend',type='TYPE_BOOL',label='LABEL_REPEATED')
+BoolExtend = _helpers.WZField('BoolExtend',type='TYPE_BOOL',label='LABEL_REPEATED',description='This field extending FieldOptions message')
 # [Message] ExtensionMessage
 ExtensionMessage = _helpers.WZMessage(name='ExtensionMessage',
                                       fields=[BoolExtend],
@@ -163,7 +163,7 @@ OtherRPC =  _helpers.WZRPC(name='OtherRPC',
 
 """Services"""
 
-SampleService = _helpers.WZService('SampleService',methods=[SampleRPC,TestRPC,OtherRPC],dependencies=[f'{_DOMAIN}.SamplePackage.v1'])
+SampleService = _helpers.WZService('SampleService',methods=[SampleRPC,TestRPC,OtherRPC],dependencies=[f'{_DOMAIN}.SamplePackage.v1'],description='Some description for SampleService')
 
 def main():
 
@@ -202,9 +202,9 @@ def main():
       ARCHITECT.AddEnum(OTHERPACKAGE, enum_name, enum_values)
 
    # SampleService
-   service_name, methods, dependencies = SampleService.to_tuple()
+   service_name, methods, dependencies, description = SampleService.to_tuple()
    
-   SAMPLESERVICE = ARCHITECT.AddService(service_name,dependencies)
+   SAMPLESERVICE = ARCHITECT.AddService(service_name,dependencies,description)
    for rpc in methods:
       rpc_name, in_out, description = rpc
       ARCHITECT.AddRPC(SAMPLESERVICE,rpc_name,in_out,description)

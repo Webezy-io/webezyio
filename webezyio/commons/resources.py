@@ -103,11 +103,12 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
     return project if json == False else MessageToDict(project)
 
 
-def generate_service(path, domain, name, service_language, dependencies, json=False):
+def generate_service(path, domain, name, service_language, dependencies, description=None, json=False):
     path = path.split('/webezy.json')[0]
     # Init service
     service = WZServiceDescriptor(uri=get_uri_service(path,name,service_language.lower()),
                                 name=name, full_name=get_service_full_name(domain,name),dependencies=dependencies,
+                                description=description,
                                 version='0.0.1')
     # Init methods
     # service.methods = dependencies
@@ -143,6 +144,7 @@ def generate_message(path,domain,package,name,fields=[],option=Options.UNKNOWN_E
                     package.dependencies.append(f.get('message_type'))
             f_uri = get_uri_field(path,f_fName)
             temp_fields.append(WZFieldDescriptor(uri=f_uri,name=f.get('name'),full_name=f_fName,
+                description=f.get('description'),
                 index=index,field_type=f.get('field_type'),
                 label=f.get('label'),enum_type=f.get('enum_type'),type=ResourceTypes.descriptor.value,kind=ResourceKinds.field.value,message_type=f.get('message_type'),extensions=f.get('extensions')))
         else:

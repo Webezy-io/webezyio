@@ -56,9 +56,9 @@ class WebezyArchitect():
     def AddClient(self):
         pass
 
-    def AddService(self,name,dependencies):
-        dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,json=True) 
-        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies)
+    def AddService(self,name,dependencies,description):
+        dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,json=True) 
+        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': { name : dict } })
         return service
 

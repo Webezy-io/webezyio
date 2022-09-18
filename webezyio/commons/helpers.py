@@ -29,14 +29,15 @@ def wzJsonToMessage(wz_json) -> WebezyJson:
 
 class WZField():
 
-    def __init__(self,name,type:_FIELD_TYPES,label:_FIELD_LABELS,message_type=None,enum_type=None,extensions=None) -> None:
+    def __init__(self,name,type:_FIELD_TYPES,label:_FIELD_LABELS,message_type=None,enum_type=None,extensions=None,description=None) -> None:
         self._name = name 
         self._field_type = type
         self._label = label
         self._message_type = message_type
         self._enum_type = enum_type
         self._extensions = extensions
-
+        self._description = description
+        
     def setName(self,name):
         self._name = name
 
@@ -99,16 +100,17 @@ class WZRPC():
 
 class WZService():
 
-    def __init__(self,name,methods:List[WZRPC]=[],dependencies:List[str]=[]) -> None:
+    def __init__(self,name,methods:List[WZRPC]=[],dependencies:List[str]=[],description=None) -> None:
         self._name = name
         self._methods = methods
         self._dependencies = dependencies
+        self._description = description
 
     def to_tuple(self):
         rpcs = []
         for rpc in self._methods:
             rpcs.append(rpc.to_tuple())  
-        return self._name, rpcs, self._dependencies
+        return self._name, rpcs, self._dependencies, self._description
 
     @property
     def name(self):
@@ -315,13 +317,14 @@ class WZJson():
 
 class WZProto():
 
-    def __init__(self,name,imports=[],service=None,package=None,messages=[],enums=[]):
+    def __init__(self,name,imports=[],service=None,package=None,messages=[],enums=[],description=None):
         self._name = name
         self._imports = imports
         self._service = service
         self._package = package
         self._messages = messages
         self._enums = enums
+        self._description = description
 
     def write_imports(self):
         if self._imports is not None:
@@ -361,7 +364,8 @@ class WZProto():
                 stream_out = 'stream ' if m.get('serverStreaming') is not None and m.get('serverStreaming') == True else ''
                 rpcs.append(f'// [webezyio] - {description}\n\trpc {rpc_name} ({stream_in}{msg_name_in}) returns ({stream_out}{msg_name_out});')
             rpcs = '\n\t'.join(rpcs)
-            return f'service {self._name} {_OPEN_BRCK}\n\t{rpcs}\n{_CLOSING_BRCK}'
+            desc = f'// [webezyio] {self._description}\n' if self._description is not None else ''
+            return f'{desc}service {self._name} {_OPEN_BRCK}\n\t{rpcs}\n{_CLOSING_BRCK}'
         else:
             return ''
 
@@ -371,6 +375,8 @@ class WZProto():
             for m in self._messages:
                 msg_name = m.get('name')
                 fields = []
+                m_desc = m.get('description')
+                ext_type = m.get('extensionType')
                 for f in m.get('fields'):
                     fLabel='' if f.get('label') == 'LABEL_OPTIONAL' else '{0} '.format(f.get('label').split('_')[-1].lower())
                     fType=f.get('fieldType').split('_')[-1].lower()
@@ -414,11 +420,13 @@ class WZProto():
                                 fOptions.append(f'({ext}) = {ext_v}')
                         fOptions = ','.join(fOptions)
                     fOptions= f' [{fOptions}]' if len(fOptions) > 0 else ''
-                    fields.append(f'{fLabel}{fType} {fName} = {fIndex}{fOptions};')
+                    fDesc=f.get('description')
+                    if ext_type == 'FieldOptions':
+                        fDesc = f'// [webezyio] - {fDesc}\n\t\t' if fDesc is not None else ''
+                    else:
+                        fDesc = f'// [webezyio] - {fDesc}\n\t' if fDesc is not None else ''
+                    fields.append(f'{fDesc}{fLabel}{fType} {fName} = {fIndex}{fOptions};')
                 
-                m_desc = m.get('description')
-                ext_type = m.get('extensionType')
-
                 if ext_type == 'FieldOptions':
                     fields = '\n\t\t'.join(fields)
                     msgs.append(f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FieldOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')

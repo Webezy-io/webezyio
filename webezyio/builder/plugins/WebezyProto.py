@@ -17,7 +17,7 @@ def post_build(wz_json:helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def write_protos(wz_json:helpers.WZJson):
     for svc in wz_json.services:
-        svc_def = helpers.WZProto(svc,wz_json.services[svc].get('dependencies'),wz_json.services[svc])
+        svc_def = helpers.WZProto(svc,wz_json.services[svc].get('dependencies'),wz_json.services[svc],description=wz_json.services[svc].get('description'))
         logging.debug(f"Writing proto file for service: {svc}")
         file_system.wFile(file_system.join_path(wz_json.path,'protos',f'{svc}.proto'),svc_def.__str__(),True)
 

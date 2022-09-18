@@ -140,6 +140,7 @@ message FieldDescriptor {
     // If the field type is another message an valid URI for the Descriptor
     optional string message_type = 10;
     map<string, google.protobuf.Value> extensions = 11;
+    optional string description = 12;
 }   
 
 enum Options{
