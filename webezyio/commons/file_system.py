@@ -4,25 +4,30 @@ import os
 import json as JSON
 import shutil
 
-def mv(old_path,new_path):
+
+def mv(old_path, new_path):
     if check_if_file_exists(old_path):
         os.rename(old_path, new_path)
+
 
 def mkdir(path):
     if check_if_dir_exists(path) == False:
         os.mkdir(path)
     else:
         logging.debug("Directory is already exists ! {0}"
-            .format(path))
+                      .format(path))
+
 
 def walkFiles(path):
     for p in os.walk(path):
         return p[2]
 
-def copyFile(file,new_file):
-    shutil.copy2(file,new_file)
 
-def wFile(path,content,overwrite=False,json=False):
+def copyFile(file, new_file):
+    shutil.copy2(file, new_file)
+
+
+def wFile(path, content, overwrite=False, json=False):
     if check_if_file_exists(path) == True:
         if overwrite == True:
             if json:
@@ -39,7 +44,7 @@ def wFile(path,content,overwrite=False,json=False):
                     file.close()
         else:
             logging.debug("{0} File is already existing ! [pass function with 'overwrite' argument if you want to override this behaviour]"
-                .format(path))
+                          .format(path))
     else:
         if json:
             # Serializing json
@@ -54,7 +59,8 @@ def wFile(path,content,overwrite=False,json=False):
                 file.write(content)
                 file.close()
 
-def rFile(path,json=False):
+
+def rFile(path, json=False):
     logging.debug(f"Reading file -> {path}")
     if check_if_file_exists(path) == True:
         if json:
@@ -63,21 +69,25 @@ def rFile(path,json=False):
             f.close()
             return data
         else:
-            with open(path, 'r') as file: 
+            with open(path, 'r') as file:
                 lines = file.readlines()
                 file.close()
                 return lines
     else:
         raise Exception("File path is not valid ! {0}".format(path))
 
+
 def check_if_dir_exists(dir_path):
     return os.path.isdir(dir_path)
+
 
 def check_if_file_exists(file_path):
     return Path(file_path).exists()
 
+
 def join_path(*paths):
     return os.path.join(*paths)
+
 
 def get_current_location():
     return os.getcwd()

@@ -14,6 +14,7 @@ class WebezyCoderError(Exception):
     def __str__(self):
         return f'[{self.error}] {self.message}'
 
+
 class WebezyProtoError(Exception):
     """Exception raised for errors in the proto parse process.
 
@@ -29,6 +30,7 @@ class WebezyProtoError(Exception):
 
     def __str__(self):
         return f'[{self.resource}] {self.message}'
+
 
 class WebezyValidationError(Exception):
 

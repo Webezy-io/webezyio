@@ -32,9 +32,9 @@ message FileDescriptor {
 }
 
 enum Language {
-    UNKNOWN_LANGUAGE = 0;
-    PYTHON = 1;
-    TYPESCRIPT = 2;
+    unknown_language = 0;
+    python = 1;
+    typescript = 2;
 }
 
 message WebezyServer {

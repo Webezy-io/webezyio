@@ -5,20 +5,20 @@ from enum import Enum
 
 import grpc
 from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.json_format import MessageToDict,ParseDict
+from google.protobuf.json_format import MessageToDict, ParseDict
 from google.protobuf.descriptor import Descriptor
-from google.protobuf.descriptor_pb2 import DescriptorProto,FieldDescriptorProto
-from google.protobuf.descriptor import FileDescriptor,Descriptor,MethodDescriptor,\
-                                       FieldDescriptor,ServiceDescriptor,EnumDescriptor
+from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
+from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
+    FieldDescriptor, ServiceDescriptor, EnumDescriptor
 
-from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson,Project,WebezyConfig,\
-                                             Language,WebezyServer,WebezyClient,\
-                                             PackageDescriptor,Descriptor as WZDescriptor,\
-                                             MethodDescriptor as WZMethodDescriptor,\
-                                             Options,FieldDescriptor as WZFieldDescriptor,\
-                                             Enum as WZEnumDescriptor, ServiceDescriptor as WZServiceDescriptor,\
-                                             WebezyContext as WZContext,WebezyFileContext as WZFileContext,WebezyMethodContext as WZMethodContext,\
-                                             WzResourceWrapper
+from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson, Project, WebezyConfig,\
+    Language, WebezyServer, WebezyClient,\
+    PackageDescriptor, Descriptor as WZDescriptor,\
+    MethodDescriptor as WZMethodDescriptor,\
+    Options, FieldDescriptor as WZFieldDescriptor,\
+    Enum as WZEnumDescriptor, ServiceDescriptor as WZServiceDescriptor,\
+    WebezyContext as WZContext, WebezyFileContext as WZFileContext, WebezyMethodContext as WZMethodContext,\
+    WzResourceWrapper
 
 
 class ResourceTypes(Enum):
@@ -60,37 +60,37 @@ class ResourceKinds(Enum):
     health = 'Webezy.health/check'
 
 
-
 def get_blank_webezy_json(json=False):
     webezyJson = WebezyJson(domain='domain', project=Project(), services={},
                             packages={}, config=WebezyConfig())
     return webezyJson if json == False else MessageToDict(webezyJson)
 
+
 def generate_project(path, name, server_langauge='python', clients=[], package_name=None, json=False):
     path = path.split('/webezy.json')[0]
     # Init server
     if server_langauge == 'python':
-        temp_langugae = Language.PYTHON
+        temp_langugae = Language.python
     elif server_langauge == 'typescript':
-        temp_langugae = Language.TYPESCRIPT
+        temp_langugae = Language.typescript
     server = WebezyServer(language=Language.Name(temp_langugae))
     # Parse clients
     temp_clients = []
     if len(clients) > 0:
         for c in clients:
 
-            if c['langugae'].lower() == 'python':
-                temp_c_lang = Language.PYTHON
-            elif c['language'].lower() == 'typescript':
-                temp_c_lang = Language.TYPESCRIPT
+            if c['language'] == 'python':
+                temp_c_lang = Language.python
+            elif c['language'] == 'typescript':
+                temp_c_lang = Language.typescript
 
             client = WebezyClient(out_dir=get_uri_client(
-                path, c['language'].lower()), language=Language.Name(temp_c_lang))
+                path, c['language']), language=Language.Name(temp_c_lang))
             temp_clients.append(client)
     # Default client
     else:
         client = WebezyClient(out_dir=get_uri_client(
-            path, 'python'), language='PYTHON')
+            path, 'python'), language='python')
         temp_clients.append(client)
     # Creating packaeg name for project
     if package_name is None:
@@ -102,14 +102,18 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
     # Return project as message or dict
     return project if json == False else MessageToDict(project)
 
-
-def generate_service(path, domain, name, service_language, dependencies, description=None, json=False):
+ 
+def generate_service(path, domain, name, service_language, dependencies, description=None,methods=[], json=False):
     path = path.split('/webezy.json')[0]
     # Init service
-    service = WZServiceDescriptor(uri=get_uri_service(path,name,service_language.lower()),
-                                name=name, full_name=get_service_full_name(domain,name),dependencies=dependencies,
-                                description=description,
-                                version='0.0.1')
+    temp_methods = []
+    for m in methods:
+        temp_methods.append(ParseDict(m,WZMethodDescriptor()))
+    service = WZServiceDescriptor(uri=get_uri_service(path, name, service_language.lower()),
+                                  name=name, full_name=get_service_full_name(domain, name), dependencies=dependencies,
+                                  methods=temp_methods,
+                                  description=description,
+                                  version='0.0.1')
     # Init methods
     # service.methods = dependencies
 
@@ -119,59 +123,73 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     return service if json == False else MessageToDict(service)
 
 
-def generate_package(path,domain,name,dependencies=[],json=False):
+def generate_package(path, domain, name, dependencies=[],messages=[], json=False):
     path = path.split('/webezy.json')[0]
-    full_name = get_package_full_name(domain,name)
-    package = PackageDescriptor(uri=get_uri_package(path,full_name),name=name,package=full_name,version='0.0.1',dependencies=dependencies)
+    temp_msgs = []
+    for m in messages:
+        temp_msgs.append(ParseDict(m,WZDescriptor()))
+    full_name = get_package_full_name(domain, name)
+    package = PackageDescriptor(uri=get_uri_package(
+        path, full_name), name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs)
 
     return package if json == False else MessageToDict(package)
 
-def generate_message(path,domain,package,name,fields=[],option=Options.UNKNOWN_EXTENSION,description=None,json=False):
+
+def generate_message(path, domain, package, name, fields=[], option=Options.UNKNOWN_EXTENSION, description=None, json=False):
     path = path.split('/webezy.json')[0]
     temp_fields = []
-    msg_fName = get_message_full_name(domain,package.name,name)
-    msg_uri = get_uri_message(path,msg_fName)
+    msg_fName = get_message_full_name(domain, package.name, name)
+    msg_uri = get_uri_message(path, msg_fName)
     if option is None:
         option = Options.UNKNOWN_EXTENSION
-
-    index = 0 if option ==Options.UNKNOWN_EXTENSION else 55555
+    index = 0 if option == Options.UNKNOWN_EXTENSION else 55555
     for f in fields:
-        if next((n for n in temp_fields if n.name == f.get('name')),None) is None:
+        if next((n for n in temp_fields if n.name == f.get('name')), None) is None:
             index += 1
-            f_fName = get_field_full_name(domain,package.name,name,f.get('name'))
+            f_fName = get_field_full_name(
+                domain, package.name, name, f.get('name'))
             if f.get('message_type') is not None:
                 if f.get('message_type') not in package.dependencies and f.get('message_type') != package.package:
                     package.dependencies.append(f.get('message_type'))
-            f_uri = get_uri_field(path,f_fName)
-            temp_fields.append(WZFieldDescriptor(uri=f_uri,name=f.get('name'),full_name=f_fName,
-                description=f.get('description'),
-                index=index,field_type=f.get('field_type'),
-                label=f.get('label'),enum_type=f.get('enum_type'),type=ResourceTypes.descriptor.value,kind=ResourceKinds.field.value,message_type=f.get('message_type'),extensions=f.get('extensions')))
+            f_uri = get_uri_field(path, f_fName)
+            temp_fields.append(WZFieldDescriptor(uri=f_uri, name=f.get('name'), full_name=f_fName,
+                                                 description=f.get(
+                                                     'description'),
+                                                 index=index, field_type=f.get(
+                                                     'field_type'),
+                                                 label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=f.get('message_type'), extensions=f.get('extensions')))
         else:
-            logging.error(f"Connot insert field {f.get('name')} already exists under {name} message")
+            logging.error(
+                f"Connot insert field {f.get('name')} already exists under {name} message")
+    msg = WZDescriptor(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,
+                       kind=ResourceKinds.message.value, extension_type=Options.Name(option), description=description)
 
-    msg = WZDescriptor(uri=msg_uri,name=name,full_name=msg_fName,fields=temp_fields,type=ResourceTypes.descriptor.value,kind=ResourceKinds.message.value,extension_type=Options.Name(option),description=description)
-    
     return msg if json == False else MessageToDict(msg)
 
-def generate_enum(path,domain,package,name,enum_values,json=False):
+
+def generate_enum(path, domain, package, name, enum_values, json=False):
     path = path.split('/webezy.json')[0]
-    
-    e_fName = get_enum_full_name(domain,package,name)
-    e_uri = get_uri_enum(path,e_fName)
+
+    e_fName = get_enum_full_name(domain, package, name)
+    e_uri = get_uri_enum(path, e_fName)
     temp_values = []
     index = 0
     for ev in enum_values:
-        ev_fName = get_enum_value_full_name(domain,package,name,ev.get('name'))
-        ev_uri = get_uri_enum_value(path,ev_fName)
-        temp_values.append(EnumValueDescriptor(uri=ev_uri,name=ev.get('name'),number=ev.get('number'),index=index))
-        index =+ 1
+        ev_fName = get_enum_value_full_name(
+            domain, package, name, ev.get('name'))
+        ev_uri = get_uri_enum_value(path, ev_fName)
+        temp_values.append(EnumValueDescriptor(uri=ev_uri, name=ev.get(
+            'name'), number=ev.get('number'), index=index))
+        index = + 1
 
-    ENUM = WZEnumDescriptor(uri=e_uri,name=name,full_name=e_fName,values=temp_values)
+    ENUM = WZEnumDescriptor(uri=e_uri, name=name,
+                            full_name=e_fName, values=temp_values)
     return ENUM if json == False else MessageToDict(ENUM)
 
-def generate_rpc(path,name,client_streaming,server_streaming,in_type,out_type,description=None,json=False):
-    RPC = WZMethodDescriptor(uri=get_uri_rpc(path,name),name=name,full_name=get_method_full_name(name),type=ResourceTypes.descriptor.value,kind=ResourceKinds.method.value,input_type=in_type,output_type=out_type,client_streaming=client_streaming,server_streaming=server_streaming,description=description)
+
+def generate_rpc(path, name, client_streaming, server_streaming, in_type, out_type, description=None, json=False):
+    RPC = WZMethodDescriptor(uri=get_uri_rpc(path, name), name=name, full_name=get_method_full_name(name), type=ResourceTypes.descriptor.value, kind=ResourceKinds.method.value,
+                             input_type=in_type, output_type=out_type, client_streaming=client_streaming, server_streaming=server_streaming, description=description)
     return RPC if json == False else MessageToDict(RPC)
 
 
@@ -180,84 +198,103 @@ def parse_proto(proto_path) -> FileDescriptor:
     proto = grpc.protos(proto_path)
     return proto.DESCRIPTOR
 
+
 def parse_pool(pool) -> DescriptorPool:
     return pool
 
-def parse_message(message_by_names,name) -> Descriptor:
+
+def parse_message(message_by_names, name) -> Descriptor:
     return message_by_names[name]
 
-def parse_method(message_by_names,name) -> MethodDescriptor:
+
+def parse_method(message_by_names, name) -> MethodDescriptor:
     return message_by_names[name]
 
-def parse_field(fields_by_name,name) -> FieldDescriptor:
+
+def parse_field(fields_by_name, name) -> FieldDescriptor:
     return fields_by_name[name]
+
 
 def parse_service(service) -> ServiceDescriptor:
     return service
 
+
 def parse_enum(enums_by_name, name) -> EnumDescriptor:
     return enums_by_name[name]
+
 
 def list_fields(fields) -> List[FieldDescriptor]:
     return fields
 
-def find_message(full_name:str,pool:DescriptorPool) -> Descriptor:
+
+def find_message(full_name: str, pool: DescriptorPool) -> Descriptor:
     return pool.FindMessageTypeByName(full_name=full_name)
 
-def find_method(full_name:str,pool:DescriptorPool) -> MethodDescriptor:
-    return pool.FindMethodByName(full_name) 
 
-def find_enum(full_name:str,pool:DescriptorPool) -> EnumDescriptor:
+def find_method(full_name: str, pool: DescriptorPool) -> MethodDescriptor:
+    return pool.FindMethodByName(full_name)
+
+
+def find_enum(full_name: str, pool: DescriptorPool) -> EnumDescriptor:
     return pool.FindEnumTypeByName(full_name)
 
-def find_field(full_name:str,pool:DescriptorPool) -> FieldDescriptor:
+
+def find_field(full_name: str, pool: DescriptorPool) -> FieldDescriptor:
     return pool.FindFieldByName(full_name)
 
-def find_file(file_name:str,pool:DescriptorPool) -> FileDescriptor:
+
+def find_file(file_name: str, pool: DescriptorPool) -> FileDescriptor:
     return pool.FindFileByName(file_name)
 
 
+def get_uri_project(path, name):
+    return construct_uri(path, ResourceTypes.project, ResourceKinds.ezy_1, name)
 
-def get_uri_project(path,name):
-    return construct_uri(path,ResourceTypes.project,ResourceKinds.ezy_1,name)
 
-def get_uri_client(path,language):
+def get_uri_client(path, language):
     uri = 'unknown'
     if language == 'python':
-        uri = construct_uri(path,ResourceTypes.client,ResourceKinds.file_py)
+        uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_py)
     elif language == 'typescript':
-        uri = construct_uri(path,ResourceTypes.client,ResourceKinds.file_ts)
+        uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_ts)
     return uri
 
-def get_uri_service(path,name,language):
+
+def get_uri_service(path, name, language):
     kind = None
     if language == 'python':
         kind = ResourceKinds.service_srvr_py
     elif language == 'typescript':
         kind = ResourceKinds.service_srvr_ts
 
-    return construct_uri(path,ResourceTypes.service,kind,name)    
-
-def get_uri_rpc(path,name):
-    return construct_uri(path,ResourceTypes.descriptor,ResourceKinds.method,name)    
-
-def get_uri_package(path,full_name):
-    return construct_uri(path,ResourceTypes.package,ResourceKinds.file_proto,full_name)
-
-def get_uri_message(path,full_name):
-    return construct_uri(path,ResourceTypes.descriptor,ResourceKinds.message,full_name)
-
-def get_uri_enum(path,full_name):
-    return construct_uri(path,ResourceTypes.descriptor,ResourceKinds.enum,full_name)
-
-def get_uri_enum_value(path,full_name):
-    return construct_uri(path,ResourceTypes.descriptor,ResourceKinds.enum_value,full_name)
-
-def get_uri_field(path,full_name):
-    return construct_uri(path,ResourceTypes.descriptor,ResourceKinds.field,full_name)
+    return construct_uri(path, ResourceTypes.service, kind, name)
 
 
-def construct_uri(path,resource_type:ResourceTypes,resource_kind:ResourceKinds,full_name=None):
+def get_uri_rpc(path, name):
+    return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.method, name)
+
+
+def get_uri_package(path, full_name):
+    return construct_uri(path, ResourceTypes.package, ResourceKinds.file_proto, full_name)
+
+
+def get_uri_message(path, full_name):
+    return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.message, full_name)
+
+
+def get_uri_enum(path, full_name):
+    return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.enum, full_name)
+
+
+def get_uri_enum_value(path, full_name):
+    return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.enum_value, full_name)
+
+
+def get_uri_field(path, full_name):
+    return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.field, full_name)
+
+
+def construct_uri(path, resource_type: ResourceTypes, resource_kind: ResourceKinds, full_name=None):
     uri = 'unknown'
     # Project
     if resource_type == ResourceTypes.project:
@@ -296,28 +333,35 @@ def construct_uri(path,resource_type:ResourceTypes,resource_kind:ResourceKinds,f
     return uri
 
 
-def get_service_full_name(domain,name):
-    return construct_full_name(ResourceTypes.service,ResourceKinds.file_proto,domain,name=name)
+def get_service_full_name(domain, name):
+    return construct_full_name(ResourceTypes.service, ResourceKinds.file_proto, domain, name=name)
 
-def get_package_full_name(domain,name):
-    return construct_full_name(ResourceTypes.package,ResourceKinds.file_proto,domain,name=name)
+
+def get_package_full_name(domain, name):
+    return construct_full_name(ResourceTypes.package, ResourceKinds.file_proto, domain, name=name)
+
 
 def get_method_full_name(name):
     pass
 
-def get_message_full_name(domain,package,name):
-    return construct_full_name(ResourceTypes.descriptor,ResourceKinds.message,domain,parent_name=package,name=name)
 
-def get_field_full_name(domain,package,message,name):
-    return construct_full_name(ResourceTypes.descriptor,ResourceKinds.field,domain,parent_name=[package,message],name=name)
+def get_message_full_name(domain, package, name):
+    return construct_full_name(ResourceTypes.descriptor, ResourceKinds.message, domain, parent_name=package, name=name)
 
-def get_enum_full_name(domain,package,enum):
-    return construct_full_name(ResourceTypes.descriptor,ResourceKinds.enum,domain,parent_name=package,name=enum)
 
-def get_enum_value_full_name(domain,package,enum,name):
-    return construct_full_name(ResourceTypes.descriptor,ResourceKinds.enum_value,domain,parent_name=[package,enum],name=name)
+def get_field_full_name(domain, package, message, name):
+    return construct_full_name(ResourceTypes.descriptor, ResourceKinds.field, domain, parent_name=[package, message], name=name)
 
-def construct_full_name(resource_type:ResourceTypes,resource_kind:ResourceKinds,domain=None,parent_name=None,name=None,version='v1'):
+
+def get_enum_full_name(domain, package, enum):
+    return construct_full_name(ResourceTypes.descriptor, ResourceKinds.enum, domain, parent_name=package, name=enum)
+
+
+def get_enum_value_full_name(domain, package, enum, name):
+    return construct_full_name(ResourceTypes.descriptor, ResourceKinds.enum_value, domain, parent_name=[package, enum], name=name)
+
+
+def construct_full_name(resource_type: ResourceTypes, resource_kind: ResourceKinds, domain=None, parent_name=None, name=None, version='v1'):
     full_name = 'unknown'
     # Service
     if resource_type == ResourceTypes.service:
@@ -344,7 +388,6 @@ def construct_full_name(resource_type:ResourceTypes,resource_kind:ResourceKinds,
             full_name = f'{domain}.{parent_name[0]}.{version}.{parent_name[1]}.{name}'
 
     return full_name
-
 
 
 def proto_to_dict(proto):

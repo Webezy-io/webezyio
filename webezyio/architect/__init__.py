@@ -1,7 +1,9 @@
 from enum import Enum
 import logging
+from webezyio.commons.file_system import join_path
+from webezyio.commons.pretty import print_note
 
-from webezyio.commons.protos.webezy_pb2 import PackageDescriptor
+from webezyio.commons.protos.webezy_pb2 import Language, PackageDescriptor
 from google.protobuf.json_format import MessageToDict
 from webezyio.commons.resources import generate_enum, generate_message, generate_package, generate_project,\
                                      generate_rpc, generate_service
@@ -25,17 +27,16 @@ class CommandMap(Enum):
 
 class WebezyArchitect():
 
-    def __init__(self,path,domain='domain',project_name='project') -> None:
+    def __init__(self,path,domain='domain',project_name='project',save=None) -> None:
         logging.info("Starting webezyio architect process")
         self._path = path
         self._domain = domain
         self._project_name = project_name
-
         self._builder = Builder()
         self._add_resource = AddResource(self._builder)
         self._logger = Logger(self._builder)
         self._set_domain = SetDomain(self._builder)
-        self._webezy = Webezy(self._path)
+        self._webezy = Webezy(self._path,save)
         self._webezy.registerCommand(CommandMap._ADD_RESOURCE,self._add_resource)
         self._webezy.registerHook(CommandMap._ADD_RESOURCE,'log',self._logger)
 
@@ -46,7 +47,7 @@ class WebezyArchitect():
     def SetConfig(self,config):
         self._webezy.execute(CommandMap._ADD_RESOURCE, {'config':config})
 
-    def AddProject(self,name=None,server_language='python',clients=[]):
+    def AddProject(self,name=None,server_language=Language.Name(Language.python),clients=[]):
         name = name if name is not None else self._project_name
         dict = generate_project(self._path,name,server_language,clients,json=True)
         project = generate_project(self._path,name,server_language,clients)
@@ -78,14 +79,14 @@ class WebezyArchitect():
             service.dependencies.append(out_package)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': { service_name : MessageToDict(service) } })
 
-    def AddPackage(self,name,dependencies):
-        dict = generate_package(self._path,self._domain,name,dependencies,True)
+    def AddPackage(self,name,dependencies=[],messages=[]):
+        dict = generate_package(self._path,self._domain,name,dependencies,messages,json=True)
         package = generate_package(self._path,self._domain,name,dependencies)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages': { f'protos/v1/{name}.proto' : dict } })
         return package
 
-    def AddMessage(self,package,name,fields,*args):
-        message = generate_message(self._path,self._domain,package,name,fields,option=args[1],description=args[0])
+    def AddMessage(self,package,name,fields,description=None,options=None):
+        message = generate_message(self._path,self._domain,package,name,fields,option=options,description=description)
         if next((m for m in package.messages if m.name == message.name), None) is None:
             package.messages.append(message)
             self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
@@ -113,6 +114,7 @@ class WebezyArchitect():
 
     def Save(self):
         logging.info("Saving webezyio architect process")
+
         self._webezy.save()
 
     def undo(self):

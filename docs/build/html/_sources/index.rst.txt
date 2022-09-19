@@ -9,8 +9,8 @@ Welcome to webezyio's documentation!
 Overview
 ********
 webezyio is free and open-source project that aims to be a complete framework for developing micro-services projects.
-The underlying communication protocol is `HTTP2` and for serialization and deserialization is protobuf.
-It utulize those communication protocol, message serialization / deserialization and code generator with `gRPC` opensource project by google. 
+The underlying communication protocol is `HTTP2`_ and for serialization and deserialization is `protobuf`_.
+It utulize those communication protocol, message serialization / deserialization and code generator with `gRPC`_ opensource project by google. 
 
 Get full explanation and many more details on usage at `webezy.io`_.
 
@@ -68,7 +68,9 @@ Init a Architect
 Init a Builder
 --------------
 
-
+.. _gRPC: https://grpc.io/
+.. _protobuf: https://developers.google.com/protocol-buffers/docs/pythontutorial
+.. _HTTP2: https://en.wikipedia.org/wiki/HTTP/2
 .. _webezy.io: https://www.webezy.io/
 
 
