@@ -1,0 +1,58 @@
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "webezyio"
+version = "0.0.1"
+description = "Webezy.io CLI for generating gRPC micro-services"
+readme = "README.md"
+authors = [{ name = "Amit Shmulevitch", email = "amitsh1995@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["grpc", "micro-services", "cli", "framework"]
+dependencies = ["pluggy>=0.3,<1.0","inquirer","protobuf<4.21.0","grpcio==1.47.0","grpcio-tools==1.47.0"]
+requires-python = ">=3.7"
+
+    [project.optional-dependencies]
+    build = ["build", "twine"]
+    dev   = ["bumpver"]
+
+    [project.scripts]
+    wz = "webezyio.cli.__main__:main"
+    webezy = "webezyio.cli.__main__:main"
+
+    [project.urls]
+    repository    = "https://github.com/Webezy-io/webezy"
+    homepage = "https://webezy.io/"
+    documentation = "https://webezy.io/docs/cli"
+
+
+[tool.bumpver]
+current_version = "0.0.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message  = "bump version {old_version} -> {new_version}"
+commit          = true
+tag             = true
+push            = false
+
+    [tool.bumpver.file_patterns]
+    "pyproject.toml" = [
+        'current_version = "{version}"',
+        'version = "{version}"',
+    ]
+    "webezy/__version__.py" = ["{version}"]
+
+
+[tool.isort]
+profile                   = "black"
+import_heading_stdlib     = "Standard library imports"
+import_heading_thirdparty = "Third party imports"
+import_heading_firstparty = "Reader imports"
+
+[tool.mypy]
+strict = true

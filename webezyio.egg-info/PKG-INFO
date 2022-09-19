@@ -1,10 +1,35 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: webezyio
-Version: 0.0.0
-Summary: UNKNOWN
-Home-page: UNKNOWN
-Author: UNKNOWN
-Author-email: UNKNOWN
-License: UNKNOWN
-Description: UNKNOWN
-Platform: UNKNOWN
+Version: 0.0.1
+Summary: Webezy.io CLI for generating gRPC micro-services
+Author-email: Amit Shmulevitch <amitsh1995@gmail.com>
+Project-URL: repository, https://github.com/Webezy-io/webezy
+Project-URL: documentation, https://webezy.io/docs/cli
+Keywords: grpc,micro-services,cli,framework
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Provides-Extra: build
+Provides-Extra: dev
+
+# webezy
+
+
+
+# Installation
+Install from pip
+```sh
+pip install webezy
+```
+
+# Sub-modules
+
+* builder - A command-pattern module for easy interacting with webezy.json
+* cli - A CLI interface module for webezy
+* coder - A pluggable API for all code generating methods
+* commons - Common modules and methods, such as retrieving and modifying protos
+
+# Usage
+

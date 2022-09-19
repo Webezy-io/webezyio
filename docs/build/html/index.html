@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Welcome to webezyio’s documentation! &#8212; webezyio 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-webezyio-s-documentation">
+<h1>Welcome to webezyio’s documentation!<a class="headerlink" href="#welcome-to-webezyio-s-documentation" title="Permalink to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<p>webezyio is free and open-source project that aims to be a complete framework for developing micro-services projects.
+The underlying communication protocol is <cite>HTTP2</cite> and for serialization and deserialization is protobuf.
+It utulize those communication protocol, message serialization / deserialization and code generator with <cite>gRPC</cite> opensource project by google.</p>
+<p>Get full explanation and many more details on usage at <a class="reference external" href="https://www.webezy.io/">webezy.io</a>.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<p>Download package from pip</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install webezyio
+</pre></div>
+</div>
+<p>Download package from git</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/webezy-io/webezyio.git#egg<span class="o">=</span>webezyio
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<p>Write webezy.io projects with Package API or with CLI.</p>
+<section id="cli">
+<h3>CLI<a class="headerlink" href="#cli" title="Permalink to this heading">¶</a></h3>
+<section id="start-a-new-project">
+<h4>Start a new project<a class="headerlink" href="#start-a-new-project" title="Permalink to this heading">¶</a></h4>
+<p>Start your webezyio project structure now and run this command:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Replace content in &lt;&gt; with your cool project name</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wz new &lt;project-name&gt;
+</pre></div>
+</div>
+</div>
+<p>The <cite>wz new</cite> command will generate all your project directories and files under the current path.
+If you want to start your project in other location run it with the <cite>–path</cite> argument</p>
+</section>
+<section id="add-resources">
+<h4>Add resources<a class="headerlink" href="#add-resources" title="Permalink to this heading">¶</a></h4>
+<p>Continue developing your project packages and services:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wz generate --package
+</pre></div>
+</div>
+</section>
+</section>
+<section id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this heading">¶</a></h3>
+<section id="init-a-architect">
+<h4>Init a Architect<a class="headerlink" href="#init-a-architect" title="Permalink to this heading">¶</a></h4>
+</section>
+<section id="init-a-builder">
+<h4>Init a Builder<a class="headerlink" href="#init-a-builder" title="Permalink to this heading">¶</a></h4>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">webezyio</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Amit Shmulevitch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>webezyio.architect package &#8212; webezyio 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="webezyio-architect-package">
+<h1>webezyio.architect package<a class="headerlink" href="#webezyio-architect-package" title="Permalink to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="webezyio.architect.interfaces.html">webezyio.architect.interfaces package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="webezyio.architect.interfaces.html#module-webezyio.architect.interfaces">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="webezyio.architect.recievers.html">webezyio.architect.recievers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="webezyio.architect.recievers.html#module-webezyio.architect.recievers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-webezyio.architect.commands">
+<span id="webezyio-architect-commands-module"></span><h2>webezyio.architect.commands module<a class="headerlink" href="#module-webezyio.architect.commands" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.AddResource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">AddResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder" title="webezyio.architect.recievers.Builder"><span class="pre">Builder</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.AddResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.AddResource.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webezyJson</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.AddResource.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.CreateNewProject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">CreateNewProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">creator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder" title="webezyio.architect.recievers.Builder"><span class="pre">Builder</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.CreateNewProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.CreateNewProject.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webezyJson</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.CreateNewProject.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.GetWebezyJson">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">GetWebezyJson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analayzer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Core" title="webezyio.architect.recievers.Core"><span class="pre">Core</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.GetWebezyJson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.GetWebezyJson.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.GetWebezyJson.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.InitProject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">InitProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder" title="webezyio.architect.recievers.Builder"><span class="pre">Builder</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.InitProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.InitProject.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.InitProject.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.Logger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">Logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder" title="webezyio.architect.recievers.Builder"><span class="pre">Builder</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.Logger.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webezyJson</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.Logger.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.RemoveResource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">RemoveResource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder" title="webezyio.architect.recievers.Builder"><span class="pre">Builder</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.RemoveResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.RemoveResource.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webezyJson</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.RemoveResource.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.SaveWebezyJson">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">SaveWebezyJson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analayzer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Core" title="webezyio.architect.recievers.Core"><span class="pre">Core</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.SaveWebezyJson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.SaveWebezyJson.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.SaveWebezyJson.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.commands.SetDomain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.commands.</span></span><span class="sig-name descname"><span class="pre">SetDomain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">builder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder" title="webezyio.architect.recievers.Builder"><span class="pre">Builder</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.SetDomain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.ICommand" title="webezyio.architect.interfaces.ICommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">ICommand</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.commands.SetDomain.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webezyJson</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.commands.SetDomain.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-webezyio.architect.hooks">
+<span id="webezyio-architect-hooks-module"></span><h2>webezyio.architect.hooks module<a class="headerlink" href="#module-webezyio.architect.hooks" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.hooks.IHook">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.hooks.</span></span><span class="sig-name descname"><span class="pre">IHook</span></span><a class="headerlink" href="#webezyio.architect.hooks.IHook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.hooks.IHook.execute">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.hooks.IHook.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-webezyio.architect.invoker">
+<span id="webezyio-architect-invoker-module"></span><h2>webezyio.architect.invoker module<a class="headerlink" href="#module-webezyio.architect.invoker" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.CoreInvoker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.invoker.</span></span><span class="sig-name descname"><span class="pre">CoreInvoker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.CoreInvoker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Invoker Class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.CoreInvoker.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.CoreInvoker.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a pre defined command and log in history</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.CoreInvoker.history">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">history</span></span><a class="headerlink" href="#webezyio.architect.invoker.CoreInvoker.history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all records in the History list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.CoreInvoker.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.CoreInvoker.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>All commands are registered in the Invoker Class</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.invoker.</span></span><span class="sig-name descname"><span class="pre">Webezy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.IUndoRedo" title="webezyio.architect.interfaces.IUndoRedo"><code class="xref py py-class docutils literal notranslate"><span class="pre">IUndoRedo</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.after_execute">
+<span class="sig-name descname"><span class="pre">after_execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.after_execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.before_execute">
+<span class="sig-name descname"><span class="pre">before_execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.before_execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.commands">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">commands</span></span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.commands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.history">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">history</span></span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.history" title="Permalink to this definition">¶</a></dt>
+<dd><p>the history of the states</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.hooks">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hooks</span></span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.hooks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.init_core">
+<span class="sig-name descname"><span class="pre">init_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.init_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.redo">
+<span class="sig-name descname"><span class="pre">redo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.redo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a REDO if the history_position is less than the end of the history list</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.registerCommand">
+<span class="sig-name descname"><span class="pre">registerCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.registerCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>All commands are registered in the Invoker Class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.registerHook">
+<span class="sig-name descname"><span class="pre">registerHook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hook_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hook</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'before'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.registerHook" title="Permalink to this definition">¶</a></dt>
+<dd><p>All hooks are registered in the Invoker Class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">webezyJson</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saving current state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.undo">
+<span class="sig-name descname"><span class="pre">undo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.undo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undo a command if there is a command that can be undone.
+Update the history psoition so that further UNDOs or REDOs
+point to the correct index</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="webezyio.architect.invoker.Webezy.webezyJson">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">webezyJson</span></span><a class="headerlink" href="#webezyio.architect.invoker.Webezy.webezyJson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-webezyio.architect">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-webezyio.architect" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.CommandMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.</span></span><span class="sig-name descname"><span class="pre">CommandMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.CommandMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.architect.</span></span><span class="sig-name descname"><span class="pre">WebezyArchitect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'domain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'project'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddClient">
+<span class="sig-name descname"><span class="pre">AddClient</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddClient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddEnum">
+<span class="sig-name descname"><span class="pre">AddEnum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enum_values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddEnum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddMessage">
+<span class="sig-name descname"><span class="pre">AddMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddPackage">
+<span class="sig-name descname"><span class="pre">AddPackage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddPackage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddProject">
+<span class="sig-name descname"><span class="pre">AddProject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'python'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddProject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddRPC">
+<span class="sig-name descname"><span class="pre">AddRPC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddRPC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.AddService">
+<span class="sig-name descname"><span class="pre">AddService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependencies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.AddService" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.EditEnum">
+<span class="sig-name descname"><span class="pre">EditEnum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.EditEnum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.EditMessage">
+<span class="sig-name descname"><span class="pre">EditMessage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.EditMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.EditPackage">
+<span class="sig-name descname"><span class="pre">EditPackage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.EditPackage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.EditService">
+<span class="sig-name descname"><span class="pre">EditService</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.EditService" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.Save">
+<span class="sig-name descname"><span class="pre">Save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.Save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.SetConfig">
+<span class="sig-name descname"><span class="pre">SetConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.SetConfig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.SetDomain">
+<span class="sig-name descname"><span class="pre">SetDomain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.SetDomain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.redo">
+<span class="sig-name descname"><span class="pre">redo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.redo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.architect.WebezyArchitect.undo">
+<span class="sig-name descname"><span class="pre">undo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.architect.WebezyArchitect.undo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">webezyio</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Amit Shmulevitch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/webezyio.architect.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
