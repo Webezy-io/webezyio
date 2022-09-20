@@ -60,7 +60,9 @@ class WebezyArchitect():
     def AddService(self,name,dependencies,description):
         dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,json=True) 
         service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description)
-        self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': { name : dict } })
+        services = self._webezy.webezyJson.get('services') if self._webezy.webezyJson.get('services') is not None else {} 
+        services[name] = dict
+        self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': services })
         return service
 
     def AddRPC(self,service,name,*args):

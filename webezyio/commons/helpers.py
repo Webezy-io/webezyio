@@ -393,7 +393,8 @@ class WZJson():
         else:
             depend = self._packages[f'protos/v1/{name}.proto'].get('dependencies')
             msgs = self._packages[f'protos/v1/{name}.proto'].get('messages')
-            return generate_package(self.path,self.domain,name,depend if depend is not None else [],msgs if msgs is not None else [])
+            enums = self._packages[f'protos/v1/{name}.proto'].get('enums')
+            return generate_package(self.path,self.domain,name,depend if depend is not None else [],msgs if msgs is not None else [],enums if enums is not None else [])
 
 
     def get_message(self, full_name):
