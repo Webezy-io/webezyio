@@ -719,7 +719,11 @@ class WZServicePy():
             close_out_type = ']' if rpc_type_out is not None and rpc_type_out == True else ''
             code = ''
             if self._context is not None:
-                code = self._context.get_rpc(self._name, rpc_name).get('code')
+                code = self._context.get_rpc(self._name, rpc_name)
+                if code is not None:
+                    code =code.get('code')
+                else:
+                    code = '\t\tpass\n\n'
             rpcs.append(
                 f'\t# @rpc @@webezyio - DO NOT REMOVE\n\tdef {rpc_name}(self, request: {open_in_type}{rpc_in_pkg}_pb2.{rpc_in_name}{closing_in_type}, context) -> {open_out_type}{rpc_out_pkg}_pb2.{rpc_out_name}{close_out_type}:\n{code}')
         rpcs = ''.join(rpcs)

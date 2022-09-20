@@ -14,6 +14,7 @@ from webezyio.commons.errors import WebezyProtoError
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.commons.file_system import join_path, mkdir, rFile
+from prettytable import PrettyTable
 
 
 def field_exists_validation(new_field, fields, msg):
@@ -120,6 +121,7 @@ def main(args=None):
     subparsers = parser.add_subparsers(
         help='Main modules to interact with Webezy CLI.')
 
+    """New command"""
     parser_new = subparsers.add_parser('new', help='Create new project')
     parser_new.add_argument('project', help='Project name')
     parser_new.add_argument('-p', '--path', required=False,
@@ -133,6 +135,12 @@ def main(args=None):
     parser_n.add_argument('project', help='Project name')
     parser_n.add_argument('-p', '--path', required=False,
                           help='Path for the project root directory')
+    parser_n.add_argument('--port', default=50051,
+                            required=False, help='Port server will run on')
+    parser_n.add_argument('--host', default='localhost',
+                            required=False, help='Host name for server')
+
+    """Generate command"""
 
     parser_generate = subparsers.add_parser(
         'generate', help='Generate resources commands')
@@ -145,11 +153,17 @@ def main(args=None):
                           's', 'p', 'm', 'r', 'e'], help='Generate a webezyio resource from specific resource type, for e.x "s" stands for "service"')
     parser_g.add_argument('-n', '--name', help='Name for the resource')
 
+    """List command"""
+
     parser_list = subparsers.add_parser('ls', help='List resources commands')
+
     parser_list.add_argument(
-        'fullName', help='Display a resource report for specific resoource by passing in a full name, for e.x domain.test.GetTest will return "GetTest" (RPC) which under "test" (service)')
-    parser_list.add_argument('-r', '--resource', choices=['service', 'package', 'message',
+        '--full-name',metavar='fullName',required=False, help='Display a resource report for specific resoource by passing in a full name, for e.x domain.test.GetTest will return "GetTest" (RPC) which under "test" (service)')
+    parser_list.add_argument('-t', '--type', choices=['service', 'package', 'message',
                              'rpc', 'enum'], help='List a webezyio resource from specific resource type')
+    
+    """Package command"""
+    
     parser_pkg = subparsers.add_parser(
         'package', help='Attach a package into other services / package')
     parser_pkg.add_argument('source', help='Package full name')
@@ -166,7 +180,8 @@ def main(args=None):
     parser.add_argument('-v', '--version', action='store_true',
                         help='Display webezyio current installed version')
 
- 
+    parser.add_argument('-e', '--expand', action='store_true',
+                        help='Expand optional fields for each resource')
 
     parser.add_argument(
         '-b','--build', action='store_true', help='Build webezyio project')
@@ -197,6 +212,9 @@ def main(args=None):
     # Logging version
     if args.version:
         print_version(__version__.__version__)
+
+    if args.verbose:
+        print_note(args,True,'Argument passed to webezy CLI')
 
     if hasattr(args, 'project'):
         domain_name = 'domain'
@@ -258,7 +276,7 @@ def main(args=None):
             if args.verbose:
                 print_note(WEBEZY_JSON._webezy_json, True, 'webezy.json')
 
-            if hasattr(args, 'resource'):
+            if hasattr(args, 'resource') :
 
                 namespace = parse_namespace_resource(
                     args.resource, WEBEZY_JSON)
@@ -290,23 +308,25 @@ def main(args=None):
                             log.debug("Package not found continuing...")
                         for p in WEBEZY_JSON.packages:
                             list_depend.append(WEBEZY_JSON.packages[p]['package'])
-
-                    if args.verbose:
+                    temp_d_list = []
+                    if args.expand:
                         dependencies = inquirer.prompt([
                             inquirer.Checkbox(
                                 'dependencies', 'Choose package dependencies', choices=list_depend)
                         ], theme=WebezyTheme())
-                        list_depend = dependencies['dependencies']
+                        temp_d_list = dependencies['dependencies']
 
+                    if args.verbose:
+                        print_note(pkg, True, 'Added package')
 
-                    ARCHITECT.AddPackage(pkg, list_depend)
+                    ARCHITECT.AddPackage(pkg, temp_d_list)
                     ARCHITECT.Save()
                     print_success(f'Success !\n\tCreated new package "{pkg}"')
                 
                 elif namespace[0] == 'service':
                     svc = results['service']
                     list_depend = []
-                    if args.verbose:
+                    if args.expand:
                         if WEBEZY_JSON.packages is not None:
                             for p in WEBEZY_JSON.packages:
                                 list_depend.append(WEBEZY_JSON.packages[p]['package'])
@@ -321,6 +341,9 @@ def main(args=None):
                         if svc in WEBEZY_JSON.services:
                             print_error(f"Service '{svc}' already exists under '{WEBEZY_JSON.project.get('name')}'")
                             exit(1)
+
+                    if args.verbose:
+                        print_note(svc, True, 'Added Service')
                     
                     ARCHITECT.AddService(svc, list_depend, None)
                     ARCHITECT.Save()
@@ -332,7 +355,7 @@ def main(args=None):
                     msg_name = results['message']
                     pkg = results['package']
                     msg_full_name = '{0}.{1}'.format(pkg, msg_name)
-
+                    description = ''
                     add_field = True
                     temp_fields = []
                     msg_fields = []
@@ -355,7 +378,11 @@ def main(args=None):
                             if d_package is not None:
                                 for msg in d_package.messages:
                                     avail_msgs.append((f'{msg.name} [{msg.full_name}]', msg.full_name))
-
+                    if args.expand:
+                        description = inquirer.prompt([inquirer.Text('description','Enter message description','')],theme=WebezyTheme())
+                        if description is not None:
+                            description = description['description']
+                    
                     while add_field == True:
 
                         opt = []
@@ -405,9 +432,16 @@ def main(args=None):
                             new_field = field['field']
                             field_exists_validation(
                                 new_field, temp_fields, msg_full_name)
+                            if args.expand:
+                                f_description = inquirer.prompt([inquirer.Text('description','Enter field description','')])                                
+                                if f_description is not None:
+                                    f_description = f_description['description']
+                            else:
+                                f_description = ''        
+                                
                             temp_fields.append(new_field)
                             msg_fields.append(helpers.WZField(
-                                new_field, field['fieldType'], field['fieldLabel'], message_type=message_type, enum_type=enum_type).to_dict())
+                                new_field, field['fieldType'], field['fieldLabel'], message_type=message_type, enum_type=enum_type,description=f_description).to_dict())
                             nextfield = inquirer.prompt([
                                 inquirer.Confirm(
                                     'continue', message='Add more fields?', default=True)
@@ -422,8 +456,11 @@ def main(args=None):
                             print_note(field, True, 'Added field')
                     package = WEBEZY_JSON.get_package(pkg.split('.')[1], False)
                     if next((m for m in package.messages if m.name == msg_name),None) is None:
+                        if args.verbose:
+                            print_note(msg_name, True, 'Added Message')
+                    
                         ARCHITECT.AddMessage(package, msg_name,
-                                            msg_fields, 'description', None)
+                                            msg_fields, description, None)
                         ARCHITECT.Save()
                     else:
                         print_error(f'Message "{msg_name}" already exists under "{package.package}"')
@@ -442,7 +479,7 @@ def main(args=None):
 
                     if dependencies is None:
                         print_error(
-                            f'Dependencies not listed under "{svc}"\n\tTry attache first a packge to service')
+                            f'Dependencies not listed under "{svc}"\n\tTry attache first a packge to service\n\tRun: \'wz package <some.package.v1> {svc}\'')
                         exit(1)
 
                     avail = []
@@ -528,7 +565,7 @@ def main(args=None):
                 if len(args.target.split('.')) > 2:
                     importing_into_pkg = True
                     old_pkg = WEBEZY_JSON.get_package(
-                        args.target('/')[-1].split('.')[0])
+                        args.target.split('.')[1])
                     dep = []
                     if old_pkg.get('dependencies') is not None:
                         dep = old_pkg.get('dependencies')
@@ -541,8 +578,12 @@ def main(args=None):
                             exit(1)
                     else:
                         dep.append(args.source)
-
-                    ARCHITECT.AddPackage(pkg, dep)
+                    pkg = WEBEZY_JSON.get_package(old_pkg.get('name'),False)
+                    temp_msgs = []
+                    for m in pkg.messages:
+                        temp_msgs.append(helpers.MessageToDict(m))
+                    ARCHITECT.AddPackage(old_pkg.get('name'), dep,temp_msgs)
+                    ARCHITECT.Save()
 
                 else:
                     dep = []
@@ -589,7 +630,75 @@ def main(args=None):
                 wzBuilder = WebezyBuilder(path=webezy_json_path)
                 wzBuilder.BuildAll()
             else:
-                parser.print_help()
+                if hasattr(args, 'full_name'):
+                    if args.full_name is None:
+                        if hasattr(args, 'type'):
+                            if args.type == 'service':
+                                header = ['Service','RPC\'s','Dependencies']
+                                tab = PrettyTable(header)
+
+                                for svc in WEBEZY_JSON.services:
+                                    service=WEBEZY_JSON.services[svc]
+                                    tab.add_row([svc,len(service.get('methods') if service.get('methods') is not None else []),service.get('dependencies')])
+                                print_info(tab,True,'Listing services resources')
+                            elif args.type == 'package':
+                                header = ['Package','Messages','Enums','Dependencies']
+                                tab = PrettyTable(header)
+
+                                for pkg in WEBEZY_JSON.packages:
+                                    pkg = WEBEZY_JSON.packages[pkg]
+                                    tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
+                                print_info(tab,True,'Listing packages resources')
+                            elif args.type == 'message':
+                                header = ['Message','Fields']
+                                tab = PrettyTable(header)
+
+                                for pkg in WEBEZY_JSON.packages:
+                                    package = WEBEZY_JSON.packages[pkg]
+                                    for m in package['messages']:
+                                        tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []) ])
+                                print_info(tab,True,'Listing packages resources')
+                    else:
+                        args_split = len(args.full_name.split('.'))
+                        if args_split == 1:
+                            print('*',args.full_name)
+                        elif args_split > 1 and args_split <=2:
+                            try:
+                                header = ['Service','RPC\'s','Dependencies']
+                                svc = WEBEZY_JSON.get_service(args.full_name.split('.')[1])
+                                tab = PrettyTable(header)
+                                tab.add_row([svc['name'],len(svc.get('methods') if svc.get('methods') is not None else []),svc.get('dependencies')])
+                                print_info(tab,True,'Listing service resource')
+                            except Exception:
+                                print_warning(f'Resource {args.full_name} wasnt found services')
+                        elif args_split == 3:
+                            try:
+                                pkg = WEBEZY_JSON.get_package(args.full_name.split('.')[1])
+                                header = ['Package','Messages','Enums','Dependencies']
+                                tab = PrettyTable(header)
+                                tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums')) if pkg.get('enums') is not None else 0,pkg.get('dependencies')])
+                                print_info(tab,True,'Listing package resource')
+                            except Exception as e:
+                                logging.error(e)
+                                print_warning(f'Resource {args.full_name} wasnt found on packages')
+                        elif args_split > 3 and args_split <= 4:
+                            try:
+                                header = ['Message','Fields']
+                                tab = PrettyTable(header)
+                                msg = WEBEZY_JSON.get_message(args.full_name)
+                                tab.add_row([msg['name'],len(msg.get('fields') if msg.get('fields') is not None else [])])
+                                print_info(tab,True,'Listing message resource')
+                            except Exception:
+                                print_warning(f'Resource {args.full_name} wasnt found on messages')
+                        else:
+                            try:
+                                msg = WEBEZY_JSON.get_message('.'.join(args.full_name.split('.')[:-1]))
+                                field = next((f for f in msg['fields'] if f['name'] == args.full_name.split('.')[-1]),None)
+                                print_info(field,True)
+                            except Exception:
+                                print_warning(f'Field {args.full_name} wasnt found on message')
+                else:
+                    parser.print_help()
         else:
             print_warning(
                 'Not under valid webezyio project !\n\tMake sure you are on the root directory of your project')

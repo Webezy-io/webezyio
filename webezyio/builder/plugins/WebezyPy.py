@@ -2,6 +2,7 @@ import logging
 import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources
+from webezyio.builder.plugins.static import gitignore_py
 
 
 @builder.hookimpl
@@ -41,7 +42,8 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
         file_system.wFile(file_system.join_path(
             wz_json.path, 'bin', 'run-server.sh'), bash_run_server_script)
     # file_system.wFile(file_system.join_path(wz_json.path,'.webezy','contxt.json'),'{"files":[]}')
-
+    # .gitignore
+    file_system.wFile(file_system.join_path(wz_json.path,'.gitignore'),gitignore_py)
     for file in files:
         file_system.wFile(file, '')
 
