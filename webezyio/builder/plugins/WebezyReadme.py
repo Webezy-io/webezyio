@@ -1,3 +1,4 @@
+from tkinter import E
 from webezyio import builder
 from webezyio.commons import helpers, file_system
 import logging
@@ -18,10 +19,14 @@ def write_readme(wz_json: helpers.WZJson):
     file_system.wFile(file_system.join_path(
         wz_json.path, 'README.md'), get_readme(wz_json), overwrite=True)
 
+_OPEN_BRCK = '{'
+_CLOSING_BRCK = '}'
 
 def get_readme(wz_json: helpers.WZJson):
     project_name = wz_json.project.get('name')
     index = {'services':[],'packages':[]}
+    project_package_name = wz_json.project.get('packageName')
+
     svcs = []
     for svc in wz_json.services:
         service = wz_json.services[svc]
@@ -76,6 +81,18 @@ def get_readme(wz_json: helpers.WZJson):
     
     pkgs = '\n\n'.join(pkgs)
     svcs = '\n\n'.join(svcs)
+    clients_usage_i = []
+    clients_usage = []
+    for c in wz_json.project.get('clients'):
+        client_lang = c.get('language')
+        client_lang = client_lang[0].upper()+client_lang[1:]
+        clients_usage_i.append(f'- [{client_lang}](#{client_lang})')
+        print(client_lang)
+        if client_lang=='Python':
+            clients_usage.append(f'### Python\n\n```py\nfrom clients.python import {project_package_name}\n\nclient = {project_package_name}()\n\n# Unary call\nresponse = stub.<Unary>(<InMessage>())\nprint(response)\n\n# Server stream\nresponses = stub.<ServerStream>(<InMessage>())\nfor res in responses:\n\tprint(res)\n\n# Client Stream\nrequests = iter([<InMessage>(),<InMessage>()])\nresponse = client.<ClientStream>(requests)\nprint(response)\n\n# Bidi Stream\nresponses = client.<BidiStream>(requests)\nfor res in responses:\n\tprint(res)\n```\n')
+        elif client_lang=='Typescript':
+            clients_usage.append(f'### Typescript\n\n```ts\nimport {_OPEN_BRCK} {project_package_name} {_CLOSING_BRCK} from \'./clients/typescript/\';\n\nlet client = new {project_package_name}();\n\n// Unary call\nclient.<Unary>(<InMessage>)\n\t.then((res:<OutMessage>) => {_OPEN_BRCK}\n\t\tconsole.log(res);\n\t{_CLOSING_BRCK}).catch((err: any) => console.log(err));\n\n// Server Stream\nclient.<ServerStream>(<InMessage>)\n\t.subscribe((res: <OutMessage>) => {_OPEN_BRCK}\n\t\tconsole.log(res);\n\t{_CLOSING_BRCK})\n\n// Client Stream\n\n// Bidi Stream\nresponses = client.<BidiStream>()\n\t.subscribe((res: <OutMessage>) => {_OPEN_BRCK}\n\t\tconsole.log(res)\n\t{_CLOSING_BRCK})\n\nresponses.write(<InMessage>)\n```\n')
+
     temp_index = []
     for k in index:
         for i in index[k]:
@@ -85,5 +102,7 @@ def get_readme(wz_json: helpers.WZJson):
                 temp_i = i.split('.')[1]
             temp_index.append(f'- [{temp_i}](#{link})')
     index = '\n'.join(temp_index)
-    readme_file = f'# {project_name}\n\nThis project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !\n\n# Index\n{index}\n\n# Services\n\n{svcs}\n\n# Packages\n\n{pkgs}\n\n\n__This project and README file has been created thanks to [webezy.io](https://www.webezy.io)__'
+    clients_usage = '\n'.join(clients_usage)
+    clients_usage_i = '\n'.join(clients_usage_i)
+    readme_file = f'# {project_name}\n\nThis project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !\n\nThis project is using gRPC as main code generator and utilize HTTP2 + protobuf protocols for communication.\n\n# Index\nUsage:\n{clients_usage_i}\n\nResources:\n{index}\n\n# Services\n\n{svcs}\n\n# Packages\n\n{pkgs}\n\n# Usage\nThis project supports clients communication in the following languages:\n{clients_usage}\n* * *\n__This project and README file has been created thanks to [webezy.io](https://www.webezy.io)__'
     return readme_file

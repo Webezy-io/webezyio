@@ -226,7 +226,6 @@ main_ts_config = '{\n\
         "skipLibCheck": true\n\
     },\n\
     "include": [\n\
-        "typings/global.d.ts",\n\
         "services/**/*",\n\
         "services/*.ts",\n\
         "*.ts"\n\
@@ -238,9 +237,6 @@ main_ts_config = '{\n\
     "references": [\n\
         {\n\
             "path": "services/protos"\n\
-        },\n\
-        {\n\
-            "path": "services"\n\
         }\n\
     ]\n\
 }'
@@ -265,6 +261,63 @@ protos_ts_config = '{\n\
     "compilerOptions": {\n\
         "composite": true,\n\
         "outDir": "../../server/services/protos",\n\
+        "noImplicitReturns": false\n\
+    },\n\
+    "include": [\n\
+        "*","google/**/*"\n\
+    ],\n\
+    "exclude": [\n\
+        "node_modules"\n\
+    ]\n\
+}'
+
+
+main_ts_config_client_only = '{\n\
+    "compilerOptions": {\n\
+        "baseUrl": ".",\n\
+        "paths": {},\n\
+        "target": "ES2019",\n\
+        "outDir": "clients/typescript",\n\
+        "module": "commonjs",\n\
+        "moduleResolution": "node",\n\
+        "incremental": true,\n\
+        "declaration": true,\n\
+        "newLine": "lf",\n\
+        "strict": true,\n\
+        "allowUnreachableCode": false,\n\
+        "allowUnusedLabels": false,\n\
+        "noFallthroughCasesInSwitch": true,\n\
+        "noImplicitOverride": true,\n\
+        "noImplicitReturns": true,\n\
+        "noPropertyAccessFromIndexSignature": true,\n\
+        "noUnusedLocals": false,\n\
+        "noUnusedParameters": false,\n\
+        "removeComments": true,\n\
+        "sourceMap": true,\n\
+        "forceConsistentCasingInFileNames": true,\n\
+        "esModuleInterop": true,\n\
+        "skipLibCheck": true\n\
+    },\n\
+    "include": [\n\
+        "services/**/*",\n\
+        "services/*.ts",\n\
+    ],\n\
+    "exclude": [\n\
+        "node_modules",\n\
+        "services/protos"\n\
+    ],\n\
+    "references": [\n\
+        {\n\
+            "path": "services/protos"\n\
+        }\n\
+    ]\n\
+}'
+
+protos_ts_config_client_only = '{\n\
+    "extends": "../../tsconfig.json",\n\
+    "compilerOptions": {\n\
+        "composite": true,\n\
+        "outDir": "../../clients/typescript/protos",\n\
         "noImplicitReturns": false\n\
     },\n\
     "include": [\n\

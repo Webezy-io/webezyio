@@ -1,3 +1,4 @@
+import logging
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 from webezyio.commons.file_system import join_path,mkdir
@@ -5,13 +6,24 @@ from webezyio.commons.protos.webezy_pb2 import Language
 from webezyio.architect import WebezyArchitect
 import os
 import inquirer
+from inquirer import errors
+
+def validate_client(answers, current):
+    if len(current) ==0:
+        raise errors.ValidationError(current,"Must chose at least 1 client !")
+    return True
+
+def validate_domain(answers, current):
+    if '.' in current:
+        raise errors.ValidationError(current,"Domain name MUST not include suffix like '.com' / '.io' and so on.")
+    return True
 
 wz_new_q = [
     inquirer.List("server", message="Choose server language", choices=[
                   ('Python', Language.python), ('Typescript', Language.typescript)], default=Language.python),
     inquirer.Checkbox("clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
-                      ('Python', Language.python), ('Typescript', Language.typescript)], default=[Language.python]),
-    inquirer.Text("domain", message="Enter domain name", default='domain'),
+                      ('Python', Language.python), ('Typescript', Language.typescript)], default=[Language.python],validate=validate_client),
+    inquirer.Text("domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
 def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None):
@@ -53,7 +65,11 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
                     {'out_dir': out_dir, 'language': client_lang})
         if k == 'domain':
             domain_name = results[k]
-    
+
+    out_dir = join_path(
+                    result_path['root_dir'], 'clients', Language.Name(results['server']))
+    if next((c for c in clients if c.get('language') == Language.Name(results['server']) ),None) is None:
+        clients.append({'out_dir': out_dir, 'language': results['server']})
     root_dir = result_path['root_dir']
     webezy_json_path = join_path(root_dir, 'webezy.json')
     mkdir(result_path['root_dir'])
@@ -68,4 +84,6 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
     ARCHITECT.Save()
     
     print_success(
-        f'Success !\n\tCreated new project "{project_name}"\n\t-> cd {root_dir}\n')
+        f'Success !\n\tCreated new project "{project_name}"\n\t-> cd {root_dir}\n\t-> And then continue developing your awesome services !\n-> For more info on how to use the webezy.io CLI go to https://www.webezy.io/docs')
+
+

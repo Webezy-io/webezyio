@@ -13,19 +13,12 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
-    file_system.mv(file_system.join_path(wz_json.path,'server','services','client.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
-    file_system.mv(file_system.join_path(wz_json.path,'server','services','client.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
-    file_system.mv(file_system.join_path(wz_json.path,'server','services','client.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
-    
     logging.debug("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
 def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     directories = [
-        # Clients
-        file_system.join_path(wz_json.path, 'clients', 'typescript'),
-        file_system.join_path(wz_json.path, 'clients', 'typescript','protos'),
         # Utils
         file_system.join_path(wz_json.path, 'services', 'utils'),
         # Protos
@@ -44,7 +37,7 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     
     # Bin files
     file_system.wFile(file_system.join_path(
-        wz_json.path, 'bin', 'init.sh'), bash_init_script_ts)
+        wz_json.path, 'bin', 'init-ts.sh'), bash_init_script_ts)
     file_system.wFile(file_system.join_path(
         wz_json.path, 'bin', 'proto.js'), protos_compile_script_ts)
 
@@ -76,9 +69,9 @@ def write_services(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # Running ./bin/init.sh script for compiling protos
-    logging.info("Running ./bin/init.sh script for 'protoc' compiler")
+    logging.info("Running ./bin/init-ts.sh script for 'protoc' compiler")
     subprocess.run(['bash', file_system.join_path(
-        wz_json.path, 'bin', 'init.sh')])
+        wz_json.path, 'bin', 'init-ts.sh')])
 
 
 def parse_proto_type_to_ts(type, label, messageType=None, enumType=None):
@@ -99,16 +92,6 @@ def parse_proto_type_to_ts(type, label, messageType=None, enumType=None):
         temp_type = f'{temp_type}[]'
     return temp_type
 
-@builder.hookimpl
-def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
-    for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'server','services','protos')):
-        file_system.copyFile(file_system.join_path(wz_json.path,'server','services', 'protos', f), file_system.join_path(wz_json.path,'clients','typescript','protos',f))
-    
-    client = helpers.WZClientTs(wz_json.project.get(
-        'packageName'), wz_json.services, wz_json.packages, wz_context)
-    file_system.wFile(file_system.join_path(
-        wz_json.path, 'services', 'client.ts'), client.__str__(), overwrite=True)
 
 _OPEN_BRCK = '{'
 _CLOSING_BRCK = '}'

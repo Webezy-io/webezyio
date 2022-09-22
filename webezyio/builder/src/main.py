@@ -5,11 +5,11 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTs
+from webezyio.builder.plugins import WebezyBase, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
-_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,
-                       WebezyTs, WebezyReadme]  # Many More To Come
+_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,
+                        WebezyReadme]  # Many More To Come
 
 
 class WebezyBuilder:
@@ -72,12 +72,14 @@ class WebezyBuilder:
 
         if server_lang == 'python':
             self._pm.register(WebezyPy)
-        
-        if client_py != False:
+        elif client_py != False:
             self._pm.register(WebezyPyClient)
         
-        if server_lang == 'typescript' or client_ts:
-            self._pm.register(WebezyTs)
+        if server_lang == 'typescript':
+            self._pm.register(WebezyTsServer)
+        
+        if client_ts:
+            self._pm.register(WebezyTsClient)
         
         else:
             raise errors.WebezyCoderError(

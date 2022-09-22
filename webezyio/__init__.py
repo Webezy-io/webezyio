@@ -9,7 +9,7 @@ logging.basicConfig(
 )
 """builder"""
 from .builder.src.main import WebezyBuilder
-from .builder.plugins import WebezyBase, WebezyPy, WebezyTs, WebezyProto, WebezyReadme, WebezyMigrate
+from .builder.plugins import WebezyBase, WebezyPy, WebezyTsServer,WebezyTsClient, WebezyProto, WebezyReadme, WebezyMigrate
 """architect"""
 from .architect import WebezyArchitect
 

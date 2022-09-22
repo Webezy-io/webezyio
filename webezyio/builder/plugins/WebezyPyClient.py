@@ -35,7 +35,7 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
         file_system.join_path(wz_json.path, 'protos', '__init__.py')]
     # Bin files
     file_system.wFile(file_system.join_path(
-        wz_json.path, 'bin', 'proto-py.sh'), bash_init_script)
+        wz_json.path, 'bin', 'init-py.sh'), bash_init_script)
     
     # file_system.wFile(file_system.join_path(wz_json.path,'.webezy','contxt.json'),'{"files":[]}')
     # .gitignore
@@ -48,9 +48,9 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
 @builder.hookimpl
 def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # Running ./bin/init.sh script for compiling protos
-    logging.info("Running ./bin/init.sh script for 'protoc' compiler")
+    logging.info("Running ./bin/init-py.sh script for 'protoc' compiler")
     subprocess.run(['bash', file_system.join_path(
-        wz_json.path, 'bin', 'proto-py.sh')])
+        wz_json.path, 'bin', 'init-py.sh')])
     # Moving .py files to ./services/protos dir
     for file in file_system.walkFiles(file_system.join_path(wz_json.path, 'protos')):
         if '.py' in file:
@@ -79,7 +79,7 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     client = helpers.WZClientPy(wz_json.project.get(
         'packageName'), wz_json.services, wz_json.packages, wz_context)
     file_system.wFile(file_system.join_path(
-        wz_json.path, 'clients', 'python', 'client.py'), client.__str__(), overwrite=True)
+        wz_json.path, 'clients', 'python', '__init__.py'), client.__str__(), overwrite=True)
 
 @builder.hookimpl
 def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
