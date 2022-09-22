@@ -123,7 +123,7 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     return service if json == False else MessageToDict(service)
 
 
-def generate_package(path, domain, name, dependencies=[],messages=[],enums=[], json=False):
+def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],description=None, json=False):
     path = path.split('/webezy.json')[0]
     temp_msgs = []
     temp_enums = []
@@ -135,7 +135,7 @@ def generate_package(path, domain, name, dependencies=[],messages=[],enums=[], j
 
     full_name = get_package_full_name(domain, name)
     package = PackageDescriptor(uri=get_uri_package(
-        path, full_name), name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums)
+        path, full_name), name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description)
 
     return package if json == False else MessageToDict(package)
 

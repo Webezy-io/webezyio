@@ -8,12 +8,14 @@ from inquirer import errors
 import re
 from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
+from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import helpers
 from webezyio.commons import file_system
 from webezyio.commons.errors import WebezyProtoError
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.commons.file_system import join_path, mkdir, rFile
+from webezyio.cli.commands import new,build,generate,ls,package as pack
 from prettytable import PrettyTable
 
 
@@ -68,30 +70,14 @@ field_label = [
 ]
 
 
-class WebezyTheme(Theme):
-    def __init__(self):
-        super().__init__()
-        self.Question.mark_color = term.cyan
-        self.Question.brackets_color = term.cyan
-        self.Question.default_color = term.cyan
-        self.Checkbox.selection_color = term.bold_black_on_bright_cyan
-        self.Checkbox.selection_icon = "❯"
-        self.Checkbox.selected_icon = "◉"
-        self.Checkbox.selected_color = term.cyan
-        self.Checkbox.unselected_color = term.normal
-        self.Checkbox.unselected_icon = "◯"
-        self.List.selection_color = term.bold_black_on_bright_cyan
-        self.List.selection_cursor = "❯"
-        self.List.unselected_color = term.normal
 
-
-wz_new_q = [
-    inquirer.List("server", message="Choose server language", choices=[
-                  ('Python', Language.python), ('Typescript', Language.typescript)], default=Language.python),
-    inquirer.Checkbox("clients", message="Choose clients languages", choices=[
-                      ('Python', Language.python), ('Typescript', Language.typescript)], default=[Language.python]),
-    inquirer.Text("domain", message="Enter domain name", default='domain'),
-]
+# wz_new_q = [
+#     inquirer.List("server", message="Choose server language", choices=[
+#                   ('Python', Language.python), ('Typescript', Language.typescript)], default=Language.python),
+#     inquirer.Checkbox("clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
+#                       ('Python', Language.python), ('Typescript', Language.typescript)], default=[Language.python]),
+#     inquirer.Text("domain", message="Enter domain name", default='domain'),
+# ]
 
 wz_g_p_q = [
     inquirer.Text("package", message="Enter package name",
@@ -111,7 +97,6 @@ wz_g_e_q = [
 def main(args=None):
     """Main CLI processing, with argpars package.
     """
-    # print('\n', 'Webezy.io CLI Started', '\n\n')
     # Main cli parser
     parser = argparse.ArgumentParser(prog='webezy',
                                      description='Command line interface for the webezyio package build awesome gRPC micro-services. For more information please visit https://www.webezy.io there you can find additional documentation and tutorials.',
@@ -170,13 +155,7 @@ def main(args=None):
     parser_pkg.add_argument('target', help='Package path or service name')
 
 
-    # parser_build = subparsers.add_parser(
-    #     'build', help='Build project commands')
-    # parser_build.add_argument('-t', '--type', required=False, choices=[
-    #                           'code', 'protos', 'all'], default='all', help='Build webezyio project for a specific type')
-
-    # parser_build = subparsers.add_parser(
-    #     'config', help='Edit webezyio global configs or edit your own project configs')
+   
     parser.add_argument('-v', '--version', action='store_true',
                         help='Display webezyio current installed version')
 
@@ -199,10 +178,8 @@ def main(args=None):
     parser.add_argument(
         '-r','--redo', action='store_true', help='Redo webezy.json modification, if undo has been made.')
 
-    # parser.add_argument(
-    #     '--help', action="store_true", help='Log level',
-    #     )
 
+    parser.add_argument('--purge',action='store_true',help='Purge .webezy/contxt.json file')
     # Parse all command line arguments
     args = parser.parse_args(args)
     log.setLevel(args.loglevel)
@@ -217,61 +194,17 @@ def main(args=None):
         print_note(args,True,'Argument passed to webezy CLI')
 
     if hasattr(args, 'project'):
-        domain_name = 'domain'
-        print_info(f'Creating new webezy project "{args.project}"')
-        results = inquirer.prompt(wz_new_q, theme=WebezyTheme())
-        if results is None:
-            print_warning("Must answer project creation questions")
-            exit(1)
-        if args.path is not None:
-            result_path = inquirer.prompt([inquirer.Path(
-                'root_dir', default=args.path, message="Enter a root dir path", exists=False)], theme=WebezyTheme())
-        else:
-            try:
-                root = os.getcwd()
-                result_path = inquirer.prompt([inquirer.Path('root_dir', default=join_path(
-                    root, args.project), message="Enter a root dir path", exists=False)], theme=WebezyTheme())
-            except Exception:
-                print_error(
-                    f"Error root dir exists\n[{join_path(root,args.project)}]")
-                exit(1)
-
-        clients = []
-
-        for k in results:
-            if k == 'server':
-                server_langugae = Language.Name(results[k])
-                print_info(f'Server language: {server_langugae}')
-            if k == 'clients':
-                for c in results[k]:
-                    client_lang = Language.Name(c)
-                    out_dir = join_path(
-                        result_path['root_dir'], 'clients', client_lang)
-                    print_info(f'Adding client: {client_lang}')
-                    clients.append(
-                        {'out_dir': out_dir, 'language': client_lang})
-            if k == 'domain':
-                domain_name = results[k]
-        # Init Builder
-        root_dir = result_path['root_dir']
-        webezy_json_path = join_path(root_dir, 'webezy.json')
-        mkdir(result_path['root_dir'])
-        ARCHITECT = WebezyArchitect(
-            path=webezy_json_path, domain=domain_name, project_name=args.project)
-
-        ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
-        ARCHITECT.SetConfig({'host': args.host, 'port': args.port})
-
-        ARCHITECT.Save()
-        print_success(
-            f'Success !\n\tCreated new project "{args.project}"\n\t-> cd {root_dir}\n')
-
+        new.create_new_project(args.project,args.path,args.host,args.port)
     else:
         if helpers.check_if_under_project():
+            
             webezy_json_path = join_path(os.getcwd(), 'webezy.json')
+
             WEBEZY_JSON = rFile(webezy_json_path, json=True)
             WEBEZY_JSON = helpers.WZJson(webezy_json=WEBEZY_JSON)
-            prj_name = WEBEZY_JSON.project['name']
+
+            if args.expand:
+                print_note('Creating resource in expanded mode')
 
             if args.verbose:
                 print_note(WEBEZY_JSON._webezy_json, True, 'webezy.json')
@@ -281,6 +214,7 @@ def main(args=None):
                 namespace = parse_namespace_resource(
                     args.resource, WEBEZY_JSON)
                 resource_name = f' [{args.name}]' if args.name is not None else ''
+                
                 print_info(
                     f"Generating new resource '{namespace[0]}'{resource_name}")
 
@@ -295,317 +229,22 @@ def main(args=None):
                     path=webezy_json_path)
 
                 if namespace[0] == 'package':
-                    pkg = results['package']
-                    list_depend = well_known_type
-
-                    if WEBEZY_JSON.packages is not None:
-                        try:
-                            if WEBEZY_JSON.get_package(pkg):
-                                print_error(
-                                    f'Package [{pkg}] is already defined under "{prj_name}" project')
-                                exit(1)
-                        except Exception:
-                            log.debug("Package not found continuing...")
-                        for p in WEBEZY_JSON.packages:
-                            list_depend.append(WEBEZY_JSON.packages[p]['package'])
-                    temp_d_list = []
-                    if args.expand:
-                        dependencies = inquirer.prompt([
-                            inquirer.Checkbox(
-                                'dependencies', 'Choose package dependencies', choices=list_depend)
-                        ], theme=WebezyTheme())
-                        temp_d_list = dependencies['dependencies']
-
-                    if args.verbose:
-                        print_note(pkg, True, 'Added package')
-
-                    ARCHITECT.AddPackage(pkg, temp_d_list)
-                    ARCHITECT.Save()
-                    print_success(f'Success !\n\tCreated new package "{pkg}"')
+                    generate.package(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
                 
                 elif namespace[0] == 'service':
-                    svc = results['service']
-                    list_depend = []
-                    if args.expand:
-                        if WEBEZY_JSON.packages is not None:
-                            for p in WEBEZY_JSON.packages:
-                                list_depend.append(WEBEZY_JSON.packages[p]['package'])
-                            depend = inquirer.prompt([
-                                inquirer.Checkbox(
-                                    'dependencies', 'Choose service dependencies', choices=list_depend),
-                            ], theme=WebezyTheme())
-                            if depend is not None:
-                                list_depend=depend['dependencies']
-
-                    if WEBEZY_JSON.services is not None:
-                        if svc in WEBEZY_JSON.services:
-                            print_error(f"Service '{svc}' already exists under '{WEBEZY_JSON.project.get('name')}'")
-                            exit(1)
-
-                    if args.verbose:
-                        print_note(svc, True, 'Added Service')
-                    
-                    ARCHITECT.AddService(svc, list_depend, None)
-                    ARCHITECT.Save()
-                    
-                    print_success(f'Success !\n\tCreated new service "{svc}"')
+                    generate.service(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
                 
                 elif namespace[0] == 'message':
+                    generate.message(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
 
-                    msg_name = results['message']
-                    pkg = results['package']
-                    msg_full_name = '{0}.{1}'.format(pkg, msg_name)
-                    description = ''
-                    add_field = True
-                    temp_fields = []
-                    msg_fields = []
-                    package = WEBEZY_JSON.get_package(pkg.split('.')[1], False)
-                    avail_msgs = []
-                    for msg in package.messages:
-                        avail_msgs.append((msg.name, msg.full_name))
-                    avail_enums = []
-                    for enum in package.enums:
-                        avail_enums.append((enum.name, enum.full_name))
-                    for d in package.dependencies:
-                        if 'google.protobuf' in d:
-                            # WEBEZY_JSON.get_package()
-                            ext_msg_pkg = '.'.join(d.split('.')[:-1])
-                            avail_msgs.append(
-                                (d.split('.')[-1], '{0}.{1}'.format(ext_msg_pkg, d.split('.')[-1].capitalize())))
-                        else:
-                            d_package = WEBEZY_JSON.get_package(
-                                d.split('.')[1],False)
-                            if d_package is not None:
-                                for msg in d_package.messages:
-                                    avail_msgs.append((f'{msg.name} [{msg.full_name}]', msg.full_name))
-                    if args.expand:
-                        description = inquirer.prompt([inquirer.Text('description','Enter message description','')],theme=WebezyTheme())
-                        if description is not None:
-                            description = description['description']
-                    
-                    while add_field == True:
-
-                        opt = []
-                        for f in fields_opt:
-                            opt.append((f.split('_')[1].lower(), f))
-                        labels = []
-
-                        for l in field_label:
-                            labels.append((l.split('_')[1].lower(), l))
-                        field = inquirer.prompt([
-                            inquirer.Text(
-                                'field', 'Enter field name', validate=validation),
-                            inquirer.List(
-                                'fieldType', 'Choose field type', choices=opt),
-                            inquirer.List(
-                                'fieldLabel', 'Choose field label', choices=labels),
-                        ], theme=WebezyTheme())
-
-                        message_type = None
-                        enum_type = None
-
-                        if field['fieldType'] == FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_MESSAGE):
-                            if len(avail_msgs) == 0:
-                                print_warning("No messages availabe for field")
-                                exit(1)
-                            else:
-                                message = inquirer.prompt([
-                                    inquirer.List(
-                                        'message', 'Choose available messages', choices=avail_msgs)
-                                ], theme=WebezyTheme())
-                                message_type = message['message']
-
-                        elif field['fieldType'] == FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_ENUM):
-                            if len(avail_enums) == 0:
-                                print_warning("No enums available for field")
-                                exit(1)
-                            else:
-                                message = inquirer.prompt([
-                                    inquirer.List(
-                                        'enum', 'Choose available enums', choices=avail_enums)
-                                ], theme=WebezyTheme())
-                                enum_type = message['enum']
-
-                        if field is None:
-                            add_field = False
-                        else:
-                            new_field = field['field']
-                            field_exists_validation(
-                                new_field, temp_fields, msg_full_name)
-                            if args.expand:
-                                f_description = inquirer.prompt([inquirer.Text('description','Enter field description','')])                                
-                                if f_description is not None:
-                                    f_description = f_description['description']
-                            else:
-                                f_description = ''        
-                                
-                            temp_fields.append(new_field)
-                            msg_fields.append(helpers.WZField(
-                                new_field, field['fieldType'], field['fieldLabel'], message_type=message_type, enum_type=enum_type,description=f_description).to_dict())
-                            nextfield = inquirer.prompt([
-                                inquirer.Confirm(
-                                    'continue', message='Add more fields?', default=True)
-                            ], theme=WebezyTheme())
-                            if nextfield is None:
-                                add_field = False
-                            else:
-                                if nextfield['continue'] == False:
-                                    add_field = False
-
-                        if args.verbose:
-                            print_note(field, True, 'Added field')
-                    package = WEBEZY_JSON.get_package(pkg.split('.')[1], False)
-                    if next((m for m in package.messages if m.name == msg_name),None) is None:
-                        if args.verbose:
-                            print_note(msg_name, True, 'Added Message')
-                    
-                        ARCHITECT.AddMessage(package, msg_name,
-                                            msg_fields, description, None)
-                        ARCHITECT.Save()
-                    else:
-                        print_error(f'Message "{msg_name}" already exists under "{package.package}"')
                 elif namespace[0] == 'rpc':
-                    rpc = results['rpc']
-                    svc = results['service']
-                    full_name = '{0}.{1}'.format(svc, rpc)
-
-                    if WEBEZY_JSON.get_rpc(full_name) is not None:
-                        print_error(
-                            f'RPC [{rpc}] is already defined under "{svc}" service')
-                        exit(1)
-
-                    dependencies = WEBEZY_JSON.services[svc.split(
-                        '.')[1]].get('dependencies')
-
-                    if dependencies is None:
-                        print_error(
-                            f'Dependencies not listed under "{svc}"\n\tTry attache first a packge to service\n\tRun: \'wz package <some.package.v1> {svc}\'')
-                        exit(1)
-
-                    avail = []
-                    for d in dependencies:
-                        pkg = WEBEZY_JSON.get_package(d.split('.')[1])
-                        msgs = pkg.get('messages')
-                        if msgs is not None:
-                            for m in msgs:
-                                avail.append(m['fullName'])
-                    if len(avail) == 0:
-                        print_error('Messages not listed under packages')
-                        exit(1)
-
-                    inputs_outputs = inquirer.prompt([
-                        inquirer.List(
-                            "input_type", message="Choose the input type", choices=avail),
-                        inquirer.List(
-                            "output_type", message="Choose the output type", choices=avail),
-                    ])
-                    if inputs_outputs is None:
-                        print_error('IN/OUT Types are required for RPC')
-                        exit(1)
-
-                    ARCHITECT.AddRPC(WEBEZY_JSON.get_service(svc.split('.')[1], False), rpc, [
-                                     (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], None)
-                    ARCHITECT.Save()
+                    generate.rpc(results,WEBEZY_JSON,ARCHITECT)
 
                 elif namespace[0] == 'enum':
-                    enum_name = results['enum']
-                    pkg = results['package']
-                    package = WEBEZY_JSON.get_package(pkg.split('.')[1], False)
-                    if package.enums:
-                        if next((e for e in package.enums if e.name == enum_name),None) is not None:
-                            print_error(f'Enum "{enum_name}" already exists under "{pkg}" package')
-                            exit(1)
-                    add_value = True
-                    e_values = []
-                    while add_value:
-                        ev = inquirer.prompt([
-                            inquirer.Text(
-                                'name', 'Enter value name', validate=validation),
-                            inquirer.Text(
-                                'value', 'Enter enum value',validate=enum_value_validate),
-                        ], theme=WebezyTheme())
-                        if ev is not None:
-                            if int(ev['value']) == 0:
-                                print_warning('Enum values with 0 will be ignored by gRPC and should be used only as default value')
-                            confirm = inquirer.prompt([inquirer.Confirm('continue',message='Add more values?',default=True)],theme=WebezyTheme())
-                            v_name = ev['name']
-                           
-                            if confirm.get('continue') == False or confirm.get('continue') == None:
-                                add_value = False
-                            if next((v for v in e_values if v['name'] == ev['name']),None) is not None:
-                                print_error(f'Enum values names must be unique ! {v_name} appears already in {enum_name}')
-                                exit(1)
-                            if next((v for v in e_values if v['value'] == ev['value']),None) is not None:
-                                print_error('Enum values must be unique inside the enum scope !')
-                                exit(1)
-
-                            for e in package.enums:
-                                if next((v for v in e.values if v.name == ev['name']),None):
-                                    print_error(f'Enum values names must be unique in all enums in package ! {v_name} appears already in {e.full_name}')
-                                    exit(1)
-                            
-
-                            e_values.append(helpers.WZEnumValue(ev['name'],int(ev['value'])).to_dict())
-                        else:
-                            print_error("Enum values are required")
-                            exit(1)
-                    if next((v for v in e_values if v['number'] == 0),None) is None:
-                        e_values.insert(0,helpers.WZEnumValue(f'UNKNOWN_{enum_name.upper()}',0).to_dict())
-                        print_warning(f'Adding default enum value "UNKNOWN_{enum_name.upper()}" : 0')
-                    ARCHITECT.AddEnum(package, enum_name, e_values)
-                    ARCHITECT.Save()
+                    generate.enum(results,WEBEZY_JSON,ARCHITECT)
 
             elif hasattr(args, 'source') and hasattr(args, 'target'):
-                importing_into_pkg = False
-                old_pkg = None
-                old_svc = None
-                ARCHITECT = WebezyArchitect(
-                    path=webezy_json_path)
-
-                if len(args.target.split('.')) > 2:
-                    importing_into_pkg = True
-                    old_pkg = WEBEZY_JSON.get_package(
-                        args.target.split('.')[1])
-                    dep = []
-                    if old_pkg.get('dependencies') is not None:
-                        dep = old_pkg.get('dependencies')
-                        if args.source not in old_pkg.get('dependencies'):
-                            dep = old_pkg.get('dependencies')
-                            dep.append(args.source)
-                        else:
-                            print_warning(
-                                f"Package '{args.source}' already injected into '{args.target}' package")
-                            exit(1)
-                    else:
-                        dep.append(args.source)
-                    pkg = WEBEZY_JSON.get_package(old_pkg.get('name'),False)
-                    temp_msgs = []
-                    for m in pkg.messages:
-                        temp_msgs.append(helpers.MessageToDict(m))
-                    ARCHITECT.AddPackage(old_pkg.get('name'), dep,temp_msgs)
-                    ARCHITECT.Save()
-
-                else:
-                    dep = []
-                    old_svc = WEBEZY_JSON.get_service(args.target)
-                    if old_svc.get('dependencies') is not None:
-                        dep = old_svc.get('dependencies')
-                        if args.source not in old_svc.get('dependencies'):
-                            dep = old_pkg.get('dependencies')
-                            dep.append(args.source)
-                        else:
-                            print_warning(
-                                f"Package '{args.source}' already injected into '{args.target}' service")
-                            exit(1)
-                    else:
-                        dep.append(args.source)
-
-                    ARCHITECT.AddService(old_svc.get('name'), dep, None)
-                    ARCHITECT.Save()
-
-                importing_into_pkg = 'package' if importing_into_pkg == True else 'service'
-                print_info(
-                    f"Attaching package '{args.source}' -> '{args.target}' {importing_into_pkg}")
+                pack.import_package(args.source,args.target,webezy_json_path,WEBEZY_JSON)
             elif args.undo:
                 path = webezy_json_path.replace('webezy.json','.webezy/cache')
             
@@ -627,76 +266,22 @@ def main(args=None):
                 #     path=webezy_json_path,save=cache_files[len(cache_files)-2 if len(cache_files) > 1 else 1])
                 # ARCHITECT.Save()
             elif args.build:
-                wzBuilder = WebezyBuilder(path=webezy_json_path)
-                wzBuilder.BuildAll()
+                build.build_all(webezy_json_path)
+            elif args.purge:
+                temp_path = webezy_json_path.replace('webezy.json','.webezy/context.json')
+                confirm =inquirer.prompt([inquirer.Confirm('confirm',False,message='You are about to purge the webezy context are you sure?')],theme=WebezyTheme())
+                if confirm.get('confirm'):
+                    file_system.removeFile(temp_path)
+                    print_success("Purged webezy context !")
+                else:
+                    print_warning("Cancelling purge for webezy context")
             else:
                 if hasattr(args, 'full_name'):
                     if args.full_name is None:
                         if hasattr(args, 'type'):
-                            if args.type == 'service':
-                                header = ['Service','RPC\'s','Dependencies']
-                                tab = PrettyTable(header)
-
-                                for svc in WEBEZY_JSON.services:
-                                    service=WEBEZY_JSON.services[svc]
-                                    tab.add_row([svc,len(service.get('methods') if service.get('methods') is not None else []),service.get('dependencies')])
-                                print_info(tab,True,'Listing services resources')
-                            elif args.type == 'package':
-                                header = ['Package','Messages','Enums','Dependencies']
-                                tab = PrettyTable(header)
-
-                                for pkg in WEBEZY_JSON.packages:
-                                    pkg = WEBEZY_JSON.packages[pkg]
-                                    tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
-                                print_info(tab,True,'Listing packages resources')
-                            elif args.type == 'message':
-                                header = ['Message','Fields']
-                                tab = PrettyTable(header)
-
-                                for pkg in WEBEZY_JSON.packages:
-                                    package = WEBEZY_JSON.packages[pkg]
-                                    for m in package['messages']:
-                                        tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []) ])
-                                print_info(tab,True,'Listing packages resources')
+                            ls.list_by_resource(args.type,WEBEZY_JSON)
                     else:
-                        args_split = len(args.full_name.split('.'))
-                        if args_split == 1:
-                            print('*',args.full_name)
-                        elif args_split > 1 and args_split <=2:
-                            try:
-                                header = ['Service','RPC\'s','Dependencies']
-                                svc = WEBEZY_JSON.get_service(args.full_name.split('.')[1])
-                                tab = PrettyTable(header)
-                                tab.add_row([svc['name'],len(svc.get('methods') if svc.get('methods') is not None else []),svc.get('dependencies')])
-                                print_info(tab,True,'Listing service resource')
-                            except Exception:
-                                print_warning(f'Resource {args.full_name} wasnt found services')
-                        elif args_split == 3:
-                            try:
-                                pkg = WEBEZY_JSON.get_package(args.full_name.split('.')[1])
-                                header = ['Package','Messages','Enums','Dependencies']
-                                tab = PrettyTable(header)
-                                tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums')) if pkg.get('enums') is not None else 0,pkg.get('dependencies')])
-                                print_info(tab,True,'Listing package resource')
-                            except Exception as e:
-                                logging.error(e)
-                                print_warning(f'Resource {args.full_name} wasnt found on packages')
-                        elif args_split > 3 and args_split <= 4:
-                            try:
-                                header = ['Message','Fields']
-                                tab = PrettyTable(header)
-                                msg = WEBEZY_JSON.get_message(args.full_name)
-                                tab.add_row([msg['name'],len(msg.get('fields') if msg.get('fields') is not None else [])])
-                                print_info(tab,True,'Listing message resource')
-                            except Exception:
-                                print_warning(f'Resource {args.full_name} wasnt found on messages')
-                        else:
-                            try:
-                                msg = WEBEZY_JSON.get_message('.'.join(args.full_name.split('.')[:-1]))
-                                field = next((f for f in msg['fields'] if f['name'] == args.full_name.split('.')[-1]),None)
-                                print_info(field,True)
-                            except Exception:
-                                print_warning(f'Field {args.full_name} wasnt found on message')
+                        ls.list_by_name(args.full_name,WEBEZY_JSON)
                 else:
                     parser.print_help()
         else:

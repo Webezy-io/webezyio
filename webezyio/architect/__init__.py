@@ -81,9 +81,9 @@ class WebezyArchitect():
             service.dependencies.append(out_package)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': { service_name : MessageToDict(service) } })
 
-    def AddPackage(self,name,dependencies=[],messages=[]):
-        dict = generate_package(self._path,self._domain,name,dependencies,messages,json=True)
-        package = generate_package(self._path,self._domain,name,dependencies)
+    def AddPackage(self,name,dependencies=[],messages=[],description=None):
+        dict = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description,json=True)
+        package = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages': { f'protos/v1/{name}.proto' : dict } })
         return package
 

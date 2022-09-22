@@ -13,6 +13,8 @@ from google.protobuf import text_format
 _WELL_KNOWN_PY_IMPORTS = [
     "from google.protobuf.timestamp_pb2 import Timestamp", "from typing import Iterator"]
 
+_WELL_KNOWN_TS_IMPORTS = ["import { \n\thandleUnaryCall,\n\thandleClientStreamingCall,\n\thandleServerStreamingCall,\n\thandleBidiStreamingCall,\n\tsendUnaryData,\n\tServerDuplexStream,\n\tServerReadableStream,\n\tServerUnaryCall,\n\tServerWritableStream,\n\tstatus,\n\tUntypedHandleCall,\n\tMetadata\n } from '@grpc/grpc-js';","import { ServiceError } from './utils/error';","import { ApiType } from './utils/interfaces';"]
+
 _FIELD_TYPES = Literal["TYPE_INT32", "TYPE_INT64", "TYPE_STRING", "TYPE_BOOL",
                        "TYPE_MESSAGE", "TYPE_ENUM", "TYPE_DOUBLE", "TYPE_FLOAT", "TYPE_BYTE"]
 _FIELD_LABELS = Literal["LABEL_OPTIONAL", "LABEL_REPEATED"]
@@ -105,7 +107,7 @@ class WZField():
                         if isinstance(dict(self.__dict__)[k][j], str):
                             temp[k[1:]][j] = Value(
                                 string_value=dict(self.__dict__)[k][j])
-                        elif isinstance(dict(self.__dict__)[k][j], int):
+                        elif isinstance(dict(self.__dict__)[k][j], int) or isinstance(dict(self.__dict__)[k][j], float):
                             temp[k[1:]][j] = Value(
                                 number_value=dict(self.__dict__)[k][j])
                         elif isinstance(dict(self.__dict__)[k][j], bool):
@@ -292,6 +294,11 @@ class WZContext():
         else:
             return svc
 
+    def new_rpc(self,service,context):
+        file = next((file for file in self._files if file.get('file') == f'./services/{service}.py'),None)
+        if file is not None:
+            file.get('methods').append(context)
+
     def edit_rpc(self, service, name, new_context):
         rpc = self.get_rpc(service, name)
         rpc['code'] = new_context['code']
@@ -380,7 +387,10 @@ class WZJson():
 
     def get_service(self, name, json=True):
         if json:
-            return self._services[name]
+            try:
+                return self._services[name]
+            except Exception:
+                return None
         else:
             depend = self._services[name].get('dependencies')
             methods = self._services[name].get('methods')
@@ -608,12 +618,13 @@ class WZProto():
 
 class WZClientPy():
 
-    def __init__(self, project_package, services=None, packages=None, context: WZContext = None):
+    def __init__(self, project_package, services=None, packages=None, context: WZContext = None, config = None):
 
         self._services = services
         self._project_package = project_package
         self._context = context
         self._packages = packages
+        self._config = config
 
     def __str__(self):
 
@@ -630,17 +641,24 @@ class WZClientPy():
         return '\n\t\t'.join(stubs)
 
     def init_wrapper(self):
-        init_func = f'def __init__(self, host, port, timeout=10):\n\t\tchannel = grpc.insecure_channel(\'{_OPEN_BRCK}0{_CLOSING_BRCK}:{_OPEN_BRCK}1{_CLOSING_BRCK}\'.format(host, port))\n\t\ttry:\n\t\t\tgrpc.channel_ready_future(channel).result(timeout=10)\n\t\texcept grpc.FutureTimeoutError:\n\t\t\tsys.exit(\'Error connecting to server\')\n\t\t{self.init_stubs()}'
+        if self._config is not None:
+            host = self._config.get('host')
+            port = self._config.get('port')
+
+        else:
+            host = 'localhost'
+            port = 50051
+        init_func = f'def __init__(self, host="{host}", port={port}, timeout=10):\n\t\tchannel = grpc.insecure_channel(\'{_OPEN_BRCK}0{_CLOSING_BRCK}:{_OPEN_BRCK}1{_CLOSING_BRCK}\'.format(host, port))\n\t\ttry:\n\t\t\tgrpc.channel_ready_future(channel).result(timeout=timeout)\n\t\texcept grpc.FutureTimeoutError:\n\t\t\tsys.exit(\'Error connecting to server\')\n\t\t{self.init_stubs()}'
         return init_func
 
     def write_imports(self):
         imports = ['from typing import Tuple,Iterator', 'import grpc',
                    'import sys', 'from functools import partial']
         for svc in self._services:
-            imports.append(f'import {svc}_pb2_grpc as {svc}Service')
+            imports.append(f'from . import {svc}_pb2_grpc as {svc}Service')
         for pkg in self._packages:
             pkg = pkg.split('/')[-1].split('.')[0]
-            imports.append(f'import {pkg}_pb2 as {pkg}')
+            imports.append(f'from . import {pkg}_pb2 as {pkg}')
 
         return '\n'.join(imports)
 
@@ -665,7 +683,7 @@ class WZClientPy():
                     out_close_type = ']' if rpc.get('serverStreaming') is not None and rpc.get(
                         'serverStreaming') == True else ''
                     rpcs.append(
-                        f'def {rpc_name}(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]]) -> {out_open_type}{rpc_out_type}{out_close_type}:\n\t\t"""webezyio"""\n\n\t\treturn self.{svc}Stub.{rpc_name}(request,metadata=metadata)')
+                        f'def {rpc_name}(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]] = ()) -> {out_open_type}{rpc_out_type}{out_close_type}:\n\t\t"""webezyio"""\n\n\t\treturn self.{svc}Stub.{rpc_name}(request,metadata=metadata)')
 
             rpcs = '\n\n\t'.join(rpcs)
         return ''.join(rpcs)
@@ -673,12 +691,13 @@ class WZClientPy():
 
 class WZServicePy():
 
-    def __init__(self, project_package, name, imports=[], service=None, package=None, messages=[], enums=[], context: WZContext = None):
+    def __init__(self, project_package, name, imports=[], service=None, package=None, messages=[], enums=[], context: WZContext = None,wz_json: WZJson= None):
         self._name = name
         self._imports = imports
         self._service = service
         self._project_package = project_package
         self._context = context
+        self._wz_json = wz_json
 
     def write_imports(self):
         if self._imports is not None:
@@ -723,7 +742,17 @@ class WZServicePy():
                 if code is not None:
                     code =code.get('code')
                 else:
-                    code = '\t\tpass\n\n'
+                    if self._wz_json is not None:
+                        fields = []
+                        msg = self._wz_json.get_message(rpc.get('outputType'))
+                        for f in msg.get('fields'):
+                            fields.append('{0}=None'.format(f.get('name')))
+                    fields = ','.join(fields)
+                    if rpc_type_out:
+                        out_prototype = f'\t\t# responses = [{rpc_out_pkg}_pb2.{rpc_out_name}({fields})]\n\t\t# for res in responses:\n\t\t#    yield res\n'
+                    else:
+                        out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
+                    code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
             rpcs.append(
                 f'\t# @rpc @@webezyio - DO NOT REMOVE\n\tdef {rpc_name}(self, request: {open_in_type}{rpc_in_pkg}_pb2.{rpc_in_name}{closing_in_type}, context) -> {open_out_type}{rpc_out_pkg}_pb2.{rpc_out_name}{close_out_type}:\n{code}')
         rpcs = ''.join(rpcs)
@@ -734,6 +763,156 @@ class WZServicePy():
 
     def __str__(self):
         return f'{self.write_imports()}\n\n{self.write_class()}'
+
+class WZServiceTs():
+    
+    def __init__(self, project_package, name, imports=[], service=None, package=None, messages=[], enums=[], context: WZContext = None,wz_json: WZJson= None):
+        self._name = name
+        self._imports = imports
+        self._service = service
+        self._project_package = project_package
+        self._context = context
+        self._wz_json = wz_json
+
+    def write_imports(self):
+        if self._imports is not None:
+            list_d = list(map(lambda i: i, _WELL_KNOWN_TS_IMPORTS))
+
+            list_d.append(f'import {_OPEN_BRCK} {self._name}Server, {self._name}Service {_CLOSING_BRCK} from \'./protos/{self._name}\';')
+            for d in self._imports:
+                name = d.split('.')[1]
+                d_name = '{0}'.format(name)
+                list_d.append(f'import * as {d_name} from \'./protos/{d_name}\';')
+
+            list_d = '\n'.join(list_d)
+            return f'{list_d}'
+        else:
+            return ''
+
+    def write_class(self):
+        rpcs = []
+        functions = self._context.get_functions(self._name)
+        if functions is not None:
+            for func in functions:
+                func_code = func['code']
+                rpcs.append(
+                    f'\t// @skip @@webezyio - DO NOT REMOVE\n{func_code}')
+
+        for rpc in self._service.get('methods'):
+            rpc_name = rpc.get('name')
+            rpc_in_pkg = rpc.get('inputType').split('.')[1]
+            rpc_in_name = rpc.get('inputType').split('.')[-1]
+            rpc_out_pkg = rpc.get('outputType').split('.')[1]
+            rpc_out_name = rpc.get('outputType').split('.')[-1]
+            rpc_type_in = rpc.get('clientStreaming') if rpc.get('clientStreaming') is not None else False
+            rpc_type_out = rpc.get('serverStreaming') if rpc.get('serverStreaming') is not None else False
+            
+            handleType = 'handleUnaryCall'
+            args = f'call: ServerUnaryCall<{rpc_in_pkg}.{rpc_in_name}, {rpc_out_pkg}.{rpc_out_name}>,\n\t\tcallback: sendUnaryData<{rpc_out_pkg}.{rpc_out_name}>'
+            
+            if rpc_type_in and rpc_type_out:
+                handleType = 'handleBidiStreamingCall'
+                args = f'call: ServerDuplexStream<{rpc_in_pkg}.{rpc_in_name}, {rpc_out_pkg}.{rpc_out_name}>'
+            elif rpc_type_in and rpc_type_out == False:
+                handleType = 'handleClientStreamingCall'
+                args = f'call: ServerReadableStream<{rpc_in_pkg}.{rpc_in_name}, {rpc_out_pkg}.{rpc_out_name}>'
+            elif rpc_type_in == False and rpc_type_out:
+                handleType = 'handleServerStreamingCall'
+                args = f'call: ServerWritableStream<{rpc_in_pkg}.{rpc_in_name}, {rpc_out_pkg}.{rpc_out_name}>'
+            code = ''
+            if self._context is not None:
+                code = self._context.get_rpc(self._name, rpc_name)
+                if code is not None:
+                    code =code.get('code')
+            temp_name = rpc_name[0].lower() + rpc_name[1:]
+            rpcs.append(
+                f'\t// @rpc @@webezyio - DO NOT REMOVE\n\tpublic {temp_name}: {handleType}<{rpc_in_pkg}.{rpc_in_name}, {rpc_out_pkg}.{rpc_out_name}> = (\n\t\t{args}\n\t) => {_OPEN_BRCK}\n{code}\n\t{_CLOSING_BRCK}\n')
+        rpcs = ''.join(rpcs)
+        return f'\nclass {self._name} implements {self._name}Server, ApiType<UntypedHandleCall> {_OPEN_BRCK}\n\t[method: string]: any;\n\n{rpcs}\n\n{_CLOSING_BRCK}\n\nexport {_OPEN_BRCK}\n\t{self._name},\n\t{self._name}Service\n{_CLOSING_BRCK};'
+
+    def to_str(self):
+        return self.__str__()
+
+    def __str__(self):
+        return f'{self.write_imports()}\n{self.write_class()}'
+
+
+class WZClientTs():
+
+    def __init__(self, project_package, services=None, packages=None, context: WZContext = None, config = None):
+        self._services = services
+        self._project_package = project_package
+        self._context = context
+        self._packages = packages
+        self._config = config
+
+    def __str__(self):
+        return f'{self.write_imports()}\n{self.write_client_wrapper()}\n\n\t{self.write_services_classes()}\n{_CLOSING_BRCK}\n'
+
+    def write_client_wrapper(self):
+        return f'const _DEFAULT_OPTION = {_OPEN_BRCK}\n\t"grpc.keepalive_time_ms": 120000,\n\t"grpc.http2.min_time_between_pings_ms": 120000,\n\t"grpc.keepalive_timeout_ms": 20000,\n\t"grpc.http2.max_pings_without_data": 0,\n\t"grpc.keepalive_permit_without_calls": 1,\n{_CLOSING_BRCK}\n\nexport class {self._project_package} {_OPEN_BRCK}\n\n\t{self.init_wrapper()}'
+
+    def init_stubs(self):
+        stubs = []
+        for svc in self._services:
+            stubs.append(f'this.{svc}_client = new {svc}Client(`${_OPEN_BRCK}this.host{_CLOSING_BRCK}:${_OPEN_BRCK}this.port{_CLOSING_BRCK}`, credentials.createInsecure(),_DEFAULT_OPTION);')
+
+        return '\n\t\t'.join(stubs)
+
+    def args_stubs(self):
+        stubs = []
+        for svc in self._services:
+            stubs.append(f'private readonly {svc}_client: {svc}Client;')
+
+        return '\n\t'.join(stubs)
+
+    def init_wrapper(self):
+        if self._config is not None:
+            host = self._config.get('host')
+            port = self._config.get('port')
+
+        else:
+            host = 'localhost'
+            port = 50051
+        init_func = f'constructor(host: string = "{host}", port: number = {port}, metadata: Metadata = new Metadata()) {_OPEN_BRCK}\n\t\tthis.host = host;\n\t\tthis.port = port;\n\t\tthis.metadata = metadata;\n\t\t{self.init_stubs()}\n\t{_CLOSING_BRCK}\n\n\tprivate readonly metadata: Metadata;\n\tprivate readonly host: string;\n\tprivate readonly port: number;\n\t{self.args_stubs()}'
+        return init_func
+
+    def write_imports(self):
+        imports = ['import { credentials, Metadata, ServiceError as _service_error, ClientUnaryCall, ClientDuplexStream, ClientReadableStream, ClientWritableStream } from \'@grpc/grpc-js\';',
+                   'import { promisify } from \'util\';','import { Observable } from \'rxjs\';']
+        for svc in self._services:
+            imports.append(f'import {_OPEN_BRCK} {svc}Client {_CLOSING_BRCK} from \'./protos/{svc}\'')
+        for pkg in self._packages:
+            pkg = pkg.split('/')[-1].split('.')[0]
+            imports.append(f'import * as {pkg} from \'./protos/{pkg}\'')
+
+        return '\n'.join(imports)
+
+    def write_services_classes(self):
+        if self._services is not None:
+            rpcs = []
+            for svc in self._services:
+                for rpc in self._services[svc]['methods']:
+                    rpc_name = rpc['name']
+                    rpc_in_type_pkg = rpc['inputType'].split('.')[1]
+                    rpc_in_type = rpc['inputType'].split('.')[-1]
+                    rpc_in_type = f'{rpc_in_type_pkg}.{rpc_in_type}'
+                    rpc_out_type_pkg = rpc['inputType'].split('.')[1]
+                    rpc_out_type = rpc['inputType'].split('.')[-1]
+                    rpc_out_type = f'{rpc_out_type_pkg}.{rpc_out_type}'
+                    rpc_output_type = rpc.get('serverStreaming') if rpc.get('serverStreaming') is not None else False
+                    rpc_input_type = rpc.get('serverStreaming') if rpc.get('serverStreaming') is not None else False
+                    
+                    return_type_overload = 'ClientUnaryCall' if rpc_output_type == False and rpc_input_type == False else 'ClientDuplexStream' if rpc_output_type == True and rpc_input_type == True else 'ClientReadableStream' if rpc_output_type == True and rpc_input_type == False else 'ClientWritableStream' if rpc_output_type == False and rpc_input_type == True else 'any'
+                    return_type = f'Promise<{rpc_out_type}>' if rpc_output_type == False else f'Observable<{rpc_out_type}>'
+                    temp_rpc_name = rpc_name[0].lower() + rpc_name[1:]
+                    rpc_impl = f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\treturn promisify<{rpc_in_type}, Metadata, {rpc_out_type}>(this.{svc}_client.{temp_rpc_name}.bind(this.{svc}_client))(request, metadata);\n\t\t{_CLOSING_BRCK} else {_OPEN_BRCK}\n\t\t return this.{svc}_client.{temp_rpc_name}(request, metadata, callback);\n\t\t{_CLOSING_BRCK}' if rpc_output_type == False else f'return new observable(subscriber => {_OPEN_BRCK}\n\t\tconst stream = this.{svc}_client.subscribe(request, metadata);\n\t\t\tstream.on(\'data\', (res: {rpc_out_type}) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(res)\n\t\t\t{_CLOSING_BRCK}).on(\'end\', () => {_OPEN_BRCK}\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK}).on(\'error\', (err: any) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(err)\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK});\n\t\t{_CLOSING_BRCK})'
+                    rpcs.append(
+                        f'\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata): {return_type};\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata, callback: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload};\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata = this.metadata, callback?: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload} | {return_type} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
+
+            rpcs = '\n\n\t'.join(rpcs)
+        return ''.join(rpcs)
+
 
 
 def parse_code_file(file_content, seperator='@rpc'):

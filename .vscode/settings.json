@@ -5,6 +5,7 @@
         "/Users/amitshmulevitch/Projects/wz/webezyio/webezyio/tests/architect/services/protos",
         "/Users/amitshmulevitch/Projects/wz/webezyio/webezyio/tests/architect/services",
         "./webezyio/tests/blank/clients/python",
-        "./webezyio/tests/blank/services"
+        "./webezyio/tests/blank/services",
+        "./webezyio/tests/project/services/protos"
     ]
 }

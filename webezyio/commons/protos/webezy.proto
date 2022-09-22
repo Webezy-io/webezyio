@@ -188,7 +188,7 @@ message PackageDescriptor {
     repeated string dependencies = 6;
     repeated Enum enums = 7;
     map<string, google.protobuf.Value> extensions = 8;
-    
+    string description = 9;
 }
 
 message MethodDescriptor {

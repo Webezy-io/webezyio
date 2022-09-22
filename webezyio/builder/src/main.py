@@ -5,7 +5,7 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyProto, WebezyPy, WebezyReadme, WebezyTs
+from webezyio.builder.plugins import WebezyBase, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTs
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
 _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,
@@ -67,10 +67,18 @@ class WebezyBuilder:
         self._pm.register(WebezyProto)
         # Default Readme
         self._pm.register(WebezyReadme)
+        client_py = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'python'),False)
+        client_ts = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'typescript'),False)
+
         if server_lang == 'python':
             self._pm.register(WebezyPy)
-        elif server_lang == 'typescript':
+        
+        if client_py != False:
+            self._pm.register(WebezyPyClient)
+        
+        if server_lang == 'typescript' or client_ts:
             self._pm.register(WebezyTs)
+        
         else:
             raise errors.WebezyCoderError(
                 'ServerLanguage', f'Not supporting {server_lang} as server language at the moment.')

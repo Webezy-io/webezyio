@@ -18,6 +18,9 @@ def mkdir(path):
                       .format(path))
 
 
+def removeFile(path):
+    os.remove(path)
+
 def walkFiles(path):
     for p in os.walk(path):
         return p[2]

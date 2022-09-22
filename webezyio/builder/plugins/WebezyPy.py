@@ -21,8 +21,6 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     directories = [
         # Clients
         file_system.join_path(wz_json.path, 'clients', 'python'),
-        # Services
-        file_system.join_path(wz_json.path, 'services'),
         # Protos
         file_system.join_path(wz_json.path, 'services', 'protos')]
 
@@ -54,7 +52,7 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
 def write_services(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     for svc in wz_json.services:
         service_code = helpers.WZServicePy(wz_json.project.get('packageName'), svc, wz_json.services[svc].get(
-            'dependencies'), wz_json.services[svc], context=wz_context).to_str()
+            'dependencies'), wz_json.services[svc], context=wz_context,wz_json=wz_json).to_str()
         file_system.wFile(file_system.join_path(
             wz_json.path, 'services', f'{svc}.py'), service_code, overwrite=True)
 
@@ -76,8 +74,19 @@ def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'services', 'protos')):
         if '.py' in f:
-            file_system.copyFile(file_system.join_path(
-                wz_json.path, 'services', 'protos', f), file_system.join_path(wz_json.path, 'clients', 'python', f))
+            file = file_system.rFile(file_system.join_path(
+                wz_json.path, 'services', 'protos', f))
+            if '_grpc' not in f:
+                index = 13
+            else:
+                index = 0
+            for l in file[index:]:
+
+                if 'import ' in  l and 'grpc' not in l and 'typing' not in l:
+                    file[index] = l.replace('import ','from . import ')
+
+                index += 1
+            file_system.wFile(file_system.join_path(wz_json.path, 'clients', 'python', f), ''.join(file),True)
 
     client = helpers.WZClientPy(wz_json.project.get(
         'packageName'), wz_json.services, wz_json.packages, wz_context)
@@ -149,6 +158,10 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                         wz_context.set_method_code(svc, func_code[0].split(
                             'def ')[1].split('(')[0], ''.join(func_code))
                     methods_i = 0
+                    for r in wz_json.services[svc]['methods']:
+                        if next((m for m in f.get('methods') if m['name'] == r['name']),None) is None:
+                            new_rpc_context = {'name': r.get('name'), 'type': 'rpc', 'code': '\t\tpass'}
+                            wz_context.new_rpc(svc, new_rpc_context)
                     # Iterating all RPC's functions
                     for m in f.get('methods'):
                         if m['type'] == 'rpc':
@@ -228,8 +241,22 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
         methods = []
         for rpc in wz_json.services[svc].get('methods'):
             rpc_name = rpc.get('name')
+            rpc_type_out = rpc.get('serverStreaming')
+            rpc_out_name = rpc.get('inputType').split('.')[-1]
+            rpc_out_pkg = rpc.get('outputType').split('.')[1]
+            rpc_output = rpc.get('outputType')
+            msg = wz_json.get_message(rpc_output)
+            fields = []
+            for f in msg.get('fields'):
+                fields.append('{0}=None'.format(f.get('name')))
+            fields = ','.join(fields)
+            if rpc_type_out:
+                out_prototype = f'\t\t# responses = [{rpc_out_pkg}_pb2.{rpc_out_name}({fields})]\n\t\t# for res in responses:\n\t\t#    yield res\n'
+            else:
+                out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
+            code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
             methods.append(resources.WZMethodContext(
-                name=rpc_name, code=f'\t\t# TODO - add code\n\t\tsuper().{rpc_name}(request, context) # Remove when ready\n\n', type='rpc'))
+                name=rpc_name, code=code, type='rpc'))
         files.append(resources.WZFileContext(
             file=f'./services/{svc}.py', methods=methods))
     context = resources.proto_to_dict(resources.WZContext(files=files))

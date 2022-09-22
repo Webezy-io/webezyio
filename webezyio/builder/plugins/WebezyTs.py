@@ -1,7 +1,8 @@
-import webezyio.builder as builder
-from webezyio.commons import helpers
-
 import logging
+import subprocess
+import webezyio.builder as builder
+from webezyio.commons import helpers, file_system, resources
+from webezyio.builder.plugins.static import gitignore_ts,utils_errors_ts,utils_interfaces,package_json,bash_init_script_ts,bash_run_server_script_ts,protos_compile_script_ts,main_ts_config,clients_ts_configs,protos_ts_config
 
 
 @builder.hookimpl
@@ -11,29 +12,249 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    # TODO add postbuild validation of generated code
+    file_system.mv(file_system.join_path(wz_json.path,'server','services','client.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
+    file_system.mv(file_system.join_path(wz_json.path,'server','services','client.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
+    file_system.mv(file_system.join_path(wz_json.path,'server','services','client.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
+    
     logging.debug("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
-def init_project_structure(wz_json: helpers.WZJson):
-    return ["ts"]
+def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    directories = [
+        # Clients
+        file_system.join_path(wz_json.path, 'clients', 'typescript'),
+        file_system.join_path(wz_json.path, 'clients', 'typescript','protos'),
+        # Utils
+        file_system.join_path(wz_json.path, 'services', 'utils'),
+        # Protos
+        file_system.join_path(wz_json.path, 'services', 'protos')]
+
+    for dir in directories:
+        file_system.mkdir(dir)
+    # Utils error
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'services','utils', 'error.ts'), utils_errors_ts)
+    # Utils Interfaces
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'services','utils', 'interfaces.ts'), utils_interfaces)
+    # package.json
+    file_system.wFile(file_system.join_path(wz_json.path,'package.json'),package_json)
+    
+    # Bin files
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'bin', 'init.sh'), bash_init_script_ts)
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'bin', 'proto.js'), protos_compile_script_ts)
+
+    # tsconfig.json
+    file_system.wFile(file_system.join_path(wz_json.path, 'tsconfig.json'),main_ts_config)
+    file_system.wFile(file_system.join_path(wz_json.path, 'services', 'protos', 'tsconfig.json'),protos_ts_config)
+    
+    if wz_json.get_server_language() == 'typescript':
+        file_system.wFile(file_system.join_path(
+            wz_json.path, 'bin', 'run-server.sh'), bash_run_server_script_ts)
+    
+    # file_system.wFile(file_system.join_path(wz_json.path,'.webezy','contxt.json'),'{"files":[]}')
+    
+    # .gitignore
+    file_system.wFile(file_system.join_path(wz_json.path,'.gitignore'),gitignore_ts)
+
+    return [directories]
 
 
 @builder.hookimpl
-def write_services(wz_json: helpers.WZJson):
-    pass
+def write_services(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    for svc in wz_json.services:
+        service_code = helpers.WZServiceTs(wz_json.project.get('packageName'), svc, wz_json.services[svc].get(
+            'dependencies'), wz_json.services[svc], context=wz_context,wz_json=wz_json).to_str()
+        file_system.wFile(file_system.join_path(
+            wz_json.path, 'services', f'{svc}.ts'), service_code, overwrite=True)
 
 
 @builder.hookimpl
-def write_protos(wz_json: helpers.WZJson):
-    pass
+def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    # Running ./bin/init.sh script for compiling protos
+    logging.info("Running ./bin/init.sh script for 'protoc' compiler")
+    subprocess.run(['bash', file_system.join_path(
+        wz_json.path, 'bin', 'init.sh')])
 
+
+def parse_proto_type_to_ts(type, label, messageType=None, enumType=None):
+    temp_type = 'None'
+    if 'int' in type or type == 'float' or type == 'double':
+        temp_type = 'number'
+    elif type == 'string':
+        temp_type = 'string'
+    elif type == 'message' or type == 'enum':
+        temp_type = '{0}__pb2.{1}'.format(
+            messageType.split('.')[1], messageType.split('.')[-1])
+    elif type == 'enum':
+        temp_type = '{0}__pb2.{1}'.format(
+            enumType.split('.')[1], enumType.split('.')[-1])
+    elif type == 'bool':
+        temp_type = 'boolean'
+    if label == 'repeated':
+        temp_type = f'{temp_type}[]'
+    return temp_type
 
 @builder.hookimpl
-def compile_protos(wz_json: helpers.WZJson):
-    pass
+def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
+    for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'server','services','protos')):
+        file_system.copyFile(file_system.join_path(wz_json.path,'server','services', 'protos', f), file_system.join_path(wz_json.path,'clients','typescript','protos',f))
+    
+    client = helpers.WZClientTs(wz_json.project.get(
+        'packageName'), wz_json.services, wz_json.packages, wz_context)
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'services', 'client.ts'), client.__str__(), overwrite=True)
 
+_OPEN_BRCK = '{'
+_CLOSING_BRCK = '}'
 
 @builder.hookimpl
-def write_clients(wz_json: helpers.WZJson):
-    pass
+def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    files = []
+
+    path = wz_json.project.get('uri')
+    for svc in wz_json.services:
+        methods = []
+        for rpc in wz_json.services[svc].get('methods'):
+            rpc_name = rpc.get('name')
+            rpc_type_out = rpc.get('serverStreaming')
+            rpc_out_name = rpc.get('inputType').split('.')[-1]
+            rpc_out_pkg = rpc.get('outputType').split('.')[1]
+            rpc_output = rpc.get('outputType')
+            msg = wz_json.get_message(rpc_output)
+            fields = []
+            for f in msg.get('fields'):
+                F_VALUE = 'null'
+                if f.get('fieldType') == 'TYPE_STRING':
+                    F_VALUE = '"SomeString"'
+                elif f.get('fieldType') == 'TYPE_BOOL':
+                    F_VALUE = 'false'
+                elif f.get('fieldType') == 'TYPE_INT32' or f.get('fieldType') ==  'TYPE_INT64':
+                    F_VALUE = '1'
+                elif f.get('fieldType') == 'TYPE_FLOAT' or f.get('fieldType') == 'TYPE_DOUBLE':
+                    F_VALUE = '1.0'
+
+                fields.append('{0}: {1}'.format(f.get('name'), F_VALUE))
+            fields = ','.join(fields)
+            if rpc_type_out:
+                out_prototype = f'\t\t// let responses = [{rpc_out_pkg}_pb2.{rpc_out_name}({fields})]\n\t\t// for res in responses:\n\t\t//    yield res'
+            else:
+                out_prototype = f'\t\t// let response:{rpc_out_pkg}.{rpc_out_name} = {_OPEN_BRCK} {fields} {_CLOSING_BRCK};\n\t\t// callback(null,response);'
+            code = f'{out_prototype}\n\t\tcallback(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
+            methods.append(resources.WZMethodContext(
+                name=rpc_name, code=code, type='rpc'))
+        files.append(resources.WZFileContext(
+            file=f'./services/{svc}.ts', methods=methods))
+    context = resources.proto_to_dict(resources.WZContext(files=files))
+    logging.debug("Writing new context")
+    file_system.mkdir(file_system.join_path(path, '.webezy'))
+    file_system.wFile(file_system.join_path(
+        path, '.webezy', 'context.json'), context, json=True, overwrite=True)
+    wz_json = helpers.WZContext(context)
+    return context
+
+@builder.hookimpl
+def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    for svc in wz_json.services:
+        try:
+            svcFile = file_system.rFile(file_system.join_path(
+                wz_json.path, 'services', f'{svc}.ts'))
+            is_init = False
+            for l in svcFile:
+                if '__init__' in l:
+                    is_init = True
+                    break
+            # Non RPC functions should have # @skip line above func name
+            function_code_inlines = helpers.parse_code_file(svcFile, '@skip')
+            # Parse all rpc's in file by default # @rpc seperator
+            rpc_code_inlines = helpers.parse_code_file(svcFile)
+            for f in wz_context.files:
+
+                if svc in f.get('file'):
+                    # Iterating all regular functions
+                    for func in function_code_inlines:
+                        func_code = []
+                        for l in func:
+                            if '@rpc @@webezyio' in l:
+                                break
+
+                            func_code.append(l)
+                        func_name = func_code[0].split(
+                           '(')[0].split('private')
+                        if len(func_name) > 1:
+                            func_name = func_name[1].strip()
+                        else:
+                            func_name = func_name[0].strip()
+                        wz_context.set_method_code(svc, func_name, ''.join(func_code))
+                    methods_i = 0
+                    for r in wz_json.services[svc]['methods']:
+                        if next((m for m in f.get('methods') if m['name'] == r['name']),None) is None:
+                            new_rpc_context = {'name': r.get('name'), 'type': 'rpc', 'code': '\t\tbreak;'}
+                            wz_context.new_rpc(svc, new_rpc_context)
+                    # Iterating all RPC's functions
+                    for m in f.get('methods'):
+                        if m['type'] == 'rpc':
+                            # Checking if edit to method has happened - meaning canot find in webezy.json all context methods
+                            if next((r for r in wz_json.services[svc]['methods'] if r['name'] == m['name']), None) == None:
+                                # Getting method details from webezy.json
+                                new_method = wz_json.services[svc]['methods'][methods_i]
+                                # Building new context with old func code
+                                new_rpc_context = {'name': new_method.get(
+                                    'name'), 'type': 'rpc', 'code': ''.join(rpc_code_inlines[methods_i][1:])}
+                                # Editing inplace the RPC context
+                                wz_context.edit_rpc(
+                                    svc, m.get('name'), new_rpc_context)
+                            else:
+                                # Setting new context
+                                temp_lines = []
+                                for line in rpc_code_inlines[methods_i][4:]:
+                                    
+                                    if '\t}\n' in line:
+                                        if '\n' == temp_lines[-1]:
+                                            temp_lines.pop(-1)
+                                        break
+
+                                    temp_lines.append(line)
+
+                                wz_context.set_rpc_code(svc, m.get('name'), ''.join(
+                                    temp_lines))
+
+                            methods_i += 1
+
+        except Exception as e:
+            logging.debug(e)
+
+    file_system.wFile(file_system.join_path(
+        wz_json.path, '.webezy', 'context.json'), wz_context.dump(), True, True)
+
+@builder.hookimpl
+def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    imports = ['import { Server, ServerCredentials } from \'@grpc/grpc-js\';']
+    services_bindings = []
+    svcs = []
+    for svc in wz_json.services:
+        svcs.append(svc)
+        imports.append(f'import {_OPEN_BRCK} {svc}, {svc}Service {_CLOSING_BRCK} from \'./services/{svc}\';')
+        services_bindings.append(
+            f'server.addService({svc}Service, new {svc}());')
+    services_bindings = '\n\t'.join(services_bindings)
+    imports = '\n'.join(imports)
+    server_code = f'// Webezy.io Generated Server Code\n\
+{imports}\n\n\
+let _PORT:number = 50051;\n\
+let _HOST:string = \'0.0.0.0\';\n\
+let _ADDR = `${_OPEN_BRCK}_HOST{_CLOSING_BRCK}:${_OPEN_BRCK}_PORT{_CLOSING_BRCK}`\n\
+const server = new Server({_OPEN_BRCK}\n\
+	"grpc.max_receive_message_length": -1,\n\
+	"grpc.max_send_message_length": -1,\n\
+{_CLOSING_BRCK});\n\n\
+{services_bindings}\n\n\
+server.bindAsync(_ADDR, ServerCredentials.createInsecure(), (err: Error | null, bindPort: number) => {_OPEN_BRCK}\n\tif (err) {_OPEN_BRCK}\n\t\tthrow err;\n\t{_CLOSING_BRCK}\n\n\tconsole.log(`[webezy] Starting gRPC:server:${_OPEN_BRCK}bindPort{_CLOSING_BRCK}`,`at -> ${_OPEN_BRCK}new Date().toLocaleString(){_CLOSING_BRCK})`);\n\tserver.start();\n{_CLOSING_BRCK});'
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'server.ts'), server_code, overwrite=True)
+
