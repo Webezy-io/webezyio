@@ -105,7 +105,8 @@ Thumbs.db\n\n\
 # Ignore built ts files\n\
 dist/**/*\n\
 # ignore yarn.lock\n\
-yarn.lock'
+yarn.lock\n\n\
+.webezy\n'
 
 bash_init_script_ts = '#!/bin/bash\n\n\
 echo "[WEBEZYIO] init.sh starting protoc compiler"\n\

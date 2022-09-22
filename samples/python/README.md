@@ -1,44 +1,41 @@
-# typescript
+# python
 
 This project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !
 
 This project is using gRPC as main code generator and utilize HTTP2 + protobuf protocols for communication.
 
-# CLI steps
+# CLI Steps
 This project has been generated thanks to webezy.io CLI using the following steps:
 
 ```sh
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro samples % wz n typescript
-
-[*] Creating new webezy project "typescript"
-[?] Choose server language: Typescript
-   Python
- ❯ Typescript
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro samples % wz n python
+[*] Creating new webezy project "python"
+[?] Choose server language: Python
+ ❯ Python
+   Typescript
 
 [?] Choose clients languages (Use arrows keys to enable disable a language): 
-   ◯ Python
- ❯ ◉ Typescript
+ ❯ ◉ Python
+   ◯ Typescript
 
 [?] Enter domain name: webezy
-[?] Enter a root dir path: /Users/amitshmulevitch/Projects/wz/webezyio/samples/typescript
-[*] Server language: typescript
-[*] Adding client: typescript
+[?] Enter a root dir path: /Users/amitshmulevitch/Projects/wz/webezyio/samples/python
+[*] Server language: python
+[*] Adding client: python
 [*] Success !
-	Created new project "typescript"
-	-> cd /Users/amitshmulevitch/Projects/wz/webezyio/samples/typescript
+	Created new project "python"
+	-> cd /Users/amitshmulevitch/Projects/wz/webezyio/samples/python
 	-> And then continue developing your awesome services !
 -> For more info on how to use the webezy.io CLI go to https://www.webezy.io/docs
-
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro samples % cd typescript 
-
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro typescript % wz g p
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro samples % cd python 
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro python % wz g p
 
 [*] Generating new resource 'package'
 [?] Enter package name: SamplePackage
 [*] Success !
 	Created new package "SamplePackage"
 
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro typescript % wz -e g s
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro python % wz -e g s
 
 [*] Creating resource in expanded mode
 [*] Generating new resource 'service'
@@ -49,7 +46,7 @@ This project has been generated thanks to webezy.io CLI using the following step
 [*] Success !
 	Created new service "SampleService"
 
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro typescript % wz g m
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro python % wz g m
 
 [*] Generating new resource 'message'
 [?] Enter message name: SampleMessage
@@ -75,7 +72,7 @@ This project has been generated thanks to webezy.io CLI using the following step
 [?] Add more fields? (Y/n): n
 [*] Created Message !
 
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro typescript % wz g r
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro python % wz g r
 
 [*] Generating new resource 'rpc'
 [?] Enter rpc name: SampleUnary
@@ -94,12 +91,12 @@ This project has been generated thanks to webezy.io CLI using the following step
 [?] Choose the output type: domain.SamplePackage.v1.SampleMessage
  > domain.SamplePackage.v1.SampleMessage
 
-(wz-venv) amitshmulevitch@Amits-MacBook-Pro typescript % wz --build
+(wz-venv) amitshmulevitch@Amits-MacBook-Pro python % wz --build
 ```
 
 # Index
 Usage:
-- [Typescript](#Typescript)
+- [Python](#Python)
 
 Resources:
 - [SampleService](#SampleService)
@@ -125,34 +122,31 @@ __SampleString__ [TYPE_STRING]
 
 # Usage
 This project supports clients communication in the following languages:
-### Typescript
+### Python
 
-```ts
-import { typescript } from './clients/typescript/';
+```py
+from clients.python import python
 
-let client = new typescript();
+client = python()
 
-// Unary call
-client.<Unary>(<InMessage>)
-	.then((res:<OutMessage>) => {
-		console.log(res);
-	}).catch((err: any) => console.log(err));
+# Unary call
+response = stub.<Unary>(<InMessage>())
+print(response)
 
-// Server Stream
-client.<ServerStream>(<InMessage>)
-	.subscribe((res: <OutMessage>) => {
-		console.log(res);
-	})
+# Server stream
+responses = stub.<ServerStream>(<InMessage>())
+for res in responses:
+	print(res)
 
-// Client Stream
+# Client Stream
+requests = iter([<InMessage>(),<InMessage>()])
+response = client.<ClientStream>(requests)
+print(response)
 
-// Bidi Stream
-responses = client.<BidiStream>()
-	.subscribe((res: <OutMessage>) => {
-		console.log(res)
-	})
-
-responses.write(<InMessage>)
+# Bidi Stream
+responses = client.<BidiStream>(requests)
+for res in responses:
+	print(res)
 ```
 
 * * *

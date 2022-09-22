@@ -81,9 +81,7 @@ class WebezyBuilder:
         if server_lang == 'typescript':
             self._pm.register(WebezyTsServer)
      
-        else:
-            raise errors.WebezyCoderError(
-                'ServerLanguage', f'Not supporting {server_lang} as server language at the moment.')
+        
         for p in _WELL_KNOWN_PLUGINS:
             plug_name = self._pm.get_name(p)
             if plug_name is not None:
