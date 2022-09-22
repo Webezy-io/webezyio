@@ -1,19 +1,19 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers, file_system, resources
+from webezyio.commons import helpers, file_system, resources,pretty
 from webezyio.builder.plugins.static import gitignore_ts,utils_errors_ts,utils_interfaces,package_json,bash_init_script_ts,bash_run_server_script_ts,protos_compile_script_ts,main_ts_config,clients_ts_configs,protos_ts_config
 
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    logging.debug("Starting webezyio build process %s plugin" % (__name__))
+    pretty.print_info("Starting webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
-    logging.debug("Finished webezyio build process %s plugin" % (__name__))
+    pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
@@ -69,9 +69,11 @@ def write_services(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # Running ./bin/init.sh script for compiling protos
-    logging.info("Running ./bin/init-ts.sh script for 'protoc' compiler")
+    pretty.print_note("Running ./bin/init-ts.sh script for 'protoc' compiler")
     subprocess.run(['bash', file_system.join_path(
         wz_json.path, 'bin', 'init-ts.sh')])
+    pretty.print_success("Compiled protos %s" % (__name__))
+    
 
 
 def parse_proto_type_to_ts(type, label, messageType=None, enumType=None):

@@ -1,13 +1,13 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers, file_system, resources
+from webezyio.commons import helpers, file_system, resources, pretty
 from webezyio.builder.plugins.static import gitignore_ts,package_json,bash_init_script_ts,protos_compile_script_ts,main_ts_config_client_only,protos_ts_config_client_only
 
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    logging.debug("Starting webezyio build process %s plugin" % (__name__))
+    pretty.print_info("Starting webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
@@ -16,7 +16,14 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
         file_system.mv(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
         file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
         file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
-    logging.debug("Finished webezyio build process %s plugin" % (__name__))
+    else:
+        subprocess.run(['tsc', '-b'])
+        if file_system.check_if_file_exists(file_system.join_path(wz_json.path,'server', 'services','index.js')):
+            file_system.mv(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
+            file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
+            file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
+
+    pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl

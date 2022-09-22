@@ -74,13 +74,13 @@ class WebezyBuilder:
             self._pm.register(WebezyPy)
         elif client_py != False:
             self._pm.register(WebezyPyClient)
-        
-        if server_lang == 'typescript':
-            self._pm.register(WebezyTsServer)
-        
+           
         if client_ts:
             self._pm.register(WebezyTsClient)
-        
+
+        if server_lang == 'typescript':
+            self._pm.register(WebezyTsServer)
+     
         else:
             raise errors.WebezyCoderError(
                 'ServerLanguage', f'Not supporting {server_lang} as server language at the moment.')

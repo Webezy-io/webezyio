@@ -1,19 +1,19 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers, file_system, resources
+from webezyio.commons import helpers, file_system, resources,pretty
 from webezyio.builder.plugins.static import gitignore_py
 
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    logging.debug("Starting webezyio build process %s plugin" % (__name__))
+    pretty.print_info("Starting webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
-    logging.debug("Finished webezyio build process %s plugin" % (__name__))
+    pretty.print_info("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl

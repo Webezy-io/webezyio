@@ -1,0 +1,12 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "SamplePackage.proto";
+
+
+service SampleService {
+	// [webezyio] - None
+	rpc SampleUnary (domain.SamplePackage.v1.SampleMessage) returns (domain.SamplePackage.v1.SampleMessage);
+}
+
+

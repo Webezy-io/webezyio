@@ -1,0 +1,14 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+
+package domain.SamplePackage.v1;
+
+
+
+// [webezyio] - None
+message SampleMessage {
+	// [webezyio] - 
+	string SampleString = 1;
+}
+
