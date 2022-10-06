@@ -60,6 +60,22 @@ class ResourceKinds(Enum):
     health = 'Webezy.health/check'
 
 
+fields_opt = [
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_DOUBLE),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_FLOAT),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_INT64),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_INT32),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_BOOL),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_STRING),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_MESSAGE),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_BYTES),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_ENUM),
+]
+field_label = [
+    WZFieldDescriptor.Label.Name(WZFieldDescriptor.Label.LABEL_OPTIONAL),
+    WZFieldDescriptor.Label.Name(WZFieldDescriptor.Label.LABEL_REPEATED)
+]
+
 def get_blank_webezy_json(json=False):
     webezyJson = WebezyJson(domain='domain', project=Project(), services={},
                             packages={}, config=WebezyConfig())
@@ -107,12 +123,14 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     path = path.split('/webezy.json')[0]
     # Init service
     temp_methods = []
-    for m in methods:
-        temp_methods.append(ParseDict(m,WZMethodDescriptor()))
+    if methods:
+        for m in methods:
+            temp_methods.append(ParseDict(m,WZMethodDescriptor()))
     service = WZServiceDescriptor(uri=get_uri_service(path, name, service_language.lower()),
                                   name=name, full_name=get_service_full_name(domain, name), dependencies=dependencies,
                                   methods=temp_methods,
                                   description=description,
+                                  type= ResourceTypes.service.value,
                                   version='0.0.1')
     # Init methods
     # service.methods = dependencies
@@ -135,7 +153,7 @@ def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],de
 
     full_name = get_package_full_name(domain, name)
     package = PackageDescriptor(uri=get_uri_package(
-        path, full_name), name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description)
+        path, full_name),type= ResourceTypes.package.value, name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description)
 
     return package if json == False else MessageToDict(package)
 
@@ -153,16 +171,22 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
             index += 1
             f_fName = get_field_full_name(
                 domain, package.name, name, f.get('name'))
+            msg_type = None
             if f.get('message_type') is not None:
-                if f.get('message_type') not in package.dependencies and f.get('message_type') != package.package:
+                if f.get('message_type') not in package.dependencies and package.package not in f.get('message_type'):
                     package.dependencies.append(f.get('message_type'))
+                if 'google.protobuf' in f.get('message_type'):
+                    msg_type = '{0}.{1}.{2}'.format(f.get('message_type').split('.')[0],f.get('message_type').split('.')[1],f.get('message_type').split('.')[-1].capitalize()) if f.get('message_type') is not None else None
+                else:
+                    msg_type = f.get('message_type')
             f_uri = get_uri_field(path, f_fName)
+                
             temp_fields.append(WZFieldDescriptor(uri=f_uri, name=f.get('name'), full_name=f_fName,
                                                  description=f.get(
                                                      'description'),
                                                  index=index, field_type=f.get(
                                                      'field_type'),
-                                                 label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=f.get('message_type'), extensions=f.get('extensions')))
+                                                 label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions')))
         else:
             logging.error(
                 f"Connot insert field {f.get('name')} already exists under {name} message")
@@ -184,15 +208,16 @@ def generate_enum(path, domain, package, name, enum_values, json=False):
             domain, package, name, ev.get('name'))
         ev_uri = get_uri_enum_value(path, ev_fName)
         temp_values.append(EnumValueDescriptor(uri=ev_uri, name=ev.get(
-            'name'), number=ev.get('number'), index=index))
+            'name'), number=ev.get('number'), index=index,type=ResourceTypes.descriptor.value,kind=ResourceKinds.enum_value.value))
         index = + 1
 
-    ENUM = WZEnumDescriptor(uri=e_uri, name=name,
+    ENUM = WZEnumDescriptor(uri=e_uri, name=name,type=ResourceTypes.descriptor.value,kind=ResourceKinds.enum.value,
                             full_name=e_fName, values=temp_values)
     return ENUM if json == False else MessageToDict(ENUM)
 
 
 def generate_rpc(path, name, client_streaming, server_streaming, in_type, out_type, description=None, json=False):
+    path = path.split('/webezy.json')[0]
     RPC = WZMethodDescriptor(uri=get_uri_rpc(path, name), name=name, full_name=get_method_full_name(name), type=ResourceTypes.descriptor.value, kind=ResourceKinds.method.value,
                              input_type=in_type, output_type=out_type, client_streaming=client_streaming, server_streaming=server_streaming, description=description)
     return RPC if json == False else MessageToDict(RPC)

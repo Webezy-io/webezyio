@@ -278,7 +278,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None):
         temp_type = 'str'
     elif type == 'byte':
         temp_type = 'bytes'
-    elif type == 'message' or type == 'enum':
+    elif type == 'message':
         temp_type = '{0}__pb2.{1}'.format(
             messageType.split('.')[1], messageType.split('.')[-1])
     elif type == 'enum':

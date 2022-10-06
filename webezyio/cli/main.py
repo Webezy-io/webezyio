@@ -1,6 +1,7 @@
 import logging
 import argparse
 import os
+from posixpath import split
 from webezyio import __version__
 import inquirer
 from inquirer.themes import Theme, term
@@ -9,19 +10,16 @@ import re
 from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import helpers
-from webezyio.commons import file_system
-from webezyio.commons.errors import WebezyProtoError
+from webezyio.commons import helpers,file_system,errors,resources
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
-from webezyio.commons.file_system import join_path, mkdir, rFile
-from webezyio.cli.commands import new,build,generate,ls,package as pack
+from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit
 from prettytable import PrettyTable
 
 
 def field_exists_validation(new_field, fields, msg):
     if new_field in fields:
-        raise WebezyProtoError(
+        raise errors.WebezyProtoError(
             'Message', f'Field {new_field} already exits under {msg}')
     return True
 
@@ -46,11 +44,15 @@ def validation(answers, current):
     if len(re.findall('-', current)) > 0:
         raise errors.ValidationError(
             current, reason='Resource name must not include hyphens, underscores are allowed')
+    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+    if(regex.search(current) != None):
+        raise errors.ValidationError(
+            current, reason='Resource name must not include special charcters')
+    
     return True
 
 
 log = logging.getLogger(__name__)
-
 well_known_type = ['google.protobuf.Timestamp','google.protobuf.Struct']
 
 fields_opt = [
@@ -115,6 +117,13 @@ def main(args=None):
                             required=False, help='Port server will run on')
     parser_new.add_argument('--host', default='localhost',
                             required=False, help='Host name for server')
+    parser_new.add_argument('--domain',
+                            required=False, help='Project domain')
+    parser_new.add_argument('--server-language',
+                            required=False, help='Server language')
+    parser_new.add_argument('--clients', nargs='*',
+                            required=False, help='Clients language list seprated by spaces')
+  
 
     parser_n = subparsers.add_parser('n', help='A shortend for new commands')
     parser_n.add_argument('project', help='Project name')
@@ -124,6 +133,14 @@ def main(args=None):
                             required=False, help='Port server will run on')
     parser_n.add_argument('--host', default='localhost',
                             required=False, help='Host name for server')
+    parser_n.add_argument('--domain',
+                            required=False, help='Project domain')
+    parser_n.add_argument('--server-language',
+                            required=False, help='Server language')
+    parser_n.add_argument('--clients', nargs='*',
+                            required=False, help='Clients language list seprated by spaces')
+    parser_n.add_argument('--build', action='store_true',
+                            required=False, help='Clients language list seprated by spaces')
 
     """Generate command"""
 
@@ -132,11 +149,18 @@ def main(args=None):
     parser_generate.add_argument('resource', choices=[
                                  'service', 'package', 'message', 'rpc', 'enum'], help='Generate a webezyio resource from specific resource type')
     parser_generate.add_argument('-n', '--name', help='Name for the resource')
+    parser_generate.add_argument('-p', '--parent', help='Name for the parent resource')
+    parser_generate.add_argument('--build', action='store_true',
+                            required=False, help='Auto build resources')
+
     parser_g = subparsers.add_parser(
         'g', help='A shortend for generate commands')
     parser_g.add_argument('resource', choices=[
                           's', 'p', 'm', 'r', 'e'], help='Generate a webezyio resource from specific resource type, for e.x "s" stands for "service"')
     parser_g.add_argument('-n', '--name', help='Name for the resource')
+    parser_g.add_argument('-p', '--parent', help='Name for the parent resource')
+    parser_g.add_argument('--build', action='store_true',
+                            required=False, help='Auto build resources')
 
     """List command"""
 
@@ -153,9 +177,20 @@ def main(args=None):
         'package', help='Attach a package into other services / package')
     parser_pkg.add_argument('source', help='Package full name')
     parser_pkg.add_argument('target', help='Package path or service name')
+    parser_pkg.add_argument('-r','--remove',action='store_true', help='Package path or service name')
 
+    """Edit command"""
+    
+    parser_edit = subparsers.add_parser(
+        'edit', help='Edit any webezy.io resource')
+    parser_edit.add_argument('name', help='Resource full name')
+    parser_edit.add_argument('-a','--action',choices=['add','remove','modify'], help='Choose which action to preform on resource')
+    parser_edit.add_argument('--sub-action', help='Choose which sub-action to preform on resource')
 
-   
+    """Run server"""
+    parser.add_argument(
+        '--run-server',action='store_true', help='Run server on current active project')
+
     parser.add_argument('-v', '--version', action='store_true',
                         help='Display webezyio current installed version')
 
@@ -194,13 +229,14 @@ def main(args=None):
         print_note(args,True,'Argument passed to webezy CLI')
 
     if hasattr(args, 'project'):
-        new.create_new_project(args.project,args.path,args.host,args.port)
+        print_info(args,True)
+        new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain)
     else:
         if helpers.check_if_under_project():
             
-            webezy_json_path = join_path(os.getcwd(), 'webezy.json')
+            webezy_json_path = file_system.join_path(os.getcwd(), 'webezy.json')
 
-            WEBEZY_JSON = rFile(webezy_json_path, json=True)
+            WEBEZY_JSON = file_system.rFile(webezy_json_path, json=True)
             WEBEZY_JSON = helpers.WZJson(webezy_json=WEBEZY_JSON)
 
             if args.expand:
@@ -209,10 +245,10 @@ def main(args=None):
             if args.verbose:
                 print_note(WEBEZY_JSON._webezy_json, True, 'webezy.json')
 
-            if hasattr(args, 'resource') :
+            if hasattr(args, 'resource'):
 
                 namespace = parse_namespace_resource(
-                    args.resource, WEBEZY_JSON)
+                    args.resource, WEBEZY_JSON, args.parent)
                 resource_name = f' [{args.name}]' if args.name is not None else ''
                 
                 print_info(
@@ -226,8 +262,7 @@ def main(args=None):
                     exit(1)
 
                 ARCHITECT = WebezyArchitect(
-                    path=webezy_json_path)
-
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
                 if namespace[0] == 'package':
                     generate.package(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
                 
@@ -235,16 +270,23 @@ def main(args=None):
                     generate.service(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
                 
                 elif namespace[0] == 'message':
-                    generate.message(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
+                    generate.message(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose,args.parent)
 
                 elif namespace[0] == 'rpc':
-                    generate.rpc(results,WEBEZY_JSON,ARCHITECT)
+                    generate.rpc(results,WEBEZY_JSON,ARCHITECT,parent=args.parent)
 
                 elif namespace[0] == 'enum':
-                    generate.enum(results,WEBEZY_JSON,ARCHITECT)
+                    generate.enum(results,WEBEZY_JSON,ARCHITECT,parent=args.parent)
+
+                if args.build:
+                    build.build_all(webezy_json_path)
 
             elif hasattr(args, 'source') and hasattr(args, 'target'):
-                pack.import_package(args.source,args.target,webezy_json_path,WEBEZY_JSON)
+                if args.remove:
+                    pack.remove_import(args.source,args.target,webezy_json_path,WEBEZY_JSON)
+                else:
+                    pack.import_package(args.source,args.target,webezy_json_path,WEBEZY_JSON)
+            
             elif args.undo:
                 path = webezy_json_path.replace('webezy.json','.webezy/cache')
             
@@ -275,6 +317,30 @@ def main(args=None):
                     print_success("Purged webezy context !")
                 else:
                     print_warning("Cancelling purge for webezy context")
+            elif args.run_server:
+                run.run_server(WEBEZY_JSON)
+
+            elif hasattr(args, 'name'):
+                resource = parse_name_to_resource(args.name,WEBEZY_JSON)
+                type = resource.get('type')
+                ARCHITECT = WebezyArchitect(
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
+                if type == 'packages':
+                    edit.edit_package(resource,args.action,WEBEZY_JSON,ARCHITECT)
+                elif type == 'service':
+                    edit.edit_service(resource,args.action,WEBEZY_JSON,ARCHITECT)
+                elif type == 'descriptors':
+                    kind = resource.get('kind')
+                    if kind == resources.ResourceKinds.enum.value:
+                        edit.edit_enum(resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+                    elif kind == resources.ResourceKinds.enum_value.value:
+                        edit.edit_enum_value(resource,args.action,WEBEZY_JSON,ARCHITECT)
+                    elif kind == resources.ResourceKinds.field.value:
+                        edit.edit_field(resource,args.action,WEBEZY_JSON,ARCHITECT)
+                    elif kind == resources.ResourceKinds.message.value:
+                        edit.edit_message(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+                    elif kind == resources.ResourceKinds.method.value:
+                        edit.edit_rpc(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
             else:
                 if hasattr(args, 'full_name'):
                     if args.full_name is None:
@@ -282,14 +348,80 @@ def main(args=None):
                             ls.list_by_resource(args.type,WEBEZY_JSON)
                     else:
                         ls.list_by_name(args.full_name,WEBEZY_JSON)
-                else:
-                    parser.print_help()
+                
         else:
             print_warning(
                 'Not under valid webezyio project !\n\tMake sure you are on the root directory of your project')
 
+def parse_name_to_resource(full_name,wz_json: helpers.WZJson):
+    resource = None
+    print(len(full_name.split('.')))
+    if len(full_name.split('.')) > 4:
+        log.debug("Searching for fields / enum values")
+        # Field / Enum Value
+        pkg_name = full_name.split('.')[1]
+        pkg_v = full_name.split('.')[2]
+        pkg_path = f'protos/{pkg_v}/{pkg_name}.proto'
+        if wz_json.packages[pkg_path].get('messages') is not None:
+            msg_name = '.'.join(full_name.split('.')[:-2])
+            search_msg = next((m for m in wz_json.packages[pkg_path].get('messages') if m.get('fullName') == msg_name),None)
+            if search_msg is not None:
+                search_field = next((f for f in search_msg if f.get('fullName') == full_name), None)
+                if search_field is not None:
+                    resource = search_field
+       
+    elif len(full_name.split('.')) == 4:
+        #  Message / Enum 
+        log.debug("Searching for Messages / enum")
 
-def parse_namespace_resource(name, wz_json: helpers.WZJson):
+        pkg_name = full_name.split('.')[1]
+        pkg_v = full_name.split('.')[2]
+        pkg_path = f'protos/{pkg_v}/{pkg_name}.proto'
+        if wz_json.packages.get(pkg_path) is None:
+
+            if wz_json.services.get(pkg_name).get('methods') is not None and resource is None:
+                log.debug("Searching for RPC")
+                rpc_name = full_name.split('.')[-1]
+                search_rpc = next((e for e in wz_json.services[pkg_name].get('methods') if e.get('name') == rpc_name),None)
+                if search_rpc is not None:
+                    resource = search_rpc
+            else:
+                print_error(f'Resource cant be found as {pkg_path} does not exists')
+                exit(1)
+        else:
+
+            if wz_json.packages.get(pkg_path).get('messages') is not None:
+                search_msg = next((m for m in wz_json.packages[pkg_path].get('messages') if m.get('fullName') == full_name),None)
+                if search_msg is not None:
+                    resource = search_msg
+            
+            if wz_json.packages.get(pkg_path).get('enums') is not None and resource is None:
+                search_enum = next((e for e in wz_json.packages[pkg_path].get('enums') if e.get('fullName') == full_name),None)
+                if search_enum is not None:
+                    resource = search_enum
+
+    elif len(full_name.split('.')) == 3:
+        # Package
+        log.debug("Searching for Package")
+        pkg_name = full_name.split('.')[1]
+        pkg_v = full_name.split('.')[2]
+        pkg_path = f'protos/{pkg_v}/{pkg_name}.proto'
+        if wz_json.packages.get(pkg_path) is not None:
+           resource = wz_json.packages.get(pkg_path)
+    elif len(full_name.split('.')) == 1:
+        # Service / Project
+        if wz_json.services.get(full_name) is not None:
+           resource = wz_json.services.get(full_name)
+
+    if resource is None:
+        print_error(f'Couldnt find any resource by the name -> {full_name}')
+        exit(1)
+    else:
+        log.debug('Found resource {0}:{1}'.format(resource.get('type'),resource.get('kind')))
+
+    return resource
+
+def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
     questions = []
     namespace = name[0]
     if namespace == 's':
@@ -310,15 +442,26 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson):
 
         for svc in services:
             temp_s.append((services[svc]['name'], services[svc]['fullName']))
+        has_service = False
+        if parent is not None:
+            for s in temp_s:
+                if parent in s[0]:
+                    parent = s[1]
+                    has_service = True
 
+            if has_service == False:
+                print_error(f"Service -> {parent} not exists under {wz_json.project.get('name')}")
+                exit(1)
         wz_g_r_q = [
             inquirer.Text("rpc", message="Enter rpc name",
-                          validate=validation),
-            inquirer.List(
-                "service", message="Choose a service to attach the rpc", choices=temp_s),
+                          validate=validation),    
             inquirer.List("type", message="Choose message type", choices=[('Unary', (False, False)), (
                 'Client stream', (True, False)), ('Server stream', (False, True)), ('Bidi stream', (True, True))]),
         ]
+        if has_service == False:
+            wz_g_r_q.append(inquirer.List(
+                "service", message="Choose a service to attach the rpc", choices=temp_s))
+
         questions = wz_g_r_q
 
     elif namespace == 'm':
@@ -332,14 +475,25 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson):
             exit(1)
 
         for pkg in packages:
-            temp_p.append(('{0} [{1}]'.format(packages[pkg]['name'],packages[pkg]['package']), packages[pkg]['package']))
+            temp_p.append(('{0} [{1}]'.format(packages[pkg]['name'],packages[pkg]['package'])))
+        
+        has_package = False
+        if parent is not None:
+            for p in temp_p:
+                if parent in p:
+                    has_package = True
+            if has_package == False:
+                print_error(f"Package -> {parent} not exists under {wz_json.project.get('name')}")
+                exit(1)
 
         wz_g_m_q = [
             inquirer.Text("message", message="Enter message name",
                           validate=validation),
-            inquirer.List(
-                "package", message="Choose a package to attach the message", choices=temp_p),
         ]
+
+        if has_package == False:
+            wz_g_m_q.append(inquirer.List(
+            "package", message="Choose a package to attach the message", choices=temp_p))
 
         questions = wz_g_m_q
 
@@ -355,7 +509,18 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson):
 
         for pkg in packages:
             temp_p.append(('{0} [{1}]'.format(packages[pkg]['name'],packages[pkg]['package']), packages[pkg]['package']))
-        wz_g_e_q.append(inquirer.List('package','Choose a package',choices=temp_p))
+        has_parent = False
+
+        if parent is not None:
+            for p in temp_p:
+                if p[1] == parent:
+                    has_parent = True
+            if has_parent == False:
+                print_error(f"{parent} Is not under current project")
+                exit(1)
+        else:
+            wz_g_e_q.append(inquirer.List('package','Choose a package',choices=temp_p))
+
         questions = wz_g_e_q
 
     return namespace, questions

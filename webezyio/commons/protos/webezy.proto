@@ -78,6 +78,8 @@ message EnumValueDescriptor {
     string name = 2;
     int32 number = 3;
     int32 index = 4;
+    string type = 5;
+    string kind =  6;
 }
 
 message Enum {
@@ -85,6 +87,8 @@ message Enum {
     string name = 2;
     string full_name = 3;
     repeated EnumValueDescriptor values = 4;
+    string type = 5;
+    string kind =  6;
 }
 
 message FieldDescriptor {
@@ -134,7 +138,7 @@ message FieldDescriptor {
     int32 index = 4;
     Type field_type = 5;
     Label label = 6;
-    Enum enum_type = 7;
+    optional string enum_type = 7;
     string type = 8;
     string kind = 9;
     // If the field type is another message an valid URI for the Descriptor
@@ -177,6 +181,8 @@ message ServiceDescriptor {
     string version = 7;
     repeated string dependencies = 8;
     string description = 9;
+    string type = 10;
+    string kind = 11;
 }
 
 message PackageDescriptor {
@@ -189,6 +195,8 @@ message PackageDescriptor {
     repeated Enum enums = 7;
     map<string, google.protobuf.Value> extensions = 8;
     string description = 9;
+    string type = 10;
+    string kind = 11;
 }
 
 message MethodDescriptor {

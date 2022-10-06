@@ -49,7 +49,7 @@ def package(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,ve
             list_depend.append(webezy_json.packages[p]['package'])
     temp_d_list = []
     if expand:
-        description = inquirer.prompt([inquirer.Text('description','Enter message description','')],theme=WebezyTheme())
+        description = inquirer.prompt([inquirer.Text('description','Enter package description','')],theme=WebezyTheme())
         description = description.get('description')
         dependencies = inquirer.prompt([
             inquirer.Checkbox(
@@ -89,18 +89,18 @@ def service(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,ve
     if verbose:
         print_note(svc, True, 'Added Service')
     
-    architect.AddService(svc, list_depend, None)
+    architect.AddService(svc, list_depend, None, [])
     architect.Save()
     
     print_success(f'Success !\n\tCreated new service "{svc}"')
 
-def message(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,verbose=False):
+def message(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,verbose=False,parent:str=None):
     msg_name = results['message']
     if msg_name.lower() == 'message':
         print_error("Do not name your message as 'message' it can cause issues down the road\n\t-> please choose another name for your message")
         exit(1)
     
-    pkg = results['package']
+    pkg = results.get('package') if parent is None else parent
     msg_full_name = '{0}.{1}'.format(pkg, msg_name)
     description = ''
     add_field = True
@@ -109,9 +109,10 @@ def message(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,ve
     package = webezy_json.get_package(pkg.split('.')[1], False)
     avail_msgs = []
     avail_field_ext = []
+
     for msg in package.messages:
-        if msg.extension_type is None:
-            if msg.description is not None:
+        if msg.extension_type == 0:
+            if msg.description is not None and msg.full_name != msg_full_name:
                 desc = f' - '+bcolors.OKBLUE+msg.description+ bcolors.ENDC
             else:
                 desc=''
@@ -130,7 +131,7 @@ def message(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,ve
             # webezy_json.get_package()
             ext_msg_pkg = '.'.join(d.split('.')[:-1])
             avail_msgs.append(
-                (d.split('.')[-1], '{0}.{1}'.format(ext_msg_pkg, d.split('.')[-1].capitalize())))
+                (d.split('.')[-1], '{0}.{1}'.format(ext_msg_pkg, d.split('.')[-1])))
         else:
             d_package = webezy_json.get_package(
                 d.split('.')[1],False)
@@ -277,9 +278,9 @@ def message(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,ve
         print_error(f'Message "{msg_name}" already exists under "{package.package}"')
 
 
-def rpc(results,webezy_json:WZJson,architect:WebezyArchitect):
+def rpc(results,webezy_json:WZJson,architect:WebezyArchitect,expand=None,parent:str=None):
     rpc = results['rpc']
-    svc = results['service']
+    svc = results.get('service') if parent is None else f'{webezy_json.domain}.{parent}.v1'
     full_name = '{0}.{1}'.format(svc, rpc)
 
     if webezy_json.get_rpc(full_name) is not None:
@@ -311,18 +312,19 @@ def rpc(results,webezy_json:WZJson,architect:WebezyArchitect):
             "input_type", message="Choose the input type", choices=avail),
         inquirer.List(
             "output_type", message="Choose the output type", choices=avail),
-    ])
+    ],theme=WebezyTheme())
     if inputs_outputs is None:
         print_error('IN/OUT Types are required for RPC')
         exit(1)
-
     architect.AddRPC(webezy_json.get_service(svc.split('.')[1], False), rpc, [
                         (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], None)
     architect.Save()
+    print_success(f'Success !\n\tCreated new RPC "{rpc}"')
 
-def enum(results,webezy_json:WZJson,architect:WebezyArchitect):
+
+def enum(results,webezy_json:WZJson,architect:WebezyArchitect,parent:str):
     enum_name = results['enum']
-    pkg = results['package']
+    pkg = results['package'] if parent is None else parent
     package = webezy_json.get_package(pkg.split('.')[1], False)
     if package.enums:
         if next((e for e in package.enums if e.name == enum_name),None) is not None:
@@ -348,7 +350,7 @@ def enum(results,webezy_json:WZJson,architect:WebezyArchitect):
             if next((v for v in e_values if v['name'] == ev['name']),None) is not None:
                 print_error(f'Enum values names must be unique ! {v_name} appears already in {enum_name}')
                 exit(1)
-            if next((v for v in e_values if v['value'] == ev['value']),None) is not None:
+            if next((v for v in e_values if v.get('number') == int(ev.get('value'))),None) is not None:
                 print_error('Enum values must be unique inside the enum scope !')
                 exit(1)
 

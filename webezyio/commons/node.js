@@ -1,15 +1,10 @@
 const path = require("path");
 const { execSync } = require("child_process");
-const rimraf = require("rimraf");
 
-const PROTO_DIR = path.join(__dirname, "../protos");
-const MODEL_DIR = path.join(__dirname, "../services/protos");
-const PROTOC_PATH = path.join(__dirname, "../node_modules/grpc-tools/bin/protoc");
-const PLUGIN_PATH = path.join(__dirname, "../node_modules/.bin/protoc-gen-ts_proto");
-
-rimraf.sync(`${MODEL_DIR}/*`, {
-  glob: { ignore: `${MODEL_DIR}/tsconfig.json` },
-});
+const PROTO_DIR = path.join(__dirname, "./protos");
+const MODEL_DIR = path.join(__dirname, "./protos");
+const PROTOC_PATH = path.join(__dirname, "../../samples/typescript/node_modules/grpc-tools/bin/protoc");
+const PLUGIN_PATH = path.join(__dirname, "../../samples/typescript/node_modules/.bin/protoc-gen-ts_proto");
 
 const protoConfig = [
   `--plugin=${PLUGIN_PATH}`,

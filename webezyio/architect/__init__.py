@@ -1,7 +1,7 @@
 from enum import Enum
 import logging
 from webezyio.commons.file_system import join_path
-from webezyio.commons.pretty import print_note
+from webezyio.commons.pretty import print_info, print_note
 
 from webezyio.commons.protos.webezy_pb2 import Language, PackageDescriptor
 from google.protobuf.json_format import MessageToDict
@@ -9,7 +9,7 @@ from webezyio.commons.resources import generate_enum, generate_message, generate
                                      generate_rpc, generate_service
 
 from webezyio.architect.recievers import Builder
-from webezyio.architect.commands import AddResource, InitProject,\
+from webezyio.architect.commands import AddResource, EditResource, InitProject,\
                                     Logger,RemoveResource, SetDomain
 from webezyio.architect.invoker import Webezy
 
@@ -20,6 +20,8 @@ logging.basicConfig(
 )
 
 class CommandMap(Enum):
+    _REMOVE_RESOURCE = "RemoveResource"
+    _EDIT_RESOURCE = "EditResource"
     _ADD_RESOURCE = "AddResource"
     _SET_DOMAIN = "SetDomain"
     _SET_CONFIG = "SetConfig"
@@ -33,10 +35,14 @@ class WebezyArchitect():
         self._domain = domain
         self._project_name = project_name
         self._builder = Builder()
+        self._remove_resource = RemoveResource(self._builder)
+        self._edit_resource = EditResource(self._builder)
         self._add_resource = AddResource(self._builder)
         self._logger = Logger(self._builder)
         self._set_domain = SetDomain(self._builder)
         self._webezy = Webezy(self._path,save)
+        self._webezy.registerCommand(CommandMap._REMOVE_RESOURCE,self._remove_resource)
+        self._webezy.registerCommand(CommandMap._EDIT_RESOURCE,self._edit_resource)
         self._webezy.registerCommand(CommandMap._ADD_RESOURCE,self._add_resource)
         self._webezy.registerHook(CommandMap._ADD_RESOURCE,'log',self._logger)
 
@@ -57,9 +63,9 @@ class WebezyArchitect():
     def AddClient(self):
         pass
 
-    def AddService(self,name,dependencies,description):
-        dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,json=True) 
-        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description)
+    def AddService(self,name,dependencies,description,methods):
+        dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,json=True,methods=methods) 
+        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,methods=methods)
         services = self._webezy.webezyJson.get('services') if self._webezy.webezyJson.get('services') is not None else {} 
         services[name] = dict
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': services })
@@ -94,7 +100,7 @@ class WebezyArchitect():
             self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
             return message
         else:
-            logging.error(f"Cannot create message {message.name} already exists under {package.name} package")
+            logging.error(f"Cannot create message '{message.name}' already exists under '{package.name}' package")
 
     def AddEnum(self,package,name,enum_values):
         enum = generate_enum(self._path,self._domain,package.name,name,enum_values)
@@ -102,17 +108,33 @@ class WebezyArchitect():
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
         return enum
 
-    def EditService(self):
-        pass
+    def EditService(self,name,dependencies,description,methods):
+        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,methods=methods)
+        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(service))
+        return service
 
-    def EditPackage(self):
-        pass
+    def EditPackage(self,name,dependencies=[],messages=[],enums=[],description=None):
+        package = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description,enums=enums)
+        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(package))
+        return package
 
-    def EditMessage(self):
-        pass
+    def EditMessage(self,package,name,fields,description=None,options=None):
+        message = generate_message(self._path,self._domain,package,name,fields,option=options,description=description)
+        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(message))
+        return message
 
-    def EditEnum(self):
-        pass
+    def EditEnum(self,package,name,enum_values):
+        enum = generate_enum(self._path,self._domain,package.name,name,enum_values)
+        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(enum))
+    
+    def RemoveEnum(self,full_name):
+        self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
+    
+    def RemoveMessage(self,full_name):
+        self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
+
+    def RemoveRpc(self, full_name):
+        self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
 
     def Save(self):
         logging.info("Saving webezyio architect process")

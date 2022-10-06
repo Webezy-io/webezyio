@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 from webezyio.commons.file_system import join_path,mkdir
@@ -26,40 +27,52 @@ wz_new_q = [
     inquirer.Text("domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
-def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None):
+def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None,server_language:str=None,clients=[],domain:str=None):
 
     domain_name = 'domain'
     print_info(f'Creating new webezy project "{project_name}"')
-    results = inquirer.prompt(wz_new_q, theme=WebezyTheme())
+    if server_language is None and clients == None and domain is None:
+        results = inquirer.prompt(wz_new_q, theme=WebezyTheme())
     
-    if results is None:
-        print_warning("Must answer project creation questions")
-        exit(1)
-    
-    if path is not None:
-        result_path = inquirer.prompt([inquirer.Path(
-            'root_dir', default=path, message="Enter a root dir path", exists=False)], theme=WebezyTheme())
+        if results is None:
+            print_warning("Must answer project creation questions")
+            exit(1)
     else:
+        results = {}
+        results['server'] = server_language
+        results['clients'] = clients
+        results['domain'] = domain
+
+    if path is None:
         try:
             root = os.getcwd()
             result_path = inquirer.prompt([inquirer.Path('root_dir', default=join_path(
                 root, project_name), message="Enter a root dir path", exists=False)], theme=WebezyTheme())
+            if result_path is not None:
+                result_path = result_path['root_dir']
         except Exception:
             print_error(
                 f"Error root dir exists\n[{join_path(root,project_name)}]")
             exit(1)
+    else:
+        result_path = join_path(path, project_name)
 
     clients = []
-
     for k in results:
         if k == 'server':
-            server_langugae = Language.Name(results[k])
+            if type(results[k]) == str:
+                server_langugae = results[k]
+            else:
+                server_langugae = Language.Name(results[k])
             print_info(f'Server language: {server_langugae}')
         if k == 'clients':
             for c in results[k]:
-                client_lang = Language.Name(c)
+                if type(c) == str:
+                    client_lang = c
+                else:
+                    client_lang = Language.Name(c)
                 out_dir = join_path(
-                    result_path['root_dir'], 'clients', client_lang)
+                    result_path, 'clients', client_lang)
                 print_info(f'Adding client: {client_lang}')
                 clients.append(
                     {'out_dir': out_dir, 'language': client_lang})
@@ -67,19 +80,19 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
             domain_name = results[k]
 
     out_dir = join_path(
-                    result_path['root_dir'], 'clients', Language.Name(results['server']))
-    if next((c for c in clients if c.get('language') == Language.Name(results['server']) ),None) is None:
+                    result_path, 'clients',results['server'] if type(results['server']) == str else Language.Name(results['server']))
+    if next((c for c in clients if c.get('language') == (results['server'] if type(results['server']) == str else Language.Name(results['server'])) ),None) is None:
         clients.append({'out_dir': out_dir, 'language': results['server']})
-    root_dir = result_path['root_dir']
+    root_dir = result_path
     webezy_json_path = join_path(root_dir, 'webezy.json')
-    mkdir(result_path['root_dir'])
+    mkdir(result_path)
 
     ARCHITECT = WebezyArchitect(
         path=webezy_json_path, domain=domain_name, project_name=project_name)
 
     ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
-
-    ARCHITECT.SetConfig({'host': host, 'port': port})
+    ARCHITECT.SetDomain(domain_name)
+    ARCHITECT.SetConfig({'host': host, 'port': int(port)})
 
     ARCHITECT.Save()
     

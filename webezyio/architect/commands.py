@@ -32,13 +32,19 @@ class AddResource(ICommand):
     def execute(self,webezyJson,*args,**kwargs):
         self._builder.add_resource(webezyJson,args,**kwargs)
 
+class EditResource(ICommand):
+    def __init__(self, builder:Builder):
+        self._builder = builder
+
+    def execute(self,webezyJson,resource,*args):
+        self._builder.edit_resource(webezyJson,resource=resource)
 
 class RemoveResource(ICommand):
     def __init__(self, builder:Builder):
         self._builder = builder
 
-    def execute(self,webezyJson,*args,**kwargs):
-        self._builder.remove_resource(webezyJson,args,**kwargs)
+    def execute(self,webezyJson,full_name,*args):
+        self._builder.remove_resource(webezyJson,full_name,*args)
 
 
 class CreateNewProject(ICommand):

@@ -1,5 +1,6 @@
 pluggy<1.0,>=0.3
 inquirer
+prettytable
 protobuf<4.21.0
 grpcio==1.47.0
 grpcio-tools==1.47.0

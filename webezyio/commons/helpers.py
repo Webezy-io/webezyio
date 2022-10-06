@@ -1,6 +1,8 @@
 import logging
 import os
+import re
 from typing import List, Literal
+from webezyio.commons import errors
 from webezyio.commons.resources import generate_package, generate_service
 from webezyio.commons.errors import WebezyCoderError, WebezyValidationError
 from webezyio.commons.file_system import check_if_file_exists, join_path
@@ -9,7 +11,7 @@ from itertools import groupby
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import ParseDict, MessageToDict
 from google.protobuf import text_format
-
+from inquirer import errors as inquirerErrors
 _WELL_KNOWN_PY_IMPORTS = [
     "from google.protobuf.timestamp_pb2 import Timestamp", "from typing import Iterator"]
 
@@ -929,3 +931,50 @@ def parse_code_file(file_content, seperator='@rpc'):
     #         temp_lines.append(lines)
 
     return [list(g) for k, g in groupby(file_content, key=lambda x: seperator not in x) if k][1:]
+
+
+
+def validation(answers, current):
+
+    if len(current) == 0:
+        raise inquirerErrors.ValidationError(
+            current, reason='Resource name must not be blank')
+    if len(re.findall('\s', current)) > 0:
+        raise inquirerErrors.ValidationError(
+            current, reason='Resource name must not include blank spaces')
+    if len(re.findall('-', current)) > 0:
+        raise inquirerErrors.ValidationError(
+            current, reason='Resource name must not include hyphens, underscores are allowed')
+    return True
+
+def field_exists_validation(new_field, fields, msg):
+    if new_field in fields:
+        raise errors.WebezyProtoError(
+            'Message', f'Field {new_field} already exits under {msg}')
+    return True
+
+def float_value_validate(answers, current):
+    try:
+        float(current)
+    except Exception:
+        raise inquirerErrors.ValidationError(
+            current, reason='Value must be valid float type')
+    return True
+
+def int_value_validate(answers, current):
+    try:
+        int(current)
+    except Exception:
+        raise inquirerErrors.ValidationError(
+            current, reason='Value must be valid integer type')
+    return True
+
+
+
+def enum_value_validate(answers, current):
+    try:
+        int(current)
+    except Exception:
+        raise errors.ValidationError(
+            current, reason='Enum Value MUST be an integer value')
+    return True
