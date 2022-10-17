@@ -101,6 +101,7 @@ _CLOSING_BRCK = '}'
 @builder.hookimpl
 def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     files = []
+    pretty.print_error("Initialize webezy.context file")
 
     path = wz_json.project.get('uri')
     for svc in wz_json.services:
@@ -145,6 +146,8 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    pretty.print_note("Re-Building webezy.context")
+
     for svc in wz_json.services:
         try:
             svcFile = file_system.rFile(file_system.join_path(
@@ -179,8 +182,9 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                     methods_i = 0
                     for r in wz_json.services[svc]['methods']:
                         if next((m for m in f.get('methods') if m['name'] == r['name']),None) is None:
+                            pretty.print_note(f"Starting new RPC at webezy,context [{r.get('name')}]")
                             new_rpc_context = {'name': r.get('name'), 'type': 'rpc', 'code': '\t\tbreak;'}
-                            wz_context.new_rpc(svc, new_rpc_context)
+                            wz_context.new_rpc(svc, new_rpc_context, suffix='ts')
                     # Iterating all RPC's functions
                     for m in f.get('methods'):
                         if m['type'] == 'rpc':
@@ -197,23 +201,31 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                             else:
                                 # Setting new context
                                 temp_lines = []
-                                for line in rpc_code_inlines[methods_i][4:]:
+                                num_lines = 4
+                                for l in rpc_code_inlines[methods_i]:
+                                    if 'ServerWritableStream<' in l:
+                                        num_lines = 3
+                                        break
+                                for line in rpc_code_inlines[methods_i][num_lines:]:
                                     
-                                    if '\t}\n' in line:
+                                    if '\t}\n' == line:
                                         if '\n' == temp_lines[-1]:
-                                            temp_lines.pop(-1)
+                                            break
+
+                                    if 'export {' in line:
                                         break
 
                                     temp_lines.append(line)
-
+                                pretty.print_info(f"Setting RPC -> {m.get('name')}\n-> {temp_lines}")
                                 wz_context.set_rpc_code(svc, m.get('name'), ''.join(
                                     temp_lines))
 
                             methods_i += 1
 
         except Exception as e:
-            logging.debug(e)
+            pretty.print_error(e)
 
+    pretty.print_note(wz_context.dump(),True)
     file_system.wFile(file_system.join_path(
         wz_json.path, '.webezy', 'context.json'), wz_context.dump(), True, True)
 

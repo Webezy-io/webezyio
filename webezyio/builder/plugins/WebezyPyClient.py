@@ -13,7 +13,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
-    pretty.print_info("Finished webezyio build process %s plugin" % (__name__))
+    pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl

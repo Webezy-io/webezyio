@@ -307,6 +307,12 @@ def rpc(results,webezy_json:WZJson,architect:WebezyArchitect,expand=None,parent:
         print_error('Messages not listed under packages')
         exit(1)
 
+    description = None
+    if expand:
+        description = inquirer.prompt([inquirer.Text('description','Enter RPC description','')],theme=WebezyTheme())
+        if description is not None:
+            description = description['description']
+
     inputs_outputs = inquirer.prompt([
         inquirer.List(
             "input_type", message="Choose the input type", choices=avail),
@@ -317,7 +323,7 @@ def rpc(results,webezy_json:WZJson,architect:WebezyArchitect,expand=None,parent:
         print_error('IN/OUT Types are required for RPC')
         exit(1)
     architect.AddRPC(webezy_json.get_service(svc.split('.')[1], False), rpc, [
-                        (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], None)
+                        (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], description)
     architect.Save()
     print_success(f'Success !\n\tCreated new RPC "{rpc}"')
 

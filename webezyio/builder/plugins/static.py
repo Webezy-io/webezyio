@@ -220,7 +220,7 @@ main_ts_config = '{\n\
         "noPropertyAccessFromIndexSignature": true,\n\
         "noUnusedLocals": false,\n\
         "noUnusedParameters": false,\n\
-        "removeComments": true,\n\
+        "removeComments": false,\n\
         "sourceMap": true,\n\
         "forceConsistentCasingInFileNames": true,\n\
         "esModuleInterop": true,\n\
@@ -293,7 +293,7 @@ main_ts_config_client_only = '{\n\
         "noPropertyAccessFromIndexSignature": true,\n\
         "noUnusedLocals": false,\n\
         "noUnusedParameters": false,\n\
-        "removeComments": true,\n\
+        "removeComments": false,\n\
         "sourceMap": true,\n\
         "forceConsistentCasingInFileNames": true,\n\
         "esModuleInterop": true,\n\
