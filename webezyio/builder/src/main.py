@@ -5,7 +5,7 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
 _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,
@@ -65,6 +65,8 @@ class WebezyBuilder:
         self._pm.register(WebezyBase)
         # Default proto
         self._pm.register(WebezyProto)
+        # Default docker
+        self._pm.register(WebezyDocker)
         # Default Readme
         self._pm.register(WebezyReadme)
         client_py = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'python'),False)
@@ -208,6 +210,13 @@ class WebezyBuilder:
         results = list(itertools.chain(*results))
         return results
 
+    def PackageProject(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
+        results = self._pm.hook.pre_build(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        results = list(itertools.chain(*results))
+        return results
+
     def BuildAll(self):
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
@@ -220,8 +229,9 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
+        package = self.PackageProject()
         results = [prebuild, init, context, protos, services,
-                   server, compile, readme, protoclass, clients, postbuild]
+                   server, compile, readme, protoclass, clients, postbuild, package]
         return results
 
     @property

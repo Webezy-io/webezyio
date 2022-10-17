@@ -172,7 +172,8 @@ package_json = '{\n\
         "grpc-tools": "^1.11.2",\n\
         "rimraf": "^3.0.2",\n\
         "ts-proto": "^1.123.1",\n\
-        "typescript": "^4.8.2"\n\
+        "typescript": "^4.8.2",\n\
+        "ts-node": "^10.9.1"\n\
     }\n\
 }'
 
