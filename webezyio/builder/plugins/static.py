@@ -143,7 +143,7 @@ execSync(`${PROTOC_PATH} ${protoConfig.join(" ")}`);\n\
 console.log(`> Proto models created: ${MODEL_DIR}`);'
 
 package_json = '{\n\
-    "name": "projectts",\n\
+    "name": "{projectName}",\n\
     "version": "1.0.0",\n\
     "description": "This project has been generated thanks to ```Webezy.io``` CLI. For start using it please run  ```sh webezy run --build```  and see the magic in action. For more information please visit https://www.webezy.io/docs",\n\
     "main": "bin/proto.js",\n\
