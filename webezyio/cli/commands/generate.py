@@ -73,6 +73,9 @@ def service(results,webezy_json:WZJson,architect:WebezyArchitect,expand=False,ve
     if expand:
         if webezy_json.packages is not None:
             for p in webezy_json.packages:
+                if webezy_json.packages[p]['name'].lower() == svc:
+                    print_error(f"Cannot create service {svc}, package by the same name is already exists !")
+                    exit(1)
                 list_depend.append(webezy_json.packages[p]['package'])
             depend = inquirer.prompt([
                 inquirer.Checkbox(
@@ -307,6 +310,12 @@ def rpc(results,webezy_json:WZJson,architect:WebezyArchitect,expand=None,parent:
         print_error('Messages not listed under packages')
         exit(1)
 
+    description = None
+    if expand:
+        description = inquirer.prompt([inquirer.Text('description','Enter RPC description','')],theme=WebezyTheme())
+        if description is not None:
+            description = description['description']
+
     inputs_outputs = inquirer.prompt([
         inquirer.List(
             "input_type", message="Choose the input type", choices=avail),
@@ -317,9 +326,14 @@ def rpc(results,webezy_json:WZJson,architect:WebezyArchitect,expand=None,parent:
         print_error('IN/OUT Types are required for RPC')
         exit(1)
     architect.AddRPC(webezy_json.get_service(svc.split('.')[1], False), rpc, [
-                        (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], None)
+                        (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], description)
     architect.Save()
     print_success(f'Success !\n\tCreated new RPC "{rpc}"')
+    lang = webezy_json.project.get('server').get('language')
+    lang_suffix = 'ts' if lang == 'typescript' else 'py' if lang == 'python' else 'Unknown'
+    path_to_svc = webezy_json.path+'/services/'+svc.split('.')[1]+'.'+lang_suffix
+    print_warning(f'\t- Make sure you are adding the new RPC "{rpc}" method to your service implemantation file at {path_to_svc}')
+    print_warning(f'\t- For more information on how to edit your service implemantation files see https://www.webezy.io/tutorial/add-new-rpc?lang='+lang)
 
 
 def enum(results,webezy_json:WZJson,architect:WebezyArchitect,parent:str):

@@ -114,7 +114,9 @@ npm i\n\
 node ./bin/proto.js\n\
 npm run build\n\
 statuscode=$?\n\
-echo "Exit code for protoc -> "$statuscode'
+echo "Exit code for protoc -> "$statuscode\n\
+[[ "$statuscode" != "0" ]] && { echo "Some error occured during init script"; exit 1; }\n\
+exit 0'
 
 bash_run_server_script_ts = '#!/bin/bash\n\n\
 node ./server/server.js'
@@ -172,7 +174,8 @@ package_json = '{\n\
         "grpc-tools": "^1.11.2",\n\
         "rimraf": "^3.0.2",\n\
         "ts-proto": "^1.123.1",\n\
-        "typescript": "^4.8.2"\n\
+        "typescript": "^4.8.2",\n\
+        "ts-node": "^10.9.1"\n\
     }\n\
 }'
 
@@ -220,7 +223,7 @@ main_ts_config = '{\n\
         "noPropertyAccessFromIndexSignature": true,\n\
         "noUnusedLocals": false,\n\
         "noUnusedParameters": false,\n\
-        "removeComments": true,\n\
+        "removeComments": false,\n\
         "sourceMap": true,\n\
         "forceConsistentCasingInFileNames": true,\n\
         "esModuleInterop": true,\n\
@@ -293,7 +296,7 @@ main_ts_config_client_only = '{\n\
         "noPropertyAccessFromIndexSignature": true,\n\
         "noUnusedLocals": false,\n\
         "noUnusedParameters": false,\n\
-        "removeComments": true,\n\
+        "removeComments": false,\n\
         "sourceMap": true,\n\
         "forceConsistentCasingInFileNames": true,\n\
         "esModuleInterop": true,\n\

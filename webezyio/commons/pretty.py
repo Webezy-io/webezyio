@@ -42,11 +42,11 @@ def print_info(message,pprint=False,tag=None):
         print(bcolors.OKCYAN+"[*]"+bcolors.ENDC,message)
 
 def print_warning(message):
-    print(bcolors.WARNING+"[!]",message+bcolors.ENDC)
+    print(bcolors.WARNING+"[!]",str(message)+bcolors.ENDC)
 
 def print_version(version):
     sep = '*'*30
     print('',bcolors.OKCYAN+sep+bcolors.ENDC,'\n',f'\twebezyio : {version}\n',bcolors.OKCYAN+sep+bcolors.ENDC)
 
 def print_error(message):
-    print(bcolors.FAIL+"[!]",message+bcolors.ENDC)
+    print(bcolors.FAIL+"[!]",str(message)+bcolors.ENDC)

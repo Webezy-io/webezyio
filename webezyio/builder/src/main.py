@@ -5,7 +5,7 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
 _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,
@@ -61,6 +61,10 @@ class WebezyBuilder:
 
     def _auto_register_hooks(self):
         server_lang = self._webezy_json.get_server_language()
+
+        deployment_type = self._webezy_json._config.get('deployment') if self._webezy_json._config.get('deployment') is not None else 'LOCAL'
+        proxy = self._webezy_json._config.get('proxy')
+
         # Default base
         self._pm.register(WebezyBase)
         # Default proto
@@ -70,6 +74,15 @@ class WebezyBuilder:
         client_py = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'python'),False)
         client_ts = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'typescript'),False)
 
+        # Default docker
+        if deployment_type == 'DOCKER':
+            self._pm.register(WebezyDocker)
+
+        # Default proxy
+        if proxy is not None:
+            pass
+
+        # Code generators plugins
         if server_lang == 'python':
             self._pm.register(WebezyPy)
         elif client_py != False:
@@ -208,6 +221,13 @@ class WebezyBuilder:
         results = list(itertools.chain(*results))
         return results
 
+    def PackageProject(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
+        results = self._pm.hook.pre_build(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        results = list(itertools.chain(*results))
+        return results
+
     def BuildAll(self):
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
@@ -220,8 +240,9 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
+        package = self.PackageProject()
         results = [prebuild, init, context, protos, services,
-                   server, compile, readme, protoclass, clients, postbuild]
+                   server, compile, readme, protoclass, clients, postbuild, package]
         return results
 
     @property

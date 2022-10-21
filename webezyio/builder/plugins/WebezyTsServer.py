@@ -60,18 +60,27 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
 @builder.hookimpl
 def write_services(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     for svc in wz_json.services:
-        service_code = helpers.WZServiceTs(wz_json.project.get('packageName'), svc, wz_json.services[svc].get(
-            'dependencies'), wz_json.services[svc], context=wz_context,wz_json=wz_json).to_str()
-        file_system.wFile(file_system.join_path(
-            wz_json.path, 'services', f'{svc}.ts'), service_code, overwrite=True)
-
+        if file_system.check_if_file_exists(file_system.join_path(
+            wz_json.path, 'services', f'{svc}.ts')) == False:
+            service_code = helpers.WZServiceTs(wz_json.project.get('packageName'), svc, wz_json.services[svc].get(
+                'dependencies'), wz_json.services[svc], context=wz_context,wz_json=wz_json).to_str()
+            file_system.wFile(file_system.join_path(
+                wz_json.path, 'services', f'{svc}.ts'), service_code, overwrite=True)
+        else:
+            pretty.print_info("Make sure you are editing the {0} file\n - See how to edit service written in Typescript".format(file_system.join_path(
+                wz_json.path, 'services', f'{svc}.ts')))
 
 @builder.hookimpl
 def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # Running ./bin/init.sh script for compiling protos
     pretty.print_note("Running ./bin/init-ts.sh script for 'protoc' compiler")
-    subprocess.run(['bash', file_system.join_path(
+    proc = subprocess.run(['bash', file_system.join_path(
         wz_json.path, 'bin', 'init-ts.sh')])
+    pretty.print_note(proc,True)
+    if int(proc.returncode) != 0:
+        pretty.print_error("ERROR occured during building process some more info on specific error can be found above")
+        exit(proc.returncode)
+    pretty.print_info(proc,True)
     pretty.print_success("Compiled protos %s" % (__name__))
     
 
@@ -101,6 +110,7 @@ _CLOSING_BRCK = '}'
 @builder.hookimpl
 def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     files = []
+    pretty.print_error("Initialize webezy.context file")
 
     path = wz_json.project.get('uri')
     for svc in wz_json.services:
@@ -127,10 +137,10 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                 fields.append('{0}: {1}'.format(f.get('name'), F_VALUE))
             fields = ','.join(fields)
             if rpc_type_out:
-                out_prototype = f'\t\t// let responses = [{rpc_out_pkg}_pb2.{rpc_out_name}({fields})]\n\t\t// for res in responses:\n\t\t//    yield res'
+                out_prototype = f'\t\tcall.destroy(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
             else:
-                out_prototype = f'\t\t// let response:{rpc_out_pkg}.{rpc_out_name} = {_OPEN_BRCK} {fields} {_CLOSING_BRCK};\n\t\t// callback(null,response);'
-            code = f'{out_prototype}\n\t\tcallback(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
+                out_prototype = f'\t\t// let response:{rpc_out_pkg}.{rpc_out_name} = {_OPEN_BRCK} {fields} {_CLOSING_BRCK};\n\t\t// callback(null,response);\n\t\tcallback(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
+            code = f'{out_prototype}\n'
             methods.append(resources.WZMethodContext(
                 name=rpc_name, code=code, type='rpc'))
         files.append(resources.WZFileContext(
@@ -145,6 +155,8 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    pretty.print_note("Re-Building webezy.context")
+
     for svc in wz_json.services:
         try:
             svcFile = file_system.rFile(file_system.join_path(
@@ -179,8 +191,9 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                     methods_i = 0
                     for r in wz_json.services[svc]['methods']:
                         if next((m for m in f.get('methods') if m['name'] == r['name']),None) is None:
+                            pretty.print_note(f"Starting new RPC at webezy,context [{r.get('name')}]")
                             new_rpc_context = {'name': r.get('name'), 'type': 'rpc', 'code': '\t\tbreak;'}
-                            wz_context.new_rpc(svc, new_rpc_context)
+                            wz_context.new_rpc(svc, new_rpc_context, suffix='ts')
                     # Iterating all RPC's functions
                     for m in f.get('methods'):
                         if m['type'] == 'rpc':
@@ -197,23 +210,31 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                             else:
                                 # Setting new context
                                 temp_lines = []
-                                for line in rpc_code_inlines[methods_i][4:]:
+                                num_lines = 4
+                                for l in rpc_code_inlines[methods_i]:
+                                    if 'ServerWritableStream<' in l:
+                                        num_lines = 3
+                                        break
+                                for line in rpc_code_inlines[methods_i][num_lines:]:
                                     
-                                    if '\t}\n' in line:
+                                    if '\t}\n' == line:
                                         if '\n' == temp_lines[-1]:
-                                            temp_lines.pop(-1)
+                                            break
+
+                                    if 'export {' in line:
                                         break
 
                                     temp_lines.append(line)
-
+                                pretty.print_info(f"Setting RPC -> {m.get('name')}\n-> {temp_lines}")
                                 wz_context.set_rpc_code(svc, m.get('name'), ''.join(
                                     temp_lines))
 
                             methods_i += 1
 
         except Exception as e:
-            logging.debug(e)
+            pretty.print_error(e)
 
+    # pretty.print_note(wz_context.dump(),True)
     file_system.wFile(file_system.join_path(
         wz_json.path, '.webezy', 'context.json'), wz_context.dump(), True, True)
 

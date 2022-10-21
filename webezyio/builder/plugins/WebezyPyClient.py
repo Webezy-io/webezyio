@@ -13,7 +13,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
-    pretty.print_info("Finished webezyio build process %s plugin" % (__name__))
+    pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
@@ -49,8 +49,11 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
 def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # Running ./bin/init.sh script for compiling protos
     logging.info("Running ./bin/init-py.sh script for 'protoc' compiler")
-    subprocess.run(['bash', file_system.join_path(
+    proc = subprocess.run(['bash', file_system.join_path(
         wz_json.path, 'bin', 'init-py.sh')])
+    if proc.returncode != 0:
+        pretty.print_error("ERROR occured during building process some more info on specific error can be found above")
+        exit(proc.returncode)
     # Moving .py files to ./services/protos dir
     for file in file_system.walkFiles(file_system.join_path(wz_json.path, 'protos')):
         if '.py' in file:
@@ -131,7 +134,8 @@ for SERVICE in "${services[@]}"; do\n\
     python3 -m grpc_tools.protoc --proto_path=$SERVICE/ --python_out=$DESTDIR --grpc_python_out=$DESTDIR $SERVICE/*.proto\n\
 done\n\
 statuscode=$?\n\
-echo "Exit code for protoc -> "$statuscode'
+echo "Exit code for protoc -> "$statuscode\n\
+exit 0'
 
 def parse_proto_type_to_py(type, label, messageType=None, enumType=None):
     temp_type = 'None'

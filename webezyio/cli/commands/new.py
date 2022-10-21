@@ -3,7 +3,7 @@ from typing import List
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 from webezyio.commons.file_system import join_path,mkdir
-from webezyio.commons.protos.webezy_pb2 import Language
+from webezyio.commons.protos.webezy_pb2 import Language,WebezyDeploymentType
 from webezyio.architect import WebezyArchitect
 import os
 import inquirer
@@ -92,7 +92,7 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
 
     ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
     ARCHITECT.SetDomain(domain_name)
-    ARCHITECT.SetConfig({'host': host, 'port': int(port)})
+    ARCHITECT.SetConfig({'host': host, 'port': int(port), 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
 
     ARCHITECT.Save()
     

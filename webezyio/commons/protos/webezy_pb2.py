@@ -16,12 +16,17 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cwebezy.proto\x12\x0ewebezy.core.v1\x1a\x1cgoogle/protobuf/struct.proto\"*\n\x0cWebezyConfig\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"\x94\x03\n\nWebezyJson\x12\x0e\n\x06\x64omain\x18\x01 \x01(\t\x12(\n\x07project\x18\x02 \x01(\x0b\x32\x17.webezy.core.v1.Project\x12:\n\x08services\x18\x03 \x03(\x0b\x32(.webezy.core.v1.WebezyJson.ServicesEntry\x12:\n\x08packages\x18\x04 \x03(\x0b\x32(.webezy.core.v1.WebezyJson.PackagesEntry\x12,\n\x06\x63onfig\x18\x05 \x01(\x0b\x32\x1c.webezy.core.v1.WebezyConfig\x1aR\n\rServicesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.webezy.core.v1.ServiceDescriptor:\x02\x38\x01\x1aR\n\rPackagesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.webezy.core.v1.PackageDescriptor:\x02\x38\x01\"\xda\x02\n\x0e\x46ileDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07package\x18\x03 \x01(\t\x12\x0e\n\x06syntax\x18\x04 \x01(\t\x12L\n\x10services_by_name\x18\x05 \x03(\x0b\x32\x32.webezy.core.v1.FileDescriptor.ServicesByNameEntry\x12\x14\n\x07\x63ontent\x18\x06 \x01(\tH\x00\x88\x01\x01\x12\x14\n\x0c\x64\x65pendencies\x18\x07 \x03(\t\x12,\n\x08messages\x18\x08 \x03(\x0b\x32\x1a.webezy.core.v1.Descriptor\x1aX\n\x13ServicesByNameEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.webezy.core.v1.ServiceDescriptor:\x02\x38\x01\x42\n\n\x08_content\":\n\x0cWebezyServer\x12*\n\x08language\x18\x02 \x01(\x0e\x32\x18.webezy.core.v1.Language\"K\n\x0cWebezyClient\x12\x0f\n\x07out_dir\x18\x01 \x01(\t\x12*\n\x08language\x18\x02 \x01(\x0e\x32\x18.webezy.core.v1.Language\"\xc3\x02\n\x07Project\x12\x0f\n\x02id\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x0b\n\x03uri\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x14\n\x0cpackage_name\x18\x04 \x01(\t\x12\x0f\n\x07version\x18\x05 \x01(\t\x12\x0c\n\x04type\x18\x06 \x01(\t\x12\x0c\n\x04kind\x18\x07 \x01(\t\x12+\n\nproperties\x18\x08 \x03(\x0b\x32\x17.google.protobuf.Struct\x12\r\n\x05\x66iles\x18\t \x03(\t\x12\x10\n\x08services\x18\n \x03(\t\x12\x17\n\x0fserver_language\x18\x0b \x01(\t\x12,\n\x06server\x18\x0c \x01(\x0b\x32\x1c.webezy.core.v1.WebezyServer\x12-\n\x07\x63lients\x18\r \x03(\x0b\x32\x1c.webezy.core.v1.WebezyClientB\x05\n\x03_id\"r\n\x11ProjectDescriptor\x12(\n\x07project\x18\x01 \x01(\x0b\x32\x17.webezy.core.v1.Project\x12\x33\n\x08services\x18\x02 \x03(\x0b\x32!.webezy.core.v1.ServiceDescriptor\"k\n\x13\x45numValueDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0e\n\x06number\x18\x03 \x01(\x05\x12\r\n\x05index\x18\x04 \x01(\x05\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\"\x85\x01\n\x04\x45num\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\x33\n\x06values\x18\x04 \x03(\x0b\x32#.webezy.core.v1.EnumValueDescriptor\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\"\x89\x07\n\x0f\x46ieldDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\r\n\x05index\x18\x04 \x01(\x05\x12\x38\n\nfield_type\x18\x05 \x01(\x0e\x32$.webezy.core.v1.FieldDescriptor.Type\x12\x34\n\x05label\x18\x06 \x01(\x0e\x32%.webezy.core.v1.FieldDescriptor.Label\x12\x16\n\tenum_type\x18\x07 \x01(\tH\x00\x88\x01\x01\x12\x0c\n\x04type\x18\x08 \x01(\t\x12\x0c\n\x04kind\x18\t \x01(\t\x12\x19\n\x0cmessage_type\x18\n \x01(\tH\x01\x88\x01\x01\x12\x43\n\nextensions\x18\x0b \x03(\x0b\x32/.webezy.core.v1.FieldDescriptor.ExtensionsEntry\x12\x18\n\x0b\x64\x65scription\x18\x0c \x01(\tH\x02\x88\x01\x01\x1aI\n\x0f\x45xtensionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.google.protobuf.Value:\x02\x38\x01\"V\n\x05Label\x12\x11\n\rLABEL_UNKNOWN\x10\x00\x12\x12\n\x0eLABEL_OPTIONAL\x10\x01\x12\x12\n\x0eLABEL_REQUIRED\x10\x02\x12\x12\n\x0eLABEL_REPEATED\x10\x03\"\xc8\x02\n\x04Type\x12\x10\n\x0cTYPE_UNKNOWN\x10\x00\x12\x0f\n\x0bTYPE_DOUBLE\x10\x01\x12\x0e\n\nTYPE_FLOAT\x10\x02\x12\x0e\n\nTYPE_INT64\x10\x03\x12\x0f\n\x0bTYPE_UINT64\x10\x04\x12\x0e\n\nTYPE_INT32\x10\x05\x12\x10\n\x0cTYPE_FIXED64\x10\x06\x12\x10\n\x0cTYPE_FIXED32\x10\x07\x12\r\n\tTYPE_BOOL\x10\x08\x12\x0f\n\x0bTYPE_STRING\x10\t\x12\x0e\n\nTYPE_GROUP\x10\n\x12\x10\n\x0cTYPE_MESSAGE\x10\x0b\x12\x0e\n\nTYPE_BYTES\x10\x0c\x12\x0f\n\x0bTYPE_UINT32\x10\r\x12\r\n\tTYPE_ENUM\x10\x0e\x12\x11\n\rTYPE_SFIXED32\x10\x0f\x12\x11\n\rTYPE_SFIXED64\x10\x10\x12\x0f\n\x0bTYPE_SINT32\x10\x11\x12\x0f\n\x0bTYPE_SINT64\x10\x12\x42\x0c\n\n_enum_typeB\x0f\n\r_message_typeB\x0e\n\x0c_description\"\xe1\x01\n\nDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12/\n\x06\x66ields\x18\x04 \x03(\x0b\x32\x1f.webezy.core.v1.FieldDescriptor\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x07 \x01(\t\x12\x12\n\nextensions\x18\x08 \x03(\t\x12/\n\x0e\x65xtension_type\x18\t \x01(\x0e\x32\x17.webezy.core.v1.Options\"\xf6\x01\n\x11ServiceDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\x31\n\x07methods\x18\x04 \x03(\x0b\x32 .webezy.core.v1.MethodDescriptor\x12\x13\n\x0b\x63lient_impl\x18\x05 \x01(\t\x12\x13\n\x0bserver_impl\x18\x06 \x01(\t\x12\x0f\n\x07version\x18\x07 \x01(\t\x12\x14\n\x0c\x64\x65pendencies\x18\x08 \x03(\t\x12\x13\n\x0b\x64\x65scription\x18\t \x01(\t\x12\x0c\n\x04type\x18\n \x01(\t\x12\x0c\n\x04kind\x18\x0b \x01(\t\"\xfc\x02\n\x11PackageDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07package\x18\x03 \x01(\t\x12,\n\x08messages\x18\x04 \x03(\x0b\x32\x1a.webezy.core.v1.Descriptor\x12\x0f\n\x07version\x18\x05 \x01(\t\x12\x14\n\x0c\x64\x65pendencies\x18\x06 \x03(\t\x12#\n\x05\x65nums\x18\x07 \x03(\x0b\x32\x14.webezy.core.v1.Enum\x12\x45\n\nextensions\x18\x08 \x03(\x0b\x32\x31.webezy.core.v1.PackageDescriptor.ExtensionsEntry\x12\x13\n\x0b\x64\x65scription\x18\t \x01(\t\x12\x0c\n\x04type\x18\n \x01(\t\x12\x0c\n\x04kind\x18\x0b \x01(\t\x1aI\n\x0f\x45xtensionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.google.protobuf.Value:\x02\x38\x01\"\xce\x01\n\x10MethodDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\x0c\n\x04type\x18\x04 \x01(\t\x12\x0c\n\x04kind\x18\x05 \x01(\t\x12\x12\n\ninput_type\x18\x06 \x01(\t\x12\x13\n\x0boutput_type\x18\x07 \x01(\t\x12\x18\n\x10\x63lient_streaming\x18\x08 \x01(\x08\x12\x18\n\x10server_streaming\x18\t \x01(\x08\x12\x13\n\x0b\x64\x65scription\x18\n \x01(\t\"A\n\rWebezyContext\x12\x30\n\x05\x66iles\x18\x01 \x03(\x0b\x32!.webezy.core.v1.WebezyFileContext\"W\n\x11WebezyFileContext\x12\x0c\n\x04\x66ile\x18\x01 \x01(\t\x12\x34\n\x07methods\x18\x02 \x03(\x0b\x32#.webezy.core.v1.WebezyMethodContext\"?\n\x13WebezyMethodContext\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\"\xc0\x02\n\x11WzResourceWrapper\x12*\n\x07project\x18\x01 \x01(\x0b\x32\x17.webezy.core.v1.ProjectH\x00\x12\x34\n\x07service\x18\x02 \x01(\x0b\x32!.webezy.core.v1.ServiceDescriptorH\x00\x12\x34\n\x07package\x18\x03 \x01(\x0b\x32!.webezy.core.v1.PackageDescriptorH\x00\x12\x32\n\x06method\x18\x04 \x01(\x0b\x32 .webezy.core.v1.MethodDescriptorH\x00\x12-\n\x07message\x18\x05 \x01(\x0b\x32\x1a.webezy.core.v1.DescriptorH\x00\x12$\n\x04\x65num\x18\x06 \x01(\x0b\x32\x14.webezy.core.v1.EnumH\x00\x42\n\n\x08Resource*<\n\x08Language\x12\x14\n\x10unknown_language\x10\x00\x12\n\n\x06python\x10\x01\x12\x0e\n\ntypescript\x10\x02*W\n\x07Options\x12\x15\n\x11UNKNOWN_EXTENSION\x10\x00\x12\x0f\n\x0b\x46ileOptions\x10\x01\x12\x12\n\x0eMessageOptions\x10\x02\x12\x10\n\x0c\x46ieldOptions\x10\x03\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cwebezy.proto\x12\x0ewebezy.core.v1\x1a\x1cgoogle/protobuf/struct.proto\"F\n\x11WebezyProxyConfig\x12\x31\n\tlisteners\x18\x01 \x03(\x0b\x32\x1e.webezy.core.v1.WebezyListener\"t\n\x0eWebezyListener\x12\x34\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32#.webezy.core.v1.WebezyServerAddress\x12,\n\x06routes\x18\x02 \x03(\x0b\x32\x1c.webezy.core.v1.WebezyRoutes\":\n\x13WebezyServerAddress\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x12\n\nport_value\x18\x02 \x01(\x05\"}\n\x0cWebezyRoutes\x12/\n\x05match\x18\x01 \x01(\x0b\x32 .webezy.core.v1.WebezyRouteMatch\x12\x0f\n\x07\x63luster\x18\x02 \x01(\t\x12+\n\nproperties\x18\x03 \x01(\x0b\x32\x17.google.protobuf.Struct\"\"\n\x10WebezyRouteMatch\x12\x0e\n\x06prefix\x18\x01 \x01(\t\"\xbd\x01\n\x0cWebezyConfig\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12\x38\n\ndeployment\x18\x03 \x01(\x0e\x32$.webezy.core.v1.WebezyDeploymentType\x12\x30\n\x05proxy\x18\x04 \x01(\x0b\x32!.webezy.core.v1.WebezyProxyConfig\x12%\n\x04\x64ocs\x18\x05 \x01(\x0b\x32\x17.google.protobuf.Struct\"\x94\x03\n\nWebezyJson\x12\x0e\n\x06\x64omain\x18\x01 \x01(\t\x12(\n\x07project\x18\x02 \x01(\x0b\x32\x17.webezy.core.v1.Project\x12:\n\x08services\x18\x03 \x03(\x0b\x32(.webezy.core.v1.WebezyJson.ServicesEntry\x12:\n\x08packages\x18\x04 \x03(\x0b\x32(.webezy.core.v1.WebezyJson.PackagesEntry\x12,\n\x06\x63onfig\x18\x05 \x01(\x0b\x32\x1c.webezy.core.v1.WebezyConfig\x1aR\n\rServicesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.webezy.core.v1.ServiceDescriptor:\x02\x38\x01\x1aR\n\rPackagesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.webezy.core.v1.PackageDescriptor:\x02\x38\x01\"\xda\x02\n\x0e\x46ileDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07package\x18\x03 \x01(\t\x12\x0e\n\x06syntax\x18\x04 \x01(\t\x12L\n\x10services_by_name\x18\x05 \x03(\x0b\x32\x32.webezy.core.v1.FileDescriptor.ServicesByNameEntry\x12\x14\n\x07\x63ontent\x18\x06 \x01(\tH\x00\x88\x01\x01\x12\x14\n\x0c\x64\x65pendencies\x18\x07 \x03(\t\x12,\n\x08messages\x18\x08 \x03(\x0b\x32\x1a.webezy.core.v1.Descriptor\x1aX\n\x13ServicesByNameEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x30\n\x05value\x18\x02 \x01(\x0b\x32!.webezy.core.v1.ServiceDescriptor:\x02\x38\x01\x42\n\n\x08_content\":\n\x0cWebezyServer\x12*\n\x08language\x18\x02 \x01(\x0e\x32\x18.webezy.core.v1.Language\"K\n\x0cWebezyClient\x12\x0f\n\x07out_dir\x18\x01 \x01(\t\x12*\n\x08language\x18\x02 \x01(\x0e\x32\x18.webezy.core.v1.Language\"\xc3\x02\n\x07Project\x12\x0f\n\x02id\x18\x01 \x01(\tH\x00\x88\x01\x01\x12\x0b\n\x03uri\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x14\n\x0cpackage_name\x18\x04 \x01(\t\x12\x0f\n\x07version\x18\x05 \x01(\t\x12\x0c\n\x04type\x18\x06 \x01(\t\x12\x0c\n\x04kind\x18\x07 \x01(\t\x12+\n\nproperties\x18\x08 \x03(\x0b\x32\x17.google.protobuf.Struct\x12\r\n\x05\x66iles\x18\t \x03(\t\x12\x10\n\x08services\x18\n \x03(\t\x12\x17\n\x0fserver_language\x18\x0b \x01(\t\x12,\n\x06server\x18\x0c \x01(\x0b\x32\x1c.webezy.core.v1.WebezyServer\x12-\n\x07\x63lients\x18\r \x03(\x0b\x32\x1c.webezy.core.v1.WebezyClientB\x05\n\x03_id\"r\n\x11ProjectDescriptor\x12(\n\x07project\x18\x01 \x01(\x0b\x32\x17.webezy.core.v1.Project\x12\x33\n\x08services\x18\x02 \x03(\x0b\x32!.webezy.core.v1.ServiceDescriptor\"k\n\x13\x45numValueDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0e\n\x06number\x18\x03 \x01(\x05\x12\r\n\x05index\x18\x04 \x01(\x05\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\"\x85\x01\n\x04\x45num\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\x33\n\x06values\x18\x04 \x03(\x0b\x32#.webezy.core.v1.EnumValueDescriptor\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\"\x89\x07\n\x0f\x46ieldDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\r\n\x05index\x18\x04 \x01(\x05\x12\x38\n\nfield_type\x18\x05 \x01(\x0e\x32$.webezy.core.v1.FieldDescriptor.Type\x12\x34\n\x05label\x18\x06 \x01(\x0e\x32%.webezy.core.v1.FieldDescriptor.Label\x12\x16\n\tenum_type\x18\x07 \x01(\tH\x00\x88\x01\x01\x12\x0c\n\x04type\x18\x08 \x01(\t\x12\x0c\n\x04kind\x18\t \x01(\t\x12\x19\n\x0cmessage_type\x18\n \x01(\tH\x01\x88\x01\x01\x12\x43\n\nextensions\x18\x0b \x03(\x0b\x32/.webezy.core.v1.FieldDescriptor.ExtensionsEntry\x12\x18\n\x0b\x64\x65scription\x18\x0c \x01(\tH\x02\x88\x01\x01\x1aI\n\x0f\x45xtensionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.google.protobuf.Value:\x02\x38\x01\"V\n\x05Label\x12\x11\n\rLABEL_UNKNOWN\x10\x00\x12\x12\n\x0eLABEL_OPTIONAL\x10\x01\x12\x12\n\x0eLABEL_REQUIRED\x10\x02\x12\x12\n\x0eLABEL_REPEATED\x10\x03\"\xc8\x02\n\x04Type\x12\x10\n\x0cTYPE_UNKNOWN\x10\x00\x12\x0f\n\x0bTYPE_DOUBLE\x10\x01\x12\x0e\n\nTYPE_FLOAT\x10\x02\x12\x0e\n\nTYPE_INT64\x10\x03\x12\x0f\n\x0bTYPE_UINT64\x10\x04\x12\x0e\n\nTYPE_INT32\x10\x05\x12\x10\n\x0cTYPE_FIXED64\x10\x06\x12\x10\n\x0cTYPE_FIXED32\x10\x07\x12\r\n\tTYPE_BOOL\x10\x08\x12\x0f\n\x0bTYPE_STRING\x10\t\x12\x0e\n\nTYPE_GROUP\x10\n\x12\x10\n\x0cTYPE_MESSAGE\x10\x0b\x12\x0e\n\nTYPE_BYTES\x10\x0c\x12\x0f\n\x0bTYPE_UINT32\x10\r\x12\r\n\tTYPE_ENUM\x10\x0e\x12\x11\n\rTYPE_SFIXED32\x10\x0f\x12\x11\n\rTYPE_SFIXED64\x10\x10\x12\x0f\n\x0bTYPE_SINT32\x10\x11\x12\x0f\n\x0bTYPE_SINT64\x10\x12\x42\x0c\n\n_enum_typeB\x0f\n\r_message_typeB\x0e\n\x0c_description\"\xe1\x01\n\nDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12/\n\x06\x66ields\x18\x04 \x03(\x0b\x32\x1f.webezy.core.v1.FieldDescriptor\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x07 \x01(\t\x12\x12\n\nextensions\x18\x08 \x03(\t\x12/\n\x0e\x65xtension_type\x18\t \x01(\x0e\x32\x17.webezy.core.v1.Options\"\xf6\x01\n\x11ServiceDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\x31\n\x07methods\x18\x04 \x03(\x0b\x32 .webezy.core.v1.MethodDescriptor\x12\x13\n\x0b\x63lient_impl\x18\x05 \x01(\t\x12\x13\n\x0bserver_impl\x18\x06 \x01(\t\x12\x0f\n\x07version\x18\x07 \x01(\t\x12\x14\n\x0c\x64\x65pendencies\x18\x08 \x03(\t\x12\x13\n\x0b\x64\x65scription\x18\t \x01(\t\x12\x0c\n\x04type\x18\n \x01(\t\x12\x0c\n\x04kind\x18\x0b \x01(\t\"\xfc\x02\n\x11PackageDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07package\x18\x03 \x01(\t\x12,\n\x08messages\x18\x04 \x03(\x0b\x32\x1a.webezy.core.v1.Descriptor\x12\x0f\n\x07version\x18\x05 \x01(\t\x12\x14\n\x0c\x64\x65pendencies\x18\x06 \x03(\t\x12#\n\x05\x65nums\x18\x07 \x03(\x0b\x32\x14.webezy.core.v1.Enum\x12\x45\n\nextensions\x18\x08 \x03(\x0b\x32\x31.webezy.core.v1.PackageDescriptor.ExtensionsEntry\x12\x13\n\x0b\x64\x65scription\x18\t \x01(\t\x12\x0c\n\x04type\x18\n \x01(\t\x12\x0c\n\x04kind\x18\x0b \x01(\t\x1aI\n\x0f\x45xtensionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.google.protobuf.Value:\x02\x38\x01\"\xce\x01\n\x10MethodDescriptor\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x11\n\tfull_name\x18\x03 \x01(\t\x12\x0c\n\x04type\x18\x04 \x01(\t\x12\x0c\n\x04kind\x18\x05 \x01(\t\x12\x12\n\ninput_type\x18\x06 \x01(\t\x12\x13\n\x0boutput_type\x18\x07 \x01(\t\x12\x18\n\x10\x63lient_streaming\x18\x08 \x01(\x08\x12\x18\n\x10server_streaming\x18\t \x01(\x08\x12\x13\n\x0b\x64\x65scription\x18\n \x01(\t\"A\n\rWebezyContext\x12\x30\n\x05\x66iles\x18\x01 \x03(\x0b\x32!.webezy.core.v1.WebezyFileContext\"W\n\x11WebezyFileContext\x12\x0c\n\x04\x66ile\x18\x01 \x01(\t\x12\x34\n\x07methods\x18\x02 \x03(\x0b\x32#.webezy.core.v1.WebezyMethodContext\"?\n\x13WebezyMethodContext\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\"\xc0\x02\n\x11WzResourceWrapper\x12*\n\x07project\x18\x01 \x01(\x0b\x32\x17.webezy.core.v1.ProjectH\x00\x12\x34\n\x07service\x18\x02 \x01(\x0b\x32!.webezy.core.v1.ServiceDescriptorH\x00\x12\x34\n\x07package\x18\x03 \x01(\x0b\x32!.webezy.core.v1.PackageDescriptorH\x00\x12\x32\n\x06method\x18\x04 \x01(\x0b\x32 .webezy.core.v1.MethodDescriptorH\x00\x12-\n\x07message\x18\x05 \x01(\x0b\x32\x1a.webezy.core.v1.DescriptorH\x00\x12$\n\x04\x65num\x18\x06 \x01(\x0b\x32\x14.webezy.core.v1.EnumH\x00\x42\n\n\x08Resource*E\n\x14WebezyDeploymentType\x12\x16\n\x12UNKNOWN_DEPLOYMENT\x10\x00\x12\t\n\x05LOCAL\x10\x01\x12\n\n\x06\x44OCKER\x10\x02*<\n\x08Language\x12\x14\n\x10unknown_language\x10\x00\x12\n\n\x06python\x10\x01\x12\x0e\n\ntypescript\x10\x02*W\n\x07Options\x12\x15\n\x11UNKNOWN_EXTENSION\x10\x00\x12\x0f\n\x0b\x46ileOptions\x10\x01\x12\x12\n\x0eMessageOptions\x10\x02\x12\x10\n\x0c\x46ieldOptions\x10\x03\x62\x06proto3')
 
+_WEBEZYDEPLOYMENTTYPE = DESCRIPTOR.enum_types_by_name['WebezyDeploymentType']
+WebezyDeploymentType = enum_type_wrapper.EnumTypeWrapper(_WEBEZYDEPLOYMENTTYPE)
 _LANGUAGE = DESCRIPTOR.enum_types_by_name['Language']
 Language = enum_type_wrapper.EnumTypeWrapper(_LANGUAGE)
 _OPTIONS = DESCRIPTOR.enum_types_by_name['Options']
 Options = enum_type_wrapper.EnumTypeWrapper(_OPTIONS)
+UNKNOWN_DEPLOYMENT = 0
+LOCAL = 1
+DOCKER = 2
 unknown_language = 0
 python = 1
 typescript = 2
@@ -31,6 +36,11 @@ MessageOptions = 2
 FieldOptions = 3
 
 
+_WEBEZYPROXYCONFIG = DESCRIPTOR.message_types_by_name['WebezyProxyConfig']
+_WEBEZYLISTENER = DESCRIPTOR.message_types_by_name['WebezyListener']
+_WEBEZYSERVERADDRESS = DESCRIPTOR.message_types_by_name['WebezyServerAddress']
+_WEBEZYROUTES = DESCRIPTOR.message_types_by_name['WebezyRoutes']
+_WEBEZYROUTEMATCH = DESCRIPTOR.message_types_by_name['WebezyRouteMatch']
 _WEBEZYCONFIG = DESCRIPTOR.message_types_by_name['WebezyConfig']
 _WEBEZYJSON = DESCRIPTOR.message_types_by_name['WebezyJson']
 _WEBEZYJSON_SERVICESENTRY = _WEBEZYJSON.nested_types_by_name['ServicesEntry']
@@ -56,6 +66,41 @@ _WEBEZYMETHODCONTEXT = DESCRIPTOR.message_types_by_name['WebezyMethodContext']
 _WZRESOURCEWRAPPER = DESCRIPTOR.message_types_by_name['WzResourceWrapper']
 _FIELDDESCRIPTOR_LABEL = _FIELDDESCRIPTOR.enum_types_by_name['Label']
 _FIELDDESCRIPTOR_TYPE = _FIELDDESCRIPTOR.enum_types_by_name['Type']
+WebezyProxyConfig = _reflection.GeneratedProtocolMessageType('WebezyProxyConfig', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYPROXYCONFIG,
+  '__module__' : 'webezy_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.core.v1.WebezyProxyConfig)
+  })
+_sym_db.RegisterMessage(WebezyProxyConfig)
+
+WebezyListener = _reflection.GeneratedProtocolMessageType('WebezyListener', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYLISTENER,
+  '__module__' : 'webezy_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.core.v1.WebezyListener)
+  })
+_sym_db.RegisterMessage(WebezyListener)
+
+WebezyServerAddress = _reflection.GeneratedProtocolMessageType('WebezyServerAddress', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYSERVERADDRESS,
+  '__module__' : 'webezy_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.core.v1.WebezyServerAddress)
+  })
+_sym_db.RegisterMessage(WebezyServerAddress)
+
+WebezyRoutes = _reflection.GeneratedProtocolMessageType('WebezyRoutes', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYROUTES,
+  '__module__' : 'webezy_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.core.v1.WebezyRoutes)
+  })
+_sym_db.RegisterMessage(WebezyRoutes)
+
+WebezyRouteMatch = _reflection.GeneratedProtocolMessageType('WebezyRouteMatch', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYROUTEMATCH,
+  '__module__' : 'webezy_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.core.v1.WebezyRouteMatch)
+  })
+_sym_db.RegisterMessage(WebezyRouteMatch)
+
 WebezyConfig = _reflection.GeneratedProtocolMessageType('WebezyConfig', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYCONFIG,
   '__module__' : 'webezy_pb2'
@@ -235,58 +280,70 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _FIELDDESCRIPTOR_EXTENSIONSENTRY._serialized_options = b'8\001'
   _PACKAGEDESCRIPTOR_EXTENSIONSENTRY._options = None
   _PACKAGEDESCRIPTOR_EXTENSIONSENTRY._serialized_options = b'8\001'
-  _LANGUAGE._serialized_start=4207
-  _LANGUAGE._serialized_end=4267
-  _OPTIONS._serialized_start=4269
-  _OPTIONS._serialized_end=4356
-  _WEBEZYCONFIG._serialized_start=62
-  _WEBEZYCONFIG._serialized_end=104
-  _WEBEZYJSON._serialized_start=107
-  _WEBEZYJSON._serialized_end=511
-  _WEBEZYJSON_SERVICESENTRY._serialized_start=345
-  _WEBEZYJSON_SERVICESENTRY._serialized_end=427
-  _WEBEZYJSON_PACKAGESENTRY._serialized_start=429
-  _WEBEZYJSON_PACKAGESENTRY._serialized_end=511
-  _FILEDESCRIPTOR._serialized_start=514
-  _FILEDESCRIPTOR._serialized_end=860
-  _FILEDESCRIPTOR_SERVICESBYNAMEENTRY._serialized_start=760
-  _FILEDESCRIPTOR_SERVICESBYNAMEENTRY._serialized_end=848
-  _WEBEZYSERVER._serialized_start=862
-  _WEBEZYSERVER._serialized_end=920
-  _WEBEZYCLIENT._serialized_start=922
-  _WEBEZYCLIENT._serialized_end=997
-  _PROJECT._serialized_start=1000
-  _PROJECT._serialized_end=1323
-  _PROJECTDESCRIPTOR._serialized_start=1325
-  _PROJECTDESCRIPTOR._serialized_end=1439
-  _ENUMVALUEDESCRIPTOR._serialized_start=1441
-  _ENUMVALUEDESCRIPTOR._serialized_end=1548
-  _ENUM._serialized_start=1551
-  _ENUM._serialized_end=1684
-  _FIELDDESCRIPTOR._serialized_start=1687
-  _FIELDDESCRIPTOR._serialized_end=2592
-  _FIELDDESCRIPTOR_EXTENSIONSENTRY._serialized_start=2053
-  _FIELDDESCRIPTOR_EXTENSIONSENTRY._serialized_end=2126
-  _FIELDDESCRIPTOR_LABEL._serialized_start=2128
-  _FIELDDESCRIPTOR_LABEL._serialized_end=2214
-  _FIELDDESCRIPTOR_TYPE._serialized_start=2217
-  _FIELDDESCRIPTOR_TYPE._serialized_end=2545
-  _DESCRIPTOR._serialized_start=2595
-  _DESCRIPTOR._serialized_end=2820
-  _SERVICEDESCRIPTOR._serialized_start=2823
-  _SERVICEDESCRIPTOR._serialized_end=3069
-  _PACKAGEDESCRIPTOR._serialized_start=3072
-  _PACKAGEDESCRIPTOR._serialized_end=3452
-  _PACKAGEDESCRIPTOR_EXTENSIONSENTRY._serialized_start=2053
-  _PACKAGEDESCRIPTOR_EXTENSIONSENTRY._serialized_end=2126
-  _METHODDESCRIPTOR._serialized_start=3455
-  _METHODDESCRIPTOR._serialized_end=3661
-  _WEBEZYCONTEXT._serialized_start=3663
-  _WEBEZYCONTEXT._serialized_end=3728
-  _WEBEZYFILECONTEXT._serialized_start=3730
-  _WEBEZYFILECONTEXT._serialized_end=3817
-  _WEBEZYMETHODCONTEXT._serialized_start=3819
-  _WEBEZYMETHODCONTEXT._serialized_end=3882
-  _WZRESOURCEWRAPPER._serialized_start=3885
-  _WZRESOURCEWRAPPER._serialized_end=4205
+  _WEBEZYDEPLOYMENTTYPE._serialized_start=4768
+  _WEBEZYDEPLOYMENTTYPE._serialized_end=4837
+  _LANGUAGE._serialized_start=4839
+  _LANGUAGE._serialized_end=4899
+  _OPTIONS._serialized_start=4901
+  _OPTIONS._serialized_end=4988
+  _WEBEZYPROXYCONFIG._serialized_start=62
+  _WEBEZYPROXYCONFIG._serialized_end=132
+  _WEBEZYLISTENER._serialized_start=134
+  _WEBEZYLISTENER._serialized_end=250
+  _WEBEZYSERVERADDRESS._serialized_start=252
+  _WEBEZYSERVERADDRESS._serialized_end=310
+  _WEBEZYROUTES._serialized_start=312
+  _WEBEZYROUTES._serialized_end=437
+  _WEBEZYROUTEMATCH._serialized_start=439
+  _WEBEZYROUTEMATCH._serialized_end=473
+  _WEBEZYCONFIG._serialized_start=476
+  _WEBEZYCONFIG._serialized_end=665
+  _WEBEZYJSON._serialized_start=668
+  _WEBEZYJSON._serialized_end=1072
+  _WEBEZYJSON_SERVICESENTRY._serialized_start=906
+  _WEBEZYJSON_SERVICESENTRY._serialized_end=988
+  _WEBEZYJSON_PACKAGESENTRY._serialized_start=990
+  _WEBEZYJSON_PACKAGESENTRY._serialized_end=1072
+  _FILEDESCRIPTOR._serialized_start=1075
+  _FILEDESCRIPTOR._serialized_end=1421
+  _FILEDESCRIPTOR_SERVICESBYNAMEENTRY._serialized_start=1321
+  _FILEDESCRIPTOR_SERVICESBYNAMEENTRY._serialized_end=1409
+  _WEBEZYSERVER._serialized_start=1423
+  _WEBEZYSERVER._serialized_end=1481
+  _WEBEZYCLIENT._serialized_start=1483
+  _WEBEZYCLIENT._serialized_end=1558
+  _PROJECT._serialized_start=1561
+  _PROJECT._serialized_end=1884
+  _PROJECTDESCRIPTOR._serialized_start=1886
+  _PROJECTDESCRIPTOR._serialized_end=2000
+  _ENUMVALUEDESCRIPTOR._serialized_start=2002
+  _ENUMVALUEDESCRIPTOR._serialized_end=2109
+  _ENUM._serialized_start=2112
+  _ENUM._serialized_end=2245
+  _FIELDDESCRIPTOR._serialized_start=2248
+  _FIELDDESCRIPTOR._serialized_end=3153
+  _FIELDDESCRIPTOR_EXTENSIONSENTRY._serialized_start=2614
+  _FIELDDESCRIPTOR_EXTENSIONSENTRY._serialized_end=2687
+  _FIELDDESCRIPTOR_LABEL._serialized_start=2689
+  _FIELDDESCRIPTOR_LABEL._serialized_end=2775
+  _FIELDDESCRIPTOR_TYPE._serialized_start=2778
+  _FIELDDESCRIPTOR_TYPE._serialized_end=3106
+  _DESCRIPTOR._serialized_start=3156
+  _DESCRIPTOR._serialized_end=3381
+  _SERVICEDESCRIPTOR._serialized_start=3384
+  _SERVICEDESCRIPTOR._serialized_end=3630
+  _PACKAGEDESCRIPTOR._serialized_start=3633
+  _PACKAGEDESCRIPTOR._serialized_end=4013
+  _PACKAGEDESCRIPTOR_EXTENSIONSENTRY._serialized_start=2614
+  _PACKAGEDESCRIPTOR_EXTENSIONSENTRY._serialized_end=2687
+  _METHODDESCRIPTOR._serialized_start=4016
+  _METHODDESCRIPTOR._serialized_end=4222
+  _WEBEZYCONTEXT._serialized_start=4224
+  _WEBEZYCONTEXT._serialized_end=4289
+  _WEBEZYFILECONTEXT._serialized_start=4291
+  _WEBEZYFILECONTEXT._serialized_end=4378
+  _WEBEZYMETHODCONTEXT._serialized_start=4380
+  _WEBEZYMETHODCONTEXT._serialized_end=4443
+  _WZRESOURCEWRAPPER._serialized_start=4446
+  _WZRESOURCEWRAPPER._serialized_end=4766
 # @@protoc_insertion_point(module_scope)

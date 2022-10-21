@@ -273,7 +273,7 @@ def main(args=None):
                     generate.message(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose,args.parent)
 
                 elif namespace[0] == 'rpc':
-                    generate.rpc(results,WEBEZY_JSON,ARCHITECT,parent=args.parent)
+                    generate.rpc(results,WEBEZY_JSON,ARCHITECT,parent=args.parent,expand=args.expand)
 
                 elif namespace[0] == 'enum':
                     generate.enum(results,WEBEZY_JSON,ARCHITECT,parent=args.parent)

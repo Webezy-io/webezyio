@@ -70,7 +70,11 @@ def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
+    if file_system.check_if_dir_exists(file_system.join_path(wz_json.path,'clients','typescript')):
+        file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
+    else:
+        file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript'))
+        file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
     for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'server','services','protos')):
         file_system.copyFile(file_system.join_path(wz_json.path,'server','services', 'protos', f), file_system.join_path(wz_json.path,'clients','typescript','protos',f))
     

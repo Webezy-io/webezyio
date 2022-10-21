@@ -62,3 +62,6 @@ def init_context(wz_json:WZJson, wz_context: WZContext):
 def parse_protos_to_resource(protos_dir,project_name,server_language,clients):
     """Parse .proto files into :class:`webezyio.commons.helpers.WZJson` object"""
 
+@hookspec
+def package_project(wz_json:WZJson, wz_context: WZContext):
+    """Provide a packaging project methods / files / scripts"""
