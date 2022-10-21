@@ -224,6 +224,7 @@ def main(args=None):
     # Logging version
     if args.version:
         print_version(__version__.__version__)
+        exit(0)
 
     if args.verbose:
         print_note(args,True,'Argument passed to webezy CLI')
@@ -231,6 +232,7 @@ def main(args=None):
     if hasattr(args, 'project'):
         print_info(args,True)
         new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain)
+        exit(0)
     else:
         if helpers.check_if_under_project():
             
@@ -348,7 +350,8 @@ def main(args=None):
                             ls.list_by_resource(args.type,WEBEZY_JSON)
                     else:
                         ls.list_by_name(args.full_name,WEBEZY_JSON)
-                
+                else:
+                    parser.print_help()
         else:
             print_warning(
                 'Not under valid webezyio project !\n\tMake sure you are on the root directory of your project')
