@@ -104,5 +104,16 @@ def get_readme(wz_json: helpers.WZJson):
     index = '\n'.join(temp_index)
     clients_usage = '\n'.join(clients_usage)
     clients_usage_i = '\n'.join(clients_usage_i)
-    readme_file = f'# {project_name}\n\nThis project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !\n\nThis project is using gRPC as main code generator and utilize HTTP2 + protobuf protocols for communication.\n\n# Index\nUsage:\n{clients_usage_i}\n\nResources:\n{index}\n\n# Services\n\n{svcs}\n\n# Packages\n\n{pkgs}\n\n# Usage\nThis project supports clients communication in the following languages:\n{clients_usage}\n* * *\n__This project and README file has been created thanks to [webezy.io](https://www.webezy.io)__'
+    extra_links = wz_json._config.get('docs')
+    temp_links = ''
+    print(wz_json.project)
+    if extra_links is not None:
+        for k in extra_links:
+            if file_system.check_if_file_exists(wz_json.project.get('uri')+''+ extra_links[k]):
+                temp_links += '{2}\n[{0}]({1})'.format(k,extra_links[k],temp_links)
+            else :
+                pretty.print_error("Extra docs file is not found ! [{0}]({1})".format(k,extra_links[k]))
+    temp_links = '\n### Further Reading\n{0}'.format(temp_links) if extra_links is not None else ''
+
+    readme_file = f'# {project_name}\n\nThis project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !\n\nThis project is using gRPC as main code generator and utilize HTTP2 + protobuf protocols for communication.\n\n# Index\nUsage:\n{clients_usage_i}\n\nResources:\n{index}\n\n# Services\n\n{svcs}\n\n# Packages\n\n{pkgs}\n\n# Usage\nThis project supports clients communication in the following languages:\n{clients_usage}\n{temp_links}\n* * *\n__This project and README file has been created thanks to [webezy.io](https://www.webezy.io)__'
     return readme_file

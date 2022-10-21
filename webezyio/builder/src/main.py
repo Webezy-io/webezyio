@@ -61,17 +61,28 @@ class WebezyBuilder:
 
     def _auto_register_hooks(self):
         server_lang = self._webezy_json.get_server_language()
+
+        deployment_type = self._webezy_json._config.get('deployment') if self._webezy_json._config.get('deployment') is not None else 'LOCAL'
+        proxy = self._webezy_json._config.get('proxy')
+
         # Default base
         self._pm.register(WebezyBase)
         # Default proto
         self._pm.register(WebezyProto)
-        # Default docker
-        self._pm.register(WebezyDocker)
         # Default Readme
         self._pm.register(WebezyReadme)
         client_py = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'python'),False)
         client_ts = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'typescript'),False)
 
+        # Default docker
+        if deployment_type == 'DOCKER':
+            self._pm.register(WebezyDocker)
+
+        # Default proxy
+        if proxy is not None:
+            pass
+
+        # Code generators plugins
         if server_lang == 'python':
             self._pm.register(WebezyPy)
         elif client_py != False:

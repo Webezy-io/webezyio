@@ -850,7 +850,19 @@ class WZClientTs():
         self._config = config
 
     def __str__(self):
-        return f'{self.write_imports()}\n{self.write_client_wrapper()}\n\n\t{self.write_services_classes()}\n{_CLOSING_BRCK}\n'
+        return f'{self.write_imports()}\n{self.write_client_wrapper()}\n\n\t{self.write_services_classes()}\n{_CLOSING_BRCK}\n{self.write_client_exports()}'
+
+    def write_client_exports(self):
+        pkgs_list = []
+        clients_list = []
+        for key in self._packages:
+            pkg = self._packages[key].get('name')
+            pkgs_list.append(pkg)
+        pkgs_list = ',\n\t'.join(pkgs_list)
+        for key in self._services:
+            clients_list.append(key+'Client')
+        clients_list = ',\n\t'.join(clients_list)
+        return f'export {_OPEN_BRCK}\n\t{pkgs_list},\n\t{clients_list}\n{_CLOSING_BRCK}' 
 
     def write_client_wrapper(self):
         return f'const _DEFAULT_OPTION = {_OPEN_BRCK}\n\t"grpc.keepalive_time_ms": 120000,\n\t"grpc.http2.min_time_between_pings_ms": 120000,\n\t"grpc.keepalive_timeout_ms": 20000,\n\t"grpc.http2.max_pings_without_data": 0,\n\t"grpc.keepalive_permit_without_calls": 1,\n{_CLOSING_BRCK}\n\nexport class {self._project_package} {_OPEN_BRCK}\n\n\t{self.init_wrapper()}'
@@ -912,15 +924,21 @@ class WZClientTs():
                     return_type_overload = 'ClientUnaryCall' if rpc_output_type == False and rpc_input_type == False else f'ClientDuplexStream<{rpc_in_type}, {rpc_out_type}>' if rpc_output_type == True and rpc_input_type == True else f'ClientReadableStream<{rpc_out_type}>' if rpc_output_type == True and rpc_input_type == False else f'ClientWritableStream<{rpc_in_type}>' if rpc_output_type == False and rpc_input_type == True else 'any'
                     return_type = f'Promise<{rpc_out_type}>' if rpc_output_type == False else f'Observable<{rpc_out_type}>'
                     temp_rpc_name = rpc_name[0].lower() + rpc_name[1:]
-                    rpc_impl = f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\treturn promisify<{rpc_in_type}, Metadata, {rpc_out_type}>(this.{svc}_client.{temp_rpc_name}.bind(this.{svc}_client))(request, metadata);\n\t\t{_CLOSING_BRCK} else {_OPEN_BRCK}\n\t\t return this.{svc}_client.{temp_rpc_name}(request, metadata, callback);\n\t\t{_CLOSING_BRCK}' if rpc_output_type == False and rpc_input_type == False else f'return new Observable(subscriber => {_OPEN_BRCK}\n\t\tconst stream = this.{svc}_client.{temp_rpc_name}(request, metadata);\n\t\t\tstream.on(\'data\', (res: {rpc_out_type}) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(res)\n\t\t\t{_CLOSING_BRCK}).on(\'end\', () => {_OPEN_BRCK}\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK}).on(\'error\', (err: any) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(err)\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK});\n\t\t{_CLOSING_BRCK})' if rpc_output_type == True and rpc_input_type == True or rpc_output_type == True else f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\tcallback = (_error:_service_error | null , _response:{rpc_out_type}) => {_OPEN_BRCK}if (_error) throw _error; return _response{_CLOSING_BRCK}\n\t\t{_CLOSING_BRCK}\n\t\treturn this.{svc}_client.{temp_rpc_name}(metadata, callback);' 
+                    rpc_impl = f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\treturn promisify<{rpc_in_type}, Metadata, {rpc_out_type}>(this.{svc}_client.{temp_rpc_name}.bind(this.{svc}_client))(request, metadata);\n\t\t{_CLOSING_BRCK} else {_OPEN_BRCK}\n\t\t return this.{svc}_client.{temp_rpc_name}(request, metadata, callback);\n\t\t{_CLOSING_BRCK}' if rpc_output_type == False and rpc_input_type == False else f'return this.{svc}_client.{temp_rpc_name}(metadata);' if rpc_output_type == True and rpc_input_type == True  else f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\tcallback = (_error:_service_error | null , _response:{rpc_out_type}) => {_OPEN_BRCK}if (_error) throw _error; return _response{_CLOSING_BRCK}\n\t\t{_CLOSING_BRCK}\n\t\treturn this.{svc}_client.{temp_rpc_name}(metadata, callback);' if rpc_output_type == False and rpc_input_type == True else f'return new Observable(subscriber => {_OPEN_BRCK}\n\t\tconst stream = this.{svc}_client.{temp_rpc_name}(request, metadata);\n\t\t\tstream.on(\'data\', (res: {rpc_out_type}) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(res)\n\t\t\t{_CLOSING_BRCK}).on(\'end\', () => {_OPEN_BRCK}\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK}).on(\'error\', (err: any) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(err)\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK});\n\t\t{_CLOSING_BRCK})'
                     if rpc_output_type == False and rpc_input_type == True:
                         description = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param metadata Metadata\n\t*/'
                         rpcs.append(
                             f'\n\t{description}\n\tpublic {rpc_name}(metadata: Metadata): {return_type};\n\tpublic {rpc_name}(metadata: Metadata, callback: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload};\n\tpublic {rpc_name}(metadata: Metadata = this.metadata, callback?: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload} | {return_type} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
-                    else:
+                    elif rpc_output_type == True and rpc_input_type == True:
                         description = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param request {rpc_in_type}\n\t* @param metadata Metadata\n\t*/'
                         rpcs.append(
-                            f'\n\t{description}\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata): {return_type};\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata, callback: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload};\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata = this.metadata, callback?: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload} | {return_type} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
+                            f'\n\t{description}\n\tpublic {rpc_name}(metadata: Metadata): {return_type_overload} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
+                    else:
+                        description_0 = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param request {rpc_in_type}\n\t* @param metadata Metadata\n\t* @returns {return_type}\n\t*/'
+                        description_1 = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param request {rpc_in_type}\n\t* @param metadata Metadata\n\t* @param callback A callback function to be excuted once the server responds with {rpc_out_type}\n\t* @returns {return_type_overload}\n\t*/'
+                        
+                        rpcs.append(
+                            f'\n\t{description_0}\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata): {return_type};\n\t{description_1}\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata, callback: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload};\n\tpublic {rpc_name}(request: {rpc_in_type}, metadata: Metadata = this.metadata, callback?: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload} | {return_type} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
 
             rpcs = '\n\n\t'.join(rpcs)
         return ''.join(rpcs)

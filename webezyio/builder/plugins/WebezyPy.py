@@ -1,7 +1,7 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers, file_system, resources
+from webezyio.commons import helpers, file_system, pretty, resources
 from webezyio.builder.plugins.static import gitignore_py
 
 
@@ -51,11 +51,15 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
 @builder.hookimpl
 def write_services(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     for svc in wz_json.services:
-        service_code = helpers.WZServicePy(wz_json.project.get('packageName'), svc, wz_json.services[svc].get(
-            'dependencies'), wz_json.services[svc], context=wz_context,wz_json=wz_json).to_str()
-        file_system.wFile(file_system.join_path(
-            wz_json.path, 'services', f'{svc}.py'), service_code, overwrite=True)
-
+        if file_system.check_if_file_exists(file_system.join_path(
+            wz_json.path, 'services', f'{svc}.py')) == False:
+            service_code = helpers.WZServicePy(wz_json.project.get('packageName'), svc, wz_json.services[svc].get(
+                'dependencies'), wz_json.services[svc], context=wz_context,wz_json=wz_json).to_str()
+            file_system.wFile(file_system.join_path(
+                wz_json.path, 'services', f'{svc}.py'), service_code, overwrite=True)
+        else:
+            pretty.print_info("Make sure you are editing the {0} file\n - See how to edit service written in python".format(file_system.join_path(
+                wz_json.path, 'services', f'{svc}.py')))
 
 @builder.hookimpl
 def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
@@ -301,7 +305,9 @@ for SERVICE in "${services[@]}"; do\n\
     python3 -m grpc_tools.protoc --proto_path=$SERVICE/ --python_out=$DESTDIR --grpc_python_out=$DESTDIR $SERVICE/*.proto\n\
 done\n\
 statuscode=$?\n\
-echo "Exit code for protoc -> "$statuscode'
+echo "Exit code for protoc -> "$statuscode\n\
+[[ "$statuscode" != "0" ]] && { echo "Some error occured during init script"; exit 1; }\n\
+exit 0'
 
 bash_run_server_script = '#!/bin/bash\n\n\
 PYTHONPATH=./services/protos:./services python3 server/server.py'

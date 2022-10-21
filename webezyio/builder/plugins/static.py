@@ -114,7 +114,9 @@ npm i\n\
 node ./bin/proto.js\n\
 npm run build\n\
 statuscode=$?\n\
-echo "Exit code for protoc -> "$statuscode'
+echo "Exit code for protoc -> "$statuscode\n\
+[[ "$statuscode" != "0" ]] && { echo "Some error occured during init script"; exit 1; }\n\
+exit 0'
 
 bash_run_server_script_ts = '#!/bin/bash\n\n\
 node ./server/server.js'
