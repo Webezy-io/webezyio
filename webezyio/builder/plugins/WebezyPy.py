@@ -7,13 +7,13 @@ from webezyio.builder.plugins.static import gitignore_py
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    logging.debug("Starting webezyio build process %s plugin" % (__name__))
+    pretty.print_info("Starting webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
-    logging.debug("Finished webezyio build process %s plugin" % (__name__))
+    pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
 
 
 @builder.hookimpl

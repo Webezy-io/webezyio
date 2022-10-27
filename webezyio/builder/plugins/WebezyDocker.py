@@ -56,3 +56,4 @@ PYTHON_DOCKERCOMPOSE = 'version: "3"\n\
 services:\n\n\
   {project}-app:\n\
     build: ./'
+

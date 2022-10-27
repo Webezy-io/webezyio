@@ -112,7 +112,8 @@ message EnumValueDescriptor {
     int32 number = 3;
     int32 index = 4;
     string type = 5;
-    string kind =  6;
+    string kind = 6;
+    string description = 7;
 }
 
 message Enum {
@@ -121,7 +122,8 @@ message Enum {
     string full_name = 3;
     repeated EnumValueDescriptor values = 4;
     string type = 5;
-    string kind =  6;
+    string kind = 6;
+    string description = 7;
 }
 
 message FieldDescriptor {

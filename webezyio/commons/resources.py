@@ -196,7 +196,7 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
     return msg if json == False else MessageToDict(msg)
 
 
-def generate_enum(path, domain, package, name, enum_values, json=False):
+def generate_enum(path, domain, package, name, enum_values, json=False,description=None):
     path = path.split('/webezy.json')[0]
 
     e_fName = get_enum_full_name(domain, package, name)
@@ -208,11 +208,11 @@ def generate_enum(path, domain, package, name, enum_values, json=False):
             domain, package, name, ev.get('name'))
         ev_uri = get_uri_enum_value(path, ev_fName)
         temp_values.append(EnumValueDescriptor(uri=ev_uri, name=ev.get(
-            'name'), number=ev.get('number'), index=index,type=ResourceTypes.descriptor.value,kind=ResourceKinds.enum_value.value))
+            'name'), number=ev.get('number'), index=index,type=ResourceTypes.descriptor.value,kind=ResourceKinds.enum_value.value,description=ev.get('description')))
         index = + 1
 
     ENUM = WZEnumDescriptor(uri=e_uri, name=name,type=ResourceTypes.descriptor.value,kind=ResourceKinds.enum.value,
-                            full_name=e_fName, values=temp_values)
+                            full_name=e_fName, values=temp_values,description=description)
     return ENUM if json == False else MessageToDict(ENUM)
 
 

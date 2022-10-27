@@ -13,8 +13,10 @@ from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import helpers,file_system,errors,resources
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
-from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit
+from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit,export
 from prettytable import PrettyTable
+
+_TEMPLATES = ['@webezyio/Blank','@webezyio/Sample']
 
 
 def field_exists_validation(new_field, fields, msg):
@@ -50,7 +52,6 @@ def validation(answers, current):
             current, reason='Resource name must not include special charcters')
     
     return True
-
 
 log = logging.getLogger(__name__)
 well_known_type = ['google.protobuf.Timestamp','google.protobuf.Struct']
@@ -97,6 +98,15 @@ wz_g_e_q = [
 
 
 def main(args=None):
+    print("""
+                 _                           _        
+ __      __ ___ | |__    ___  ____ _   _    (_)  ___  
+ \ \ /\ / // _ \| '_ \  / _ \|_  /| | | |   | | / _ \ 
+  \ V  V /|  __/| |_) ||  __/ / / | |_| |\033[96m _\033[0m | || (_) |
+   \_/\_/  \___||_.__/  \___|/___| \__, |\033[96m(_)\033[0m|_| \___/ 
+                                   |___/              
+""")
+
     """Main CLI processing, with argpars package.
     """
     # Main cli parser
@@ -123,6 +133,8 @@ def main(args=None):
                             required=False, help='Server language')
     parser_new.add_argument('--clients', nargs='*',
                             required=False, help='Clients language list seprated by spaces')
+    parser_new.add_argument('--template', choices=_TEMPLATES,default=_TEMPLATES[0],
+                            required=False, help='Create new project based on template')
   
 
     parser_n = subparsers.add_parser('n', help='A shortend for new commands')
@@ -141,7 +153,8 @@ def main(args=None):
                             required=False, help='Clients language list seprated by spaces')
     parser_n.add_argument('--build', action='store_true',
                             required=False, help='Clients language list seprated by spaces')
-
+    parser_n.add_argument('--template', choices=_TEMPLATES,default=_TEMPLATES[0],
+                            required=False, help='Create new project based on template')
     """Generate command"""
 
     parser_generate = subparsers.add_parser(
@@ -187,6 +200,13 @@ def main(args=None):
     parser_edit.add_argument('-a','--action',choices=['add','remove','modify'], help='Choose which action to preform on resource')
     parser_edit.add_argument('--sub-action', help='Choose which sub-action to preform on resource')
 
+    """Export command"""
+    
+    parser_export = subparsers.add_parser(
+        'export', help='Export a template from your webezy.json / proto files directory / webezy.template.py')
+    parser_export.add_argument('path', help='Path for webezy.json / protos files directory / webezy.template.py')
+    parser_export.add_argument('-c','--code', action='store_true', help='Export template including code files')
+
     """Run server"""
     parser.add_argument(
         '--run-server',action='store_true', help='Run server on current active project')
@@ -231,7 +251,7 @@ def main(args=None):
 
     if hasattr(args, 'project'):
         print_info(args,True)
-        new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain)
+        new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain,template=args.template)
         exit(0)
     else:
         if helpers.check_if_under_project():
@@ -343,6 +363,14 @@ def main(args=None):
                         edit.edit_message(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
                     elif kind == resources.ResourceKinds.method.value:
                         edit.edit_rpc(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+            elif args.path:
+                print(export.create_webezy_template_py())
+                if file_system.check_if_file_exists(args.path):
+                    pass
+                elif file_system.check_if_dir_exists(args.path):
+                    pass
+                else:
+                    raise errors.WebezyProtoError("Export Service Template Error","Make sure you are passing a valid path to webezy.json / protos directory / webezy.template.py script for WebezyArchitect")
             else:
                 if hasattr(args, 'full_name'):
                     if args.full_name is None:
@@ -352,9 +380,11 @@ def main(args=None):
                         ls.list_by_name(args.full_name,WEBEZY_JSON)
                 else:
                     parser.print_help()
+        
         else:
             print_warning(
                 'Not under valid webezyio project !\n\tMake sure you are on the root directory of your project')
+            parser.print_help()
 
 def parse_name_to_resource(full_name,wz_json: helpers.WZJson):
     resource = None
