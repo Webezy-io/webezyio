@@ -4,41 +4,111 @@ webezyio is free and open-source project that aims to be a complete framework fo
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
 It utulize those communication protocol, message serialization / deserialization and code generator with [```gRPC```](https://grpc.io) opensource project by google. 
 
+Webezy.io has been created to give deleopers quick and structerd way for building gRPC services without pain while keeping thins open for further modifications.
+
+In result we are trying not to restrict the implemantations themselves but to restrict the project structure to well defined and re-usable by many languages and scenarios.
+
+The current supported languages are:
+| **Language** | **Server** | **Client** |   **Status**   |
+|:------------:|:----------:|:----------:|:--------------:|
+|    Python    |    **V**   |    **V**   |     Stable     |
+|  Typescript  |    **V**   |    **V**   |     Stable     |
+| Go           |    **X**   |    **X**   | In-Development |
+| C#.NET       |    **X**   |    **X**   |     Planned    |
+
 Get full explanation and many more details on usage at [```webezy.io```](https://www.webezy.io).
 
 The `webezyio CLI` is a wrapper for WebezyArchitect class which does mainly the processing and execution of creating webezy.jso file.
 
-You can interact with the WebezyArchitect class in main two ways:
+You can interact with the WebezyArchitect class with two main ways:
 
-- CLI - The most common and easy to get you started creating gRPC services.
-- Python API - Will be useful for more compehransive project creation flows and for developers who wants to understand how webezyio works.
-
-Also you can create a new template which holds generated code to `WebezyArchitect` class based on your already pre-defined services, which we use this technique to distribute services templates that can be installed on different projects.
-
-```sh
-webezy template <path/to/webezy.json> --out-path templates --template-name <SomeTemplate>
-```
-
-[WebezyArchitect API Example](/tests/blank/test.py)
+- __CLI__ - The most common and easy to get you started creating gRPC services.
+- __Python API__ - Will be useful for more compehransive project creation flows and for developers who wants to understand how webezyio works.
 
 # Installation
 Install from pip
 ```sh
 pip install webezyio
 ```
+# Docs
 
-# Sub-modules
+Go to [Webezy.io Docs](https://www.webezy.io/docs) for full explanation.
+
+__Tutorials:__
+- [Sample project](https://www.webezy.io/docs/tutorials/sample-project)
+
+## Quick Start 
+
+> __Note__ Please refer to [CLI docs](https://www.webezy.io/docs/cli) for any question you got, also make sute to use the CLI help `webezy --help` should give you an additional information on every command you may possibly run
+
+To create a new webezy.io project run the following command:
+```sh
+webezy new <YourProject>
+```
+> __Note__ you can create a new project based on template to get started quickly
+```sh
+wz n <YourProject> --template @webezyio/Sample
+```
+ - For more information see [Project Templating](https://www.webezyio/docs/project-templating)
+
+Then you will need to navigate into your project
+
+> __Note__ if you didnt specified the `--path` argument when creating new project by default it will create a project under your current directory
+
+```sh
+cd <YourProject>
+```
+
+After you are under the new project directory you can go ahead and create webezy.io resources with those simple commands:
+
+> __Note__ Please note that every sub-command of `generate` and `new` can be shortend with the first letter e.g : `wz g p` is equivalent to `wz generate package`
+
+```sh
+# Generate new package to hold messages
+webezy generate package
+# Generate new service to hold RPC's (Methods)
+webezy generate service
+# Generate message under specified package
+webezy generate message
+# Generate RPC (Method) under specified service
+# Same as running `wz g r`
+webezy generate rpc
+```
+> __Note__ Make sure before creating new RPC on service that you have imported at least 1 package to be used by the service. for more information visit -> [Package Docs](https://www.webezy.io/docs/tutorials/import-packages)
+
+
+After you had generated your resources for the project and modified the code (See the docs for more explanation on how to develop your project and make changes [Sample Project](https://www.webezy.io/docs/tutorials/sample-project)).
+
+You can now build your project and run your server with those simple commands:
+
+```sh
+# First build your project
+webezy --build
+# Then run the server
+webezy --run-server
+```
+
+> __Note__ you can auto-build your resources if applicable straight when you are generating them with adding `--build` argument to `webezy generate` comands.
+
+You can use now your client code that has been autogenerated in your specified language(s) on creating the project.
+
+> __Pro-Tip:__ you can always make your commands even shorter with replacing `webezy` with `wz`
+
+# Understanding Webezy.io
+While it is not nesscesary step to get you started we do recommend to invest few minutes to read an overview of how `Webezy.io` Built and utulizing gRPC, this high level overview will make you approach some scenarios more easly.
+
+## Sub-modules
 
 * builder - A command-pattern module for easy interacting with webezy.json
 * cli - A CLI interface module for webezy
 * coder - A pluggable API for all code generating methods
 * commons - Common modules and methods, such as retrieving and modifying protos
 
-# Project Structure
+## Project Structure
 
 Every webezy.io project should look like the following schema:
 
-> __Note:__ For simplicity we use for this example 1 service (`SampleService`) and 1 package (`SamplePackage`)
+> __Note__ For simplicity we use for this example 1 service (`SampleService`) and 1 package (`SamplePackage`)
 ```sh
 # Root dir of your project
 my-project/
@@ -62,60 +132,47 @@ my-project/
 ├─ README.md
 ```
 
-# Docs
+The main compoenent is the `webezy.json` file which conssisting of all project resources and metadata.
 
-Go to [Webezy.io Docs](https://www.webezy.io/docs) for full explanation.
+This "Snapshot" of current project state is confined into well structerd json format based on its proto message definition at `webezyio.commons.protos.webezy_pb2.py`.
 
-## Quick Start 
+```proto
+message WebezyJson {
+    string domain = 1;
+    Project project = 2;
+    map<string, ServiceDescriptor> services = 3;
+    map<string, PackageDescriptor> packages = 4;
+    WebezyConfig config = 5;
+}
+```
+> __Note__ See how we utulized protobuffers as main serialization and desrialization in our CLI and core modules
 
-> __Note:__ Please refer to [CLI docs](https://www.webezy.io/docs/cli) for any question you got, also make sute to use the CLI help `webezy --help` should give you an additional information on every command you may possibly run
+This Json document mainly connsist of 4 components:
 
-To create a new webezy.io project run the following command:
+- `project` - All project specific metadata this data is only to be consumed by internal Webezy.io CLI and modules.
+- `config` - Open metadata for various tasks as one of them is to give plugins and other external modules to have context point.
+- `packages` - gRPC driven component for all packages which are centralized place for `Enums` and `Messages` under so called "Package" compoenent to be consumed by a "Service".
+- `services` - gRPC driven component for all Services which holds details on RPC's, and Service dependencies which are "Packages" that hold "Messages" that relate to RPC's input and output types.
+
+## Service templating
+
+A unique feature allow you to develop locally your project and generate a template or a "Snapshot" of your project resources which can be shared or built on top for versions or branches the generated script currently in `Python` only. (Future use may include Typescript as well)
+
+This script can be consumed by the `Webezy.io CLI` to generate your webezy.json and all other directories structure, then you can normally like every webezy project edit or add resources as you wish ! as it was your own services from scratch, allowing you to develop fast and even build your own "Opensource" template which can be reused or refactored as user wish.
+
+Also you can create a new template which holds generated code to `WebezyArchitect` class based on your already pre-defined services, which we use this technique to distribute services templates that can be installed on different projects.
+
+### Create a template from service
 ```sh
-webezy new <YourProject>
+webezy template <path/to/webezy.json> --out-path templates --template-name <SomeTemplate>
 ```
 
-Then you will need to navigate into your project
-
-> __Note:__ if you didnt specified the `--path` argument when creating new project by default it will create a project under your current directory
-
+### Load a template for blank service
 ```sh
-cd <YourProject>
+webezy template <mycustom.template.py> --load
 ```
 
-After you are under the new project directory you can go ahead and create webezy.io resources with those simple commands:
-
-> __Note:__ Please note that every sub-command of `generate` and `new` can be shortend with the first letter e.g : `wz g p` is equivalent to `wz generate package`
-
-```sh
-# Generate new package to hold messages
-webezy generate package
-# Generate new service to hold RPC's (Methods)
-webezy generate service
-# Generate message under specified package
-webezy generate message
-# Generate RPC (Method) under specified service
-webezy generate rpc
-```
-> __Note:__ Make sure before creating new RPC on service that you have imported at least 1 package to be used by the service. for more information visit -> [Package Docs](https://www.webezy.io/docs/tutorials/import-packages)
-
-
-After you had generated your resources for the project and modified the code (See the docs for more explanation on how to develop your project and make changes [Sample Project](https://www.webezy.io/docs/tutorials/sample-project)).
-
-You can now build your project and run your server with those simple commands:
-
-```sh
-# First build your project
-webezy --build
-# Then run the server
-webezy --run-server
-```
-
-> __Note:__ you can auto-build your resources if applicable straight when you are generating them with adding `--build` argument to `webezy generate` comands.
-
-You can use now your client code that has been autogenerated in your specified language(s) on creating the project.
-
-> __Pro-Tip:__ you can always make your commands even shorter with replacing `webezy` with `wz`
+[WebezyArchitect API Example](./webezyio/tests/blank/test.py)
 
 
 ### Development
@@ -123,3 +180,20 @@ You can use now your client code that has been autogenerated in your specified l
 We are welcoming any code contribution and help to maintain and release new fetures as well documenting the library.
 
 See our [contirbution page](./docs/contirbuting.md)
+
+## Builder plugins
+
+Webezy.io allows developer to create thier own modules that inherit from `webezyio.builder` class, this small modules can be activate on specific hooks and mainly in use with building the proto files, code files and project structure as general.
+
+As you may have noted webezyio has it's `Architect` class an `Builder` class which responsible as thier names applies - __Design and bring some feel to the project (`Architect`) \ To construct in reality from the highlevel reprepresentationresntation of resource, to actual working code (`Builder`)__
+
+While currently `Architect` plugins are not supported (But we do plan to open this module as well).
+
+The `Builder` Class has been created in plug and play concept for easier and more granluar modules which can be dropped or added without affectively changing how Webezy.io CLI works.
+
+This feature allows you as the developer to further enrich you project creating process with custom files, modules or even changing the projec structure itself to your demands and needs.
+
+[See plugins directory for examples](./webezyio/builder/plugins/)
+
+---
+__Created with love by Amit Shmulevitch. 2022 © webezy.io__
