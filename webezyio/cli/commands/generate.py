@@ -295,8 +295,9 @@ def rpc(results,webezy_json:WZJson,architect:WebezyArchitect,expand=None,parent:
         '.')[1]].get('dependencies')
 
     if dependencies is None:
+        svc_name = svc.split('.')[1]
         print_error(
-            f'Dependencies not listed under "{svc}"\n\tTry attache first a packge to service\n\tRun: \'wz package <some.package.v1> {svc}\'')
+            f'Dependencies not listed under "{svc}"\n\tTry attache first a packge to service\n\tRun: \'wz package <some.package.v1> {svc_name}\'')
         exit(1)
 
     avail = []

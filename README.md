@@ -6,6 +6,20 @@ It utulize those communication protocol, message serialization / deserialization
 
 Get full explanation and many more details on usage at [```webezy.io```](https://www.webezy.io).
 
+The `webezyio CLI` is a wrapper for WebezyArchitect class which does mainly the processing and execution of creating webezy.jso file.
+
+You can interact with the WebezyArchitect class in main two ways:
+
+- CLI - The most common and easy to get you started creating gRPC services.
+- Python API - Will be useful for more compehransive project creation flows and for developers who wants to understand how webezyio works.
+
+Also you can create a new template which holds generated code to `WebezyArchitect` class based on your already pre-defined services, which we use this technique to distribute services templates that can be installed on different projects.
+
+```sh
+webezy template <path/to/webezy.json> --out-path templates --template-name <SomeTemplate>
+```
+
+[WebezyArchitect API Example](/tests/blank/test.py)
 
 # Installation
 Install from pip
@@ -94,7 +108,7 @@ You can now build your project and run your server with those simple commands:
 # First build your project
 webezy --build
 # Then run the server
-webezy --run
+webezy --run-server
 ```
 
 > __Note:__ you can auto-build your resources if applicable straight when you are generating them with adding `--build` argument to `webezy generate` comands.

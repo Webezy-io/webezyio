@@ -110,7 +110,9 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                             if f'{message_name} = _reflection' in l:
                                 temp_fields = []
                                 init_fields = []
+                                pretty.print_info(init_fields)
                                 for field in m['fields']:
+
                                     fName = field['name']
                                     fType = parse_proto_type_to_py(field['fieldType'].split(
                                         '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name)
@@ -153,6 +155,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
     elif type == 'byte':
         temp_type = 'bytes'
     elif type == 'message':
+        pretty.print_info(current_pkg)
         if messageType.split('.')[1] != current_pkg:
             temp_type = '{0}__pb2.{1}'.format(
                 messageType.split('.')[1], messageType.split('.')[-1])

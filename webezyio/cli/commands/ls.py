@@ -85,10 +85,20 @@ def list_all(webezy_json:WZJson):
         tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
     print_info(tab,True,'Listing packages resources')
 
-    header = ['Message','Fields']
+    header = ['Message','Fields','Package']
     tab = PrettyTable(header)
     for pkg in webezy_json.packages:
         package = webezy_json.packages[pkg]
         for m in package['messages']:
-            tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []) ])
-    print_info(tab,True,'Listing packages resources')
+            tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []),package['package']])
+    print_info(tab,True,'Listing packages messages')
+    
+    header = ['Enum','Values','Package']
+    tab = PrettyTable(header)
+    for pkg in webezy_json.packages:
+        package = webezy_json.packages[pkg]
+        if package.get('enums'):
+
+            for e in package['enums']:
+                tab.add_row([e['name'],len(e.get('values') if e.get('values') is not None else []),package['package']])
+    print_info(tab,True,'Listing packages enums')

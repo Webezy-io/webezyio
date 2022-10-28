@@ -220,12 +220,25 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                                 temp_fields = []
                                 init_fields = []
                                 for field in m['fields']:
+
                                     fName = field['name']
                                     fType = parse_proto_type_to_py(field['fieldType'].split(
-                                        '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'))
-                                    temp_fields.append(
-                                        f'{fName} = {fType} # type: {fType}')
+                                        '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name)
+                                    if field['fieldType'].split(
+                                        '_')[-1].lower() == 'enum':
+                                        temp_fields.append(
+                                            f'{fName} = {fType} # type: enum_type_wrapper.EnumTypeWrapper')
+                                    else:
+                                        temp_fields.append(
+                                            f'{fName} = {fType} # type: {fType}')
                                     init_fields.append(f'{fName}={fType}')
+                                # for field in m['fields']:
+                                #     fName = field['name']
+                                #     fType = parse_proto_type_to_py(field['fieldType'].split(
+                                #         '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'))
+                                #     temp_fields.append(
+                                #         f'{fName} = {fType} # type: {fType}')
+                                #     init_fields.append(f'{fName}={fType}')
                                 temp_fields = '\n\t'.join(temp_fields)
                                 init_fields = ', '.join(init_fields)
                                 file_content.insert(
@@ -272,7 +285,7 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     return context
 
 
-def parse_proto_type_to_py(type, label, messageType=None, enumType=None):
+def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_pkg=None):
     temp_type = 'None'
     if 'int' in type:
         temp_type = 'int'
@@ -283,11 +296,20 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None):
     elif type == 'byte':
         temp_type = 'bytes'
     elif type == 'message':
-        temp_type = '{0}__pb2.{1}'.format(
-            messageType.split('.')[1], messageType.split('.')[-1])
+        pretty.print_info(current_pkg)
+        if messageType.split('.')[1] != current_pkg:
+            temp_type = '{0}__pb2.{1}'.format(
+                messageType.split('.')[1], messageType.split('.')[-1])
+        else:
+            temp_type = '{1}'.format(
+                messageType.split('.')[1], messageType.split('.')[-1])
     elif type == 'enum':
-        temp_type = '{0}__pb2.{1}'.format(
-            enumType.split('.')[1], enumType.split('.')[-1])
+        if enumType.split('.')[1] != current_pkg:
+            temp_type = '{0}__pb2.{1}'.format(
+                enumType.split('.')[1], enumType.split('.')[-1])
+        else:
+            temp_type = '{1}'.format(
+                enumType.split('.')[1], enumType.split('.')[-1])
     elif type == 'bool':
         temp_type = 'bool'
 
@@ -295,6 +317,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None):
         temp_type = f'List[{temp_type}]'
 
     return temp_type
+
 
 
 bash_init_script = '#!/bin/bash\n\n\

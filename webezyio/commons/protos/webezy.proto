@@ -33,12 +33,22 @@ message WebezyRouteMatch {
     string prefix = 1;
 }
 
+message WebezyTemplate {
+    string name = 1;
+    string out_path = 2;
+    repeated string include = 3;
+    repeated string exclude = 4;
+    repeated string tags = 5;
+    string description = 6;
+}
+
 message WebezyConfig {
     string host = 1;
     int32 port = 2;
     WebezyDeploymentType deployment = 3;
     WebezyProxyConfig proxy = 4;
     google.protobuf.Struct docs = 5;
+    WebezyTemplate template = 6;
 }
 
 message WebezyJson {
