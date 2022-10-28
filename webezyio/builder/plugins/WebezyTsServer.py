@@ -33,7 +33,7 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     file_system.wFile(file_system.join_path(
         wz_json.path, 'services','utils', 'interfaces.ts'), utils_interfaces)
     # package.json
-    file_system.wFile(file_system.join_path(wz_json.path,'package.json'),package_json.format(projectName=wz_json.project.get('packageName')))
+    file_system.wFile(file_system.join_path(wz_json.path,'package.json'),package_json.replace('REPLACEME',wz_json.project.get('packageName')))
     
     # Bin files
     file_system.wFile(file_system.join_path(

@@ -40,7 +40,10 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     for dir in directories:
         file_system.mkdir(dir)
     # package.json
-    file_system.wFile(file_system.join_path(wz_json.path,'package.json'),package_json.format(projectName=wz_json.project.get('packageName')))
+    if wz_json.get_server_language() != 'typescript':
+        pretty.print_info('Removing rimraf server dir')
+        tmp_pkg_json = package_json.replace('rimraf server &&','')
+    file_system.wFile(file_system.join_path(wz_json.path,'package.json'),tmp_pkg_json.replace('REPLACEME',wz_json.project.get('packageName')))
     
     # Bin files
     file_system.wFile(file_system.join_path(
@@ -75,8 +78,10 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     else:
         file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript'))
         file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
-    for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'server','services','protos')):
-        file_system.copyFile(file_system.join_path(wz_json.path,'server','services', 'protos', f), file_system.join_path(wz_json.path,'clients','typescript','protos',f))
+    
+    if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'server','services','protos')):
+        for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'server','services','protos')):
+            file_system.copyFile(file_system.join_path(wz_json.path,'server','services', 'protos', f), file_system.join_path(wz_json.path,'clients','typescript','protos',f))
     
     client = helpers.WZClientTs(wz_json.project.get(
         'packageName'), wz_json.services, wz_json.packages, wz_context)

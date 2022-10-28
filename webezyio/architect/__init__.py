@@ -1,9 +1,10 @@
 from enum import Enum
 import logging
+from webezyio.commons.errors import WebezyProtoError
 from webezyio.commons.file_system import join_path
 from webezyio.commons.pretty import print_info, print_note
 
-from webezyio.commons.protos.webezy_pb2 import Language, PackageDescriptor
+from webezyio.commons.protos.webezy_pb2 import Language, PackageDescriptor,Project
 from google.protobuf.json_format import MessageToDict
 from webezyio.commons.resources import generate_enum, generate_message, generate_package, generate_project,\
                                      generate_rpc, generate_service
@@ -31,6 +32,8 @@ class WebezyArchitect():
 
     def __init__(self,path,domain='domain',project_name='project',save=None) -> None:
         logging.info("Starting webezyio architect process")
+        if 'webezy.json' not in path:
+            raise WebezyProtoError('webezy.json file path is not valid','Make sure you pass in your architect class the right path to your webezy.json file')
         self._path = path
         self._domain = domain
         self._project_name = project_name
@@ -53,7 +56,7 @@ class WebezyArchitect():
     def SetConfig(self,config):
         self._webezy.execute(CommandMap._ADD_RESOURCE, {'config':config})
 
-    def AddProject(self,name=None,server_language=Language.Name(Language.python),clients=[]):
+    def AddProject(self,name=None,server_language=Language.Name(Language.python),clients=[]) -> Project:
         name = name if name is not None else self._project_name
         dict = generate_project(self._path,name,server_language,clients,json=True)
         project = generate_project(self._path,name,server_language,clients)
@@ -101,9 +104,10 @@ class WebezyArchitect():
             return message
         else:
             logging.error(f"Cannot create message '{message.name}' already exists under '{package.name}' package")
-
-    def AddEnum(self,package,name,enum_values):
-        enum = generate_enum(self._path,self._domain,package.name,name,enum_values)
+        return message
+        
+    def AddEnum(self,package,name,enum_values,description=None):
+        enum = generate_enum(self._path,self._domain,package.name,name,enum_values,description=description)
         package.enums.append(enum)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
         return enum

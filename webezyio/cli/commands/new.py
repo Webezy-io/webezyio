@@ -1,6 +1,7 @@
 import logging
-from typing import List
+from typing import List, Literal
 from webezyio.cli.theme import WebezyTheme
+from webezyio.commons.helpers import WZEnumValue, WZField
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 from webezyio.commons.file_system import join_path,mkdir
 from webezyio.commons.protos.webezy_pb2 import Language,WebezyDeploymentType
@@ -8,6 +9,8 @@ from webezyio.architect import WebezyArchitect
 import os
 import inquirer
 from inquirer import errors
+
+_TEMPLATES = Literal["@webezyio/Blank", "@webezyio/Sample"]
 
 def validate_client(answers, current):
     if len(current) ==0:
@@ -27,10 +30,11 @@ wz_new_q = [
     inquirer.Text("domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
-def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None,server_language:str=None,clients=[],domain:str=None):
+def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None,server_language:str=None,clients=[],domain:str=None,template:_TEMPLATES='@webezyio/Blank'):
 
     domain_name = 'domain'
-    print_info(f'Creating new webezy project "{project_name}"')
+    print_info(f'Creating new webezy project "{project_name}" [{template}]')
+
     if server_language is None and clients == None and domain is None:
         results = inquirer.prompt(wz_new_q, theme=WebezyTheme())
     
@@ -93,10 +97,49 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
     ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
     ARCHITECT.SetDomain(domain_name)
     ARCHITECT.SetConfig({'host': host, 'port': int(port), 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
-
+    
+    attach_template(ARCHITECT,template)
+    
     ARCHITECT.Save()
     
     print_success(
         f'Success !\n\tCreated new project "{project_name}"\n\t-> cd {root_dir}\n\t-> And then continue developing your awesome services !\n-> For more info on how to use the webezy.io CLI go to https://www.webezy.io/docs')
 
+def attach_template(ARCHITECT:WebezyArchitect,template:_TEMPLATES):
+    if template == '@webezyio/Sample':
 
+        pkg = ARCHITECT.AddPackage('SamplePackage',[],[],'This is a sample package to be used in "SampleService"')
+
+        _SAMPLE_MSG_FIELDS = [
+            WZField('SampleString','TYPE_STRING','LABEL_OPTIONAL',None,None,None,'This is a sample field under "SampleMessage" which expect string value').to_dict(),
+            WZField('SampleBool','TYPE_BOOL','LABEL_OPTIONAL',None,None,None,'This is a sample field under "SampleMessage" which expect boolean value').to_dict(),
+            WZField('SampleInt','TYPE_INT32','LABEL_OPTIONAL',None,None,None,'This is a sample field under "SampleMessage" which expect int32 value').to_dict(),
+            WZField('SampleFloat','TYPE_FLOAT','LABEL_OPTIONAL',None,None,None,'This is a sample field under "SampleMessage" which expect float value').to_dict(),
+            WZField('StringArray','TYPE_STRING','LABEL_REPEATED',None,None,None,'This is a list/array field under "SampleMessage" which expect strings values').to_dict()
+        ]
+        msg = ARCHITECT.AddMessage(pkg,'SampleMessage',_SAMPLE_MSG_FIELDS,'This is a sample message')
+
+        _ENUM_VALUES = [
+            WZEnumValue(name='UNKNOWN',number=0,description='This is the default enum value which should be ignored when passed to server / client').to_dict(),
+            WZEnumValue(name='SOME_VALUE',number=1).to_dict(),
+            WZEnumValue(name='OTHER_VALUE',number=2).to_dict()
+        ]
+        
+        enm = ARCHITECT.AddEnum(pkg,'SampleEnum',_ENUM_VALUES,'This is Enum type to be used as field type')
+        
+        _SAMPLE_MSG_FIELDS = [
+            WZField('NestedMessage','TYPE_MESSAGE','LABEL_OPTIONAL',msg.full_name,None,None,'This is a nested message field which expect "{0}" value'.format(msg.full_name)).to_dict(),
+            WZField('SampleEnum','TYPE_ENUM','LABEL_OPTIONAL',None,enm.full_name,None,'This is a enum field which expect "{0}" value'.format(enm.full_name)).to_dict(),
+        ]
+
+        msg_1 = ARCHITECT.AddMessage(pkg,'ComplexMessage',_SAMPLE_MSG_FIELDS,'This is a more complex message structure including nested fields and enums')
+
+        svc = ARCHITECT.AddService(name='SampleService',methods=[],description='This is a sample service',dependencies=[pkg.package])
+        ARCHITECT.AddRPC(svc, 'SampleUnary', [
+                        (False, msg.full_name), (False, msg_1.full_name)], 'This is a sample unary RPC call')
+        ARCHITECT.AddRPC(svc, 'SampleClientStream', [
+                        (True, msg.full_name), (False, msg_1.full_name)], 'This is a sample client stream RPC call')
+        ARCHITECT.AddRPC(svc, 'SampleServerStream', [
+                        (False, msg.full_name), (True, msg_1.full_name)], 'This is a sample server stream RPC call')
+        ARCHITECT.AddRPC(svc, 'SampleBidiStream', [
+                        (True, msg.full_name), (True, msg_1.full_name)], 'This is a sample bidi-stream RPC call')

@@ -101,6 +101,7 @@ class WZField():
 
     def to_dict(self):
         temp = {}
+        self._validate()
         for k in dict(self.__dict__):
             if k == '_extensions':
                 if dict(self.__dict__)[k] is not None:
@@ -120,6 +121,16 @@ class WZField():
 
         return temp
 
+    def _validate(self):
+        if self._field_type == 'TYPE_ENUM':
+            if self._enum_type is None:
+                pretty.print_error(f"Field {self._name} missing enum type and is configured as 'TYPE_ENUM'")
+                exit(1)
+        elif self._field_type == 'TYPE_MESSAGE':
+            if self._message_type is None:    
+                pretty.print_error(f"Field {self._name} missing enum type and is configured as 'TYPE_ENUM'")
+                exit(1)
+
     @property
     def name(self):
         return self._name
@@ -138,8 +149,20 @@ class WZField():
 
 
 class WZRPC():
+    """webezyio RPC level object that defines the required meta data properties."""
 
     def __init__(self, name, in_type, out_type, client_stream=False, server_stream=False, description=None) -> None:
+        """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.MethodDescriptor` representation.
+
+        Parameters
+        ----------
+            name (str): A RPC name, `MUST` not include blank space and hyphens.
+            in_type (str): Full name for message to be used as input type for the new RPC.
+            out_type (str):  Full name for message to be used as output type for the new RPC.
+            client_stream (bool): If client stream is available to this RPC, Defaulted to False.
+            server_stream (bool): If sever stream is available to this RPC, Defaulted to False.
+            description (str): Description for the RPC mainly used for client generated docs.
+        """
         self._name = name
         self._input_type = in_type
         self._output_type = out_type
@@ -220,7 +243,7 @@ class WZMessage():
 class WZEnumValue():
     """webezyio enum value level object that defines the required meta data properties."""
 
-    def __init__(self, name: str, number: int) -> None:
+    def __init__(self, name: str, number: int, description: str = None) -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.EnumValue` representation.
 
         Parameters
@@ -230,12 +253,16 @@ class WZEnumValue():
         """
         self._name = name
         self._number = number
+        self._description = description
 
     def setName(self, name):
         self._name = name
 
     def setNumber(self, type):
-        self._field_type = type
+        self._number = type
+
+    def setDescription(self, type):
+        self._description = type
 
     def to_dict(self):
         temp = {}
@@ -255,7 +282,7 @@ class WZEnumValue():
 class WZEnum():
     """webezyio enum level object that defines the required meta data properties."""
 
-    def __init__(self, name, enum_values: List[WZEnumValue] = []) -> None:
+    def __init__(self, name, enum_values: List[WZEnumValue] = [],description:str = '') -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Enum` representation.
 
         Parameters
@@ -265,12 +292,13 @@ class WZEnum():
         """
         self._name = name
         self._enum_values = enum_values
+        self._description = description
 
     def to_tuple(self):
         enums_values = []
         for ev in self._enum_values:
             enums_values.append(ev.to_dict())
-        return self._name, enums_values
+        return self._name, enums_values, self._description
 
     @property
     def name(self):
@@ -602,10 +630,12 @@ class WZProto():
                     value_name = v.get('name')
                     value_number = 0 if v.get(
                         'number') is None else v.get('number')
-                    values.append(f'{value_name} = {value_number};')
+                    v_desc = v.get('description')
+                    values.append(f'// [webezyio] - {v_desc}\n\t{value_name} = {value_number};')
                 values = '\n\t'.join(values)
+                e_desc = e.get('description')
                 enums.append(
-                    f'enum {enum_name} {_OPEN_BRCK}\n\t{values}\n{_CLOSING_BRCK}\n')
+                    f'// [webezyio] - {e_desc}\nenum {enum_name} {_OPEN_BRCK}\n\t{values}\n{_CLOSING_BRCK}\n')
             return '\n'.join(enums)
 
         else:
@@ -674,8 +704,8 @@ class WZClientPy():
                     rpc_in_type_pkg = rpc['inputType'].split('.')[1]
                     rpc_in_type = rpc['inputType'].split('.')[-1]
                     rpc_in_type = f'{rpc_in_type_pkg}.{rpc_in_type}'
-                    rpc_out_type_pkg = rpc['inputType'].split('.')[1]
-                    rpc_out_type = rpc['inputType'].split('.')[-1]
+                    rpc_out_type_pkg = rpc['outputType'].split('.')[1]
+                    rpc_out_type = rpc['outputType'].split('.')[-1]
                     rpc_out_type = f'{rpc_out_type_pkg}.{rpc_out_type}'
                     in_open_type = 'Iterator[' if rpc.get(
                         'clientStreaming') is not None and rpc.get('clientStreaming') == True else ''
@@ -912,8 +942,8 @@ class WZClientTs():
                     rpc_in_type_pkg = rpc['inputType'].split('.')[1]
                     rpc_in_type = rpc['inputType'].split('.')[-1]
                     rpc_in_type = f'{rpc_in_type_pkg}.{rpc_in_type}'
-                    rpc_out_type_pkg = rpc['inputType'].split('.')[1]
-                    rpc_out_type = rpc['inputType'].split('.')[-1]
+                    rpc_out_type_pkg = rpc['outputType'].split('.')[1]
+                    rpc_out_type = rpc['outputType'].split('.')[-1]
                     rpc_out_type = f'{rpc_out_type_pkg}.{rpc_out_type}'
                     rpc_output_type = rpc.get('serverStreaming') if rpc.get('serverStreaming') is not None else False
                     rpc_input_type = rpc.get('clientStreaming') if rpc.get('clientStreaming') is not None else False
