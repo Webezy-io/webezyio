@@ -282,7 +282,7 @@ class WZEnumValue():
 class WZEnum():
     """webezyio enum level object that defines the required meta data properties."""
 
-    def __init__(self, name, enum_values: List[WZEnumValue] = []) -> None:
+    def __init__(self, name, enum_values: List[WZEnumValue] = [],description:str = '') -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Enum` representation.
 
         Parameters
@@ -292,12 +292,13 @@ class WZEnum():
         """
         self._name = name
         self._enum_values = enum_values
+        self._description = description
 
     def to_tuple(self):
         enums_values = []
         for ev in self._enum_values:
             enums_values.append(ev.to_dict())
-        return self._name, enums_values
+        return self._name, enums_values, self._description
 
     @property
     def name(self):
