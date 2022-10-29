@@ -21,6 +21,9 @@ def mkdir(path):
 def removeFile(path):
     os.remove(path)
 
+def walkDirs(path):
+    return [x[0] for x in os.walk(path)]
+
 def walkFiles(path):
     for p in os.walk(path):
         return p[2]
@@ -30,8 +33,11 @@ def copyFile(file, new_file):
     shutil.copy2(file, new_file)
 
 
-def wFile(path, content, overwrite=False, json=False):
+def wFile(path, content, overwrite=False, json=False,force=False):
     if check_if_file_exists(path) == True:
+        if force:
+            os.makedirs(os.path.dirname(path),mode=0o777, exist_ok=True)
+            os.chmod(os.path.dirname(path),0o777)
         if overwrite == True:
             if json:
                 # Serializing json
@@ -41,6 +47,7 @@ def wFile(path, content, overwrite=False, json=False):
                 with open(path, "w") as outfile:
                     outfile.write(json_object)
             else:
+
                 logging.debug(f"Overwriting file {path}")
                 with open(path, 'w') as file:
                     file.write(content)
@@ -49,6 +56,9 @@ def wFile(path, content, overwrite=False, json=False):
             logging.debug("{0} File is already existing ! [pass function with 'overwrite' argument if you want to override this behaviour]"
                           .format(path))
     else:
+        if force:
+            os.makedirs(os.path.dirname(path),mode=0o777, exist_ok=True)
+            os.chmod(os.path.dirname(path),0o777)
         if json:
             # Serializing json
             json_object = JSON.dumps(content, indent=4)

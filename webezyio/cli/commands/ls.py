@@ -28,11 +28,12 @@ def list_by_name(full_name,webezy_json:WZJson):
             print_warning(f'Resource {full_name} wasnt found on packages')
     elif args_split > 3 and args_split <= 4:
         try:
-            header = ['Message','Fields']
+            header = ['Field','Field type','Enum Type', 'Message Type']
             tab = PrettyTable(header)
             msg = webezy_json.get_message(full_name)
-            tab.add_row([msg['name'],len(msg.get('fields') if msg.get('fields') is not None else [])])
-            print_info(tab,True,'Listing message resource')
+            for f in msg.get('fields'):
+                tab.add_row([f['name'],f.get('fieldType'),f.get('enumType'),f.get('messageType')])
+            print_info(tab,True,'Listing message [{0}] fields'.format(msg.get('fullName')))
         except Exception:
             print_warning(f'Resource {full_name} wasnt found on messages')
     else:
@@ -59,12 +60,12 @@ def list_by_resource(type,webezy_json:WZJson):
             tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
         print_info(tab,True,'Listing packages resources')
     elif type == 'message':
-        header = ['Message','Fields']
+        header = ['Message','Fields','Package']
         tab = PrettyTable(header)
         for pkg in webezy_json.packages:
             package = webezy_json.packages[pkg]
             for m in package['messages']:
-                tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []) ])
+                tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []), package.get('package') ])
         print_info(tab,True,'Listing packages resources')
     else:
         list_all(webezy_json)

@@ -270,6 +270,7 @@ message WebezyContext {
 message WebezyFileContext {
     string file = 1;
     repeated WebezyMethodContext methods = 2;
+    bytes code = 3;
 }
 
 message WebezyMethodContext {  
