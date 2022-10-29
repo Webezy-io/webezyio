@@ -34,6 +34,14 @@ pip install webezyio
 
 Go to [Webezy.io Docs](https://www.webezy.io/docs) for full explanation.
 
+__Useful Resources__:
+
+- [Awesome gRPC - A curated list of useful resources for gRPC](https://github.com/grpc-ecosystem/awesome-grpc)
+
+- [API Design Guide From Google - Matches well into gRPC specific design patterns](https://cloud.google.com/apis/design/)
+
+
+
 __Tutorials:__
 - [Sample project](https://www.webezy.io/docs/tutorials/sample-project)
 
@@ -254,6 +262,32 @@ webezy template <mycustom.template.py> --load
 
 [WebezyArchitect API Example](./webezyio/tests/blank/test.py)
 
+[SamplePy Template](./webezyio/commons/templates/webezyio/SamplePy.template.py)
+
+### Configure template options
+Each template can be configured in `webezy.json` file under `"config"` value for easy generating without elborate CLI commands:
+```json
+{
+  "config": {
+    "template": {
+      "outPath": "template",
+      "name": "SamplePy",
+      "description": "A basic sample project for webezyio.\nIt is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google.",
+      "include": [
+        "typescript.ts",
+        "python.py",
+        "services"
+      ],
+      "author": "Amit Shmulevitch"
+    }
+  }
+}
+```
+With those specifications described above we can now call the `template` command without any further arguments.
+```sh
+wz template webezy.json -c
+```
+> __Note__ the `-c` / `--code` argument it is telling the exporter of template to include all files listed under project while he searching for `"include"` list of files / folders and cross checking the `"exclude"` list.
 
 ### Development
 
