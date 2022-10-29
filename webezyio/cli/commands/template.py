@@ -26,6 +26,7 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     includes = None
     excludes = None
     root_path = wz_json.path.split('webezy.json')[0]
+    author = wz_json._config.get('template').get('author') if  wz_json._config.get('template') is not None else 'Unknown'
     if include_code:
         includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
         excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
@@ -37,14 +38,16 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
         if p.get('enums') is not None:
             for e in p.get('enums'):
                 enums.append(e)
-    return f'{create_init(project_pkg_name,description)}{create_constants(host=host,port=port,project_name=project_name,domain=wz_json.domain,server_language=wz_json.get_server_language())}{create_clients(clients)}{add_project()}{create_enums_values(enums)}{create_enums(enums)}{create_fields(messages)}{create_msgs(messages)}{create_pckgs(wz_json.packages)}{add_packgs(wz_json.packages)}{add_msgs(wz_json.packages)}{add_enums(wz_json.packages)}{create_rpcs(wz_json.services)}{create_services(wz_json.services)}{add_services(wz_json.services)}{add_rpcs(wz_json.services)}{create_file_context(root_path,include=includes,exclude=excludes) if include_code else ""}{save_architect()}'
+    return f'{create_init(project_pkg_name,description,author)}{create_constants(host=host,port=port,project_name=project_name,domain=wz_json.domain,server_language=wz_json.get_server_language())}{create_clients(clients)}{add_project()}{create_enums_values(enums)}{create_enums(enums)}{create_fields(messages)}{create_msgs(messages)}{create_pckgs(wz_json.packages)}{add_packgs(wz_json.packages)}{add_msgs(wz_json.packages)}{add_enums(wz_json.packages)}{create_rpcs(wz_json.services)}{create_services(wz_json.services)}{add_services(wz_json.services)}{add_rpcs(wz_json.services)}{create_file_context(root_path,include=includes,exclude=excludes) if include_code else ""}{save_architect()}'
 
-def create_init(project_name:str='webezy.io',description=None):
+def create_init(project_name:str='webezy.io',description=None,author=None):
     return """
 \"\"\"Init script for webezy.io template {0}
 Generated thanks to -
 {1}
 {2}
+
+Author: {3}
 \"\"\"
 # Main webezyio class to create gRPC services programmatically
 # (Same inteface that webezyio cli is built as wrapper for
@@ -65,7 +68,7 @@ import sys
 import argparse
 import zlib
 
-    """.format(project_name,theme.logo_ascii_art,description if description is not None else '')
+    """.format(project_name,theme.logo_ascii_art,description if description is not None else '',author)
 
 def create_constants(domain, project_name, server_language:str='python', host:str = 'localhost', port:int = 50051):
     return f"""

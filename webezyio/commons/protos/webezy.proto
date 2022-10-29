@@ -40,6 +40,7 @@ message WebezyTemplate {
     repeated string exclude = 4;
     repeated string tags = 5;
     string description = 6;
+    string author = 7;
 }
 
 message WebezyConfig {
