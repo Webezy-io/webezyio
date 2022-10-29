@@ -16,16 +16,21 @@ from webezyio.commons.pretty import print_info, print_note, print_version, print
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit,template
 from prettytable import PrettyTable
+_TEMPLATES = ['@webezyio/Blank']
 
-_TEMPLATES = ['@webezyio/Blank','@webezyio/Sample']
-
+templates_dir = os.path.dirname(os.path.dirname(__file__))+'/commons/templates'
+for d in file_system.walkDirs(templates_dir):
+    if d != templates_dir:
+        for f in file_system.walkFiles(d):
+            domain = d.split('/')[-1]
+            template_name = f.split('.')[0]
+            _TEMPLATES.append(f'@{domain}/{template_name}')
 
 def field_exists_validation(new_field, fields, msg):
     if new_field in fields:
         raise errors.WebezyProtoError(
             'Message', f'Field {new_field} already exits under {msg}')
     return True
-
 
 def enum_value_validate(answers, current):
     try:
@@ -566,7 +571,7 @@ def template_commands(args):
                     save_file_location = save_file_location if WEBEZY_JSON._config.get('template').get('outPath') is None else file_system.join_path(WEBEZY_JSON.path.replace('webezy.json',''),WEBEZY_JSON._config.get('template').get('outPath'),'{0}.template.py'.format(filename))
                 parent_path = file_system.join_path(file_system.get_current_location(),os.path.dirname(save_file_location))
                 if file_system.check_if_dir_exists(parent_path):
-                    file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,args.code),overwrite=True)
+                    file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,args.code),overwrite=True,force=True)
                     print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                 else:
                     print_error("Path to template output dosnt exist ! [{0}]".format(save_file_location))                        

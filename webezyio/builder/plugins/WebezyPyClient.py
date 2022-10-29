@@ -73,7 +73,7 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                 index = 0
             for l in file[index:]:
 
-                if 'import ' in  l and 'grpc' not in l and 'typing' not in l:
+                if 'import ' in  l and 'grpc' not in l and 'typing' not in l and 'google.protobuf' not in l:
                     file[index] = l.replace('import ','from . import ')
 
                 index += 1
@@ -157,8 +157,11 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
     elif type == 'message':
         pretty.print_info(current_pkg)
         if messageType.split('.')[1] != current_pkg:
-            temp_type = '{0}__pb2.{1}'.format(
-                messageType.split('.')[1], messageType.split('.')[-1])
+            if messageType.split('.')[1] == 'protobuf':
+                temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(messageType.split('.')[-1].lower(),messageType.split('.')[-1])
+            else:
+                temp_type = '{0}__pb2.{1}'.format(
+                    messageType.split('.')[1], messageType.split('.')[-1])
         else:
             temp_type = '{1}'.format(
                 messageType.split('.')[1], messageType.split('.')[-1])
