@@ -148,8 +148,9 @@ def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],de
 
     for m in messages:
         temp_msgs.append(ParseDict(m,WZDescriptor()))
-    for e in enums:
-        temp_enums.append(ParseDict(e,WZEnumDescriptor()))
+    if enums is not None:
+        for e in enums:
+            temp_enums.append(ParseDict(e,WZEnumDescriptor()))
 
     full_name = get_package_full_name(domain, name)
     package = PackageDescriptor(uri=get_uri_package(

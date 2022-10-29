@@ -1,3 +1,4 @@
+import os
 import subprocess
 from tkinter import E, N
 from webezyio.architect import WebezyArchitect
@@ -5,6 +6,7 @@ from webezyio.cli import theme
 from webezyio.commons import file_system
 from webezyio.commons.helpers import WZJson,MessageToDict
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
+import zlib
 
 _OPEN_BRCK = '{'
 _CLOSING_BRCK = '}'
@@ -23,10 +25,11 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     enums = []
     includes = None
     excludes = None
-    root_path = wz_json.path.split('.webezy.json')[0]
+    root_path = wz_json.path.split('webezy.json')[0]
     if include_code:
         includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
         excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
+        print_note(excludes,True,"Excluding")
     for pkg in wz_json.packages:
         p = wz_json.packages[pkg]
         for m in p.get('messages'):
@@ -59,16 +62,27 @@ from webezyio.commons.protos.webezy_pb2 import Language, WebezyContext, WebezyFi
 # Default system imports
 import os
 import sys
+import argparse
+import zlib
 
     """.format(project_name,theme.logo_ascii_art,description if description is not None else '')
 
 def create_constants(domain, project_name, server_language:str='python', host:str = 'localhost', port:int = 50051):
     return f"""
 \"\"\"Initialize constants and WebezyArchitect class\"\"\"
+parser = argparse.ArgumentParser(
+                    prog = '{project_name}',
+                    description = 'What the program does',
+                    epilog = 'Text at the bottom of help')
+parser.add_argument('--domain',default='{domain}')           # optional argument
+parser.add_argument('--project-name',default='{project_name}')           # optional argument
+
+args = parser.parse_args()
+
 # Constants
 _PATH = file_system.join_path(os.getcwd(), 'webezy.json') 
-_DOMAIN = '{domain}'
-_PROJECT_NAME = '{project_name}'
+_DOMAIN = args.domain
+_PROJECT_NAME = args.project_name
 _SERVER_LANGUAGE = Language.Name(Language.{server_language})
 _HOST = '{host}'
 _PORT = {port}
@@ -146,13 +160,18 @@ def create_fields(messages):
         
         fields[m.get('fullName')] = []
         for f in  m.get('fields'):
-            
+            temp_msg_type = f.get('messageType')
+            if temp_msg_type is not None:
+                if 'google' not in temp_msg_type:
+                    temp_msg_type = '_DOMAIN + \'.{}\''.format('.'.join(temp_msg_type.split('.')[1:]))
+                else:
+                    temp_msg_type = '\'{}\''.format(temp_msg_type)
             field = '\n# Constructing a field for [{4}]\n_field_{4} = helpers.WZField(name=\'{0}\',\n\
                               description=\'{1}\',\n\
                               label=\'{2}\',\n\
                               type=\'{3}\',\n\
                               message_type={6},\n\
-                              enum_type={5})\n'.format(f.get('name'),f.get('description'),f.get('label'),f.get('fieldType'),f.get('fullName').replace('.','_'),'\'{}\''.format(f.get('enumType')) if f.get('enumType') is not None else None,'\'{}\''.format(f.get('messageType')) if f.get('messageType') is not None else None)
+                              enum_type={5})\n'.format(f.get('name'),f.get('description'),f.get('label'),f.get('fieldType'),f.get('fullName').replace('.','_'),'_DOMAIN+\'.{}\''.format('.'.join(f.get('enumType').split('.')[1:])) if f.get('enumType') is not None else None,'{}'.format(temp_msg_type))
             fields[m.get('fullName')].append((f.get('fullName').replace('.','_'),field))
 
     code = ''
@@ -250,7 +269,7 @@ def create_rpcs(services):
     for s in services:
         svc = services.get(s)
         for rpc in svc.get('methods'):
-            code += '\n_rpc_{0}_{4} = helpers.WZRPC(name=\'{4}\', in_type=msgs_map[\'{1}\'].full_name, out_type=msgs_map[\'{2}\'].full_name, description=\'{3}\')'.format(svc.get('fullName').replace('.','_'),rpc.get('inputType'),rpc.get('outputType'),rpc.get('description'),rpc.get('name'))
+            code += '\n_rpc_{0}_{4} = helpers.WZRPC(name=\'{4}\',client_stream={5},server_stream={6},in_type=msgs_map[_DOMAIN+\'.{1}\'].full_name, out_type=msgs_map[_DOMAIN+\'.{2}\'].full_name, description=\'{3}\')'.format(svc.get('fullName').replace('.','_'),'.'.join(rpc.get('inputType').split('.')[1:]),'.'.join(rpc.get('outputType').split('.')[1:]),rpc.get('description'),rpc.get('name'),rpc.get('clientStreaming'),rpc.get('serverStreaming'))
     return """
 \"\"\"Services and thier resources\"\"\"
 # Construct rpc's
@@ -333,12 +352,22 @@ def create_file_context(root_path,include,exclude):
                         for f in file_system.walkFiles(d):
                             code = ''.join(file_system.rFile(file_system.join_path(d,f)))
                             code = bytes(code, 'utf-8')
-                            list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),code))
+                            list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),zlib.compress(code)))
 
         for inc in include:
             if '*' not in inc:
-                print_info({'file':file_system.join_path(file_system.get_current_location(),inc)},True)
-
+                if '.' in inc:
+                    if file_system.check_if_file_exists(inc):
+                        print_info({'file':file_system.join_path(file_system.get_current_location(),inc)},True)
+                        code = ''.join(file_system.rFile(inc))
+                        code = bytes(code, 'utf-8')
+                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(inc,zlib.compress(code)))
+                else:
+                    if file_system.check_if_dir_exists(inc):
+                        for f in file_system.walkFiles(file_system.get_current_location()+'/'+inc):
+                            code = ''.join(file_system.rFile(file_system.join_path(file_system.get_current_location(),inc,f)))
+                            code = bytes(code, 'utf-8')
+                            list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(inc,f),zlib.compress(code)))
     else:
         for f in file_system.walkFiles(root_path):
             if f not in exclude and '.template.py' not in f and 'webezy.json' not in f:
@@ -352,7 +381,7 @@ def create_file_context(root_path,include,exclude):
                     for f in file_system.walkFiles(d):
                         code = ''.join(file_system.rFile(f))
                         code = bytes(code, 'utf-8')
-                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),code))
+                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),zlib.compress(code)))
 
     return """
 # Initalize all code files 
@@ -360,7 +389,7 @@ _context = WebezyContext(files=[{0}])
 
 # Creating all code files on target project
 for f in _context.files:
-\tfile_system.wFile(file_system.get_current_location()+f.file,f.code.decode('utf-8'),force=True)
+\tfile_system.wFile(file_system.get_current_location()+'/'+f.file,zlib.decompress(f.code).decode(),force=True)
 
     """.format(','.join(list_files))
 

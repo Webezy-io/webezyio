@@ -16,16 +16,21 @@ from webezyio.commons.pretty import print_info, print_note, print_version, print
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit,template
 from prettytable import PrettyTable
+_TEMPLATES = ['@webezyio/Blank']
 
-_TEMPLATES = ['@webezyio/Blank','@webezyio/Sample']
-
+templates_dir = os.path.dirname(os.path.dirname(__file__))+'/commons/templates'
+for d in file_system.walkDirs(templates_dir):
+    if d != templates_dir:
+        for f in file_system.walkFiles(d):
+            domain = d.split('/')[-1]
+            template_name = f.split('.')[0]
+            _TEMPLATES.append(f'@{domain}/{template_name}')
 
 def field_exists_validation(new_field, fields, msg):
     if new_field in fields:
         raise errors.WebezyProtoError(
             'Message', f'Field {new_field} already exits under {msg}')
     return True
-
 
 def enum_value_validate(answers, current):
     try:

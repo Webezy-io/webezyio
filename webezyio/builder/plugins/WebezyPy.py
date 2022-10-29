@@ -86,7 +86,7 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                 index = 0
             for l in file[index:]:
 
-                if 'import ' in  l and 'grpc' not in l and 'typing' not in l:
+                if 'import ' in  l and 'grpc' not in l and 'typing' not in l and 'google.protobuf' not in l:
                     file[index] = l.replace('import ','from . import ')
 
                 index += 1
@@ -100,20 +100,22 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    imports = ['_ONE_DAY_IN_SECONDS = 60 * 60 * 24',
-               'from concurrent import futures', 'import time', 'import grpc']
-    services_bindings = []
-    svcs = []
-    for svc in wz_json.services:
-        svcs.append(svc)
-        imports.append(f'import {svc}_pb2_grpc')
-        services_bindings.append(
-            f'{svc}_pb2_grpc.add_{svc}Servicer_to_server({svc}.{svc}(),server)')
-    svcs = ', '.join(svcs)
-    imports.append(f'import {svcs}')
-    services_bindings = '\n\t'.join(services_bindings)
-    imports = '\n'.join(imports)
-    server_code = f'"""Webezy.io Generated Server Code"""\n\
+    if file_system.check_if_file_exists(file_system.join_path(
+            wz_json.path, 'server', 'server.py')) == False:
+        imports = ['_ONE_DAY_IN_SECONDS = 60 * 60 * 24',
+                'from concurrent import futures', 'import time', 'import grpc']
+        services_bindings = []
+        svcs = []
+        for svc in wz_json.services:
+            svcs.append(svc)
+            imports.append(f'import {svc}_pb2_grpc')
+            services_bindings.append(
+                f'{svc}_pb2_grpc.add_{svc}Servicer_to_server({svc}.{svc}(),server)')
+        svcs = ', '.join(svcs)
+        imports.append(f'import {svcs}')
+        services_bindings = '\n\t'.join(services_bindings)
+        imports = '\n'.join(imports)
+        server_code = f'"""Webezy.io Generated Server Code"""\n\
 {imports}\n\n\
 def serve(host="0.0.0.0:50051"):\n\
 \tserver = grpc.server(futures.ThreadPoolExecutor(max_workers=10))\n\
@@ -128,9 +130,10 @@ def serve(host="0.0.0.0:50051"):\n\
 \t\tserver.stop(0)\n\n\
 if __name__ == "__main__":\n\
 \tserve()'
-    file_system.wFile(file_system.join_path(
-        wz_json.path, 'server', 'server.py'), server_code, overwrite=True)
-
+        file_system.wFile(file_system.join_path(
+            wz_json.path, 'server', 'server.py'), server_code, overwrite=True)
+    else:
+        pretty.print_info("Make sure you are adding new services into server/server.py")
 
 @builder.hookimpl
 def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
@@ -298,8 +301,11 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
     elif type == 'message':
         pretty.print_info(current_pkg)
         if messageType.split('.')[1] != current_pkg:
-            temp_type = '{0}__pb2.{1}'.format(
-                messageType.split('.')[1], messageType.split('.')[-1])
+            if messageType.split('.')[1] == 'protobuf':
+                temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(messageType.split('.')[-1].lower(),messageType.split('.')[-1])
+            else:
+                temp_type = '{0}__pb2.{1}'.format(
+                    messageType.split('.')[1], messageType.split('.')[-1])
         else:
             temp_type = '{1}'.format(
                 messageType.split('.')[1], messageType.split('.')[-1])
