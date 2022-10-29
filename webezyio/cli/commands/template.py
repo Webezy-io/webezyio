@@ -1,5 +1,5 @@
 import subprocess
-from tkinter import N
+from tkinter import E, N
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
 from webezyio.commons import file_system
@@ -12,7 +12,7 @@ _CLOSING_BRCK = '}'
 def parse_wz_json():
     pass
 
-def create_webezy_template_py(wz_json:WZJson):
+def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     host = wz_json._config.get('host')
     port = wz_json._config.get('port')
     project_pkg_name = wz_json.project['packageName'] if wz_json._config.get('template') is None else  wz_json._config.get('template').get('name')
@@ -21,6 +21,12 @@ def create_webezy_template_py(wz_json:WZJson):
     description = wz_json._config.get('template').get('description') if wz_json._config.get('template') is not None else ''
     messages = []
     enums = []
+    includes = None
+    excludes = None
+    root_path = wz_json.path.split('.webezy.json')[0]
+    if include_code:
+        includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
+        excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
     for pkg in wz_json.packages:
         p = wz_json.packages[pkg]
         for m in p.get('messages'):
@@ -28,7 +34,7 @@ def create_webezy_template_py(wz_json:WZJson):
         if p.get('enums') is not None:
             for e in p.get('enums'):
                 enums.append(e)
-    return f'{create_init(project_pkg_name,description)}{create_constants(host=host,port=port,project_name=project_name,domain=wz_json.domain,server_language=wz_json.get_server_language())}{create_clients(clients)}{add_project()}{create_enums_values(enums)}{create_enums(enums)}{create_fields(messages)}{create_msgs(messages)}{create_pckgs(wz_json.packages)}{add_packgs(wz_json.packages)}{add_msgs(wz_json.packages)}{add_enums(wz_json.packages)}{create_rpcs(wz_json.services)}{create_services(wz_json.services)}{add_services(wz_json.services)}{add_rpcs(wz_json.services)}{save_architect()}'
+    return f'{create_init(project_pkg_name,description)}{create_constants(host=host,port=port,project_name=project_name,domain=wz_json.domain,server_language=wz_json.get_server_language())}{create_clients(clients)}{add_project()}{create_enums_values(enums)}{create_enums(enums)}{create_fields(messages)}{create_msgs(messages)}{create_pckgs(wz_json.packages)}{add_packgs(wz_json.packages)}{add_msgs(wz_json.packages)}{add_enums(wz_json.packages)}{create_rpcs(wz_json.services)}{create_services(wz_json.services)}{add_services(wz_json.services)}{add_rpcs(wz_json.services)}{create_file_context(root_path,include=includes,exclude=excludes) if include_code else ""}{save_architect()}'
 
 def create_init(project_name:str='webezy.io',description=None):
     return """
@@ -48,7 +54,7 @@ from webezyio.commons import helpers, file_system
 
 # Webezy proto modules also helps us here to construct our services
 # gRPC used to create another gRPC ! :)
-from webezyio.commons.protos.webezy_pb2 import Language
+from webezyio.commons.protos.webezy_pb2 import Language, WebezyContext, WebezyFileContext
 
 # Default system imports
 import os
@@ -309,3 +315,71 @@ def load_template(file_path:str):
     else:
         print_error("File [{0}] does not exist !".format(file_path))
         exit(1)
+
+def create_file_context(root_path,include,exclude):
+    list_files = []
+    if len(include) != 0:
+        if '*' in include:
+            for f in file_system.walkFiles(root_path):
+                if f not in exclude and '.template.py' not in f and 'webezy.json' not in f:
+                    print_info({'file':f},True)
+
+        if '*/**' in include:
+            for d in file_system.walkDirs(root_path):
+                file_relative_path = d.split(file_system.get_current_location())[1]
+                if file_relative_path != '':
+                    if check_exclude(exclude,d,file_relative_path):
+                        print_info("Iterating dir code files")
+                        for f in file_system.walkFiles(d):
+                            code = ''.join(file_system.rFile(file_system.join_path(d,f)))
+                            code = bytes(code, 'utf-8')
+                            list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),code))
+
+        for inc in include:
+            if '*' not in inc:
+                print_info({'file':file_system.join_path(file_system.get_current_location(),inc)},True)
+
+    else:
+        for f in file_system.walkFiles(root_path):
+            if f not in exclude and '.template.py' not in f and 'webezy.json' not in f:
+                print_info({'file':f},True)
+
+        for d in file_system.walkDirs(root_path):
+            file_relative_path = d.split(file_system.get_current_location())[1]
+            if file_relative_path != '':
+                if check_exclude(exclude,d,file_relative_path):
+                    print_info("Iterating dir code files")
+                    for f in file_system.walkFiles(d):
+                        code = ''.join(file_system.rFile(f))
+                        code = bytes(code, 'utf-8')
+                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),code))
+
+    return """
+# Initalize all code files 
+_context = WebezyContext(files=[{0}]) 
+
+# Creating all code files on target project
+for f in _context.files:
+\tfile_system.wFile(file_system.get_current_location()+f.file,f.code.decode('utf-8'),force=True)
+
+    """.format(','.join(list_files))
+
+def check_exclude(exclude,dir,file):
+    if len(exclude) != 0:
+        is_valid = False
+        for exc in exclude:
+            if exc in file:
+                is_valid = False
+                break
+            else:
+                is_valid = True
+        if is_valid:
+            print_info({'directory':dir,'relative':file},True)
+            return True
+
+    else:
+        print_info({'directory':dir,'relative':file},True)
+        return True
+
+def publish_template(template_file:str,code_context):
+    pass
