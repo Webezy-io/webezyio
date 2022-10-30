@@ -383,7 +383,7 @@ def create_file_context(root_path,include,exclude):
                 if check_exclude(exclude,d,file_relative_path):
                     print_info("Iterating dir code files")
                     for f in file_system.walkFiles(d):
-                        code = ''.join(file_system.rFile(f))
+                        code = ''.join(file_system.rFile(file_system.join_path(d,f)))
                         code = bytes(code, 'utf-8')
                         list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),zlib.compress(code)))
 
@@ -407,12 +407,14 @@ def check_exclude(exclude,dir,file):
             else:
                 is_valid = True
         if is_valid:
-            print_info({'directory':dir,'relative':file},True)
-            return True
+            if 'node_modules' not in dir:
+                print_info({'directory':dir,'relative':file},True)
+                return True
 
     else:
-        print_info({'directory':dir,'relative':file},True)
-        return True
+        if 'node_modules' not in dir:
+            print_info({'directory':dir,'relative':file},True)
+            return True
 
 def publish_template(template_file:str,code_context):
     pass

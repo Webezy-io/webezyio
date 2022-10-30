@@ -7,6 +7,7 @@ import inquirer
 from inquirer.themes import Theme, term
 from inquirer import errors
 import re
+from webezyio.builder.plugins import WebezyMigrate
 from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
@@ -580,7 +581,15 @@ def template_commands(args):
                     print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                     exit(1)
             else:
-                raise errors.WebezyProtoError("Export Service Template Error","File type not supported")
+                if file_system.check_if_dir_exists(args.path):
+                    builder = WebezyBuilder(path=file_system.get_current_location(),hooks=[WebezyMigrate])
+                    builder.PreBuild()
+                    print_info(file_system.join_path(file_system.get_current_location(),args.path))
+                    builder.ParseProtosToResource(project_name="test",protos_dir=file_system.join_path(file_system.get_current_location(),args.path),clients=[],server_language="python")
+                    builder.PostBuild()
+                    raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
+                else:
+                    raise errors.WebezyProtoError("Export Service Template Error","File type not supported")
     elif file_system.check_if_dir_exists(args.path):
         raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
     else:

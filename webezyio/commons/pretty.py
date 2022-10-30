@@ -13,7 +13,7 @@ class bcolors:
 
 
 def print_success(message):
-    print(bcolors.OKGREEN+"[*]",message+bcolors.ENDC)
+    print(bcolors.OKGREEN+"[*]",str(message)+bcolors.ENDC)
 
 
 def print_note(message,pprint=False,tag=None):
