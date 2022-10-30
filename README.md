@@ -262,7 +262,20 @@ webezy template <mycustom.template.py> --load
 
 [WebezyArchitect API Example](./webezyio/tests/blank/test.py)
 
-[SamplePy Template](./webezyio/commons/templates/webezyio/SamplePy.template.py)
+__Builtins Templates__:
+
+You can use quick start templates that are built in the webezyio.commons.template module as follows:
+
+```sh
+# A sample python server
+wz new <SomeProject> --template @webezyio/SamplePy
+# A sample typescript server
+wz new <SomeProject> --template @webezyio/SampleTs
+```
+
+[SamplePy Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py)
+
+[SampleTs Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py)
 
 ### Configure template options
 Each template can be configured in `webezy.json` file under `"config"` value for easy generating without elborate CLI commands:
