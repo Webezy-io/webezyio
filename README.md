@@ -4,9 +4,9 @@ webezyio is free and open-source project that aims to be a complete framework fo
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
 It utulize those communication protocol, message serialization / deserialization and code generator with [```gRPC```](https://grpc.io) opensource project by google. 
 
-Webezy.io has been created to give deleopers quick and structerd way for building gRPC services without pain while keeping thins open for further modifications.
+Webezy.io has been created to give devlopers quick and structerd way for building gRPC services without pain while keeping thins open for further modifications.
 
-In result we are trying not to restrict the implemantations themselves but to restrict the project structure to well defined and re-usable by many languages and scenarios.
+In result we are trying not to restrict the implemantations themselves but instead applying small restrictions on the project structure for well defined, re-usable structure that can be used by many languages and scenarios.
 
 The current supported languages are:
 | **Language** | **Server** | **Client** |   **Status**   |
@@ -278,16 +278,19 @@ Each template can be configured in `webezy.json` file under `"config"` value for
         "python.py",
         "services"
       ],
-      "author": "Amit Shmulevitch"
+      "author": "Amit Shmulevitch",
+      "includeCode": true
     }
   }
 }
 ```
 With those specifications described above we can now call the `template` command without any further arguments.
 ```sh
-wz template webezy.json -c
+wz template webezy.json
 ```
-> __Note__ the `-c` / `--code` argument it is telling the exporter of template to include all files listed under project while he searching for `"include"` list of files / folders and cross checking the `"exclude"` list.
+> __Note__ the "includeCode" key it can be passed as `-c` / `--code` argument to `wz template` command, it is passed to the exporter of template and includes all files listed under project while searching for `"include"` list of files and folders then cross checking the `"exclude"` list against them - Each file listed in the "includes" array will be compressed and attached to the template script.
+
+> __Warning__ DO NOT set sensitive information on template code files that are included on template, such as keys and secrets as it will be copied to the template script.
 
 ### Development
 
