@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = ["grpc", "micro-services", "cli", "framework"]
-dependencies = ["pluggy>=0.3,<1.0","inquirer","prettytable","protobuf<4.21.0","grpcio==1.47.0","grpcio-tools==1.47.0"]
+dependencies = ["pluggy>=0.3,<1.0","inquirer","prettytable","protobuf<4.21.0","grpcio>=1.47.0","grpcio-tools>=1.47.0"]
 requires-python = ">=3.7"
 
     [project.optional-dependencies]
@@ -27,7 +27,7 @@ requires-python = ">=3.7"
     webezy = "webezyio.cli.__main__:main"
 
     [project.urls]
-    repository    = "https://github.com/Webezy-io/webezy"
+    repository    = "https://github.com/Webezy-io/webezyio"
     homepage = "https://webezy.io/"
     documentation = "https://webezy.io/docs/cli"
 

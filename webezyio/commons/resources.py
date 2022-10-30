@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from typing import List
 from enum import Enum
 
@@ -10,6 +11,8 @@ from google.protobuf.descriptor import Descriptor
 from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
     FieldDescriptor, ServiceDescriptor, EnumDescriptor
+from grpc_tools import command
+from webezyio.commons.pretty import print_info
 
 from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson, Project, WebezyConfig,\
     Language, WebezyServer, WebezyClient,\
@@ -225,9 +228,16 @@ def generate_rpc(path, name, client_streaming, server_streaming, in_type, out_ty
 
 
 def parse_proto(proto_path) -> FileDescriptor:
-    logging.info(f"Parsing proto file -> {proto_path}")
-    proto = grpc.protos(proto_path)
-    return proto.DESCRIPTOR
+    print_info(f"Parsing proto file -> {proto_path}")
+    # command.build_package_protos(proto_path)
+    # os.chdir(os.getcwd()+'/protos')
+    try:
+        sys.path.index(os.getcwd()+'/protos')
+    except:
+        sys.path.append(os.getcwd()+'/protos')
+
+    proto = grpc.protos_and_services(proto_path)
+    return proto
 
 
 def parse_pool(pool) -> DescriptorPool:

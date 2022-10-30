@@ -172,15 +172,75 @@ optional arguments:
 ```
 ## wz ls
 List your project resources
+```sh
+optional arguments:
+  -h, --help            show this help message and exit
+  --full-name fullName  Display a resource report for specific resoource by passing in a full name, for e.x domain.test.GetTest will return "GetTest" (RPC) which
+                        under "test" (service)
+  -t {service,package,message,rpc,enum}, --type {service,package,message,rpc,enum}
+                        List a webezyio resource from specific resource type
+```
 
 ## wz package
 Mangae your dependencies inside your project
+```sh
+positional arguments:
+  source        Package full name
+  target        Package path or service name
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -r, --remove  Package path or service name
+```
+__Import a package into service__
+
+```sh
+wz package <domain.package.v1> <servicename>
+```
+
+__Import a package into another package__
+
+```sh
+wz package <domain.package.v1> <domain.other.v1> 
+```
 
 ## wz edit
 Edit your webezy.io resources
 
+```sh
+positional arguments:
+  name                  Resource full name
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a {add,remove,modify}, --action {add,remove,modify}
+                        Choose which action to preform on resource
+  --sub-action SUB_ACTION
+                        Choose which sub-action to preform on resource
+```
+
+__Edit a message__
+
+```sh
+wz edit <domain.package.v1.message>
+```
+
 ## wz template
 Create or load a project template
+```sh
+positional arguments:
+  path                  Path for webezy.json / protos files directory / webezy.template.py
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c, --code            Create a template including code files
+  --out-path OUT_PATH   Specify the template file location, defaulted to root project dir
+  --template-name TEMPLATE_NAME
+                        Specify the template name, defaulted to project package name
+  --load                Initalize a template
+```
+See [Service Templating Section](#service-templating) for more information.
+
 
 # Understanding Webezy.io
 While it is not nesscesary step to get you started we do recommend to invest few minutes to read an overview of how `Webezy.io` Built and utulizing gRPC, this high level overview will make you approach some scenarios more easly.
@@ -262,7 +322,20 @@ webezy template <mycustom.template.py> --load
 
 [WebezyArchitect API Example](./webezyio/tests/blank/test.py)
 
-[SamplePy Template](./webezyio/commons/templates/webezyio/SamplePy.template.py)
+__Builtins Templates__:
+
+You can use quick start templates that are built in the webezyio.commons.template module as follows:
+
+```sh
+# A sample python server
+wz new <SomeProject> --template @webezyio/SamplePy
+# A sample typescript server
+wz new <SomeProject> --template @webezyio/SampleTs
+```
+
+[SamplePy Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py)
+
+[SampleTs Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py)
 
 ### Configure template options
 Each template can be configured in `webezy.json` file under `"config"` value for easy generating without elborate CLI commands:
@@ -272,7 +345,7 @@ Each template can be configured in `webezy.json` file under `"config"` value for
     "template": {
       "outPath": "template",
       "name": "SamplePy",
-      "description": "A basic sample project for webezyio.\nIt is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google.",
+      "description": "A basic sample project for webezyio.\nIt is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google",
       "include": [
         "typescript.ts",
         "python.py",
