@@ -6,7 +6,7 @@ from webezyio.commons.helpers import WZJson
 def list_by_name(full_name,webezy_json:WZJson):
     args_split = len(full_name.split('.'))
     if args_split == 1:
-        print('*',full_name)
+        print_info(full_name)
     elif args_split > 1 and args_split <=2:
         try:
             header = ['Service','RPC\'s','Dependencies']
