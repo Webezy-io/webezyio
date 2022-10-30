@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import json as JSON
 import shutil
+from distutils.dir_util import copy_tree
 
 
 def mv(old_path, new_path):
@@ -16,6 +17,10 @@ def mkdir(path):
     else:
         logging.debug("Directory is already exists ! {0}"
                       .format(path))
+
+def cpDir(dir_path,target_path):
+    if check_if_dir_exists(dir_path):
+        copy_tree(dir_path, target_path)
 
 
 def removeFile(path):

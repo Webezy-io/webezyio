@@ -87,7 +87,6 @@ def get_readme(wz_json: helpers.WZJson):
         client_lang = c.get('language')
         client_lang = client_lang[0].upper()+client_lang[1:]
         clients_usage_i.append(f'- [{client_lang}](#{client_lang})')
-        print(client_lang)
         if client_lang=='Python':
             clients_usage.append(f'### Python\n\n```py\nfrom clients.python import {project_package_name}\n\nclient = {project_package_name}()\n\n# Unary call\nresponse = stub.<Unary>(<InMessage>())\nprint(response)\n\n# Server stream\nresponses = stub.<ServerStream>(<InMessage>())\nfor res in responses:\n\tprint(res)\n\n# Client Stream\nrequests = iter([<InMessage>(),<InMessage>()])\nresponse = client.<ClientStream>(requests)\nprint(response)\n\n# Bidi Stream\nresponses = client.<BidiStream>(requests)\nfor res in responses:\n\tprint(res)\n```\n')
         elif client_lang=='Typescript':
@@ -106,7 +105,6 @@ def get_readme(wz_json: helpers.WZJson):
     clients_usage_i = '\n'.join(clients_usage_i)
     extra_links = wz_json._config.get('docs')
     temp_links = ''
-    print(wz_json.project)
     if extra_links is not None:
         for k in extra_links:
             if file_system.check_if_file_exists(wz_json.project.get('uri')+''+ extra_links[k]):

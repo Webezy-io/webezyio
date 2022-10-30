@@ -80,7 +80,6 @@ def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     if int(proc.returncode) != 0:
         pretty.print_error("ERROR occured during building process some more info on specific error can be found above")
         exit(proc.returncode)
-    pretty.print_info(proc,True)
     pretty.print_success("Compiled protos %s" % (__name__))
     
 
@@ -225,7 +224,7 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                                         break
 
                                     temp_lines.append(line)
-                                pretty.print_info(f"Setting RPC -> {m.get('name')}\n-> {temp_lines}")
+                                # pretty.print_info(f"Setting RPC -> {m.get('name')}\n-> {temp_lines}")
                                 wz_context.set_rpc_code(svc, m.get('name'), ''.join(
                                     temp_lines))
 

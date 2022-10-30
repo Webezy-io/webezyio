@@ -4,9 +4,9 @@ webezyio is free and open-source project that aims to be a complete framework fo
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
 It utulize those communication protocol, message serialization / deserialization and code generator with [```gRPC```](https://grpc.io) opensource project by google. 
 
-Webezy.io has been created to give deleopers quick and structerd way for building gRPC services without pain while keeping thins open for further modifications.
+Webezy.io has been created to give devlopers quick and structerd way for building gRPC services without pain while keeping thins open for further modifications.
 
-In result we are trying not to restrict the implemantations themselves but to restrict the project structure to well defined and re-usable by many languages and scenarios.
+In result we are trying not to restrict the implemantations themselves but instead applying small restrictions on the project structure for well defined, re-usable structure that can be used by many languages and scenarios.
 
 The current supported languages are:
 | **Language** | **Server** | **Client** |   **Status**   |
@@ -33,6 +33,14 @@ pip install webezyio
 # Docs
 
 Go to [Webezy.io Docs](https://www.webezy.io/docs) for full explanation.
+
+__Useful Resources__:
+
+- [Awesome gRPC - A curated list of useful resources for gRPC](https://github.com/grpc-ecosystem/awesome-grpc)
+
+- [API Design Guide From Google - Matches well into gRPC specific design patterns](https://cloud.google.com/apis/design/)
+
+
 
 __Tutorials:__
 - [Sample project](https://www.webezy.io/docs/tutorials/sample-project)
@@ -254,6 +262,35 @@ webezy template <mycustom.template.py> --load
 
 [WebezyArchitect API Example](./webezyio/tests/blank/test.py)
 
+[SamplePy Template](./webezyio/commons/templates/webezyio/SamplePy.template.py)
+
+### Configure template options
+Each template can be configured in `webezy.json` file under `"config"` value for easy generating without elborate CLI commands:
+```json
+{
+  "config": {
+    "template": {
+      "outPath": "template",
+      "name": "SamplePy",
+      "description": "A basic sample project for webezyio.\nIt is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google.",
+      "include": [
+        "typescript.ts",
+        "python.py",
+        "services"
+      ],
+      "author": "Amit Shmulevitch",
+      "includeCode": true
+    }
+  }
+}
+```
+With those specifications described above we can now call the `template` command without any further arguments.
+```sh
+wz template webezy.json
+```
+> __Note__ the "includeCode" key it can be passed as `-c` / `--code` argument to `wz template` command, it is passed to the exporter of template and includes all files listed under project while searching for `"include"` list of files and folders then cross checking the `"exclude"` list against them - Each file listed in the "includes" array will be compressed and attached to the template script.
+
+> __Warning__ DO NOT set sensitive information on template code files that are included on template, such as keys and secrets as it will be copied to the template script.
 
 ### Development
 

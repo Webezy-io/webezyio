@@ -1,6 +1,8 @@
 import time
 import logging
 from webezyio.builder.src import lru
+from webezyio.commons import pretty
+from webezyio.commons import helpers
 from webezyio.commons.file_system import rFile, wFile, join_path, walkFiles, mkdir
 from webezyio.commons.helpers import wzJsonToMessage, MessageToDict
 from webezyio.architect.commands import GetWebezyJson, SaveWebezyJson
@@ -186,7 +188,7 @@ class Webezy(IUndoRedo):
                 'uri'), '.webezy', 'cache', f'save_{self._saves-1}.json'), True))
             if old_save != message :
                 logging.info(old_save)
-                message = wzJsonToMessage(self._webezy_json)
+                message = wzJsonToMessage(self._webezy_json,validate=True)
                 try:
                     wFile(path, MessageToDict(message),
                         overwrite=True, json=True)
@@ -233,3 +235,53 @@ class Webezy(IUndoRedo):
     @property
     def webezyJson(self):
         return self._webezy_json
+
+
+    def validate_webezy_json(self,wzjson):
+        if  wzjson.packages is not None:
+            for p in wzjson.packages:
+                pkg = wzjson.packages[p]
+                reorder = []
+                index = 0
+                for m in pkg.messages:
+                    dependency_in_pkg = next((f for f in m.fields if f.message_type is not None),None)
+                    
+                    reorder.append(index)
+                    if dependency_in_pkg is not None:
+                        if pkg.package in dependency_in_pkg.message_type:
+                            pretty.print_error(dependency_in_pkg)
+                            pretty.print_info(reorder,True,"{0} / {1}".format(index,max(reorder)))
+                            if index > max(reorder):
+                                reorder = [x+1 for x in reorder]
+                                reorder[index] = max(reorder) -1
+                            else: 
+                                reorder[index] = index +1
+                        else:
+                            if index >= reorder[index]:
+                                reorder = [x+1 for x in reorder]
+
+                            reorder[index] = index
+                    else:
+                        reorder[index] = max(reorder) +1
+                    pretty.print_info(dependency_in_pkg,True)
+                    pretty.print_info(reorder,True,"After changes")
+                
+                    index += 1
+                reorder = [x-1 for x in reorder]
+                mylist = [pkg.messages[i] for i in reorder]
+                pkg_temp = MessageToDict(pkg)
+                pkg_temp['messages'] = mylist
+
+                pretty.print_info(mylist,True,"Last step")
+                wzjson_temp = MessageToDict(wzjson)
+                index = 0
+                for i in pkg_temp['messages']:
+                    pretty.print_info(i,True)
+
+                    pkg_temp[index] = MessageToDict(i)
+                    index += 1
+
+                wzjson_temp.get('packages')[p] = pkg_temp
+                pretty.print_info(wzjson_temp,True)
+                return helpers.wzJsonToMessage(wzjson_temp)
+                # pretty.print_info(wzjson.packages[p],True,"Package After Change step")

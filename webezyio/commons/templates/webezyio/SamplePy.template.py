@@ -11,6 +11,8 @@ Generated thanks to -
 
 A basic sample project for webezyio.
 It is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google.
+
+Author: Amit Shmulevitch
 """
 # Main webezyio class to create gRPC services programmatically
 # (Same inteface that webezyio cli is built as wrapper for

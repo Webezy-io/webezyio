@@ -41,6 +41,7 @@ message WebezyTemplate {
     repeated string tags = 5;
     string description = 6;
     string author = 7;
+    bool include_code = 8;
 }
 
 message WebezyConfig {

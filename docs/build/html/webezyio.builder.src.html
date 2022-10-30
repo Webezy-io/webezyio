@@ -69,6 +69,12 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="webezyio.builder.src.hookspecs.package_project">
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.src.hookspecs.</span></span><span class="sig-name descname"><span class="pre">package_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.hookspecs.package_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide a packaging project methods / files / scripts</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="webezyio.builder.src.hookspecs.parse_protos_to_resource">
 <span class="sig-prename descclassname"><span class="pre">webezyio.builder.src.hookspecs.</span></span><span class="sig-name descname"><span class="pre">parse_protos_to_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protos_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_language</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clients</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.hookspecs.parse_protos_to_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse .proto files into <a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><code class="xref py py-class docutils literal notranslate"><span class="pre">webezyio.commons.helpers.WZJson</span></code></a> object</p>
@@ -205,6 +211,12 @@ Defined on <a href="#id1"><span class="problematic" id="id2">:module:`webezyio.b
 <dt class="sig sig-object py" id="webezyio.builder.src.main.WebezyBuilder.OverrideGeneratedClasses">
 <span class="sig-name descname"><span class="pre">OverrideGeneratedClasses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.main.WebezyBuilder.OverrideGeneratedClasses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executing the <a class="reference internal" href="#webezyio.builder.src.hookspecs.override_generated_classes" title="webezyio.builder.src.hookspecs.override_generated_classes"><code class="xref py py-func docutils literal notranslate"><span class="pre">webezyio.builder.src.hookspecs.override_generated_classes()</span></code></a> hook</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.builder.src.main.WebezyBuilder.PackageProject">
+<span class="sig-name descname"><span class="pre">PackageProject</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.main.WebezyBuilder.PackageProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executing the <a class="reference internal" href="#webezyio.builder.src.hookspecs.package_project" title="webezyio.builder.src.hookspecs.package_project"><code class="xref py py-func docutils literal notranslate"><span class="pre">webezyio.builder.src.hookspecs.package_project()</span></code></a> hook</p>
 </dd></dl>
 
 <dl class="py method">

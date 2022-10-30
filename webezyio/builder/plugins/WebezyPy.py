@@ -299,7 +299,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
     elif type == 'byte':
         temp_type = 'bytes'
     elif type == 'message':
-        pretty.print_info(current_pkg)
+        # pretty.print_info(current_pkg)
         if messageType.split('.')[1] != current_pkg:
             if messageType.split('.')[1] == 'protobuf':
                 temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(messageType.split('.')[-1].lower(),messageType.split('.')[-1])

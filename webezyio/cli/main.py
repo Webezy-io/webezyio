@@ -570,11 +570,14 @@ def template_commands(args):
                     filename = filename if WEBEZY_JSON._config.get('template').get('name') is None else WEBEZY_JSON._config.get('template').get('name')
                     save_file_location = save_file_location if WEBEZY_JSON._config.get('template').get('outPath') is None else file_system.join_path(WEBEZY_JSON.path.replace('webezy.json',''),WEBEZY_JSON._config.get('template').get('outPath'),'{0}.template.py'.format(filename))
                 parent_path = file_system.join_path(file_system.get_current_location(),os.path.dirname(save_file_location))
+                include_code = args.code if WEBEZY_JSON._config.get('template') is None else WEBEZY_JSON._config.get('template').get('includeCode') if  WEBEZY_JSON._config.get('template').get('includeCode') is not None else False
                 if file_system.check_if_dir_exists(parent_path):
-                    file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,args.code),overwrite=True,force=True)
+                    file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True)
                     print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                 else:
-                    print_error("Path to template output dosnt exist ! [{0}]".format(save_file_location))                        
+                    print_warning("Path to template output path does not exist ! [{0}] - Will try to create the sub-dir".format(save_file_location))                        
+                    file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True,force=True)
+                    print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                     exit(1)
             else:
                 raise errors.WebezyProtoError("Export Service Template Error","File type not supported")

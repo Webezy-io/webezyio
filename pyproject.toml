@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "webezyio"
-version = "0.0.4"
+version = "0.0.5"
 description = "Webezy.io CLI for generating gRPC micro-services"
 readme = "README.md"
 authors = [{ name = "Amit Shmulevitch", email = "amitsh1995@gmail.com" }]
@@ -33,7 +33,7 @@ requires-python = ">=3.7"
 
 
 [tool.bumpver]
-current_version = "0.0.4"
+current_version = "0.0.5"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true

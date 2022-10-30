@@ -30,6 +30,7 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     if include_code:
         includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
         excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
+        print_note(includes,True,"Including")
         print_note(excludes,True,"Excluding")
     for pkg in wz_json.packages:
         p = wz_json.packages[pkg]
