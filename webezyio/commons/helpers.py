@@ -38,7 +38,49 @@ def wzJsonCacheToMessage(path) -> WebezyJson:
     msg.ParseFromString(data)
 
 
-def wzJsonToMessage(wz_json) -> WebezyJson:
+def wzJsonToMessage(wz_json,validate:bool=False) -> WebezyJson:
+    if validate:
+        pretty.print_info("Validating webezy.json",True)
+        # assert(wz_json.get('project') is not None)
+        # assert(wz_json.get('config') is not None)
+        # assert(wz_json.get('packages') is not None)
+        # assert(wz_json.get('services') is not None)
+        # for p in wz_json.get('packages'):
+        #     pkg = wz_json.get('packages')[p]
+        #     reorder = []
+        #     index = 0
+        #     for m in pkg.get('messages'):
+        #         dependency_in_pkg = next((f for f in m.get('fields') if f.get('messageType') is not None),None)
+                
+        #         reorder.append(index)
+        #         if dependency_in_pkg is not None:
+        #             if pkg.get('package') in dependency_in_pkg.get('messageType'):
+        #                 pretty.print_error(dependency_in_pkg)
+        #                 pretty.print_info(reorder,True,"{0} / {1}".format(index,max(reorder)))
+        #                 if index > max(reorder):
+        #                     reorder = [x+1 for x in reorder]
+        #                     reorder[index] = max(reorder) -1
+        #                 else: 
+        #                     reorder[index] = index +1
+        #             else:
+        #                 if index >= reorder[index]:
+        #                     reorder = [x+1 for x in reorder]
+
+        #                 reorder[index] = index
+        #         else:
+        #             reorder[index] = max(reorder) +1
+        #         pretty.print_info(dependency_in_pkg,True)
+        #         pretty.print_info(reorder,True,"After changes")
+            
+        #         index += 1
+        #     reorder = [x-1 for x in reorder]
+        #     mylist = [pkg.get('messages')[i] for i in reorder]
+        #     pkg['messages'] = mylist
+
+        #     pretty.print_info(mylist,True,"Last step")
+        #     wz_json['packages'][p] = pkg
+        #     pretty.print_info(wz_json['packages'][p],True,"Package After Change step")
+         
     return ParseDict(wz_json, WebezyJson())
 
 

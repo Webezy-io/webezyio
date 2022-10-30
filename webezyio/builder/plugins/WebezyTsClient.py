@@ -22,7 +22,9 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
             file_system.mv(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
             file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
             file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
-
+    
+    # file_system.cpDir(file_system.join_path(wz_json.path,'server','services','p'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
+    
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
 
 
@@ -43,6 +45,8 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     if wz_json.get_server_language() != 'typescript':
         pretty.print_info('Removing rimraf server dir')
         tmp_pkg_json = package_json.replace('rimraf server &&','')
+    else:
+        tmp_pkg_json = package_json
     file_system.wFile(file_system.join_path(wz_json.path,'package.json'),tmp_pkg_json.replace('REPLACEME',wz_json.project.get('packageName')))
     
     # Bin files
@@ -82,7 +86,10 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'server','services','protos')):
         for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'server','services','protos')):
             file_system.copyFile(file_system.join_path(wz_json.path,'server','services', 'protos', f), file_system.join_path(wz_json.path,'clients','typescript','protos',f))
-    
+        
+        if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'server','services','protos','google')):
+            file_system.cpDir(file_system.join_path(wz_json.path, 'server','services','protos','google'),file_system.join_path(wz_json.path, 'clients','typescript','protos','google'))
+
     client = helpers.WZClientTs(wz_json.project.get(
         'packageName'), wz_json.services, wz_json.packages, wz_context)
     file_system.wFile(file_system.join_path(
