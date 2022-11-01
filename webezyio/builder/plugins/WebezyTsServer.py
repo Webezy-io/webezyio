@@ -260,6 +260,10 @@ const server = new Server({_OPEN_BRCK}\n\
 {_CLOSING_BRCK});\n\n\
 {services_bindings}\n\n\
 server.bindAsync(_ADDR, ServerCredentials.createInsecure(), (err: Error | null, bindPort: number) => {_OPEN_BRCK}\n\tif (err) {_OPEN_BRCK}\n\t\tthrow err;\n\t{_CLOSING_BRCK}\n\n\tconsole.log(`[webezy] Starting gRPC:server:${_OPEN_BRCK}bindPort{_CLOSING_BRCK}`,`at -> ${_OPEN_BRCK}new Date().toLocaleString(){_CLOSING_BRCK})`);\n\tserver.start();\n{_CLOSING_BRCK});'
-    file_system.wFile(file_system.join_path(
-        wz_json.path, 'server.ts'), server_code, overwrite=True)
-
+   
+    if file_system.check_if_file_exists(file_system.join_path(
+            wz_json.path, 'server.ts')) == False:
+        file_system.wFile(file_system.join_path(
+            wz_json.path, 'server.ts'), server_code, overwrite=True)
+    else:
+        pretty.print_warning("Make sure you make desired changes on server.ts file !")
