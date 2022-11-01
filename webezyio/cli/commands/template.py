@@ -15,6 +15,9 @@ def parse_wz_json():
     pass
 
 def create_webezy_template_py(wz_json:WZJson,include_code:bool):
+    opt_template = wz_json._config.get('template')
+    opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
+    print_info("Generating template from [{0}] project:\n\t- {1}".format(wz_json.project.get('name'),opts))
     host = wz_json._config.get('host')
     port = wz_json._config.get('port')
     project_pkg_name = wz_json.project['packageName'] if wz_json._config.get('template') is None else  wz_json._config.get('template').get('name')
@@ -30,8 +33,6 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     if include_code:
         includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
         excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
-        print_note(includes,True,"Including")
-        print_note(excludes,True,"Excluding")
     for pkg in wz_json.packages:
         p = wz_json.packages[pkg]
         for m in p.get('messages'):
@@ -175,7 +176,7 @@ def create_fields(messages):
                               label=\'{2}\',\n\
                               type=\'{3}\',\n\
                               message_type={6},\n\
-                              enum_type={5})\n'.format(f.get('name'),f.get('description'),f.get('label'),f.get('fieldType'),f.get('fullName').replace('.','_'),'_DOMAIN+\'.{}\''.format('.'.join(f.get('enumType').split('.')[1:])) if f.get('enumType') is not None else None,'{}'.format(temp_msg_type))
+                              enum_type={5})\n'.format(f.get('name'),str(f.get('description')).replace("'",'"'),f.get('label'),f.get('fieldType'),f.get('fullName').replace('.','_'),'_DOMAIN+\'.{}\''.format('.'.join(f.get('enumType').split('.')[1:])) if f.get('enumType') is not None else None,'{}'.format(temp_msg_type))
             fields[m.get('fullName')].append((f.get('fullName').replace('.','_'),field))
 
     code = ''
@@ -203,7 +204,7 @@ def create_msgs(messages):
     for m in messages:
         code += '\n# Constructing message [{0}]\n_msg_{0} = helpers.WZMessage(name=\'{1}\',\n\
                                  description=\'{2}\',\n\
-                                 fields=_msg_fields_{0})\n'.format(m.get('fullName').replace('.','_'),m.get('name'),m.get('description'))
+                                 fields=_msg_fields_{0})\n'.format(m.get('fullName').replace('.','_'),m.get('name'),str(m.get('description')))
     return """
 # Construct messages
 {0}
@@ -235,7 +236,7 @@ def add_packgs(packages):
         pkg = packages[p]
         code += '\n# Adding package [{0}]\n_pkg_{0} = _architect.AddPackage(_pkg_{0}_name,\n\
                                                     dependencies=[],\n\
-                                                    description=\'{1}\')'.format(pkg.get('package').replace('.','_'),pkg.get('description'))
+                                                    description=\'{1}\')'.format(pkg.get('package').replace('.','_'),str(pkg.get('description')).replace("'",'"'))
     return """
 # Add packages
 {0}
@@ -273,7 +274,7 @@ def create_rpcs(services):
     for s in services:
         svc = services.get(s)
         for rpc in svc.get('methods'):
-            code += '\n_rpc_{0}_{4} = helpers.WZRPC(name=\'{4}\',client_stream={5},server_stream={6},in_type=msgs_map[_DOMAIN+\'.{1}\'].full_name, out_type=msgs_map[_DOMAIN+\'.{2}\'].full_name, description=\'{3}\')'.format(svc.get('fullName').replace('.','_'),'.'.join(rpc.get('inputType').split('.')[1:]),'.'.join(rpc.get('outputType').split('.')[1:]),rpc.get('description'),rpc.get('name'),rpc.get('clientStreaming'),rpc.get('serverStreaming'))
+            code += '\n_rpc_{0}_{4} = helpers.WZRPC(name=\'{4}\',client_stream={5},server_stream={6},in_type=msgs_map[_DOMAIN+\'.{1}\'].full_name, out_type=msgs_map[_DOMAIN+\'.{2}\'].full_name, description=\'{3}\')'.format(svc.get('fullName').replace('.','_'),'.'.join(rpc.get('inputType').split('.')[1:]),'.'.join(rpc.get('outputType').split('.')[1:]),str(rpc.get('description')).replace("'",'"'),rpc.get('name'),rpc.get('clientStreaming'),rpc.get('serverStreaming'))
     return """
 \"\"\"Services and thier resources\"\"\"
 # Construct rpc's
@@ -296,7 +297,7 @@ def create_services(services):
                                               methods=[{1}],\n\
                                               dependencies=[{2}],\n\
                                               description=\'{3}\')\n\
-\n_svc_{0}_name, _svc_{0}_methods, _svc_{0}_dependencies, _svc_{0}_desc = _svc_{0}.to_tuple()'.format(svc.get('name'),','.join(temp_rpcs),','.join(temp_dependencies),svc.get('description'))
+\n_svc_{0}_name, _svc_{0}_methods, _svc_{0}_dependencies, _svc_{0}_desc = _svc_{0}.to_tuple()'.format(svc.get('name'),','.join(temp_rpcs),','.join(temp_dependencies),str(svc.get('description')).replace("'",'"'))
 
     return """
 # Construct services
@@ -345,47 +346,125 @@ def create_file_context(root_path,include,exclude):
         if '*' in include:
             for f in file_system.walkFiles(root_path):
                 if f not in exclude and '.template.py' not in f and 'webezy.json' not in f:
-                    print_info({'file':f},True)
+                    code = ''.join(file_system.rFile(f))
+                    code = bytes(code, 'utf-8')
+                    list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(f,zlib.compress(code)))
+                    print_note("Added file to template -> 'file':{0}".format(f),True)
 
-        if '*/**' in include:
+        if '**/*' in include:
             for d in file_system.walkDirs(root_path):
                 file_relative_path = d.split(file_system.get_current_location())[1]
                 if file_relative_path != '':
                     if check_exclude(exclude,d,file_relative_path):
-                        print_info("Iterating dir code files")
                         for f in file_system.walkFiles(d):
                             code = ''.join(file_system.rFile(file_system.join_path(d,f)))
                             code = bytes(code, 'utf-8')
                             list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),zlib.compress(code)))
+                            print_note("Added file to template -> 'path':{0},'file':{1}".format(file_relative_path,f),True)
+
 
         for inc in include:
             if '*' not in inc:
                 if '.' in inc:
-                    if file_system.check_if_file_exists(inc):
-                        print_info({'file':file_system.join_path(file_system.get_current_location(),inc)},True)
+                    if file_system.check_if_file_exists(inc) and check_exclude(exclude,None,inc):
                         code = ''.join(file_system.rFile(inc))
                         code = bytes(code, 'utf-8')
                         list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(inc,zlib.compress(code)))
+                        print_note("Added file to template -> 'file':{0}".format(inc),True)
+
                 else:
                     if file_system.check_if_dir_exists(inc):
                         for f in file_system.walkFiles(file_system.get_current_location()+'/'+inc):
-                            code = ''.join(file_system.rFile(file_system.join_path(file_system.get_current_location(),inc,f)))
-                            code = bytes(code, 'utf-8')
-                            list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(inc,f),zlib.compress(code)))
-    else:
-        for f in file_system.walkFiles(root_path):
-            if f not in exclude and '.template.py' not in f and 'webezy.json' not in f:
-                print_info({'file':f},True)
+                            if check_exclude(exclude,inc,f):
+                                code = ''.join(file_system.rFile(file_system.join_path(file_system.get_current_location(),inc,f)))
+                                code = bytes(code, 'utf-8')
+                                list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(inc,f),zlib.compress(code)))
+                                print_note("Added file to template -> 'path':{0},'file':{1}".format(inc,f),True)
 
-        for d in file_system.walkDirs(root_path):
-            file_relative_path = d.split(file_system.get_current_location())[1]
-            if file_relative_path != '':
-                if check_exclude(exclude,d,file_relative_path):
-                    print_info("Iterating dir code files")
-                    for f in file_system.walkFiles(d):
-                        code = ''.join(file_system.rFile(file_system.join_path(d,f)))
-                        code = bytes(code, 'utf-8')
-                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),zlib.compress(code)))
+            else:
+                if '/' in inc:
+                    paths = inc.split('/')
+
+                    if len(paths) > 2 and len(paths) <= 3:
+                        relative = '/'.join(paths[:2])
+                        if file_system.check_if_dir_exists(relative):
+                            for f in file_system.walkFiles(file_system.get_current_location()+'/'+relative):
+
+                                if '*.' in paths[-1] and check_exclude(exclude,relative,f):
+                                    suffix = paths[-1].split('.')[1]
+                                    if suffix in f:
+                                        code = ''.join(file_system.rFile(file_system.join_path(relative,f)))
+                                        code = bytes(code, 'utf-8')
+                                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(relative,f),zlib.compress(code)))
+                                        print_note("Added file to template -> 'path':{0},'file':{1}".format(relative,f),True)
+                        else:
+                            if '/**' in relative:
+                                for d in file_system.walkDirs(paths[0]):
+                                    for f in file_system.walkFiles(d):
+                                        if check_exclude(exclude,d,f):
+                                            if '*.' in paths[-1]:
+                                                suffix = paths[-1].split('.')[1]
+                                                if suffix in f:
+                                                    code = ''.join(file_system.rFile(file_system.join_path(d,f)))
+                                                    code = bytes(code, 'utf-8')
+                                                    list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(d,f),zlib.compress(code)))
+                                                    print_note("Added file to template -> 'path':{0},'file':{1}".format(d,f),True)
+                                            elif paths[-1] == f:
+                                                code = ''.join(file_system.rFile(file_system.join_path(d,f)))
+                                                code = bytes(code, 'utf-8')
+                                                list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(d,f),zlib.compress(code)))
+                                                print_note("Added file to template -> 'path':{0},'file':{1}".format(d,f),True)
+
+                    elif len(paths) < 2:
+                        if file_system.check_if_dir_exists(paths[0]):
+                            for f in file_system.walkFiles(file_system.get_current_location()+'/'+paths[0]):
+                                if check_exclude(exclude,paths[0],f):
+                                    if '*.' in paths[1]:
+                                        suffix = paths[1].split('.')[1]
+                                        if suffix in f:
+                                            code = ''.join(file_system.rFile(file_system.join_path(paths[0],f)))
+                                            code = bytes(code, 'utf-8')
+                                            list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(paths[0],f),zlib.compress(code)))
+                                            print_note("Added file to template -> 'path':{0},'file':{1}".format(paths[0],f),True)
+                                    elif paths[1] == f:
+                                        code = ''.join(file_system.rFile(file_system.join_path(paths[0],f)))
+                                        code = bytes(code, 'utf-8')
+                                        list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(paths[0],f),zlib.compress(code)))
+                                        print_note("Added file to template -> 'path':{0},'file':{1}".format(paths[0],f),True)
+
+
+                        elif '**' in paths[0]:
+                            for d in file_system.walkDirs(root_path):
+                                file_relative_path = d.split(file_system.get_current_location())[1]
+                                if file_relative_path != '':
+                                    if check_exclude(exclude,d,file_relative_path):
+                                        for f in file_system.walkFiles(d):
+                                            if '*.' in paths[1] and check_exclude(exclude,paths[0],f):
+                                                suffix = paths[1].split('.')[1]
+                                                if suffix in f:
+                                                    code = ''.join(file_system.rFile(file_system.join_path(paths[0],f)))
+                                                    code = bytes(code, 'utf-8')
+                                                    list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(paths[0],f),zlib.compress(code)))
+                                                    print_note("Added file to template -> 'path':{0},'file':{1}".format(paths[0],f),True)
+                    else:
+                        print_warning("Relative path is to deep !\n\tMax allowed recursion of directories is 2 from root directory of your project")
+    else:   
+        print_warning("No code files included !\n\t- We do not support template include ALL files under directory due to performance reasons\n\t  however we do plan to enrich this functionality with .wzignore file to exclude all files under directory based on the relative paths.")
+        # TODO add .wzignore file which contains a ignore template relative paths / regex paths ( [*] only - for suffix and folders filter functionality)
+        
+        # for f in file_system.walkFiles(root_path):
+        #     if f not in exclude and '.template.py' not in f and 'webezy.json' not in f:
+        #         print_info({'file':f},True)
+
+        # for d in file_system.walkDirs(root_path):
+        #     file_relative_path = d.split(file_system.get_current_location())[1]
+        #     if file_relative_path != '':
+        #         if check_exclude(exclude,d,file_relative_path):
+        #             print_info("Iterating dir code files")
+        #             for f in file_system.walkFiles(d):
+        #                 code = ''.join(file_system.rFile(file_system.join_path(d,f)))
+        #                 code = bytes(code, 'utf-8')
+        #                 list_files.append('WebezyFileContext(file=\'{0}\',code={1})'.format(file_system.join_path(file_relative_path,f),zlib.compress(code)))
 
     return """
 # Initalize all code files 
@@ -395,9 +474,10 @@ _context = WebezyContext(files=[{0}])
 for f in _context.files:
 \tfile_system.wFile(file_system.get_current_location()+'/'+f.file,zlib.decompress(f.code).decode(),force=True)
 
-    """.format(','.join(list_files))
+    """.format(',\n'.join(list_files))
 
 def check_exclude(exclude,dir,file):
+    # print_note(f"Checking exclude for -> {dir}/{file}")
     if len(exclude) != 0:
         is_valid = False
         for exc in exclude:
@@ -407,13 +487,21 @@ def check_exclude(exclude,dir,file):
             else:
                 is_valid = True
         if is_valid:
-            if 'node_modules' not in dir:
-                print_info({'directory':dir,'relative':file},True)
+            if dir is not None:
+                if 'node_modules' not in dir:
+                    # print_info({'directory':dir,'relative':file},True)
+                    return True
+            else:
                 return True
 
+
     else:
-        if 'node_modules' not in dir:
-            print_info({'directory':dir,'relative':file},True)
+        if dir is not None:
+            if 'node_modules' not in dir:
+                # print_info({'directory':dir,'relative':file},True)
+                return True
+
+        else:
             return True
 
 def publish_template(template_file:str,code_context):

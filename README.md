@@ -54,8 +54,13 @@ To create a new webezy.io project run the following command:
 webezy new <YourProject>
 ```
 > __Note__ you can create a new project based on template to get started quickly
+Sample Python server (Clients are available both in TS + PY)
 ```sh
-wz n <YourProject> --template @webezyio/Sample
+wz n <YourProject> --template @webezyio/SamplePy
+```
+Or the same resources just for Typescript server
+```sh
+wz n <YourProject> --template @webezyio/SampleTs
 ```
  - For more information see [Project Templating](https://www.webezyio/docs/project-templating)
 
