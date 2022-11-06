@@ -2,6 +2,9 @@ import logging
 import os
 import re
 from typing import List, Literal
+from webezyio import __version__,config
+
+from webezyio.core import webezycore,WebezyAnalytics_pb2
 from webezyio.commons import errors, pretty
 from webezyio.commons.resources import generate_package, generate_service
 from webezyio.commons.errors import WebezyCoderError, WebezyValidationError
@@ -11,7 +14,10 @@ from itertools import groupby
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import ParseDict, MessageToDict
 from google.protobuf import text_format
+from google.protobuf.timestamp_pb2 import Timestamp
+from platform import platform
 from inquirer import errors as inquirerErrors
+
 _WELL_KNOWN_PY_IMPORTS = [
     "from google.protobuf.timestamp_pb2 import Timestamp", "from typing import Iterator"]
 
@@ -1078,3 +1084,24 @@ def enum_value_validate(answers, current):
         raise errors.ValidationError(
             current, reason='Enum Value MUST be an integer value')
     return True
+
+def send_analytic_event(args):
+    stub = webezycore()
+    ts = Timestamp()
+    ts.GetCurrentTime()
+    temp_args = []
+    for k in args.__dict__:
+        temp_args.append(str((k,args.__dict__[k])))
+    # hostname=socket.gethostname() 
+    try:
+        stub.PublishCLIEvent(
+        WebezyAnalytics_pb2.CLIEvent(
+            version=__version__.__version__,
+            ts=ts,
+            args=temp_args,
+            os=platform(),
+            user_id='UNKNWON' if config.token is None else config.token
+        ))
+    except:
+        pass
+    

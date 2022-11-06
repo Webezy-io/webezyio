@@ -1,12 +1,12 @@
+from datetime import datetime
 import logging
 import argparse
 import os
-from posixpath import split
-from webezyio import __version__
+from platform import platform
 import inquirer
-from inquirer.themes import Theme, term
 from inquirer import errors
 import re
+from webezyio import __version__, config
 from webezyio.builder.plugins import WebezyMigrate
 from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
@@ -16,7 +16,8 @@ from webezyio.commons import helpers,file_system,errors,resources
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit,template
-from prettytable import PrettyTable
+from pathlib import Path
+
 _TEMPLATES = ['@webezyio/Blank']
 
 templates_dir = os.path.dirname(os.path.dirname(__file__))+'/commons/templates'
@@ -107,6 +108,20 @@ wz_g_e_q = [
 def main(args=None):
     print(theme.logo_ascii_art_color)
 
+    if config.first_run:
+        analytic = inquirer.prompt([inquirer.Confirm('analytic',default=True,message='We want to gather some basic usage and bug report while you are using webezyio CLI')],theme=WebezyTheme())
+        p = Path(__file__).parents[1]
+        config_file = ''.join(file_system.rFile(file_system.join_path(p,'config.py')))
+        if analytic is not None and analytic.get('analytic'):
+            config_file = config_file.replace('analytics=False','analytics=True')
+        hash_token=platform()+':'+datetime.today().isoformat()
+        if 'token=' not in config_file:
+            config_file +='\ntoken="{0}"'.format(hash_token)
+            log.debug('Token already exists on current installation')
+        config_file = config_file.replace('first_run=True','first_run=False')
+        file_system.wFile(file_system.join_path(p,'config.py'),content=config_file,overwrite=True)
+
+
     """Main CLI processing, with argpars package.
     """
     # Main cli parser
@@ -151,8 +166,7 @@ def main(args=None):
                             required=False, help='Server language')
     parser_n.add_argument('--clients', nargs='*',
                             required=False, help='Clients language list seprated by spaces')
-    parser_n.add_argument('--build', action='store_true',
-                            required=False, help='Clients language list seprated by spaces')
+   
     parser_n.add_argument('--template', choices=_TEMPLATES,default=_TEMPLATES[0],
                             required=False, help='Create new project based on template')
     """Generate command"""
@@ -210,6 +224,12 @@ def main(args=None):
     parser_template.add_argument('--load',action='store_true', help='Initalize a template')
     parser_template.add_argument('--list',action='store_true', help='List all available templates')
 
+    """Build command"""
+    parser_build = subparsers.add_parser(
+        'build', help='Build project resources')
+    parser_build.add_argument('--protos',action='store_true', help='Build resources protos files only')
+    parser_build.add_argument('--code',action='store_true', help='Build resources code classes files only')
+
     """Run server"""
     parser.add_argument(
         '--run-server',action='store_true', help='Run server on current active project')
@@ -220,8 +240,8 @@ def main(args=None):
     parser.add_argument('-e', '--expand', action='store_true',
                         help='Expand optional fields for each resource')
 
-    parser.add_argument(
-        '-b','--build', action='store_true', help='Build webezyio project')
+    # parser.add_argument(
+    #     '-b','--build', action='store_true', help='Build webezyio project')
     
     # Log level optional argument
     parser.add_argument(
@@ -240,9 +260,13 @@ def main(args=None):
     parser.add_argument('--purge',action='store_true',help='Purge .webezy/contxt.json file')
     # Parse all command line arguments
     args = parser.parse_args(args)
+    
     log.setLevel(args.loglevel)
-
     log.debug(args)
+
+    if config.analytics:
+        log.debug('sending analytic event')
+        helpers.send_analytic_event(args)
 
     # Logging version
     if args.version:
@@ -253,7 +277,7 @@ def main(args=None):
         print_note(args,True,'Argument passed to webezy CLI')
 
     if hasattr(args, 'project'):
-        print_info(args,True)
+        # print_info(args,True)
         new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain,template=args.template)
         exit(0)
     else:
@@ -336,8 +360,17 @@ def main(args=None):
                 # ARCHITECT = WebezyArchitect(
                 #     path=webezy_json_path,save=cache_files[len(cache_files)-2 if len(cache_files) > 1 else 1])
                 # ARCHITECT.Save()
-            elif args.build:
-                build.build_all(webezy_json_path)
+            elif hasattr(args, 'protos') and hasattr(args, 'code'):
+                if args.code:
+                    print_info("Building project resources code files")
+                    build.build_code(webezy_json_path)
+                elif args.protos:
+                    print_info("Building project resources proto's files")
+                    build.build_protos(webezy_json_path)
+                elif args.code == False and args.protos == False:
+                    print_info("Building project resources")
+                    build.build_all(webezy_json_path)
+                    
             elif args.purge:
                 temp_path = webezy_json_path.replace('webezy.json','.webezy/context.json')
                 confirm =inquirer.prompt([inquirer.Confirm('confirm',False,message='You are about to purge the webezy context are you sure?')],theme=WebezyTheme())
