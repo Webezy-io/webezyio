@@ -1,8 +1,11 @@
+LICENSE
 README.md
 pyproject.toml
 setup.py
+docs/source/conf.py
 webezyio/__init__.py
 webezyio/__version__.py
+webezyio/config.py
 webezyio.egg-info/PKG-INFO
 webezyio.egg-info/SOURCES.txt
 webezyio.egg-info/dependency_links.txt
@@ -46,6 +49,7 @@ webezyio/cli/commands/package.py
 webezyio/cli/commands/run.py
 webezyio/cli/commands/template.py
 webezyio/commons/__init__.py
+webezyio/commons/client_wrapper.py
 webezyio/commons/errors.py
 webezyio/commons/file_system.py
 webezyio/commons/helpers.py
@@ -57,6 +61,13 @@ webezyio/commons/protos/webezy_pb2_grpc.py
 webezyio/commons/templates/webezyio/PubSubTs.template.py
 webezyio/commons/templates/webezyio/SamplePy.template.py
 webezyio/commons/templates/webezyio/SampleTs.template.py
+webezyio/core/Analytics_pb2.py
+webezyio/core/Analytics_pb2_grpc.py
+webezyio/core/WebezyAnalytics_pb2.py
+webezyio/core/WebezyAnalytics_pb2_grpc.py
+webezyio/core/WebezyCore_pb2.py
+webezyio/core/WebezyCore_pb2_grpc.py
+webezyio/core/__init__.py
 webezyio/tests/unit-test.py
 webezyio/tests/blank/test.py
 webezyio/tests/commons/test.py

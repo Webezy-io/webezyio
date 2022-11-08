@@ -56,3 +56,6 @@ import_heading_firstparty = "Reader imports"
 
 [tool.mypy]
 strict = true
+
+[tool.setuptools.packages.find]
+exclude = ["docker"]  # alternatively: `exclude = ["additional*"]`

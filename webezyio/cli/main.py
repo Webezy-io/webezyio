@@ -1,3 +1,24 @@
+# Copyright (c) 2022 Webezy.io.
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 from datetime import datetime
 import logging
 import argparse
@@ -12,7 +33,7 @@ from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import helpers,file_system,errors,resources
+from webezyio.commons import helpers,file_system,errors,resources, parser
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit,template
@@ -622,6 +643,9 @@ def template_commands(args):
                         file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True,force=True)
                         print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                         exit(1)
+                if '.proto' in args.path:
+                    parse = parser.WebezyParser(path=args.path)
+                    print(parse)
                 else:
                     if file_system.check_if_dir_exists(args.path):
                         builder = WebezyBuilder(path=file_system.get_current_location(),hooks=[WebezyMigrate])

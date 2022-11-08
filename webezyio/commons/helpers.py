@@ -1,3 +1,24 @@
+# Copyright (c) 2022 Webezy.io.
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import logging
 import os
 import re
@@ -111,7 +132,7 @@ class WZProject():
 class WZField():
     """webezyio field level object that defines the required meta data properties."""
 
-    def __init__(self, name, type: _FIELD_TYPES, label: _FIELD_LABELS, message_type=None, enum_type=None, extensions=None, description=None) -> None:
+    def __init__(self, name, type: _FIELD_TYPES, label: _FIELD_LABELS, message_type=None, enum_type=None, extensions=None, description=None, key_type=None, value_type=None, oneof_fields=[]) -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.FieldDescriptor` representation.
 
         Parameters
@@ -134,6 +155,10 @@ class WZField():
         self._enum_type = enum_type
         self._extensions = extensions
         self._description = description
+        self._key_type = key_type
+        self._value_type = value_type
+        self._oneof_fields = oneof_fields
+
 
     def setName(self, name):
         self._name = name
