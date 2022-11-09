@@ -446,7 +446,6 @@ def main(args=None):
 
 def parse_name_to_resource(full_name,wz_json: helpers.WZJson):
     resource = None
-    print(len(full_name.split('.')))
     if len(full_name.split('.')) > 4:
         log.debug("Searching for fields / enum values")
         # Field / Enum Value

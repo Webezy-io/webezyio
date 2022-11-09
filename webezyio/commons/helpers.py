@@ -192,6 +192,7 @@ class WZField():
             else:
                 temp[k[1:]] = dict(self.__dict__)[k]
 
+
         return temp
 
     def _validate(self):
@@ -625,6 +626,31 @@ class WZProto():
                         fType = f.get('messageType')
                     elif fType == 'enum':
                         fType = f.get('enumType')
+                    elif fType == 'map':
+                        keyType = f.get('keyType').split('_')[-1].lower()
+                        valueType = f.get('valueType').split('_')[-1].lower() if f.get('valueType') != 'TYPE_MESSAGE' else f.get('messageType') if f.get('valueType') == 'TYPE_MESSAGE' else f.get('enumType') if f.get('valueType') == 'TYPE_ENUM' else None
+                        if valueType is None:
+                            pretty.print_error("Value type for 'map' is not valid ! {0}".format(f.get('valueType')))
+                        else:
+                            fType = 'map<{0}, {1}>'.format(keyType,valueType)
+                    elif fType == 'oneof':
+                        field_name = f.get('name')
+                        oneof_fields = []
+                        
+                        for oneof_field in f.get('oneofFields'):
+                            if oneof_field.get('fieldType') == 'TYPE_MESSAGE':
+                                oneof_field_type = oneof_field.get('messageType')
+                            elif oneof_field.get('fieldType') == 'TYPE_ENUM':
+                                oneof_field_type = oneof_field.get('enumType')
+                            else:
+                                oneof_field_type = oneof_field.get('fieldType').split('_')[-1].lower()
+                            
+                            oneof_field_name = oneof_field.get('name')
+                            oneof_field_index = oneof_field.get('index') if oneof_field.get('index') is not None else 1
+                            oneof_fields.append(f'\n\t\t{oneof_field_type} {oneof_field_name} = {oneof_field_index};')
+                        oneof_fields = ''.join(oneof_fields)
+                        fType = f'oneof {field_name} {_OPEN_BRCK}\n{oneof_fields}\n\t{_CLOSING_BRCK}'
+                    
                     fName = f.get('name')
                     fIndex = f.get('index')
                     fOptions = []
@@ -673,8 +699,12 @@ class WZProto():
                         fDesc = f'// [webezyio] - {fDesc}\n\t\t' if fDesc is not None else ''
                     else:
                         fDesc = f'// [webezyio] - {fDesc}\n\t' if fDesc is not None else ''
-                    fields.append(
-                        f'{fDesc}{fLabel}{fType} {fName} = {fIndex}{fOptions};')
+                    if f.get('fieldType') == 'TYPE_ONEOF':
+                        fields.append(
+                            f'{fDesc}{fType}')
+                    else:
+                        fields.append(
+                            f'{fDesc}{fLabel}{fType} {fName} = {fIndex}{fOptions};')
 
                 if ext_type == 'FieldOptions':
                     fields = '\n\t\t'.join(fields)

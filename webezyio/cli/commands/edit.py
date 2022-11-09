@@ -207,7 +207,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     temp_fields = []
     msg_fields =[]
     for f in resource.get('fields'):
-        msg_fields.append(helpers.WZField(f.get('name'),f.get('fieldType'),f.get('label'),f.get('messageType'),f.get('enumType'),f.get('extensions'),f.get('description')).to_dict())
+        msg_fields.append(helpers.WZField(f.get('name'),f.get('fieldType'),f.get('label'),f.get('messageType'),f.get('enumType'),f.get('extensions'),f.get('description'),key_type=f.get('keyType'),value_type=f.get('valueType'),oneof_fields=f.get('oneofFields')).to_dict())
     for msg in package.messages:
         if msg.extension_type == 0 and msg.full_name != msg_full_name:
             if msg.description is not None:
@@ -270,10 +270,14 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
             inquirer.Text(
                 'field', 'Enter field name', validate=helpers.validation),
             inquirer.List(
-                'fieldType', 'Choose field type', choices=opt),
-            inquirer.List(
-                'fieldLabel', 'Choose field label', choices=labels),
+                'fieldType', 'Choose field type', choices=opt)
         ], theme=WebezyTheme())
+
+        label = None
+        if field is not None:
+            if field.get('fieldType') != 'TYPE_MAP' and field.get('fieldType') != 'TYPE_ONEOF':
+                label = inquirer.prompt([inquirer.List(
+                    'fieldLabel', 'Choose field label', choices=labels)], theme=WebezyTheme())
 
         message_type = None
         enum_type = None
@@ -346,10 +350,47 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                 f_description = ''        
                 
             temp_fields.append(new_field)
-            print_info(field,True)
+            map_types = None
+            oneof_fields = []
+            if field['fieldType'] == 'TYPE_MAP':
+                map_types = inquirer.prompt([
+                    inquirer.List(
+                        'keyType', '[MAP] Choose key type', choices=[o for o in opt if o[1] != 'TYPE_BOOL' and  o[1] != 'TYPE_FLOAT' and o[1] != 'TYPE_DOUBLE' and o[1] != 'TYPE_ENUM' and o[1] != 'TYPE_MESSAGE' and o[1] != 'TYPE_MAP' and o[1] != 'TYPE_ONEOF' and o[1] != 'TYPE_BYTES']),
+                    inquirer.List(
+                        'valueType', '[MAP] Choose value type', choices=[o for o in opt if o[1] != 'TYPE_MAP' and o[1] != 'TYPE_ONEOF'])
+                ], theme=WebezyTheme())
+                
+                if map_types.get('valueType') == 'TYPE_MESSAGE' or map_types.get('valueType') == 'TYPE_ENUM':
+                    if map_types.get('valueType') == 'TYPE_MESSAGE':
+                        if len(avail_msgs) == 0:
+                            print_warning("[MAP] No messages availabe for field")
+                            exit(1)
+                        else:
+                            message = inquirer.prompt([
+                                inquirer.List(
+                                    'message', '[MAP] Choose available messages', choices=avail_msgs)
+                            ], theme=WebezyTheme())
+                            message_type = message['message']
+                    elif map_types.get('valueType') == 'TYPE_ENUM':
+                        if len(avail_enums) == 0:
+                            print_warning("[MAP] No enums available for field")
+                            exit(1)
+                        else:
+                            message = inquirer.prompt([
+                                inquirer.List(
+                                    'enum', '[MAP] Choose available enums', choices=avail_enums)
+                            ], theme=WebezyTheme())
+                            enum_type = message['enum']
+            elif field['fieldType'] == 'TYPE_ONEOF':
+                temp_fields_oneof = []
+                add_field_oneof = True
+                oneof_fields = add_fields_oneof(add_field_oneof,avail_msgs=avail_msgs,avail_enums=avail_enums,pre_fields=temp_fields_oneof,msg_full_name=msg_full_name)
+
             msg_fields.append(helpers.WZField(
-                new_field, field['fieldType'], field['fieldLabel'], message_type=message_type, enum_type=enum_type,description=f_description,extensions=f_ext).to_dict())
-            
+                new_field, field['fieldType'], label['fieldLabel'] if label is not None else 'LABEL_OPTIONAL',
+                message_type=message_type, enum_type=enum_type, description=f_description,
+                extensions=f_ext, key_type=map_types.get('keyType') if map_types is not None else None, value_type=map_types.get('valueType') if map_types is not None else None, oneof_fields=oneof_fields).to_dict())
+
             nextfield = inquirer.prompt([
                 inquirer.Confirm(
                     'continue', message='Add more fields?', default=True)
@@ -362,6 +403,73 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     architect.EditMessage(package, resource.get('name'),
                             msg_fields, description, extend)
     architect.Save()
+
+def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_name):
+    final_fields = pre_fields
+    while add_field:
+        opt = []
+        for f in resources.fields_opt:
+            opt.append((f.split('_')[1].lower(), f))
+        labels = []
+        for l in resources.field_label:
+            labels.append((l.split('_')[1].lower(), l))
+
+        field = inquirer.prompt([
+            inquirer.Text(
+                'field', '[ONEOF] Enter field name', validate=helpers.validation),
+            inquirer.List(
+                'fieldType', '[ONEOF] Choose field type', choices=[o for o in opt if o != 'TYPE_MAP' and o != 'TYPE_ONEOF']),
+
+        ], theme=WebezyTheme())
+
+        label = None
+        message_type = None
+        enum_type = None
+
+        if field['fieldType'] == resources.FieldDescriptor.Type.Name(resources.FieldDescriptor.Type.TYPE_MESSAGE):
+            if len(avail_msgs) == 0:
+                print_warning("[ONEOF] No messages availabe for field")
+                exit(1)
+            else:
+                message = inquirer.prompt([
+                    inquirer.List(
+                        'message', '[ONEOF] Choose available messages', choices=avail_msgs)
+                ], theme=WebezyTheme())
+                message_type = message['message']
+
+        elif field['fieldType'] == resources.FieldDescriptor.Type.Name(resources.FieldDescriptor.Type.TYPE_ENUM):
+            if len(avail_enums) == 0:
+                print_warning("[ONEOF] No enums available for field")
+                exit(1)
+            else:
+                message = inquirer.prompt([
+                    inquirer.List(
+                        'enum', '[ONEOF] Choose available enums', choices=avail_enums)
+                ], theme=WebezyTheme())
+                enum_type = message['enum']
+
+        if field is None:
+            add_field = False
+        else:
+            new_field = field['field']
+            helpers.field_exists_validation(
+                new_field, final_fields, msg_full_name+'.'+new_field)
+
+        final_fields.append(helpers.WZField(
+                new_field, field['fieldType'], label['fieldLabel'] if label is not None else 'LABEL_OPTIONAL',
+                message_type=message_type, enum_type=enum_type, description=None,
+                extensions=None, key_type=None, value_type=None, oneof_fields=[]).to_dict())
+
+        nextfield = inquirer.prompt([
+            inquirer.Confirm(
+                'continue', message='[ONEOF] Add more fields?', default=True)
+        ], theme=WebezyTheme())
+        if nextfield is None:
+            add_field = False
+        else:
+            if nextfield['continue'] == False:
+                add_field = False
+    return final_fields
 
 def add_values(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=False):
     enum_name = resource['name']
