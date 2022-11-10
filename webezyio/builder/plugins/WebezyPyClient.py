@@ -114,7 +114,7 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
             file_content = file_system.rFile(
                 file_system.join_path(wz_json.path, 'services', 'protos', f))
             file_content.insert(
-                5, '\nfrom typing import overload, Iterator, List\n')
+                5, '\nfrom typing import overload, Iterator, List, Dict\n')
             if len(name) > 1:
                 name = name[0]
 
@@ -135,16 +135,40 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                                 for field in m['fields']:
 
                                     fName = field['name']
+                                    key_type = field.get('keyType').split('_')[-1].lower() if field.get('keyType') is not None else None
+                                    value_type = field.get('valueType').split('_')[-1].lower() if field.get('keyType') is not None else None
                                     fType = parse_proto_type_to_py(field['fieldType'].split(
-                                        '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name)
+                                            '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name,key_type=key_type,value_type=value_type)
                                     if field['fieldType'].split(
                                         '_')[-1].lower() == 'enum':
                                         temp_fields.append(
                                             f'{fName} = {fType} # type: enum_type_wrapper.EnumTypeWrapper')
+                                    elif field['fieldType'].split(
+                                        '_')[-1].lower() == 'oneof':
+                                        for f_oneof in field.get('oneofFields'):
+                                            fOneofName = f_oneof['name']
+                                            fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
+                                                '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
+                                            if f_oneof['fieldType'].split(
+                                                '_')[-1].lower() == 'enum':
+                                                temp_fields.append(
+                                                    f'{fOneofName} = {fOneofType} # type: enum_type_wrapper.EnumTypeWrapper')
+                                            else:
+                                                temp_fields.append(
+                                                    f'{fOneofName} = {fOneofType} # type: {fOneofType}')
                                     else:
                                         temp_fields.append(
                                             f'{fName} = {fType} # type: {fType}')
-                                    init_fields.append(f'{fName}={fType}')
+                                    
+                                    if field.get('fieldType') != 'TYPE_ONEOF':
+                                        init_fields.append(f'{fName}={fType}')
+                                    else:
+                                        for f_oneof in field.get('oneofFields'):
+                                            fOneofName = f_oneof['name']
+                                            fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
+                                                '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
+                                            init_fields.append(f'{fOneofName}={fOneofType}')
+
                                 temp_fields = '\n\t'.join(temp_fields)
                                 init_fields = ', '.join(init_fields)
                                 file_content.insert(
@@ -165,7 +189,7 @@ statuscode=$?\n\
 echo "Exit code for protoc -> "$statuscode\n\
 exit 0'
 
-def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_pkg=None):
+def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_pkg=None,key_type=None,value_type=None):
     temp_type = 'None'
     if 'int' in type:
         temp_type = 'int'
@@ -195,6 +219,8 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
                 enumType.split('.')[1], enumType.split('.')[-1])
     elif type == 'bool':
         temp_type = 'bool'
+    elif type == 'map':
+        temp_type = f'Dict[{parse_proto_type_to_py(key_type,label,messageType,enumType,current_pkg)},{parse_proto_type_to_py(value_type,label,messageType,enumType,current_pkg)}]'
 
     if label == 'repeated':
         temp_type = f'List[{temp_type}]'
