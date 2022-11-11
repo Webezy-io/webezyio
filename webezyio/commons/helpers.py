@@ -1156,7 +1156,7 @@ def send_analytic_event(args):
             args=temp_args,
             os=platform(),
             user_id='UNKNWON' if config.token is None else config.token
-        ))
-    except:
-        pass
+            ))
+    except Exception as e:
+        pretty.print_warning(e)
     

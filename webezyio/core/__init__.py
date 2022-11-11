@@ -9,7 +9,7 @@ from . import WebezyCore_pb2 as WebezyCore
 
 class webezycore:
 
-	def __init__(self, host="localhost", port=50051, timeout=0.1):
+	def __init__(self, host="webezy-core.francecentral.cloudapp.azure.com", port=9000, timeout=1):
 		channel = grpc.insecure_channel('{0}:{1}'.format(host, port))
 		try:
 			grpc.channel_ready_future(channel).result(timeout=timeout)
