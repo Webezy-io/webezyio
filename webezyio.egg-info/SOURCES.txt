@@ -53,6 +53,7 @@ webezyio/commons/client_wrapper.py
 webezyio/commons/errors.py
 webezyio/commons/file_system.py
 webezyio/commons/helpers.py
+webezyio/commons/parser.py
 webezyio/commons/pretty.py
 webezyio/commons/resources.py
 webezyio/commons/protos/__init__.py
