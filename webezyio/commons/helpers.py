@@ -1,7 +1,31 @@
+# Copyright (c) 2022 Webezy.io.
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import logging
 import os
 import re
 from typing import List, Literal
+from webezyio import __version__,config
+
+from webezyio.core import webezycore,WebezyAnalytics_pb2
 from webezyio.commons import errors, pretty
 from webezyio.commons.resources import generate_package, generate_service
 from webezyio.commons.errors import WebezyCoderError, WebezyValidationError
@@ -11,7 +35,10 @@ from itertools import groupby
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import ParseDict, MessageToDict
 from google.protobuf import text_format
+from google.protobuf.timestamp_pb2 import Timestamp
+from platform import platform
 from inquirer import errors as inquirerErrors
+
 _WELL_KNOWN_PY_IMPORTS = [
     "from google.protobuf.timestamp_pb2 import Timestamp", "from typing import Iterator"]
 
@@ -105,7 +132,7 @@ class WZProject():
 class WZField():
     """webezyio field level object that defines the required meta data properties."""
 
-    def __init__(self, name, type: _FIELD_TYPES, label: _FIELD_LABELS, message_type=None, enum_type=None, extensions=None, description=None) -> None:
+    def __init__(self, name, type: _FIELD_TYPES, label: _FIELD_LABELS, message_type=None, enum_type=None, extensions=None, description=None, key_type=None, value_type=None, oneof_fields=[]) -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.FieldDescriptor` representation.
 
         Parameters
@@ -128,6 +155,10 @@ class WZField():
         self._enum_type = enum_type
         self._extensions = extensions
         self._description = description
+        self._key_type = key_type
+        self._value_type = value_type
+        self._oneof_fields = oneof_fields
+
 
     def setName(self, name):
         self._name = name
@@ -160,6 +191,7 @@ class WZField():
                                 bool_value=dict(self.__dict__)[k][j])
             else:
                 temp[k[1:]] = dict(self.__dict__)[k]
+
 
         return temp
 
@@ -594,6 +626,31 @@ class WZProto():
                         fType = f.get('messageType')
                     elif fType == 'enum':
                         fType = f.get('enumType')
+                    elif fType == 'map':
+                        keyType = f.get('keyType').split('_')[-1].lower()
+                        valueType = f.get('valueType').split('_')[-1].lower() if f.get('valueType') != 'TYPE_MESSAGE' else f.get('messageType') if f.get('valueType') == 'TYPE_MESSAGE' else f.get('enumType') if f.get('valueType') == 'TYPE_ENUM' else None
+                        if valueType is None:
+                            pretty.print_error("Value type for 'map' is not valid ! {0}".format(f.get('valueType')))
+                        else:
+                            fType = 'map<{0}, {1}>'.format(keyType,valueType)
+                    elif fType == 'oneof':
+                        field_name = f.get('name')
+                        oneof_fields = []
+                        
+                        for oneof_field in f.get('oneofFields'):
+                            if oneof_field.get('fieldType') == 'TYPE_MESSAGE':
+                                oneof_field_type = oneof_field.get('messageType')
+                            elif oneof_field.get('fieldType') == 'TYPE_ENUM':
+                                oneof_field_type = oneof_field.get('enumType')
+                            else:
+                                oneof_field_type = oneof_field.get('fieldType').split('_')[-1].lower()
+                            
+                            oneof_field_name = oneof_field.get('name')
+                            oneof_field_index = oneof_field.get('index') if oneof_field.get('index') is not None else 1
+                            oneof_fields.append(f'\n\t\t{oneof_field_type} {oneof_field_name} = {oneof_field_index};')
+                        oneof_fields = ''.join(oneof_fields)
+                        fType = f'oneof {field_name} {_OPEN_BRCK}\n{oneof_fields}\n\t{_CLOSING_BRCK}'
+                    
                     fName = f.get('name')
                     fIndex = f.get('index')
                     fOptions = []
@@ -642,8 +699,12 @@ class WZProto():
                         fDesc = f'// [webezyio] - {fDesc}\n\t\t' if fDesc is not None else ''
                     else:
                         fDesc = f'// [webezyio] - {fDesc}\n\t' if fDesc is not None else ''
-                    fields.append(
-                        f'{fDesc}{fLabel}{fType} {fName} = {fIndex}{fOptions};')
+                    if f.get('fieldType') == 'TYPE_ONEOF':
+                        fields.append(
+                            f'{fDesc}{fType}')
+                    else:
+                        fields.append(
+                            f'{fDesc}{fLabel}{fType} {fName} = {fIndex}{fOptions};')
 
                 if ext_type == 'FieldOptions':
                     fields = '\n\t\t'.join(fields)
@@ -1078,3 +1139,24 @@ def enum_value_validate(answers, current):
         raise errors.ValidationError(
             current, reason='Enum Value MUST be an integer value')
     return True
+
+def send_analytic_event(args):
+    stub = webezycore()
+    ts = Timestamp()
+    ts.GetCurrentTime()
+    temp_args = []
+    for k in args.__dict__:
+        temp_args.append(str((k,args.__dict__[k])))
+    # hostname=socket.gethostname() 
+    try:
+        stub.PublishCLIEvent(
+        WebezyAnalytics_pb2.CLIEvent(
+            version=__version__.__version__,
+            ts=ts,
+            args=temp_args,
+            os=platform(),
+            user_id='UNKNWON' if config.token is None else config.token
+            ))
+    except Exception as e:
+        pretty.print_warning(e)
+    

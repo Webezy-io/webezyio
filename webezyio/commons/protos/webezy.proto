@@ -139,6 +139,7 @@ message Enum {
 }
 
 message FieldDescriptor {
+
     enum Label {
         // 0 is reserved for errors
         LABEL_UNKNOWN = 0;
@@ -146,6 +147,7 @@ message FieldDescriptor {
         LABEL_REQUIRED = 2;
         LABEL_REPEATED = 3;
     }
+
     enum Type {
         // 0 is reserved for errors.
         TYPE_UNKNOWN = 0;
@@ -178,6 +180,8 @@ message FieldDescriptor {
         TYPE_SFIXED64 = 16;
         TYPE_SINT32 = 17;  // Uses ZigZag encoding.
         TYPE_SINT64 = 18;  // Uses ZigZag encoding.
+        TYPE_MAP = 19;
+        TYPE_ONEOF = 20;
       }
     string uri = 1;
     string name = 2;
@@ -192,6 +196,9 @@ message FieldDescriptor {
     optional string message_type = 10;
     map<string, google.protobuf.Value> extensions = 11;
     optional string description = 12;
+    optional Type key_type = 13;
+    optional Type value_type = 14;
+    repeated FieldDescriptor oneof_fields = 15;
 }   
 
 enum Options{

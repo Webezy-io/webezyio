@@ -245,6 +245,26 @@ class WebezyBuilder:
                    server, compile, readme, protoclass, clients, postbuild, package]
         return results
 
+    def BuildOnlyProtos(self):
+        prebuild = self.PreBuild()
+        init = self.InitProjectStructure()
+        context = self.RebuildContext()
+        protos = self.BuildProtos()
+        results = [prebuild, init, context, protos]
+        return results
+
+    def BuildOnlyCode(self):
+        services = self.BuildServices()
+        server = self.BuildServer()
+        compile = self.CompileProtos()
+        readme = self.WriteReadme()
+        protoclass = self.OverrideGeneratedClasses()
+        clients = self.BuildClients()
+        postbuild = self.PostBuild()
+        package = self.PackageProject()
+        results = [services, server, compile, readme, protoclass, clients, postbuild, package]
+        return results
+
     @property
     def WZJson(self):
         return self._webezy_json

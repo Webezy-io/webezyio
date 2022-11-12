@@ -1,3 +1,24 @@
+# Copyright (c) 2022 Webezy.io.
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import logging
 import os
 import sys
@@ -57,6 +78,7 @@ class ResourceKinds(Enum):
     file_java = 'Webezy.file/java'
     method = 'Webezy.descriptor/method'
     field = 'Webezy.descriptor/field'
+    oneof_field = 'Webezy.descriptor/oneof_field'
     message = 'Webezy.descriptor/message'
     enum = 'Webezy.descriptor/enum'
     enum_value = 'Webezy.descriptor/enum_value'
@@ -73,6 +95,8 @@ fields_opt = [
     WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_MESSAGE),
     WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_BYTES),
     WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_ENUM),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_ONEOF),
+    WZFieldDescriptor.Type.Name(WZFieldDescriptor.Type.TYPE_MAP),
 ]
 field_label = [
     WZFieldDescriptor.Label.Name(WZFieldDescriptor.Label.LABEL_OPTIONAL),
@@ -184,13 +208,29 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                 else:
                     msg_type = f.get('message_type')
             f_uri = get_uri_field(path, f_fName)
-                
+            fields_oneof = []
+            if f.get('oneof_fields'):
+                for f_oneof in f.get('oneof_fields'):
+                    f_oneof_full_name = get_oneof_field_full_name(domain=domain,package=package.name,message=name,parent_field=f.get('name'),name=f_oneof.get('name'))
+                    f_oneof_uri = get_uri_oneof_field(path, f_oneof_full_name)
+                    fields_oneof.append(WZFieldDescriptor(uri=f_oneof_uri,
+                        name=f_oneof.get('name'),
+                        full_name=f_oneof_full_name,
+                        description=f_oneof.get('description'),
+                        index=index,
+                        field_type=f_oneof.get('fieldType') if f_oneof.get('fieldType') is not None else f_oneof.get('field_type'),
+                        enum_type=f_oneof.get('enumType') if f_oneof.get('enumType') is not None else f_oneof.get('enum_type'),
+                        type=ResourceTypes.descriptor.value,
+                        kind=ResourceKinds.oneof_field.value,
+                        message_type=f_oneof.get('messageType')  if f_oneof.get('messageType') is not None else f_oneof.get('message_type')))
+                    index += 1
+
             temp_fields.append(WZFieldDescriptor(uri=f_uri, name=f.get('name'), full_name=f_fName,
                                                  description=f.get(
                                                      'description'),
                                                  index=index, field_type=f.get(
                                                      'field_type'),
-                                                 label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions')))
+                                                 label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions'),key_type=f.get('key_type'),value_type=f.get('value_type'),oneof_fields=fields_oneof))
         else:
             logging.error(
                 f"Connot insert field {f.get('name')} already exists under {name} message")
@@ -334,6 +374,8 @@ def get_uri_enum_value(path, full_name):
 def get_uri_field(path, full_name):
     return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.field, full_name)
 
+def get_uri_oneof_field(path, full_name):
+    return construct_uri(path, ResourceTypes.descriptor, ResourceKinds.oneof_field, full_name)
 
 def construct_uri(path, resource_type: ResourceTypes, resource_kind: ResourceKinds, full_name=None):
     uri = 'unknown'
@@ -370,6 +412,9 @@ def construct_uri(path, resource_type: ResourceTypes, resource_kind: ResourceKin
         # Field
         elif resource_kind == ResourceKinds.field:
             uri = f'{path}/fields/{full_name}'
+        # Oneof Field
+        elif resource_kind == ResourceKinds.oneof_field:
+            uri = f'{path}/oneof_field/{full_name}'
 
     return uri
 
@@ -389,10 +434,11 @@ def get_method_full_name(name):
 def get_message_full_name(domain, package, name):
     return construct_full_name(ResourceTypes.descriptor, ResourceKinds.message, domain, parent_name=package, name=name)
 
-
 def get_field_full_name(domain, package, message, name):
     return construct_full_name(ResourceTypes.descriptor, ResourceKinds.field, domain, parent_name=[package, message], name=name)
 
+def get_oneof_field_full_name(domain, package, message,parent_field, name):
+    return construct_full_name(ResourceTypes.descriptor, ResourceKinds.oneof_field, domain, parent_name=[package, message, parent_field], name=name)
 
 def get_enum_full_name(domain, package, enum):
     return construct_full_name(ResourceTypes.descriptor, ResourceKinds.enum, domain, parent_name=package, name=enum)
@@ -427,6 +473,9 @@ def construct_full_name(resource_type: ResourceTypes, resource_kind: ResourceKin
         # Field
         elif resource_kind == ResourceKinds.field:
             full_name = f'{domain}.{parent_name[0]}.{version}.{parent_name[1]}.{name}'
+        # Oneof Field
+        elif resource_kind == ResourceKinds.oneof_field:
+            full_name = f'{domain}.{parent_name[0]}.{version}.{parent_name[1]}.{parent_name[2]}.{name}'
 
     return full_name
 
