@@ -672,7 +672,7 @@ def template_commands(args):
                         file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True,force=True)
                         print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                         exit(1)
-                if '.proto' in args.path:
+                elif '.proto' in args.path:
                     parse = parser.WebezyParser(path=args.path)
                     print(parse)
                 else:

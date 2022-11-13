@@ -224,7 +224,6 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                         kind=ResourceKinds.oneof_field.value,
                         message_type=f_oneof.get('messageType')  if f_oneof.get('messageType') is not None else f_oneof.get('message_type')))
                     index += 1
-
             temp_fields.append(WZFieldDescriptor(uri=f_uri, name=f.get('name'), full_name=f_fName,
                                                  description=f.get(
                                                      'description'),
