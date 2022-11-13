@@ -23,10 +23,11 @@ import grpc
 import sys
 from functools import partial
 
+from webezyio.commons.pretty import print_info
+
 class WebezyioClient:
 
     def __init__(self, service_module, stub_name, host, port, timeout=10):
-        print(service_module.__file__)
         channel = grpc.insecure_channel('{0}:{1}'.format(host, port))
         try:
             grpc.channel_ready_future(channel).result(timeout=10)

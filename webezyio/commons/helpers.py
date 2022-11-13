@@ -22,6 +22,7 @@
 import logging
 import os
 import re
+import socket
 from typing import List, Literal
 from webezyio import __version__,config
 
@@ -1145,17 +1146,21 @@ def send_analytic_event(args):
     ts = Timestamp()
     ts.GetCurrentTime()
     temp_args = []
-    for k in args.__dict__:
-        temp_args.append(str((k,args.__dict__[k])))
-    # hostname=socket.gethostname() 
+    if hasattr(args, '__dict__'):
+        for k in args.__dict__:
+            temp_args.append(str((k,args.__dict__[k])))
+    else:
+        temp_args = [str((k, v)) for k, v in args.items()]
+    hostname=socket.gethostname() 
+    # pretty.print_info(temp_args)
     try:
         stub.PublishCLIEvent(
         WebezyAnalytics_pb2.CLIEvent(
             version=__version__.__version__,
             ts=ts,
             args=temp_args,
-            os=platform(),
-            user_id='UNKNWON' if config.token is None else config.token
+            os=platform() if hasattr(config,'token') == False else config.token.split(':')[0], 
+            user_id='UNKNWON:'+hostname if hasattr(config,'token') == False else config.token+':'+hostname
             ))
     except Exception as e:
         pretty.print_warning(e)
