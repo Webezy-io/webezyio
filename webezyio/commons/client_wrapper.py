@@ -22,11 +22,11 @@
 import grpc
 import sys
 from functools import partial
+from webezyio.commons import pretty
 
 class WebezyioClient:
 
     def __init__(self, service_module, stub_name, host, port, timeout=10):
-        print(service_module.__file__)
         channel = grpc.insecure_channel('{0}:{1}'.format(host, port))
         try:
             grpc.channel_ready_future(channel).result(timeout=10)
@@ -46,7 +46,7 @@ class WebezyioClient:
                 args[2], **kwargs, timeout=self.timeout
             )
         except grpc.RpcError as e:
-            print('Call {0} failed with {1}'.format(
+            pretty.print_error('Call {0} failed with {1}'.format(
                 args[1], e.code())
             )
             raise

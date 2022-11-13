@@ -37,7 +37,11 @@ def parse_wz_json():
 
 def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     opt_template = wz_json._config.get('template')
-    opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
+    opts = None
+    if opt_template is None:
+        print_warning("Couldnt find webezy.config.template object at webezy.json file")
+    else:
+        opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
     print_info("Generating template from [{0}] project:\n\t- {1}".format(wz_json.project.get('name'),opts))
     host = wz_json._config.get('host')
     port = wz_json._config.get('port')
@@ -197,7 +201,19 @@ def create_fields(messages):
                               label=\'{2}\',\n\
                               type=\'{3}\',\n\
                               message_type={6},\n\
-                              enum_type={5})\n'.format(f.get('name'),str(f.get('description')).replace("'",'"'),f.get('label'),f.get('fieldType'),f.get('fullName').replace('.','_'),'_DOMAIN+\'.{}\''.format('.'.join(f.get('enumType').split('.')[1:])) if f.get('enumType') is not None else None,'{}'.format(temp_msg_type))
+                              enum_type={5},\n\
+                              key_type={7},\n\
+                              value_type={8},\n\
+                              oneof_fields=None # Not supporting templating with oneof_fields !\n)\n'.format(
+                                  f.get('name'),
+                                  str(f.get('description')).replace("'",'"'),
+                                  f.get('label'),
+                                  f.get('fieldType'),
+                                  f.get('fullName').replace('.','_'),
+                                  '_DOMAIN+\'.{}\''.format('.'.join(f.get('enumType').split('.')[1:])) if f.get('enumType') is not None else None,
+                                  '{}'.format(temp_msg_type),
+                                  '\'{0}\''.format(f.get('keyType')) if f.get('keyType') is not None else None,
+                                  '\'{0}\''.format(f.get('valueType')) if f.get('valueType') is not None else None)
             fields[m.get('fullName')].append((f.get('fullName').replace('.','_'),field))
 
     code = ''

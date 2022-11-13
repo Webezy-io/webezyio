@@ -20,10 +20,13 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from datetime import datetime
+from importlib import reload
+import importlib
 import logging
 import argparse
 import os
 from platform import platform
+import sys
 import inquirer
 from inquirer import errors
 import re
@@ -33,10 +36,10 @@ from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import helpers,file_system,errors,resources, parser
+from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
-from webezyio.cli.commands import new,build,generate,ls,package as pack,run,edit,template
+from webezyio.cli.commands import call, new,build,generate,ls,package as pack,run,edit,template
 from pathlib import Path
 
 _TEMPLATES = ['@webezyio/Blank']
@@ -132,16 +135,22 @@ def main(args=None):
     if config.first_run:
         analytic = inquirer.prompt([inquirer.Confirm('analytic',default=True,message='We want to gather some basic usage and bug report while you are using webezyio CLI')],theme=WebezyTheme())
         p = Path(__file__).parents[1]
-        config_file = ''.join(file_system.rFile(file_system.join_path(p,'config.py')))
-        if analytic is not None and analytic.get('analytic'):
-            config_file = config_file.replace('analytics=False','analytics=True')
         hash_token=platform()+':'+datetime.today().isoformat()
+
+        config_file = ''.join(file_system.rFile(file_system.join_path(p,'config.py')))
         if 'token=' not in config_file:
             config_file +='\ntoken="{0}"'.format(hash_token)
             log.debug('Token already exists on current installation')
+       
+        file_system.wFile(file_system.join_path(p,'config.py'),content=config_file,overwrite=True)
+        if analytic is None or analytic.get('analytic') == False:
+            reload(config)
+            helpers.send_analytic_event({'DisabledAnalytic':hash_token})
+            config_file = config_file.replace('analytics=True','analytics=False')
+        else:
+            config_file = config_file.replace('analytics=False','analytics=True')
         config_file = config_file.replace('first_run=True','first_run=False')
         file_system.wFile(file_system.join_path(p,'config.py'),content=config_file,overwrite=True)
-
 
     """Main CLI processing, with argpars package.
     """
@@ -251,6 +260,16 @@ def main(args=None):
     parser_build.add_argument('--protos',action='store_true', help='Build resources protos files only')
     parser_build.add_argument('--code',action='store_true', help='Build resources code classes files only')
 
+    """Call command"""
+    parser_call = subparsers.add_parser(
+        'call', help='Call a RPC')
+    parser_call.add_argument('service', help='Service full path')
+    parser_call.add_argument('rpc', help='RPC name')
+    parser_call.add_argument('--debug',action='store_true', help='Debug the call process')
+    parser_call.add_argument('--host',default='localhost', help='Pass a host of service')
+    parser_call.add_argument('--port',default=50051, help='Pass a port for service')
+
+
     """Run server"""
     parser.add_argument(
         '--run-server',action='store_true', help='Run server on current active project')
@@ -286,7 +305,6 @@ def main(args=None):
     log.debug(args)
 
     if config.analytics:
-        log.debug('sending analytic event')
         helpers.send_analytic_event(args)
 
     # Logging version
@@ -426,6 +444,18 @@ def main(args=None):
                         edit.edit_rpc(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
             elif hasattr(args, 'path'):
                 template_commands(args)
+            elif hasattr(args, 'service') and hasattr(args, 'rpc'):
+                call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug)
+                # if file_system.get_current_location() not in sys.path:
+                #     sys.path.append(file_system.get_current_location())
+                # path = args.service.replace('/','.').replace('.py','')
+                # stub_name = path.split('.')[-1].replace('_pb2_grpc','')+'Stub'
+                # rpc = args.rpc
+                # print_info(f'{path = } {rpc = }')
+                # service_module = importlib.import_module(path)
+                # stub = client_wrapper.WebezyioClient(service_module,stub_name,'localhost',50051)
+                # response = getattr(stub, rpc)()
+                # print_info(f'{response = }')
             else:
                 if hasattr(args, 'full_name'):
                     if args.full_name is None:
@@ -642,7 +672,7 @@ def template_commands(args):
                         file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True,force=True)
                         print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
                         exit(1)
-                if '.proto' in args.path:
+                elif '.proto' in args.path:
                     parse = parser.WebezyParser(path=args.path)
                     print(parse)
                 else:
