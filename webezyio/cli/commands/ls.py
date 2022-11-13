@@ -83,45 +83,61 @@ def list_by_resource(type,webezy_json:WZJson):
         tab = PrettyTable(header)
         header = ['RPC','Type','Input','Output']
         tab_rpcs = PrettyTable(header)
-        for svc in webezy_json.services:
-            service=webezy_json.services[svc]
-            for rpc in service.get('methods'):
-                add_rpc_desc(tab_rpcs,rpc)
-            add_service_desc(tab,service)
-        print_info(tab,True,'Listing services resources')
+        if webezy_json.services is not None:
+            for svc in webezy_json.services:
+                service=webezy_json.services[svc]
+                if service.get('methods') is not None:
+                    for rpc in service.get('methods'):
+                        add_rpc_desc(tab_rpcs,rpc)
+                add_service_desc(tab,service)
+            print_info(tab,True,'Listing services resources')
+        else:
+            print_warning("No services under {}".format(webezy_json.project.get('packageName')))
     
     # Packages list
     elif type == 'package':
         header = ['Package','Messages','Enums','Dependencies']
         tab = PrettyTable(header)
-        for pkg in webezy_json.packages:
-            pkg = webezy_json.packages[pkg]
-            tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
-        print_info(tab,True,'Listing packages resources')
-    
+        if webezy_json.packages is not None:
+
+            for pkg in webezy_json.packages:
+                pkg = webezy_json.packages[pkg]
+                tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
+            print_info(tab,True,'Listing packages resources')
+        else:
+            print_warning("No packages under {}".format(webezy_json.project.get('packageName')))
+
     # Messages List
     elif type == 'message':
         header = ['Message','Fields','Package']
         tab = PrettyTable(header)
-        for pkg in webezy_json.packages:
-            package = webezy_json.packages[pkg]
-            for m in package['messages']:
-                tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []), package.get('package') ])
-        print_info(tab,True,'Listing packages resources')
-    
+        if webezy_json.packages is not None:
+            for pkg in webezy_json.packages:
+                package = webezy_json.packages[pkg]
+                if package.get('messages'):
+                    for m in package['messages']:
+                        tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []), package.get('package') ])
+            print_info(tab,True,'Listing packages resources')
+        else:
+            print_warning("No packages under {}".format(webezy_json.project.get('packageName')))
+
     # RPC's List
     elif type == 'rpc':
         header = ['RPC','Type','Input','Output']
         tab_rpcs = PrettyTable(header)
-        for svc in webezy_json.services:
-            service = webezy_json.services[svc]
-            for rpc in service.get('methods'):
-                add_rpc_desc(tab_rpcs,rpc)
-        print_info(tab_rpcs,True,'Listing RPC\'s')
-
+        if webezy_json.services is not None:
+            for svc in webezy_json.services:
+                service = webezy_json.services[svc]
+                for rpc in service.get('methods'):
+                    add_rpc_desc(tab_rpcs,rpc)
+            print_info(tab_rpcs,True,'Listing RPC\'s')
+        else:
+            print_warning("No services under {}".format(webezy_json.project.get('packageName')))
+    
     # Not supported listing ALL resources
     else:
-        print_warning("Listing '{0}' not supported yet".format(type))
+        if type is not None:
+            print_warning("Listing '{0}' not supported yet".format(type))
         list_all(webezy_json)
 
 def list_all(webezy_json:WZJson):
@@ -139,43 +155,51 @@ def list_all(webezy_json:WZJson):
         for svc in webezy_json.services:
             service=webezy_json.services[svc]
             add_service_desc(tab,service)
-
-            for rpc in service.get('methods'):
-                add_rpc_desc(tab_rpcs,rpc)
-
+            if service.get('methods') is not None:
+                for rpc in service.get('methods'):
+                    add_rpc_desc(tab_rpcs,rpc)
+    
         print_info(tab,True,'Listing services resources')
         print_info(tab_rpcs,True,'Listing RPC\'s')
     
     # Packages list
     header = ['Package','Messages','Enums','Dependencies']
     tab = PrettyTable(header)
-    
-    for pkg in webezy_json.packages:
-        pkg = webezy_json.packages[pkg]
-        add_package_desc(tab,pkg)
-    
+    if webezy_json.packages is not None:
+        for pkg in webezy_json.packages:
+            pkg = webezy_json.packages[pkg]
+            add_package_desc(tab,pkg)
+    else:
+        print_warning("No packages on project")
+
     print_info(tab,True,'Listing packages resources')
 
     # Messages List
     header = ['Message','Fields','Package']
     tab = PrettyTable(header)
-    
-    for pkg in webezy_json.packages:
-        package = webezy_json.packages[pkg]
-        for m in package['messages']:
-            add_message_desc(tab,m,package)
+
+    if webezy_json.packages is not None:
+        for pkg in webezy_json.packages:
+            package = webezy_json.packages[pkg]
+            for m in package['messages']:
+                add_message_desc(tab,m,package)
+    else:
+        print_warning("No packages on project")
     
     print_info(tab,True,'Listing packages messages')
     
     # Enums list
     header = ['Enum','Values','Package']
     tab = PrettyTable(header)
-    for pkg in webezy_json.packages:
-        package = webezy_json.packages[pkg]
-        if package.get('enums'):
+    if webezy_json.packages is not None:
+        for pkg in webezy_json.packages:
+            package = webezy_json.packages[pkg]
+            if package.get('enums'):
 
-            for e in package['enums']:
-                add_enum_desc(tab,e,package)
+                for e in package['enums']:
+                    add_enum_desc(tab,e,package)
+    else:
+        print_warning("No packages on project")
     print_info(tab,True,'Listing packages enums')
 
 
