@@ -41,6 +41,7 @@ webezyio/cli/main.py
 webezyio/cli/theme.py
 webezyio/cli/commands/__init__.py
 webezyio/cli/commands/build.py
+webezyio/cli/commands/call.py
 webezyio/cli/commands/edit.py
 webezyio/cli/commands/generate.py
 webezyio/cli/commands/ls.py
