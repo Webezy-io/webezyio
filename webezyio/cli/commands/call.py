@@ -26,12 +26,12 @@ from webezyio.commons import client_wrapper
 from webezyio import _helpers,_fs,_pretty
 import sys,importlib
 from google.protobuf.timestamp_pb2 import Timestamp
-from webezyio.commons.pretty import print_info
+import time
 
 _supported_types = ['TYPE_STRING','TYPE_MESSAGE','TYPE_BOOL','TYPE_INT32','TYPE_INT64','TYPE_FLOAT','TYPE_DOUBLE']
 
-def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson,host:str='localhost',port:int=50051):
-    
+def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson,host:str='localhost',port:int=50051,debug:bool=False):
+
     # Check if root directory is in current path
     if _fs.get_current_location() not in sys.path:
         sys.path.append(_fs.get_current_location())
@@ -49,7 +49,7 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
         _pretty.print_error("Error RPC : \"{0}\", is not found under service -> [{1}]".format(rpc,service_name))
         exit(1)
 
-    _pretty.print_info(f'calling {path = } [{stub_name}] -> {rpc = } [{rpc_full_name}]')
+    _pretty.print_info(f'calling {path = } [{stub_name}]\n\t-> {rpc  = } [{rpc_full_name}]\n\t-> {host = }\n\t-> {port = }')
     
     # Dynamic import module (Only supporting clients proto modules)
     service_module = importlib.import_module(path)
@@ -62,6 +62,7 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
     input_message_name = rpc_description['inputType'].split('.')[-1]
     
     input_message_description = wz_json.get_message(rpc_description['inputType'])
+    output_message_description = wz_json.get_message(rpc_description['outputType'])
 
     # Get modules objects
     package_proto = getattr(service_module,input_package_name+'__pb2')
@@ -80,7 +81,7 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
         if seed_data.get('seed') == True:
             for f in input_message_description['fields']:
 
-                if f['fieldType'] in _supported_types:
+                if f['fieldType'] in _supported_types and f['label'] == 'LABEL_OPTIONAL':
                     if f['fieldType'] == 'TYPE_STRING':
                         setattr(msg,f['name'],'Test')
                     elif f['fieldType'] == 'TYPE_BOOL':
@@ -93,6 +94,11 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
                         if f['messageType'] == 'google.protobuf.Timestamp':
                             ts = getattr(msg,f['name'])
                             getattr(ts,'GetCurrentTime')()
+                        elif f['messageType'] == 'google.protobuf.Struct':
+                            struct = getattr(msg,f['name'])
+                            getattr(struct,'update')({'test':'struct'})
+                        elif wz_json.get_message(f['messageType']) is not None:
+                            _pretty.print_info(f['messageType'])
 
         # User input message
         else:
@@ -123,17 +129,41 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
             for k in fields:
                 setattr(msg,k,fields[k])
 
-    _pretty.print_info(msg,True)
+    _pretty.print_info(msg,True,'Request Object [{0}]'.format(input_message_description['fullName']))
     # TODO allow support for UNARY / STREAM
-   
+    # get the start time
+    if debug:
+        st = time.time()    
     try:
-        
         response = getattr(stub, rpc)(msg)
-        _pretty.print_info(f'{response = }')
-        
-        for i in response:
-            print_info(i,True)
+        _pretty.print_info('Waiting for server response... [{0}]'.format(output_message_description['fullName']))
+        if debug:
+            # get the end time
+            et = time.time()
+            # get the execution time
+            elapsed_time = et - st
+            if elapsed_time < 1:
+                elapsed_time = elapsed_time * 1000
+                _pretty.print_note('Execution time: {:.2f} ms.'.format(elapsed_time))
+            else:
+                _pretty.print_note('Execution time: {:.2f} sec.'.format(elapsed_time))
+            _pretty.print_note('Response size: {}'.format(sys.getsizeof(response)))
+        try:
+            for i in response:
+                _pretty.print_info(i,True)
+        except:
+            _pretty.print_info(f'{response = }')
 
     except Exception as e:
+        if debug:
+            # get the end time
+            et = time.time()
+            # get the execution time
+            elapsed_time = et - st
+            if elapsed_time < 1:
+                elapsed_time = elapsed_time * 1000
+                _pretty.print_note('Execution time: {:.2f} ms.'.format(elapsed_time))
+            else:
+                _pretty.print_note('Execution time: {:.2f} sec.'.format(elapsed_time))  
+            
         _pretty.print_error(e,True)
-    

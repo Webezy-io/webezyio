@@ -22,8 +22,7 @@
 import grpc
 import sys
 from functools import partial
-
-from webezyio.commons.pretty import print_info
+from webezyio.commons import pretty
 
 class WebezyioClient:
 
@@ -47,7 +46,7 @@ class WebezyioClient:
                 args[2], **kwargs, timeout=self.timeout
             )
         except grpc.RpcError as e:
-            print('Call {0} failed with {1}'.format(
+            pretty.print_error('Call {0} failed with {1}'.format(
                 args[1], e.code())
             )
             raise

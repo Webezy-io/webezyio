@@ -265,6 +265,9 @@ def main(args=None):
         'call', help='Call a RPC')
     parser_call.add_argument('service', help='Service full path')
     parser_call.add_argument('rpc', help='RPC name')
+    parser_call.add_argument('--debug',action='store_true', help='Debug the call process')
+    parser_call.add_argument('--host',default='localhost', help='Pass a host of service')
+    parser_call.add_argument('--port',default=50051, help='Pass a port for service')
 
 
     """Run server"""
@@ -442,7 +445,7 @@ def main(args=None):
             elif hasattr(args, 'path'):
                 template_commands(args)
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
-                call.CallRPC(args.service,args.rpc,WEBEZY_JSON)
+                call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug)
                 # if file_system.get_current_location() not in sys.path:
                 #     sys.path.append(file_system.get_current_location())
                 # path = args.service.replace('/','.').replace('.py','')
