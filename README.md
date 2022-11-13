@@ -247,6 +247,41 @@ optional arguments:
 See [Service Templating Section](#service-templating) for more information.
 
 
+## wz call
+Call a service RPC for a running server host
+```sh
+positional arguments:
+  service      Service full path
+  rpc          RPC name
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --debug      Debug the call process
+  --host HOST  Pass a host of service
+  --port PORT  Pass a port for service
+```
+For e.x if we want to run a service RPC called "GetUnary" in Service "Test"
+we would pass the following command:
+
+```sh
+wz call clients/python/Test_pb2_grpc.py GetUnary
+```
+Not that we passed the relative path from the root directory of the project to the service module under "clients" directory and we used the python client module.
+
+Which will require us to verify we have attached and built a service client in `python`
+If you didnt started your prject with `Python` client add the following configuration under `project`.`clients` Array in `webezy.json` file located on your project root directory:
+```json
+{
+  "outDir": "<path-to-project>/clients/python",
+  "language": "python"
+}
+```
+
+Then make sure you re-built the project code so the client modules will be created properly:
+```sh
+wz build
+```
+
 # Understanding Webezy.io
 While it is not nesscesary step to get you started we do recommend to invest few minutes to read an overview of how `Webezy.io` Built and utulizing gRPC, this high level overview will make you approach some scenarios more easly.
 
