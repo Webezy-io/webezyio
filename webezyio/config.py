@@ -7,7 +7,17 @@
                                    |___/              .configs
 
 webezyio cli module configuration"""
+# Supported builtins templates
+webezyio_templates = [
+    "@webezyio/Blank",
+    "@webezyio/SamplePy",
+    "@webezyio/SampleTs",
+    "@webezyio/PubSubTs",
+    "@webezyio/HelloWorldPy",
+    "@webezyio/HelloWorldTs"
+]
 # Analytic gathering approval
-analytics=True
+analytics=False
 # First run flag
-first_run=True
+first_run=False
+token="macOS-12.6-arm64-arm-64bit:2022-11-14T22:34:39.671501"

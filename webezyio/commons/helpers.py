@@ -23,8 +23,10 @@ import logging
 import os
 import re
 import socket
+import subprocess
 from typing import List, Literal
 from webezyio import __version__,config
+from webezyio.commons import file_system
 
 from webezyio.core import webezycore,WebezyAnalytics_pb2
 from webezyio.commons import errors, pretty
@@ -1166,4 +1168,23 @@ def send_analytic_event(args):
             ))
     except Exception as e:
         pretty.print_warning(e)
-    
+
+_BUILTINS_TEMPLATES = Literal[
+    "@webezyio/Blank",
+    "@webezyio/SamplePy",
+    "@webezyio/SampleTs",
+    "@webezyio/PubSubTs",
+    "@webezyio/HelloWorldPy",
+    "@webezyio/HelloWorldTs"]
+
+def attach_template(ARCHITECT,template:_BUILTINS_TEMPLATES):
+    if template != '@webezyio/Blank':
+        file_dir = os.path.dirname(__file__)
+        template_domain_name = template.split('/')[0].split('@')[-1]
+        template_name = template.split('/')[-1]
+        print(file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name))
+        print(file_system.get_current_location())
+        os.chdir(ARCHITECT._path.split('webezy.json')[0])
+        print(file_system.get_current_location())
+
+        subprocess.run(['python',file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--domain',ARCHITECT._domain,'--project-name',ARCHITECT._project_name])

@@ -447,7 +447,10 @@ def main(args=None):
                     elif kind == resources.ResourceKinds.method.value:
                         edit.edit_rpc(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
             elif hasattr(args, 'path'):
-                template_commands(args)
+                ARCHITECT = WebezyArchitect(
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
+                print_info(ARCHITECT._project)
+                template_commands(args,WEBEZY_JSON,ARCHITECT)
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
                 call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug,timeout=int(args.timeout))
                 # if file_system.get_current_location() not in sys.path:
@@ -649,47 +652,69 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
 
     return namespace, questions
 
-def template_commands(args):
-    if args.list:
-        for temp in _TEMPLATES:
-            print_info(temp)
-    else:
-        if file_system.check_if_file_exists(args.path):
-            if args.load:
-                template.load_template(args.path)
-            else:
-                if 'webezy.json' in args.path:
-                    WEBEZY_JSON = file_system.rFile(args.path, json=True)
-                    WEBEZY_JSON = helpers.WZJson(webezy_json=WEBEZY_JSON)
-                    filename = WEBEZY_JSON.project.get('packageName') if args.template_name is None else args.template_name
-                    save_file_location = args.path.replace('webezy.json','{0}.template.py'.format(filename)) if args.out_path is None else file_system.join_path(args.out_path,'{0}.template.py'.format(filename))
-                    if WEBEZY_JSON._config.get('template') is not None:
-                        filename = filename if WEBEZY_JSON._config.get('template').get('name') is None else WEBEZY_JSON._config.get('template').get('name')
-                        save_file_location = save_file_location if WEBEZY_JSON._config.get('template').get('outPath') is None else file_system.join_path(WEBEZY_JSON.path.replace('webezy.json',''),WEBEZY_JSON._config.get('template').get('outPath'),'{0}.template.py'.format(filename))
-                    parent_path = file_system.join_path(file_system.get_current_location(),os.path.dirname(save_file_location))
-                    include_code = args.code if WEBEZY_JSON._config.get('template') is None else WEBEZY_JSON._config.get('template').get('includeCode') if  WEBEZY_JSON._config.get('template').get('includeCode') is not None else False
-                    if file_system.check_if_dir_exists(parent_path):
-                        file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True)
-                        print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
-                    else:
-                        print_warning("Path to template output path does not exist ! [{0}] - Will try to create the sub-dir".format(save_file_location))                        
-                        file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True,force=True)
-                        print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
-                        exit(1)
-                elif '.proto' in args.path:
-                    parse = parser.WebezyParser(path=args.path)
-                    print(parse)
-                else:
-                    if file_system.check_if_dir_exists(args.path):
-                        builder = WebezyBuilder(path=file_system.get_current_location(),hooks=[WebezyMigrate])
-                        builder.PreBuild()
-                        print_info(file_system.join_path(file_system.get_current_location(),args.path))
-                        builder.ParseProtosToResource(project_name="test",protos_dir=file_system.join_path(file_system.get_current_location(),args.path),clients=[],server_language="python")
-                        builder.PostBuild()
-                        raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
-                    else:
-                        raise errors.WebezyProtoError("Export Service Template Error","File type not supported")
-        elif file_system.check_if_dir_exists(args.path):
-            raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
+def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
+    try:
+        if args.list:
+            for temp in _TEMPLATES:
+                print_info(temp)
         else:
-            raise errors.WebezyProtoError("Export Service Template Error","Make sure you are passing a valid path to webezy.json / protos directory / webezy.template.py script for WebezyArchitect")
+            if file_system.check_if_file_exists(args.path):
+                if args.load:
+                    template.load_template(args.path)
+                else:
+                    if 'webezy.json' in args.path:
+                        WEBEZY_JSON = file_system.rFile(args.path, json=True)
+                        WEBEZY_JSON = helpers.WZJson(webezy_json=WEBEZY_JSON)
+                        filename = WEBEZY_JSON.project.get('packageName') if args.template_name is None else args.template_name
+                        save_file_location = args.path.replace('webezy.json','{0}.template.py'.format(filename)) if args.out_path is None else file_system.join_path(args.out_path,'{0}.template.py'.format(filename))
+                        if WEBEZY_JSON._config.get('template') is not None:
+                            filename = filename if WEBEZY_JSON._config.get('template').get('name') is None else WEBEZY_JSON._config.get('template').get('name')
+                            save_file_location = save_file_location if WEBEZY_JSON._config.get('template').get('outPath') is None else file_system.join_path(WEBEZY_JSON.path.replace('webezy.json',''),WEBEZY_JSON._config.get('template').get('outPath'),'{0}.template.py'.format(filename))
+                        parent_path = file_system.join_path(file_system.get_current_location(),os.path.dirname(save_file_location))
+                        include_code = args.code if WEBEZY_JSON._config.get('template') is None else WEBEZY_JSON._config.get('template').get('includeCode') if  WEBEZY_JSON._config.get('template').get('includeCode') is not None else False
+                        if file_system.check_if_dir_exists(parent_path):
+                            file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True)
+                            print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
+                        else:
+                            print_warning("Path to template output path does not exist ! [{0}] - Will try to create the sub-dir".format(save_file_location))                        
+                            file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code),overwrite=True,force=True)
+                            print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))
+                            exit(1)
+                    elif '.proto' in args.path:
+                        parse = parser.WebezyParser(path=args.path)
+                        print(parse)
+                    else:
+                        if file_system.check_if_dir_exists(args.path):
+                            builder = WebezyBuilder(path=file_system.get_current_location(),hooks=[WebezyMigrate])
+                            builder.PreBuild()
+                            print_info(file_system.join_path(file_system.get_current_location(),args.path))
+                            builder.ParseProtosToResource(project_name="test",protos_dir=file_system.join_path(file_system.get_current_location(),args.path),clients=[],server_language="python")
+                            builder.PostBuild()
+                            raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
+                        else:
+                            raise errors.WebezyProtoError("Export Service Template Error","File type not supported")
+            elif file_system.check_if_dir_exists(args.path):
+                raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
+            else:
+                # Handle custom template import / builtin template
+                if '@' in args.path:
+                    prj_configs = prj_conf.parse_project_config(wz_json.path)
+                    if prj_configs is None:
+                        if args.path in config.webezyio_templates:
+                            if 'Py' == args.path[len(args.path)-2:] and wz_json.project.get('server').get('language') != 'python':
+                                raise errors.WebezyValidationError("Not supporting server language","The [{0}] template is only supporting 'python' as server language please try and run - wz template {1} --load".format(args.path,args.path.replace('Py','Ts')))
+                            if 'Ts' == args.path[len(args.path)-2:] and wz_json.project.get('server').get('language') != 'typescript':
+                                raise errors.WebezyValidationError("Not supporting server language","The [{0}] template is only supporting 'typescript' as server language please try and run - wz template {1} --load".format(args.path,args.path.replace('Ts','Py')))
+                            helpers.attach_template(architect,args.path)
+                        else:
+                            raise errors.WebezyValidationError("Template importing error","Error occured during import attempt of [{0}] which does not included under 'Builtins' templates.".format(args.path))
+                    else:
+                        if prj_configs.get('templates') is not None:
+                            print_info(prj_conf.parse_project_config(wz_json.path),True)
+                        else:
+                            # TODO Should fallback to default builtins
+                            raise errors.WebezyValidationError("Config templates are empty","Please make sure you configurd a list of templates in your custom config.py file under root project directory")
+                else:
+                    raise errors.WebezyProtoError("Export Service Template Error","Make sure you are passing a valid path to webezy.json / protos directory / webezy.template.py script for WebezyArchitect - or a valid id for the template!")
+    except Exception as e:
+        print_error(e,True,e.__class__.__name__+' : '+e.resource)

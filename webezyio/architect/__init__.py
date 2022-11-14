@@ -56,6 +56,7 @@ class WebezyArchitect():
         if 'webezy.json' not in path:
             raise WebezyProtoError('webezy.json file path is not valid','Make sure you pass in your architect class the right path to your webezy.json file')
         self._path = path
+        self._project = None
         self._domain = domain
         self._project_name = project_name
         self._builder = Builder()
@@ -82,6 +83,7 @@ class WebezyArchitect():
         dict = generate_project(self._path,name,server_language,clients,json=True)
         project = generate_project(self._path,name,server_language,clients)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'project':dict})
+        self._project = project
         return project
     
     def AddClient(self):
