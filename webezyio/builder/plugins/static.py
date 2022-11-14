@@ -140,7 +140,13 @@ echo "Exit code for protoc -> "$statuscode\n\
 exit 0'
 
 bash_run_server_script_ts = '#!/bin/bash\n\n\
-node ./server/server.js'
+if [[ $1 == "debug" ]]\n\
+then\n\
+\techo "Debug mode: $1"\n\
+\tGRPC_VERBOSITY=DEBUG GRPC_TRACE=all node ./server/server.js\n\
+else\n\
+\tnode ./server/server.js\n\
+fi'
 
 protos_compile_script_ts = 'const path = require("path");\n\
 const { execSync } = require("child_process");\n\

@@ -96,9 +96,9 @@ You can now build your project and run your server with those simple commands:
 
 ```sh
 # First build your project
-webezy --build
+webezy build
 # Then run the server
-webezy --run-server
+webezy run 
 ```
 
 > __Note__ you can auto-build your resources if applicable straight when you are generating them with adding `--build` argument to `webezy generate` comands.
@@ -114,7 +114,7 @@ Command line interface for the webezyio package build awesome gRPC micro-service
 additional documentation and tutorials.
 
 positional arguments:
-  {new,n,generate,g,ls,package,edit,template}
+  {new,n,generate,g,ls,package,edit,template,build,call,run}
                         Main modules to interact with Webezy CLI.
     new                 Create new project
     n                   A shortend for new commands
@@ -124,13 +124,14 @@ positional arguments:
     package             Attach a package into other services / package
     edit                Edit any webezy.io resource
     template            Create a template from your webezy.json / proto files directory / webezy.template.py
+    build               Build project resources
+    call                Call a RPC
+    run                 Run server on current active project
 
 optional arguments:
   -h, --help            show this help message and exit
-  --run-server          Run server on current active project
   -v, --version         Display webezyio current installed version
   -e, --expand          Expand optional fields for each resource
-  -b, --build           Build webezyio project
   --loglevel {DEBUG,DEBUG,WARNING,ERROR,CRITICAL}
                         Log level
   --verbose             Control on verbose logging
@@ -138,7 +139,7 @@ optional arguments:
   -r, --redo            Redo webezy.json modification, if undo has been made.
   --purge               Purge .webezy/contxt.json file
 
-For more information see - https://www.webezy.io/docs/cli | Created with love by Amit Shmulevitch. 2022 © webezy.io [0.0.4]
+For more information see - https://www.webezy.io/docs/cli | Created with love by Amit Shmulevitch. 2022 © webezy.io [0.0.9]
 ```
 
 ## wz new
@@ -246,6 +247,49 @@ optional arguments:
 ```
 See [Service Templating Section](#service-templating) for more information.
 
+
+## wz call
+Call a service RPC for a running server host
+```sh
+positional arguments:
+  service      Service full path
+  rpc          RPC name
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --debug      Debug the call process
+  --host HOST  Pass a host of service
+  --port PORT  Pass a port for service
+```
+For e.x if we want to run a service RPC called "GetUnary" in Service "Test"
+we would pass the following command:
+
+```sh
+wz call clients/python/Test_pb2_grpc.py GetUnary
+```
+Not that we passed the relative path from the root directory of the project to the service module under "clients" directory and we used the python client module.
+
+Which will require us to verify we have attached and built a service client in `python`
+If you didnt started your prject with `Python` client add the following configuration under `project`.`clients` Array in `webezy.json` file located on your project root directory:
+```json
+{
+  "outDir": "<path-to-project>/clients/python",
+  "language": "python"
+}
+```
+
+Then make sure you re-built the project code so the client modules will be created properly:
+```sh
+wz build
+```
+
+## wz run
+Run the project server with attached services
+```sh
+optional arguments:
+  -h, --help  show this help message and exit
+  --debug     Start the gRPC server with debug mode attached
+```
 
 # Understanding Webezy.io
 While it is not nesscesary step to get you started we do recommend to invest few minutes to read an overview of how `Webezy.io` Built and utulizing gRPC, this high level overview will make you approach some scenarios more easly.

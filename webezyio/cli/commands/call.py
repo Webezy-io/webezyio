@@ -30,7 +30,7 @@ import time
 
 _supported_types = ['TYPE_STRING','TYPE_MESSAGE','TYPE_BOOL','TYPE_INT32','TYPE_INT64','TYPE_FLOAT','TYPE_DOUBLE']
 
-def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson,host:str='localhost',port:int=50051,debug:bool=False):
+def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson,host:str='localhost',port:int=50051,debug:bool=False,timeout=10):
 
     # Check if root directory is in current path
     if _fs.get_current_location() not in sys.path:
@@ -54,7 +54,7 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
     # Dynamic import module (Only supporting clients proto modules)
     service_module = importlib.import_module(path)
     # Init the service stub
-    stub = client_wrapper.WebezyioClient(service_module,stub_name,host,port)
+    stub = client_wrapper.WebezyioClient(service_module,stub_name,host,port,timeout)
     # Get RPC description from webezy.json file
     rpc_description = wz_json.get_rpc(rpc_full_name)
 

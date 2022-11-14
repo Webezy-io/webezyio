@@ -51,6 +51,7 @@ webezyio/cli/commands/run.py
 webezyio/cli/commands/template.py
 webezyio/commons/__init__.py
 webezyio/commons/client_wrapper.py
+webezyio/commons/config.py
 webezyio/commons/errors.py
 webezyio/commons/file_system.py
 webezyio/commons/helpers.py
@@ -60,6 +61,8 @@ webezyio/commons/resources.py
 webezyio/commons/protos/__init__.py
 webezyio/commons/protos/webezy_pb2.py
 webezyio/commons/protos/webezy_pb2_grpc.py
+webezyio/commons/templates/webezyio/HelloWorldPy.template.py
+webezyio/commons/templates/webezyio/HelloWorldTs.template.py
 webezyio/commons/templates/webezyio/PubSubTs.template.py
 webezyio/commons/templates/webezyio/SamplePy.template.py
 webezyio/commons/templates/webezyio/SampleTs.template.py
