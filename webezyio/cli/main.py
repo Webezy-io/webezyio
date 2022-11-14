@@ -36,7 +36,7 @@ from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser
+from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import call, new,build,generate,ls,package as pack,run,edit,template
@@ -268,6 +268,7 @@ def main(args=None):
     parser_call.add_argument('--debug',action='store_true', help='Debug the call process')
     parser_call.add_argument('--host',default='localhost', help='Pass a host of service')
     parser_call.add_argument('--port',default=50051, help='Pass a port for service')
+    parser_call.add_argument('--timeout',default=10, help='An optional duration of time in seconds to allow for the RPC')
 
 
     """Run server"""
@@ -322,6 +323,7 @@ def main(args=None):
     else:
         if helpers.check_if_under_project():
             
+            webezy_project_config = prj_conf.parse_project_config(os.getcwd())
             webezy_json_path = file_system.join_path(os.getcwd(), 'webezy.json')
 
             try:
@@ -445,7 +447,7 @@ def main(args=None):
             elif hasattr(args, 'path'):
                 template_commands(args)
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
-                call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug)
+                call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug,timeout=int(args.timeout))
                 # if file_system.get_current_location() not in sys.path:
                 #     sys.path.append(file_system.get_current_location())
                 # path = args.service.replace('/','.').replace('.py','')

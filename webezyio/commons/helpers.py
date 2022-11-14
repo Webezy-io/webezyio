@@ -767,7 +767,7 @@ class WZClientPy():
         return f'{self.write_imports()}\n{self.write_client_wrapper()}\n\n\t{self.write_services_classes()}'
 
     def write_client_wrapper(self):
-        return f'\nclass {self._project_package}:\n\n\t{self.init_wrapper()}'
+        return f'\n# For available channel options in python visit https://github.com/grpc/grpc/blob/v1.46.x/include/grpc/impl/codegen/grpc_types.h\n_CHANNEL_OPTIONS = (("grpc.keepalive_permit_without_calls",1),\n\t("grpc.keepalive_time_ms",120000),\n\t("grpc.http2.min_time_between_pings_ms",120000),\n\t("grpc.keepalive_timeout_ms",20000),\n\t("grpc.http2.max_pings_without_data",0),)\n\nclass {self._project_package}:\n\n\t{self.init_wrapper()}'
 
     def init_stubs(self):
         stubs = []
@@ -784,7 +784,7 @@ class WZClientPy():
         else:
             host = 'localhost'
             port = 50051
-        init_func = f'def __init__(self, host="{host}", port={port}, timeout=10):\n\t\tchannel = grpc.insecure_channel(\'{_OPEN_BRCK}0{_CLOSING_BRCK}:{_OPEN_BRCK}1{_CLOSING_BRCK}\'.format(host, port))\n\t\ttry:\n\t\t\tgrpc.channel_ready_future(channel).result(timeout=timeout)\n\t\texcept grpc.FutureTimeoutError:\n\t\t\tsys.exit(\'Error connecting to server\')\n\t\t{self.init_stubs()}'
+        init_func = f'def __init__(self, host="{host}", port={port}, timeout=10):\n\t\tchannel = grpc.insecure_channel(\'{_OPEN_BRCK}0{_CLOSING_BRCK}:{_OPEN_BRCK}1{_CLOSING_BRCK}\'.format(host, port),_CHANNEL_OPTIONS)\n\t\ttry:\n\t\t\tgrpc.channel_ready_future(channel).result(timeout=timeout)\n\t\texcept grpc.FutureTimeoutError:\n\t\t\tsys.exit(\'Error connecting to server\')\n\t\t{self.init_stubs()}'
         return init_func
 
     def write_imports(self):
@@ -819,6 +819,8 @@ class WZClientPy():
                         'serverStreaming') is not None and rpc.get('serverStreaming') == True else ''
                     out_close_type = ']' if rpc.get('serverStreaming') is not None and rpc.get(
                         'serverStreaming') == True else ''
+                    rpcs.append(
+                        f'def {rpc_name}_WithCall(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]] = ()) -> Tuple[{out_open_type}{rpc_out_type}{out_close_type}, grpc.Call]:\n\t\t"""webezyio - {description} Returns: RPC output and a call object"""\n\n\t\treturn self.{svc}Stub.{rpc_name}.with_call(request,metadata=metadata)')
                     rpcs.append(
                         f'def {rpc_name}(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]] = ()) -> {out_open_type}{rpc_out_type}{out_close_type}:\n\t\t"""webezyio - {description}"""\n\n\t\treturn self.{svc}Stub.{rpc_name}(request,metadata=metadata)')
 

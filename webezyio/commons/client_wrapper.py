@@ -28,12 +28,12 @@ class WebezyioClient:
 
     def __init__(self, service_module, stub_name, host, port, timeout=10):
         channel = grpc.insecure_channel('{0}:{1}'.format(host, port))
+        self.timeout = timeout
         try:
-            grpc.channel_ready_future(channel).result(timeout=10)
+            grpc.channel_ready_future(channel).result(timeout=self.timeout)
         except grpc.FutureTimeoutError:
             sys.exit('Error connecting to server')
         self.stub = getattr(service_module, stub_name)(channel)
-        self.timeout = timeout
 
     def __getattr__(self, attr):
         return partial(self._wrapped_call, self.stub, attr)
