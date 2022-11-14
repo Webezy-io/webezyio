@@ -272,8 +272,10 @@ def main(args=None):
 
 
     """Run server"""
-    parser.add_argument(
-        '--run-server',action='store_true', help='Run server on current active project')
+    parser_run_server = subparsers.add_parser(
+        'run', help='Run server on current active project')
+    parser_run_server.add_argument(
+        '--debug',action='store_true', help='Start the gRPC server with debug mode attached')
 
     parser.add_argument('-v', '--version', action='store_true',
                         help='Display webezyio current installed version')
@@ -420,8 +422,8 @@ def main(args=None):
                     print_success("Purged webezy context !")
                 else:
                     print_warning("Cancelling purge for webezy context")
-            elif args.run_server:
-                run.run_server(WEBEZY_JSON)
+            elif hasattr(args,'debug'):
+                run.run_server(WEBEZY_JSON,args.debug)
 
             elif hasattr(args, 'name'):
                 resource = parse_name_to_resource(args.name,WEBEZY_JSON)

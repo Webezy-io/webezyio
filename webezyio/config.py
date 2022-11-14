@@ -8,7 +8,6 @@
 
 webezyio cli module configuration"""
 # Analytic gathering approval
-analytics=False
+analytics=True
 # First run flag
-first_run=False
-token="macOS-12.6-arm64-arm-64bit:2022-11-13T13:30:13.567219"
+first_run=True

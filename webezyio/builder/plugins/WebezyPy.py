@@ -384,4 +384,10 @@ echo "Exit code for protoc -> "$statuscode\n\
 exit 0'
 
 bash_run_server_script = '#!/bin/bash\n\n\
-PYTHONPATH=./services/protos:./services python3 server/server.py'
+if [[ $1 == "debug" ]]\n\
+then\n\
+\techo "Debug Mode: $1"\n\
+GRPC_VERBOSITY=DEBUG GRPC_TRACE=all PYTHONPATH=./services/protos:./services python3 server/server.py\n\
+else\n\
+\tPYTHONPATH=./services/protos:./services python3 server/server.py\n\
+fi'
