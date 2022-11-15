@@ -252,7 +252,6 @@ def main(args=None):
     parser_template.add_argument('--out-path', help='Specify the template file location, defaulted to root project dir')
     parser_template.add_argument('--template-name', help='Specify the template name, defaulted to project package name')
     parser_template.add_argument('--load',action='store_true', help='Initalize a template')
-    parser_template.add_argument('--list',action='store_true', help='List all available templates')
 
     """Build command"""
     parser_build = subparsers.add_parser(
@@ -325,7 +324,7 @@ def main(args=None):
     else:
         if helpers.check_if_under_project():
             
-            webezy_project_config = prj_conf.parse_project_config(os.getcwd())
+            # webezy_project_config = prj_conf.parse_project_config(os.getcwd())
             webezy_json_path = file_system.join_path(os.getcwd(), 'webezy.json')
 
             try:
@@ -653,11 +652,11 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
 
 def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
     try:
-        if args.list:
-            print_info([temp for temp in _TEMPLATES if 'Blank' not in temp],True,'Webezy Builtins')
+        if args.path == 'list':
             prj_configs = prj_conf.parse_project_config(wz_json.path)
+            print_info([temp for temp in prj_configs.get('webezyio_templates') if 'Blank' not in temp],True,'Webezy Builtins')
             if prj_configs is not None:
-                print_note(prj_configs.get('templates'),True,'Custom Templates [config.py]')
+                print_note(prj_configs.get('custom_templates'),True,'Custom Templates [config.py]')
         else:
             if file_system.check_if_file_exists(args.path):
                 if args.load:
@@ -714,8 +713,8 @@ def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
                         # Handle custom templates
                         if prj_configs is not None:
                             print_warning("Attaching custom templates. If you want to attach a builtin template drop the 'templates' array in config.py file.")
-                            if prj_configs.get('templates'):
-                                for temp in prj_configs.get('templates'):
+                            if prj_configs.get('custom_templates'):
+                                for temp in prj_configs.get('custom_templates'):
                                     template_path = file_system.join_path(file_system.get_current_location(),temp[1])
                                     if temp[0] == args.path:
                                         if file_system.check_if_file_exists(template_path):
