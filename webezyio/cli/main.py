@@ -727,7 +727,6 @@ def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
                                     else:
                                         raise errors.WebezyValidationError("Template not found","Custom template [{0}] not listed on 'templates' array at config.py file.".format(args.path))
                             else:
-                                # TODO Should fallback to default builtins
                                 raise errors.WebezyValidationError("Config templates are empty","Please make sure you configurd a list of templates in your custom config.py file under root project directory")
                 else:
                     raise errors.WebezyProtoError("Export Service Template Error","Make sure you are passing a valid path to webezy.json / protos directory / webezy.template.py script for WebezyArchitect - or a valid id for the template!")
