@@ -895,7 +895,7 @@ class WZServicePy():
                         out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
                     code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
             rpcs.append(
-                f'\t# @rpc @@webezyio - DO NOT REMOVE\n\tdef {rpc_name}(self, request: {open_in_type}{rpc_in_pkg}_pb2.{rpc_in_name}{closing_in_type}, context) -> {open_out_type}{rpc_out_pkg}_pb2.{rpc_out_name}{close_out_type}:\n{code}')
+                f'\t# @rpc @@webezyio - DO NOT REMOVE\n\tdef {rpc_name}(self, request: {open_in_type}{rpc_in_pkg}_pb2.{rpc_in_name}{closing_in_type}, context: grpc.ServicerContext) -> {open_out_type}{rpc_out_pkg}_pb2.{rpc_out_name}{close_out_type}:\n{code}')
         rpcs = ''.join(rpcs)
         return f'class {self._name}({self._name}_pb2_grpc.{self._name}Servicer):\n\n{rpcs}'
 
@@ -903,7 +903,7 @@ class WZServicePy():
         return self.__str__()
 
     def __str__(self):
-        return f'{self.write_imports()}\n\n{self.write_class()}'
+        return f'"""Webezy.io service implemantation for -> {self._name}"""\nimport grpc\n{self.write_imports()}\n\n{self.write_class()}'
 
 class WZServiceTs():
     
@@ -1182,9 +1182,6 @@ def attach_template(ARCHITECT,template:_BUILTINS_TEMPLATES):
         file_dir = os.path.dirname(__file__)
         template_domain_name = template.split('/')[0].split('@')[-1]
         template_name = template.split('/')[-1]
-        print(file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name))
-        print(file_system.get_current_location())
+        pretty.print_note(file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name))
         os.chdir(ARCHITECT._path.split('webezy.json')[0])
-        print(file_system.get_current_location())
-
         subprocess.run(['python',file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--domain',ARCHITECT._domain,'--project-name',ARCHITECT._project_name])

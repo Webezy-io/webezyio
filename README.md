@@ -244,6 +244,7 @@ optional arguments:
   --template-name TEMPLATE_NAME
                         Specify the template name, defaulted to project package name
   --load                Initalize a template
+  --list                List all available templates
 ```
 See [Service Templating Section](#service-templating) for more information.
 
@@ -413,6 +414,24 @@ wz template webezy.json
 > __Note__ the "includeCode" key it can be passed as `-c` / `--code` argument to `wz template` command, it is passed to the exporter of template and includes all files listed under project while searching for `"include"` list of files and folders then cross checking the `"exclude"` list against them - Each file listed in the "includes" array will be compressed and attached to the template script.
 
 > __Warning__ DO NOT set sensitive information on template code files that are included on template, such as keys and secrets as it will be copied to the template script.
+
+### Project Custom Configurations
+Each Webezy.io project can be configured to developer needs with creating a `config.py` file at the root directory of yout Webezy.io project.
+
+__Supported Configurations__
+
+- __`templates`__ Make custom templates available for your project.
+  You can make custom templates from local or remote project and "import" a template generator script to be used in your new project or already existing project.
+  Configure in `config.py` file the following parameters:
+```py
+templates=[('<TemplateId>','<TemplatePath>')]
+```
+  - `<TemplateId>` should be replaced with unique and valid id to be identified and imported at your project with Webezy.io CLI, for example our builtins are constructed the same way: `@<domain>/<name><Py/Ts>`
+  > __Note__ That `<Py/Ts>` is acting as indicator for the supported server language for that specific template
+  - `<TemplatePath>` is the relative path to the template generator script - You can generate a template from already running project:
+```sh
+wz template webezy.json --template-name <SomeTemplate>
+```
 
 ### Development
 

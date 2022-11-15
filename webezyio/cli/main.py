@@ -26,6 +26,7 @@ import logging
 import argparse
 import os
 from platform import platform
+import subprocess
 import sys
 import inquirer
 from inquirer import errors
@@ -42,15 +43,14 @@ from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import call, new,build,generate,ls,package as pack,run,edit,template
 from pathlib import Path
 
-_TEMPLATES = ['@webezyio/Blank']
-
-templates_dir = os.path.dirname(os.path.dirname(__file__))+'/commons/templates'
-for d in file_system.walkDirs(templates_dir):
-    if d != templates_dir:
-        for f in file_system.walkFiles(d):
-            domain = d.split('/')[-1]
-            template_name = f.split('.')[0]
-            _TEMPLATES.append(f'@{domain}/{template_name}')
+_TEMPLATES = config.webezyio_templates
+# templates_dir = os.path.dirname(os.path.dirname(__file__))+'/commons/templates'
+# for d in file_system.walkDirs(templates_dir):
+#     if d != templates_dir:
+#         for f in file_system.walkFiles(d):
+#             domain = d.split('/')[-1]
+#             template_name = f.split('.')[0]
+#             _TEMPLATES.append(f'@{domain}/{template_name}')
 
 def field_exists_validation(new_field, fields, msg):
     if new_field in fields:
@@ -178,7 +178,7 @@ def main(args=None):
                             required=False, help='Server language')
     parser_new.add_argument('--clients', nargs='*',
                             required=False, help='Clients language list seprated by spaces')
-    parser_new.add_argument('--template', choices=_TEMPLATES,default=_TEMPLATES[0],
+    parser_new.add_argument('--template', default=_TEMPLATES[0],
                             required=False, help='Create new project based on template')
   
 
@@ -449,7 +449,6 @@ def main(args=None):
             elif hasattr(args, 'path'):
                 ARCHITECT = WebezyArchitect(
                     path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
-                print_info(ARCHITECT._project)
                 template_commands(args,WEBEZY_JSON,ARCHITECT)
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
                 call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug,timeout=int(args.timeout))
@@ -655,8 +654,10 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
 def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
     try:
         if args.list:
-            for temp in _TEMPLATES:
-                print_info(temp)
+            print_info([temp for temp in _TEMPLATES if 'Blank' not in temp],True,'Webezy Builtins')
+            prj_configs = prj_conf.parse_project_config(wz_json.path)
+            if prj_configs is not None:
+                print_note(prj_configs.get('templates'),True,'Custom Templates [config.py]')
         else:
             if file_system.check_if_file_exists(args.path):
                 if args.load:
@@ -699,22 +700,36 @@ def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
                 # Handle custom template import / builtin template
                 if '@' in args.path:
                     prj_configs = prj_conf.parse_project_config(wz_json.path)
-                    if prj_configs is None:
-                        if args.path in config.webezyio_templates:
-                            if 'Py' == args.path[len(args.path)-2:] and wz_json.project.get('server').get('language') != 'python':
-                                raise errors.WebezyValidationError("Not supporting server language","The [{0}] template is only supporting 'python' as server language please try and run - wz template {1} --load".format(args.path,args.path.replace('Py','Ts')))
-                            if 'Ts' == args.path[len(args.path)-2:] and wz_json.project.get('server').get('language') != 'typescript':
-                                raise errors.WebezyValidationError("Not supporting server language","The [{0}] template is only supporting 'typescript' as server language please try and run - wz template {1} --load".format(args.path,args.path.replace('Ts','Py')))
-                            helpers.attach_template(architect,args.path)
-                        else:
-                            raise errors.WebezyValidationError("Template importing error","Error occured during import attempt of [{0}] which does not included under 'Builtins' templates.".format(args.path))
+                    
+                    if args.path in config.webezyio_templates:
+                        # Check if suffix of template name is Py
+                        if 'Py' == args.path[len(args.path)-2:] and wz_json.project.get('server').get('language') != 'python':
+                            raise errors.WebezyValidationError("Not supporting server language","The [{0}] template is only supporting 'python' as server language please try and run - wz template {1} --load".format(args.path,args.path.replace('Py','Ts')))
+                        # Check if suffix of template name is Ts
+                        if 'Ts' == args.path[len(args.path)-2:] and wz_json.project.get('server').get('language') != 'typescript':
+                            raise errors.WebezyValidationError("Not supporting server language","The [{0}] template is only supporting 'typescript' as server language please try and run - wz template {1} --load".format(args.path,args.path.replace('Ts','Py')))
+                        # Attach template from builtins
+                        helpers.attach_template(architect,args.path)
                     else:
-                        if prj_configs.get('templates') is not None:
-                            print_info(prj_conf.parse_project_config(wz_json.path),True)
-                        else:
-                            # TODO Should fallback to default builtins
-                            raise errors.WebezyValidationError("Config templates are empty","Please make sure you configurd a list of templates in your custom config.py file under root project directory")
+                        # Handle custom templates
+                        if prj_configs is not None:
+                            print_warning("Attaching custom templates. If you want to attach a builtin template drop the 'templates' array in config.py file.")
+                            if prj_configs.get('templates'):
+                                for temp in prj_configs.get('templates'):
+                                    template_path = file_system.join_path(file_system.get_current_location(),temp[1])
+                                    if temp[0] == args.path:
+                                        if file_system.check_if_file_exists(template_path):
+                                            # Attach template from custom templates
+                                            print_info("Running template file for {0}".format(args.path))
+                                            subprocess.run(['python',template_path,'--domain',architect._domain,'--project-name',architect._project_name])
+                                        else:
+                                            raise errors.WebezyValidationError("Template not found","The template file is not found on : {0}".format(template_path))
+                                    else:
+                                        raise errors.WebezyValidationError("Template not found","Custom template [{0}] not listed on 'templates' array at config.py file.".format(args.path))
+                            else:
+                                # TODO Should fallback to default builtins
+                                raise errors.WebezyValidationError("Config templates are empty","Please make sure you configurd a list of templates in your custom config.py file under root project directory")
                 else:
                     raise errors.WebezyProtoError("Export Service Template Error","Make sure you are passing a valid path to webezy.json / protos directory / webezy.template.py script for WebezyArchitect - or a valid id for the template!")
     except Exception as e:
-        print_error(e,True,e.__class__.__name__+' : '+e.resource)
+        print_error(e,True,e.__class__.__name__+' : '+e.resource if hasattr(e,'resource') else '')

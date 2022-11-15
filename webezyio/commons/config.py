@@ -8,10 +8,12 @@ class WebezyProjectConfig:
 
     def __init__(self,**kwargs) -> None:
         self.client_channel_opt = kwargs.get('client_channel_opt')
+        self.templates = kwargs.get('templates')
 
     def config(self):
         return {
-            'client_channel_opt': self.client_channel_opt
+            'client_channel_opt': self.client_channel_opt,
+            'templates': self.templates
         }
 
 def parse_project_config(root_path:str):
@@ -26,9 +28,9 @@ def parse_project_config(root_path:str):
 
         wz_prj_conf = WebezyProjectConfig(
             client_channel_opt= prj_conf_module.client_channel_opt  if hasattr(prj_conf_module,'client_channel_opt') else None,
+            templates= prj_conf_module.templates  if hasattr(prj_conf_module,'templates') else None,
         )
 
-        log.debug(wz_prj_conf.config())
     else:
         log.debug("No custom project config.py file")
     
