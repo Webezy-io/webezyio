@@ -427,8 +427,11 @@ __Supported Configurations__
 templates=[('<TemplateId>','<TemplatePath>')]
 ```
   - `<TemplateId>` should be replaced with unique and valid id to be identified and imported at your project with Webezy.io CLI, for example our builtins are constructed the same way: `@<domain>/<name><Py/Ts>`
+  
   > __Note__ That `<Py/Ts>` is acting as indicator for the supported server language for that specific template
+
   - `<TemplatePath>` is the relative path to the template generator script - You can generate a template from already running project:
+
 ```sh
 wz template webezy.json --template-name <SomeTemplate>
 ```
