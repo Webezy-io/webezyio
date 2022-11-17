@@ -66,11 +66,24 @@ message TestExtension {
   ];
   bool test_bool = 3 [
     (domain.extensions.v1.ExtensionMessage.TestListBool) = true,
-    (domain.extensions.v1.ExtensionMessage.TestListBool) = false,
+    (domain.extensions.v1.ExtensionMessage.TestListBool) = false
   ];
   double test_int_extension = 4 [
     (domain.extensions.v1.ExtensionMessage.TestInt) = 10
   ];
+  domain.extensions.v1.TestEnum test_enum = 5 [
+    (domain.extensions.v1.ExtensionMessage.TestMessage) = {
+      name: "Hello extension"
+    },
+    (domain.extensions.v1.ExtensionMessage).messages = "Extensions",
+    (domain.extensions.v1.ExtensionMessage).messages = "Are",
+    (domain.extensions.v1.ExtensionMessage).messages = "Powerful"
+  ];
+}
+
+message TestMessage {
+  string name = 1;
+  repeated messages = 2;
 }
 
 enum TestEnum {
@@ -81,11 +94,12 @@ enum TestEnum {
 
 // Defining parent message which holding extendable of 'FieldOptions'
 message ExtensionMessage {
-	extend google.protobuf.FieldOptions {
-		repeated bool TestListBool = 55556;
-		string TestString = 55557;
-		int32 TestInt = 55559;
+  extend google.protobuf.FieldOptions {
+    repeated bool TestListBool = 55556;
+    string TestString = 55557;
+    int32 TestInt = 55559;
     domain.extensions.v1.TestEnum TestEnum = 55560;
-	}
+    domain.extensions.v1.TestMessage TestMessage = 55561;
+  }
 }
 ```
