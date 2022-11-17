@@ -155,6 +155,7 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     temp_methods = []
     if methods:
         for m in methods:
+            print_info(m,True)
             temp_methods.append(ParseDict(m,WZMethodDescriptor()))
     service = WZServiceDescriptor(uri=get_uri_service(path, name, service_language.lower()),
                                   name=name, full_name=get_service_full_name(domain, name), dependencies=dependencies,
@@ -235,7 +236,7 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                                                  label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions'),key_type=f.get('key_type'),value_type=f.get('value_type'),oneof_fields=fields_oneof))
         else:
             logging.error(
-                f"Connot insert field {f.get('name')} already exists under {name} message")
+                f"Cannot insert field {f.get('name')} already exists under {name} message")
     msg = WZDescriptor(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,
                        kind=ResourceKinds.message.value, extension_type=Options.Name(option), description=description)
 

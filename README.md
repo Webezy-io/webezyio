@@ -1,4 +1,8 @@
-# webezy
+# webezy.io (webezyio)
+
+[![Downloads](https://pepy.tech/badge/webezyio)](https://pepy.tech/project/webezyio)
+
+[![Python 3.6](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
 [webezyio](./docs/webezyio_concepts.md) is free and open-source project that aims to be a complete framework for developing micro-services projects.
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
@@ -43,7 +47,7 @@ __Useful Resources__:
 
 
 __Tutorials:__
-- [Sample project](https://www.webezy.io/docs/tutorials/sample-project)
+- [Quick Start](https://www.webezy.io/docs/quick-start)
 
 ## Quick Start 
 
@@ -138,7 +142,7 @@ Some built-ins features are provided so you can jump-start your development righ
 
 - [Webezy.io Official VSCode Extension](https://marketplace.visualstudio.com/items?itemName=webezy.vscode-webezy) - See [docs]()
 
-## Development
+# Development
 
 We are welcoming any code contribution and help to maintain and release new fetures as well documenting the library.
 

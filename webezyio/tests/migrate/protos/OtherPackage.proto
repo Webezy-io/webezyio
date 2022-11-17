@@ -6,7 +6,8 @@ package domain.OtherPackage.v1;
 
 
 
-// [webezyio] - Some description in other message
+// [webezyio] - None
 message OtherMessage {
 	string StringField = 1;
 }
+

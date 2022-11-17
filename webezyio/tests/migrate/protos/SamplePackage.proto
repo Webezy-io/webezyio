@@ -4,27 +4,41 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "OtherPackage.proto";
 import "google/protobuf/descriptor.proto";
-package domain.SamplePackage.v1;
+package webezy.SamplePackage.v1;
 
 
 
-// [webezyio] - Some description in sample message
+// [webezyio] - None
 message SampleMessage {
-	bool ExtendedField = 1 [(ExtensionMessage.BoolExtend) = false,(ExtensionMessage.BoolExtend) = true];
+	bool ExtendedField = 1 [(webezy.SamplePackage.v1.ExtensionMessage.BoolExtend) = false,(webezy.SamplePackage.v1.ExtensionMessage.BoolExtend) = true];
 	google.protobuf.Timestamp Timestamp = 2;
-	int32 Integer = 3;
-	domain.OtherPackage.v1.OtherMessage ChildMessage = 4;
+	int32 Integer = 3 [(webezy.SamplePackage.v1.ExtensionMessage.TestString) = "Test"];
+	domain.OtherPackage.v1.OtherMessage ChildMessage = 4 [
+		(webezy.SamplePackage.v1.ExtensionMessage.testChild) = {name:"Test"},
+		(webezy.SamplePackage.v1.ExtensionMessage.testChild) = {name:"Other"}
+	];
 	map<string, string> test = 5;
+	map<string, domain.OtherPackage.v1.OtherMessage> testNestedMap = 6;
+	map<string, webezy.SamplePackage.v1.SampleEnum> testEnumMap = 7;
+}
+
+message TestChild {
+	string name = 1;
 }
 
 // [webezyio] - None
 message ExtensionMessage {
 	extend google.protobuf.FieldOptions {
 		repeated bool BoolExtend = 55556;
+		string TestString = 55557;
+		repeated TestChild testChild = 55558;
 	}
 }
 
+// [webezyio] - None
 enum SampleEnum {
+	// [webezyio] - None
 	UNKNWON = 0;
+	// [webezyio] - None
 	TEST = 1;
 }

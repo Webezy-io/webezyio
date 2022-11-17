@@ -80,7 +80,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
             # print_info(dir(protos[1]),True,'Service Module')
 
             proto_module = protos[0].DESCRIPTOR
-            
+            domain = proto_module.package.split('.')[0]
+
             """File options"""
             proto_file_opt = proto_module.GetOptions()
             proto_file_depend = proto_module.dependencies
@@ -110,7 +111,7 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
 
                     for rpc in service_methods:
                         proto_rpc = service_methods[rpc]
-                        service_rpc = helpers.WZRPC(proto_rpc.name,proto_rpc.input_type,proto_rpc.output_type,proto_rpc.client_streaming,proto_rpc.server_streaming)
+                        service_rpc = helpers.WZRPC(proto_rpc.name,proto_rpc.input_type.full_name,proto_rpc.output_type.full_name,proto_rpc.client_streaming,proto_rpc.server_streaming)
                         service._methods.append(service_rpc)
                     
                     # print_note({'index':_services[svc].index,'has_options':_services[svc].has_options},True,'[{0}] Service expanded'.format(service_full_name))
@@ -141,11 +142,11 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                             extended_field_desc = helpers.WZField(field_extended.name,
                                 type=resources.WZFieldDescriptor.Type.Name(field_extended.type),
                                 label=resources.WZFieldDescriptor.Label.Name(field_extended.label),
-                                enum_type=field_extended.enum_type,message_type=field_extended.message_type)
+                                enum_type=field_extended.enum_type.full_name if field_extended.enum_type is not None else None,message_type=field_extended.message_type.full_name if field_extended.message_type is not None else None)
                             
                             message._fields.append(extended_field_desc)
 
-                    for f in pkg_messages[msg].fields:
+                    for field in pkg_messages[msg].fields:
                         is_map_field = False
                         field_extensions = None
                         field_key_type = None
@@ -153,16 +154,16 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                         
                         # print_note(resources.WZFieldDescriptor.Type.Name(f.type),True,f.full_name)
                         # Handle message as field
-                        if f.message_type is not None:
+                        if field.message_type is not None:
 
                             # Handle map special field type
-                            if 'Entry' == f.message_type.name[-5:]:
+                            if 'Entry' == field.message_type.name[-5:]:
                                 is_map_field = True
-                                for entry in f.message_type.fields_by_name:
+                                for entry in field.message_type.fields_by_name:
                                     if 'key' == entry:
-                                        field_key_type = resources.WZFieldDescriptor.Type.Name(f.message_type.fields_by_name[entry].type)
+                                        field_key_type = resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name[entry].type)
                                     elif 'value' == entry:
-                                        field_value_type = resources.WZFieldDescriptor.Type.Name(f.message_type.fields_by_name[entry].type)
+                                        field_value_type = resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name[entry].type)
                                     else:
                                         # Not a map message
                                         field_key_type = None
@@ -172,9 +173,9 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                 pass
 
                         # Handle field extensions
-                        if f.has_options:
+                        if field.has_options:
                             field_extensions = {}
-                            field_options = f.GetOptions()
+                            field_options = field.GetOptions()
                             
                             # print_note(field_options.Extensions,True,'Extensions {}'.format(f.name))
                             # print_note(field_options.Extensions._extended_message.ListFields())
@@ -191,6 +192,13 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                             list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value))
                                         elif 'INT' in field_opt_type:
                                             list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value))
+                                        elif 'MESSAGE' in field_opt_type:
+                                            struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
+                                            for field_ext_temp in f_ext[0].message_type.fields:
+                                                if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
+                                                    raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
+                                                struct_temp.update({field_ext_temp.name:getattr(field_opt_value,field_ext_temp.name)})
+                                            list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp))
                                         else:
                                             print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
 
@@ -203,15 +211,35 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                         field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[1])
                                     elif 'INT' in field_opt_type:
                                         field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(number_value=f_ext[1])
+                                    elif 'MESSAGE' in field_opt_type:
+                                            struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
+                                            for field_ext_temp in f_ext[0].message_type.fields:
+                                                if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
+                                                    raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
+                                                struct_temp.update({field_ext_temp.name:getattr(f_ext[1],field_ext_temp.name)})
+                                            field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp)
                                     else:
                                         print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
-                        field_message_type = f.message_type.full_name if hasattr(f.message_type,'full_name') else None
+                        
+
+                        field_message_type = field.message_type.full_name if hasattr(field.message_type,'full_name') else None
                         field_message_type = field_message_type if field_message_type is not None and field_message_type[-5:] != 'Entry' else None
-                        field = helpers.WZField(f.name,
-                                                type=resources.WZFieldDescriptor.Type.Name(f.type if is_map_field == False else resources.WZFieldDescriptor.Type.TYPE_MAP),
-                                                label=resources.WZFieldDescriptor.Label.Name(f.label),
+                        field_enum_type = field.enum_type.full_name if hasattr(field.enum_type,'full_name') else None
+                        if field_message_type == None:
+                            if hasattr(field.message_type,'fields_by_name'):
+                                if resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_MESSAGE':
+                                    field_message_type = field.message_type.fields_by_name.get('value').message_type.full_name
+                                elif resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_ENUM':
+                                    field_enum_type = field.message_type.fields_by_name.get('value').enum_type.full_name
+                                
+                                # field_message_type = f.message_type.fields_by_name.get('value')
+                                # print_info(field_message_type.full_name,field_message_type.type)
+
+                        field = helpers.WZField(field.name,
+                                                type=resources.WZFieldDescriptor.Type.Name(field.type if is_map_field == False else resources.WZFieldDescriptor.Type.TYPE_MAP),
+                                                label=resources.WZFieldDescriptor.Label.Name(field.label if field_key_type is None else 1),
                                                 message_type=field_message_type,
-                                                enum_type=f.enum_type.full_name if hasattr(f.enum_type,'full_name') else None,
+                                                enum_type=field_enum_type,
                                                 extensions=field_extensions,key_type=field_key_type,value_type=field_value_type
                                                 )
                         message._fields.append(field)
@@ -247,8 +275,7 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
 def _migrate_to_template(template_name:str,template_path:str):
     pass
 
-def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[str,helpers.WZPackage],services):
-    
+def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[str,helpers.WZPackage],services:List[helpers.WZService]):
     msgs_map = {}
 
     ARCHITECT = WebezyArchitect(
@@ -282,5 +309,12 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
         for e in package_enums:
             enum_name, enum_values, enum_desc = e
             ARCHITECT.AddEnum(package_temp, enum_name, enum_values, enum_desc)
+
+    for servc in services:
+        svc_name, svc_methods, svc_dependencies, svc_desc = servc.to_tuple()
+        temp_service = ARCHITECT.AddService(svc_name,svc_dependencies,svc_desc,[])
+        for rpc in svc_methods:
+            rpc_name, rpc_in_out, rpc_desc = rpc
+            ARCHITECT.AddRPC(temp_service,rpc_name,rpc_in_out,rpc_desc)
 
     ARCHITECT.Save()

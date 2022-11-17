@@ -6,11 +6,12 @@ import "OtherPackage.proto";
 
 
 service SampleService {
-	// [webezyio] - SampleRPC - Some description for RPC
-	rpc SampleRPC (domain.SamplePackage.v1.SampleMessage) returns (domain.SamplePackage.v1.SampleMessage);
-	// [webezyio] - TestRPC - Some description for RPC
+	// [webezyio] - None
+	rpc SampleRPC (webezy.SamplePackage.v1.SampleMessage) returns (webezy.SamplePackage.v1.SampleMessage);
+	// [webezyio] - None
 	rpc TestRPC (stream domain.OtherPackage.v1.OtherMessage) returns (domain.OtherPackage.v1.OtherMessage);
-	// [webezyio] - OtherRPC - Some description for RPC
-	rpc OtherRPC (stream domain.OtherPackage.v1.OtherMessage) returns (domain.SamplePackage.v1.SampleMessage);
+	// [webezyio] - None
+	rpc OtherRPC (stream domain.OtherPackage.v1.OtherMessage) returns (webezy.SamplePackage.v1.SampleMessage);
 }
+
 

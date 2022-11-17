@@ -627,7 +627,7 @@ class WZProto():
                 m_desc = m.get('description')
                 ext_type = m.get('extensionType')
                 for f in m.get('fields'):
-                    fLabel = '' if f.get('label') == 'LABEL_OPTIONAL' else '{0} '.format(
+                    fLabel = '' if f.get('label') == 'LABEL_OPTIONAL' or f.get('label') is None else '{0} '.format(
                         f.get('label').split('_')[-1].lower())
                     fType = f.get('fieldType').split('_')[-1].lower()
                     if fType == 'message':
@@ -636,7 +636,7 @@ class WZProto():
                         fType = f.get('enumType')
                     elif fType == 'map':
                         keyType = f.get('keyType').split('_')[-1].lower()
-                        valueType = f.get('valueType').split('_')[-1].lower() if f.get('valueType') != 'TYPE_MESSAGE' else f.get('messageType') if f.get('valueType') == 'TYPE_MESSAGE' else f.get('enumType') if f.get('valueType') == 'TYPE_ENUM' else None
+                        valueType = f.get('valueType').split('_')[-1].lower() if f.get('valueType') != 'TYPE_MESSAGE' and f.get('valueType') != 'TYPE_ENUM'  else f.get('messageType') if f.get('valueType') == 'TYPE_MESSAGE' else f.get('enumType') if f.get('valueType') == 'TYPE_ENUM' else None
                         if valueType is None:
                             pretty.print_error("Value type for 'map' is not valid ! {0}".format(f.get('valueType')))
                         else:
@@ -665,13 +665,18 @@ class WZProto():
                     if f.get('extensions') is not None:
                         for ext in f.get('extensions'):
                             list_names = ext.split('.')
+                            ext_msg = None
+
                             if len(list_names) > 2:
-                                ext_pkg = next((pkg for pkg in self._package if pkg == 'protos/{0}/{1}.proto'.format(
-                                    ext.split('.')[2], ext.split('.')[1])))
-                                if ext_pkg is not None:
-                                    ext_msg = next((m for m in self._messages[ext_pkg] if m.get(
-                                        'name') == ext.split('.')[3]), None)
-                                    logging.debug(f'{list_names} | {ext_msg}')
+                                if '.'.join(list_names[:3]) == self._package:
+                                    ext_msg = next((m for m in self._messages if m.get('name') == list_names[3]),None)
+
+                                # ext_pkg = next((pkg for pkg in self._package if pkg == 'protos/{0}/{1}.proto'.format(
+                                #     ext.split('.')[2], ext.split('.')[1])),None)
+                                # if ext_pkg is not None:
+                                #     ext_msg = next((m for m in self._messages[ext_pkg] if m.get(
+                                #         'name') == ext.split('.')[3]), None)
+                                #     logging.debug(f'{list_names} | {ext_msg}')
                             else:
                                 ext_msg = next((m for m in self._messages if m.get(
                                     'name') == ext.split('.')[0]), None)
@@ -699,7 +704,26 @@ class WZProto():
                                         ext_v = "false"
                                     elif ext_v == 1:
                                         ext_v = "true"
-                                fOptions.append(f'({ext}) = {ext_v}')
+                                label_ext = field.get(
+                                    'label').split('_')[-1].lower()
+                                if label_ext == 'repeated':
+                                    for v in ext_v:
+                                        if 'int' in type_ext:
+                                            temp_v = int(v)
+                                        elif type_ext == 'float' or type_ext == 'double':
+                                            temp_v = float(v)
+                                        elif type_ext == 'string':
+                                            temp_v = f'"{v}"'
+                                        elif type_ext == 'bool':
+                                            if v == 0:
+                                                temp_v = "false"
+                                            elif v == 1:
+                                                temp_v = "true"
+                                        pretty.print_info(v)
+                                        fOptions.append(f'({ext}) = {temp_v}')
+
+                                else:
+                                    fOptions.append(f'({ext}) = {ext_v}')
                         fOptions = ','.join(fOptions)
                     fOptions = f' [{fOptions}]' if len(fOptions) > 0 else ''
                     fDesc = f.get('description')

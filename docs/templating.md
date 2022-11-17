@@ -16,7 +16,7 @@ webezy template <path/to/webezy.json> --out-path templates --template-name <Some
 webezy template <mycustom.template.py> --load
 ```
 
-[WebezyArchitect API Example](./webezyio/tests/blank/test.py)
+[WebezyArchitect API Example](../webezyio/tests/blank/test.py)
 
 __Builtins Templates__:
 
@@ -29,9 +29,15 @@ wz new <SomeProject> --template @webezyio/SamplePy
 wz new <SomeProject> --template @webezyio/SampleTs
 ```
 
-[SamplePy Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py)
+[HelloWorld Python Template](../webezyio/commons/templates/webezyio/HelloWorldPy.template.py) - `@webezyio/HelloWorldPy`
 
-[SampleTs Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py)
+[HelloWorld Typescript Template](../webezyio/commons/templates/webezyio/HelloWorldTs.template.py) - `@webezyio/HelloWorldTs`
+
+[SamplePy Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py) - `@webezyio/SamplePy`
+
+[SampleTs Template](https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py) - `@webezyio/SamplePy`
+
+[Publisher Subscriber Typescript Template](../webezyio/commons/templates/webezyio/PubSubTs.template.py) - `@webezyio/PubSubTs`
 
 > __Note__ You can list all available templates with the following command: `wz template list`
 
@@ -46,8 +52,7 @@ __`webezy.json`__
     "template": {
       "outPath": "template",
       "name": "SamplePy",
-      "description": "A basic sample project for webezyio.
-      It is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google",
+      "description": "A basic sample project for webezyio. It is included with examples for all RPC's types and using Enums + Nested Messages, including 'Well Known' messages from google",
       "include": [
         "typescript.ts",
         "python.py",
