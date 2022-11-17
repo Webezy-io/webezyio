@@ -14,4 +14,3 @@ service SampleService {
 	rpc OtherRPC (stream domain.OtherPackage.v1.OtherMessage) returns (domain.SamplePackage.v1.SampleMessage);
 }
 
-

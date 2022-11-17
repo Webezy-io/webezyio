@@ -33,7 +33,8 @@ from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
     FieldDescriptor, ServiceDescriptor, EnumDescriptor
 from grpc_tools import command
-from webezyio.commons.pretty import print_info
+from webezyio.commons import errors
+from webezyio.commons.pretty import print_info, print_note
 
 from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson, Project, WebezyConfig,\
     Language, WebezyServer, WebezyClient,\
@@ -116,6 +117,8 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
         temp_langugae = Language.python
     elif server_langauge == 'typescript':
         temp_langugae = Language.typescript
+    else:
+        raise errors.WebezyValidationError('Server Language Error','Must pass a valid server language for your new project')
     server = WebezyServer(language=Language.Name(temp_langugae))
     # Parse clients
     temp_clients = []
@@ -267,7 +270,7 @@ def generate_rpc(path, name, client_streaming, server_streaming, in_type, out_ty
 
 
 def parse_proto(proto_path) -> FileDescriptor:
-    print_info(f"Parsing proto file -> {proto_path}")
+    print_note(f"Parsing proto file into python module -> {proto_path}")
     # command.build_package_protos(proto_path)
     # os.chdir(os.getcwd()+'/protos')
     try:

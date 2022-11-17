@@ -192,6 +192,11 @@ class WZField():
                         elif isinstance(dict(self.__dict__)[k][j], bool):
                             temp[k[1:]][j] = Value(
                                 bool_value=dict(self.__dict__)[k][j])
+                        else:
+                            if isinstance(dict(self.__dict__)[k][j], Value):
+                                temp[k[1:]][j] = dict(self.__dict__)[k][j]
+                            else:
+                                pretty.print_warning("Not supported extension type !")
             else:
                 temp[k[1:]] = dict(self.__dict__)[k]
 
@@ -205,7 +210,7 @@ class WZField():
                 exit(1)
         elif self._field_type == 'TYPE_MESSAGE':
             if self._message_type is None:    
-                pretty.print_error(f"Field {self._name} missing enum type and is configured as 'TYPE_ENUM'")
+                pretty.print_error(f"Field {self._name} missing enum type and is configured as 'TYPE_MESSAGE'")
                 exit(1)
 
     @property

@@ -40,7 +40,7 @@ from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
-from webezyio.cli.commands import call, new,build,generate,ls,package as pack,run,edit,template
+from webezyio.cli.commands import call, migrate, new,build,generate,ls,package as pack,run,edit,template
 from pathlib import Path
 
 _TEMPLATES = config.webezyio_templates
@@ -276,15 +276,19 @@ def main(args=None):
     parser_run_server.add_argument(
         '--debug',action='store_true', help='Start the gRPC server with debug mode attached')
 
+
+    """Migrate command"""
+    praser_migrate = subparsers.add_parser('migrate',help='Migrate existing gRPC project to Webezy.io project')
+    praser_migrate.add_argument('--protos',help='Relative path of proto directory')
+    praser_migrate.add_argument('--format',choices=['json','python'],help='Relative path of proto directory')
+
+    # Utils
     parser.add_argument('-v', '--version', action='store_true',
                         help='Display webezyio current installed version')
 
     parser.add_argument('-e', '--expand', action='store_true',
                         help='Expand optional fields for each resource')
 
-    # parser.add_argument(
-    #     '-b','--build', action='store_true', help='Build webezyio project')
-    
     # Log level optional argument
     parser.add_argument(
         '--loglevel', default='ERROR', help='Log level',
@@ -469,10 +473,15 @@ def main(args=None):
                     else:
                         ls.list_by_name(args.full_name,WEBEZY_JSON)
                 else:
+                    if hasattr(args,'protos'):
+                        print_warning("Cant migrate existing Webezy.io project !")
+                        exit(1)
                     parser.print_help()
         
         else:
-            if hasattr(args, 'path'):
+            if hasattr(args,'protos'):
+                migrate.migrate_project(args.protos,output_path=file_system.get_current_location(),format='json')
+            elif hasattr(args, 'path'):
                 template_commands(args)
             else:
                 print_warning(
@@ -685,11 +694,11 @@ def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
                         print(parse)
                     else:
                         if file_system.check_if_dir_exists(args.path):
-                            builder = WebezyBuilder(path=file_system.get_current_location(),hooks=[WebezyMigrate])
-                            builder.PreBuild()
-                            print_info(file_system.join_path(file_system.get_current_location(),args.path))
-                            builder.ParseProtosToResource(project_name="test",protos_dir=file_system.join_path(file_system.get_current_location(),args.path),clients=[],server_language="python")
-                            builder.PostBuild()
+                            # builder = WebezyBuilder(path=file_system.get_current_location(),hooks=[WebezyMigrate])
+                            # builder.PreBuild()
+                            # print_info(file_system.join_path(file_system.get_current_location(),args.path))
+                            # builder.ParseProtosToResource(project_name="test",protos_dir=file_system.join_path(file_system.get_current_location(),args.path),clients=[],server_language="python")
+                            # builder.PostBuild()
                             raise errors.WebezyProtoError("Not supported yet","Will be used to pass a directory path which holds proto files")
                         else:
                             raise errors.WebezyProtoError("Export Service Template Error","File type not supported")

@@ -45,14 +45,15 @@ class WebezyBuilder:
 
     def _parse_protos(self, path):
         if self._webezy_json is not None:
-            for svc in self._webezy_json.services:
-                sys.path.append(path.split('/webezy.json')[0])
-                os.chdir(path.split('/webezy.json')[0])
-                try:
-                    self._protos_map[svc] = resources.parse_proto(
-                        file_system.join_path('protos', f'{svc}.proto'))
-                except Exception:
-                    logging.debug("Error while parsing existing protos")
+            if self._webezy_json.services is not None:
+                for svc in self._webezy_json.services:
+                    sys.path.append(path.split('/webezy.json')[0])
+                    os.chdir(path.split('/webezy.json')[0])
+                    try:
+                        self._protos_map[svc] = resources.parse_proto(
+                            file_system.join_path('protos', f'{svc}.proto'))
+                    except Exception:
+                        logging.debug("Error while parsing existing protos")
 
     def _register_hooks(self) -> None:
         for hook in self.hooks:
@@ -208,13 +209,10 @@ class WebezyBuilder:
 
     def ParseProtosToResource(self, protos_dir=None, project_name=None, server_language=None, clients=[]):
         """Executing the :func:`webezyio.builder.src.hookspecs.parse_protos_to_resource` hook"""
-        logging.info(protos_dir)
-
         path = self._path.replace(
             'webezy.json', 'protos') if protos_dir is None else protos_dir
-        logging.info(path)
         server_language = self._server_language if server_language is None else 'python'
-        project_name = self._project_name if project_name is None else 'unknown-project'
+        project_name = self._project_name if project_name is None else project_name if self._project_name is None else 'unknown-project'
         clients = self._clients if len(clients) == 0 else clients
         results = self._pm.hook.parse_protos_to_resource(
             protos_dir=path, project_name=project_name, server_language=server_language, clients=clients)

@@ -21,12 +21,14 @@
 
 import logging
 import os
+from pathlib import Path
 import sys
-from typing import List, Literal
+from typing import Dict, List, Literal
+from webezyio.architect import WebezyArchitect
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources, errors
-from webezyio.commons.pretty import print_info, print_success
-from webezyio.commons.protos.webezy_pb2 import Descriptor, Language, Project, ServiceDescriptor, WebezyClient, WebezyServer, WzResourceWrapper
+from webezyio.commons.pretty import print_error, print_info, print_note, print_success, print_warning
+from webezyio.commons.protos.webezy_pb2 import Descriptor, Language, Project, ServiceDescriptor, WebezyClient, WebezyDeploymentType, WebezyServer, WzResourceWrapper,google_dot_protobuf_dot_struct__pb2
 
 
 @builder.hookimpl
@@ -43,114 +45,193 @@ _WELL_KNOWN_LANGUAGED = Literal["python", "typescript"]
 
 
 @builder.hookimpl
-def parse_protos_to_resource(protos_dir, project_name, server_language, clients: List[int] = [Language.python]):
+def parse_protos_to_resource(protos_dir, project_name, server_language, clients: List[int] = [Language.python],domain=None):
     resources_added = []
     pkgs = {}
-    services = {}
+    services = []
     prj = {}
-    path = protos_dir.replace('/protos', '')
-    print_info(path,tag='path')
-    print_info(protos_dir)
+    
+    project_path = str(Path(protos_dir).parents[0])
+
+    print_info(project_path,True,tag='migrating project at path:')
 
     temp_clients = []
     for c in clients:
         temp_clients.append(WebezyClient(language=Language.Name(
-            c), out_dir=file_system.join_path(path, 'clients', Language.Name(c))))
+            c), out_dir=file_system.join_path(project_path, 'clients', Language.Name(c))))
+
     srvr = WebezyServer(language=Language.Name(Language.python))
-    prj = Project(uri=path, name=project_name, package_name=project_name.replace('-', '').replace('_', ''), version='0.0.1',
-                  type=resources.ResourceTypes.project.name, kind=resources.ResourceKinds.ezy_1.name, server=srvr, clients=temp_clients)
+
+    prj = Project(uri=project_path, name=project_name, package_name=project_name.replace('-', '').replace('_', ''), version='0.0.1',
+                  type=resources.ResourceTypes.project.value, kind=resources.ResourceKinds.ezy_1.value, server=srvr, clients=temp_clients)
     resources_added.append(WzResourceWrapper(project=prj))
 
     if file_system.walkFiles(protos_dir) is None:
         raise errors.WebezyProtoError(
             "File", "Error on parsing proto files. make sure you have a protos dir under current location.")
-    # for f in file_system.walkFiles(protos_dir):
-    #     temp_file = file_system.rFile(f'{protos_dir}/{f}')
-    #     index = 0
-    #     file = temp_file
-    #     for l in file:
-    #         if 'import "' in l and 'google/protobuf' not in l:
-    #             file[index] = l.replace('import "', 'import "protos/')
-    #         index += 1
-    #     # print(f, file)
-    #     file_system.wFile(f'{protos_dir}/{f}', ''.join(file), True)
 
     for f in file_system.walkFiles(protos_dir):
 
-        print_info(f"Parsing -> {f}")
         try:
+            """Init parse protos"""
             protos = resources.parse_proto(f)
             # pool = resources.parse_pool(protos.pool)
-            print_info(protos,True)
-            print_info(dir(protos[0]),True,'Proto Module')
-            print_info(dir(protos[1]),True,'Service Module')
+            # print_info(dir(protos[0]),True,'Proto Module')
+            # print_info(dir(protos[1]),True,'Service Module')
+
             proto_module = protos[0].DESCRIPTOR
-            # print_info(
-                # f'[{proto_module.name}] {proto_module.package} | Has Opt: {proto_module.has_options} | {proto_module.extensions_by_name}')
+            
+            """File options"""
+            proto_file_opt = proto_module.GetOptions()
+            proto_file_depend = proto_module.dependencies
 
-            if proto_module.services_by_name != {} and proto_module.message_types_by_name != {}:
+            _services = proto_module.services_by_name
+            _package = proto_module.package
+
+            # print_note({'file_options':proto_file_opt,'file_dependencies':proto_file_depend},True)
+           
+            """Validations"""
+            # TODO Handle project with no service (For future use of protobuf as standalone feature)
+
+            if _services != {} and proto_module.message_types_by_name != {}:
                 raise errors.WebezyProtoError(
-                    'Service', 'Service canot hold messages ! Please de-attach the messages to stand-alone package')
+                    'Service', 'Service MUST NOT hold messages ! Please de-attach the messages to stand-alone package')
+            
+            # Service
+            if _services != {}:
+                print_info("Parsing \"Service\" proto file\n\t-> Services : {0}".format(len(_services)))
 
+                for svc in _services:
+
+                    service_name = _services[svc].name
+                    service_full_name = _services[svc].full_name
+                    service_methods = _services[svc].methods_by_name
+                    service = helpers.WZService(service_name,methods=[],dependencies=[])
+
+                    for rpc in service_methods:
+                        proto_rpc = service_methods[rpc]
+                        service_rpc = helpers.WZRPC(proto_rpc.name,proto_rpc.input_type,proto_rpc.output_type,proto_rpc.client_streaming,proto_rpc.server_streaming)
+                        service._methods.append(service_rpc)
+                    
+                    # print_note({'index':_services[svc].index,'has_options':_services[svc].has_options},True,'[{0}] Service expanded'.format(service_full_name))
+                    services.append(service)
+
+            # Package
             if proto_module.package is not None and proto_module.package != '':
                 pkg_name = proto_module.package.split('.')[1]
-                print_info(pkg_name)
-        #         pkg_v = protos.package.split('.')[-1]
-        #         pkg_domain = protos.package.split('.')[0]
-        #         pkg_path = 'protos/{0}/{1}.proto'.format(pkg_v, pkg_name)
-        #         pkgs[pkg_path] = {'uri': resources.get_uri_package(
-        #             path, protos.package), 'name': pkg_name, 'package': protos.package, 'messages': [], 'enums': []}
-        #         for msg in protos.message_types_by_name:
-        #             desc = resources.DescriptorProto()
-        #             protos.message_types_by_name[msg].CopyToProto(desc)
-        #             msg_full_name = f'{protos.package}.{desc.name}'
-        #             fields = []
-        #             try:
-        #                 logging.info(desc.Extensions)
-        #             except Exception:
-        #                 logging.debug("Not extension")
-        #             for f in desc.field:
-        #                 field_full_name = f'{msg_full_name}.{f.name}'
-        #                 field = {'uri': resources.get_uri_field(path, field_full_name), 'name': f.name, 'fullName': field_full_name, 'index': f.number, 'fieldType': resources.FieldDescriptorProto.Type.Name(
-        #                     f.type), 'label': resources.FieldDescriptorProto.Label.Name(f.label), 'type': resources.ResourceTypes.descriptor.value, 'kind': resources.ResourceKinds.field.value}
+                pkg_messages = proto_module.message_types_by_name
+                pkg_enums = proto_module.enum_types_by_name
+                package = helpers.WZPackage(pkg_name,messages=[],enums=[])
+                # print_note({'has_options':proto_module.has_options,'extensions':proto_module.extensions_by_name},True,'[{0}] Service expanded'.format(service_full_name))
+                print_info("Parsing \"Package\" proto file\n\t-> Messages : {}\n\t-> Enums : {}".format(len(pkg_messages),len(pkg_enums)))
 
-        #                 if resources.FieldDescriptorProto.Type.Name(f.type) == 'TYPE_MESSAGE':
-        #                     field['messageType'] = f.type_name[1:]
+                # Iterating package messages
+                for msg in pkg_messages:
+                    message = helpers.WZMessage(pkg_messages[msg].name,fields=[])
+                    # print_note(dir(pkg_messages[msg]))
+                    # print_note(pkg_messages[msg].extensions,True,msg)
+                    # print_note(dir(pkg_messages[msg]),True)
 
-        #                 fields.append(field)
+                    for ext in pkg_messages[msg].extensions:
+                        # print_info(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name,True)
+                        # print_info(ext.extension_scope.extensions[0].name,True)
+                        extension_type = resources.Options.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
+                        message._extension_type = extension_type
+                        for field_extended in ext.extension_scope.extensions:
+                            extended_field_desc = helpers.WZField(field_extended.name,
+                                type=resources.WZFieldDescriptor.Type.Name(field_extended.type),
+                                label=resources.WZFieldDescriptor.Label.Name(field_extended.label),
+                                enum_type=field_extended.enum_type,message_type=field_extended.message_type)
+                            
+                            message._fields.append(extended_field_desc)
 
-        #             # resources.Descriptor(name=desc.name,full_name=desc.full_name,filename=desc.filename,containing_type=desc.containing_type,fields=desc.fields,nested_types=desc.nested_types,enum_types=desc.enum_types,extensions=desc.extensions)
-        #             msg_dict = {'uri': resources.get_uri_message(
-        #                 path, msg_full_name), 'name': desc.name, 'fullName': msg_full_name, 'fields': fields}
+                    for f in pkg_messages[msg].fields:
+                        is_map_field = False
+                        field_extensions = None
+                        field_key_type = None
+                        field_value_type = None
+                        
+                        # print_note(resources.WZFieldDescriptor.Type.Name(f.type),True,f.full_name)
+                        # Handle message as field
+                        if f.message_type is not None:
 
-        #             pkgs[pkg_path]['messages'].append(msg_dict)
-        #             resources_added.append(WzResourceWrapper(
-        #                 message=resources.ParseDict(msg_dict, Descriptor())))
+                            # Handle map special field type
+                            if 'Entry' == f.message_type.name[-5:]:
+                                is_map_field = True
+                                for entry in f.message_type.fields_by_name:
+                                    if 'key' == entry:
+                                        field_key_type = resources.WZFieldDescriptor.Type.Name(f.message_type.fields_by_name[entry].type)
+                                    elif 'value' == entry:
+                                        field_value_type = resources.WZFieldDescriptor.Type.Name(f.message_type.fields_by_name[entry].type)
+                                    else:
+                                        # Not a map message
+                                        field_key_type = None
+                                        field_value_type = None
+                                        break
+                            else:
+                                pass
 
-        #         for enum in protos.enum_types_by_name:
-        #             pass
+                        # Handle field extensions
+                        if f.has_options:
+                            field_extensions = {}
+                            field_options = f.GetOptions()
+                            
+                            # print_note(field_options.Extensions,True,'Extensions {}'.format(f.name))
+                            # print_note(field_options.Extensions._extended_message.ListFields())
 
-        #     for svc in protos.services_by_name:
-        #         rpcs = []
-        #         for rpc in protos.services_by_name[svc].methods_by_name:
-        #             rpc = protos.services_by_name[svc].methods_by_name[rpc]
-        #             client_stream = rpc.client_streaming
-        #             server_stream = rpc.server_streaming
-        #             full_name = rpc.full_name
-        #             input_type = rpc.input_type.full_name
-        #             output_type = rpc.output_type.full_name
-        #             rpcs.append({'uri': resources.get_uri_rpc(path, full_name), 'name': rpc.name, 'fullName': full_name,
-        #                         'outputType': output_type, 'inputType': input_type, 'clientStreaming': client_stream, 'serverStreaming': server_stream})
-        #         service = {'uri': resources.get_uri_service(
-        #             path, svc, server_language), 'name': svc, 'methods': rpcs}
-        #         services[svc] = service
-        #         logging.info(f"Adding {svc}")
-        #         resources_added.append(WzResourceWrapper(
-        #             service=resources.ParseDict(service, ServiceDescriptor())))
+                            for f_ext in field_options.Extensions._extended_message.ListFields():
+                                field_opt_type = resources.WZFieldDescriptor.Type.Name(f_ext[0].type)
+                                field_opt_label = resources.WZFieldDescriptor.Label.Name(f_ext[0].label)
+                                if 'REPEATED' in field_opt_label:
+                                    list_values_temp = []
+                                    for field_opt_value in f_ext[1]:
+                                        if 'BOOL' in field_opt_type:
+                                            list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(bool_value=field_opt_value))
+                                        elif 'STRING' in field_opt_type:
+                                            list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value))
+                                        elif 'INT' in field_opt_type:
+                                            list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value))
+                                        else:
+                                            print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
 
+                                    list_values = google_dot_protobuf_dot_struct__pb2.ListValue(values=list_values_temp)
+                                    field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
+                                else:
+                                    if 'BOOL' in field_opt_type:
+                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(bool_value=f_ext[1])
+                                    elif 'STRING' in field_opt_type:
+                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[1])
+                                    elif 'INT' in field_opt_type:
+                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(number_value=f_ext[1])
+                                    else:
+                                        print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
+                        field_message_type = f.message_type.full_name if hasattr(f.message_type,'full_name') else None
+                        field_message_type = field_message_type if field_message_type is not None and field_message_type[-5:] != 'Entry' else None
+                        field = helpers.WZField(f.name,
+                                                type=resources.WZFieldDescriptor.Type.Name(f.type if is_map_field == False else resources.WZFieldDescriptor.Type.TYPE_MAP),
+                                                label=resources.WZFieldDescriptor.Label.Name(f.label),
+                                                message_type=field_message_type,
+                                                enum_type=f.enum_type.full_name if hasattr(f.enum_type,'full_name') else None,
+                                                extensions=field_extensions,key_type=field_key_type,value_type=field_value_type
+                                                )
+                        message._fields.append(field)
+                    package._messages.append(message)
+
+                # Iterating package enums
+                for en in pkg_enums:
+                    e_values = []
+                    for ev in pkg_enums[en].values:
+                        e_value = helpers.WZEnumValue(ev.name,ev.number)
+                        e_values.append(e_value)
+                    enum_desc = helpers.WZEnum(pkg_enums[en].name,enum_values=e_values)
+                    package._enums.append(enum_desc)
+
+                pkgs['protos/v1/{0}.proto'.format(package.name)] = package
+                # package = helpers.WZPackage(pkg_name,messages=[],enums=[])
+            
         except Exception as e:
-            logging.exception(
-                f'Exception occured during handling of [{f}] : {e}')
+            print_error(
+                f'Migration Exception occured during handling of [{f}] : {e}')
 
     # for f in file_system.walkFiles(protos_dir):
     #     index = 0
@@ -160,6 +241,46 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
     #             temp_file[index] = l.replace('import "protos/', 'import "')
     #         index += 1
     #     file_system.wFile(f'{protos_dir}/{f}', ''.join(temp_file), True)
-    print_success(resources_added)
-
+    _migrate_to_webezy_json(file_system.join_path(project_path,'webezy.json'),domain if domain is not None else 'webezy',prj,pkgs,services)
     return resources_added
+
+def _migrate_to_template(template_name:str,template_path:str):
+    pass
+
+def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[str,helpers.WZPackage],services):
+    
+    msgs_map = {}
+
+    ARCHITECT = WebezyArchitect(
+        path=webezy_json_path, domain=domain, project_name=project.name)
+    c_languages = []
+    for client in project.clients:
+        print_info(client)
+        # if type(client) == str:
+        #     client_lang = client
+        # else:
+        #     client_lang = Language.Name(client)
+        # out_dir = file_system.join_path(
+        #     webezy_json_path.replace('webezy.json',''), 'clients', client_lang)
+        # print_info(f'Adding client: {client_lang}')
+        # c_languages.append(
+        #     {'out_dir': out_dir, 'language': client_lang})
+
+    ARCHITECT.AddProject(server_language=resources.Language.Name(project.server.language), clients=c_languages)
+    ARCHITECT.SetDomain(domain)
+    ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
+
+    for p in packages:
+        package_name, package_messages, package_enums = packages[p].to_tuple()
+
+        package_temp = ARCHITECT.AddPackage(package_name)
+        for m in package_messages:
+            msg_name, msg_fields, msg_desc, msg_opt = m
+            msg_temp = ARCHITECT.AddMessage(package_temp, msg_name, msg_fields, msg_desc, msg_opt)
+            msgs_map[msg_temp.full_name] = msg_temp
+
+        for e in package_enums:
+            enum_name, enum_values, enum_desc = e
+            ARCHITECT.AddEnum(package_temp, enum_name, enum_values, enum_desc)
+
+    ARCHITECT.Save()

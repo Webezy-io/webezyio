@@ -10,10 +10,11 @@ package domain.SamplePackage.v1;
 
 // [webezyio] - Some description in sample message
 message SampleMessage {
-	bool ExtendedField = 1 [(ExtensionMessage.BoolExtend) = true];
+	bool ExtendedField = 1 [(ExtensionMessage.BoolExtend) = false,(ExtensionMessage.BoolExtend) = true];
 	google.protobuf.Timestamp Timestamp = 2;
 	int32 Integer = 3;
 	domain.OtherPackage.v1.OtherMessage ChildMessage = 4;
+	map<string, string> test = 5;
 }
 
 // [webezyio] - None
