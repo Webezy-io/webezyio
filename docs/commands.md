@@ -90,6 +90,15 @@ __Edit a message__
 wz edit <domain.package.v1.message>
 ```
 
+## wz build
+
+Build the project resources
+```sh
+optional arguments:
+  -h, --help  show this help message and exit
+  --protos    Build resources protos files only
+  --code      Build resources code classes files only
+```
 ## wz template
 Create or load a project template
 ```sh
@@ -106,7 +115,6 @@ optional arguments:
 ```
 
 See [Service Templating Section](./docs//templating.md) for more information.
-
 
 ## wz call
 Call a service RPC for a running server host
@@ -150,3 +158,28 @@ optional arguments:
   -h, --help  show this help message and exit
   --debug     Start the gRPC server with debug mode attached
 ```
+
+## wz migrate
+Migrate existing gRPC project to a __Webezy.io__ project
+
+```sh
+optional arguments:
+  -h, --help            show this help message and exit
+  --protos PROTOS       Relative path of proto directory
+  --format {json,python}
+                        Migrate output file format
+
+```
+
+Go to exisitng gRPC project which hold `.proto` files in __ONE__ parent directory.
+
+Lets say we have our proto file all in one directory under our project called `'Modules'`
+we can run the migration plan as follow from the root directory:
+```sh
+wz migrate --protos Modules
+```
+It will run the migration for all `.proto` files existing in the directory passed to `--protos` argument.
+
+When the process succeeds we will get an output of all resources parsed into `webezy.json` format at the same path of our original project.
+
+> __Warning__ Migration of project is experimental feature

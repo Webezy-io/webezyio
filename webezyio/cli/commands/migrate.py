@@ -28,7 +28,7 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from webezyio.commons.protos.webezy_pb2 import Language
 
-def migrate_project(protos_directory:str,output_path:str,format:Literal['json','python'],server_language=Language.python,clients=[Language.python]):
+def migrate_project(protos_directory:str,output_path:str,format:Literal['json','python']='json',server_language=Language.python,clients=[Language.python]):
     if format == 'python':
         raise Exception("Cannot process a migration plan into python file ! only json format is supported right now.")
         

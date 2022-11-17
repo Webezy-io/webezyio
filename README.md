@@ -49,7 +49,7 @@ __Tutorials:__
 
 > __Note__ Please refer to [CLI docs](https://www.webezy.io/docs/cli) for any question you got, also make sute to use the CLI help `webezy --help` should give you an additional information on every command you may possibly run
 
-To create a new webezy.io project run the following command:
+To create a [new webezy.io](./docs/commands.md#wz-new) project run the following command:
 ```sh
 webezy new <YourProject>
 ```
@@ -72,7 +72,7 @@ Then you will need to navigate into your project
 cd <YourProject>
 ```
 
-After you are under the new project directory you can go ahead and create webezy.io resources with those simple commands:
+After you are under the new project directory you can go ahead and [create webezy.io resources](./docs/commands.md#wz-generate) with those simple commands:
 
 > __Note__ Please note that every sub-command of `generate` and `new` can be shortend with the first letter e.g : `wz g p` is equivalent to `wz generate package`
 
@@ -92,7 +92,7 @@ webezy generate rpc
 
 After you had generated your resources for the project and modified the code (See the docs for more explanation on how to develop your project and make changes [Sample Project](https://www.webezy.io/docs/tutorials/sample-project)).
 
-You can now build your project and run your server with those simple commands:
+You can now [build your project](./docs/commands.md#wz-build) and [run your server](./docs/commands.md#wz-run) with those simple commands:
 
 ```sh
 # First build your project
@@ -129,6 +129,7 @@ Some of the features are listed below:
 
 - [Templating](./docs/templating.md) - Wrap your project and re-share them among team members or to your won base project templates into other future or existing Webezy.io projects.
 - [Custom Configurations](./docs/custom_configurations.md) - Learn how to define custom configurations for a project to make your life easier.
+- [Migration](/docs/commands.md#wz-migrate) - You can now migrate your existing gRPC project to unified structure and resources of Webezy.io projects.
 
 # Batteries Included
 Webezy.io goal is to make development lifecycles quick and meaningfull while coding a distrubted-system using state of the art technologies.
