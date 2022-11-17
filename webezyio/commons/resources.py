@@ -197,6 +197,9 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
     msg_uri = get_uri_message(path, msg_fName)
     if option is None:
         option = Options.UNKNOWN_EXTENSION
+    else:
+        if 'google.protobuf.descriptor' not in package.dependencies:
+            package.dependencies.append('google.protobuf.Descriptor')
     index = 0 if option == Options.UNKNOWN_EXTENSION else 55555
     for f in fields:
         if next((n for n in temp_fields if n.name == f.get('name')), None) is None:
@@ -205,8 +208,9 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                 domain, package.name, name, f.get('name'))
             msg_type = None
             if f.get('message_type') is not None:
-                if f.get('message_type') not in package.dependencies and package.package not in f.get('message_type'):
-                    package.dependencies.append(f.get('message_type'))
+                package_name = '.'.join(f.get('message_type').split('.')[:3])
+                if package_name not in package.dependencies and package.package not in f.get('message_type'):
+                    package.dependencies.append(package_name)
                 if 'google.protobuf' in f.get('message_type'):
                     msg_type = '{0}.{1}.{2}'.format(f.get('message_type').split('.')[0],f.get('message_type').split('.')[1],f.get('message_type').split('.')[-1].capitalize()) if f.get('message_type') is not None else None
                 else:

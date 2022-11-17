@@ -9,9 +9,9 @@ service SampleService {
 	// [webezyio] - None
 	rpc SampleRPC (webezy.SamplePackage.v1.SampleMessage) returns (webezy.SamplePackage.v1.SampleMessage);
 	// [webezyio] - None
-	rpc TestRPC (stream domain.OtherPackage.v1.OtherMessage) returns (domain.OtherPackage.v1.OtherMessage);
+	rpc TestRPC (stream webezy.OtherPackage.v1.OtherMessage) returns (webezy.OtherPackage.v1.OtherMessage);
 	// [webezyio] - None
-	rpc OtherRPC (stream domain.OtherPackage.v1.OtherMessage) returns (webezy.SamplePackage.v1.SampleMessage);
+	rpc OtherRPC (stream webezy.OtherPackage.v1.OtherMessage) returns (webezy.SamplePackage.v1.SampleMessage);
 }
 
 

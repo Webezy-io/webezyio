@@ -199,6 +199,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                                     raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
                                                 struct_temp.update({field_ext_temp.name:getattr(field_opt_value,field_ext_temp.name)})
                                             list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp))
+                                        elif 'ENUM' in field_opt_type:
+                                            list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[0].enum_type.values_by_number[field_opt_value].name))
                                         else:
                                             print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
 
@@ -218,6 +220,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                                     raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
                                                 struct_temp.update({field_ext_temp.name:getattr(f_ext[1],field_ext_temp.name)})
                                             field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp)
+                                    elif 'ENUM' in field_opt_type:
+                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[0].enum_type.values_by_number[f_ext[1]].name)
                                     else:
                                         print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
                         

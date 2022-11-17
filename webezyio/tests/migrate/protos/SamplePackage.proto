@@ -10,20 +10,23 @@ package webezy.SamplePackage.v1;
 
 // [webezyio] - None
 message SampleMessage {
-	bool ExtendedField = 1 [(webezy.SamplePackage.v1.ExtensionMessage.BoolExtend) = false,(webezy.SamplePackage.v1.ExtensionMessage.BoolExtend) = true];
+	bool ExtendedField = 1 [
+		(webezy.SamplePackage.v1.ExtensionMessage.BoolExtend) = false,
+		(webezy.SamplePackage.v1.ExtensionMessage.BoolExtend) = true];
 	google.protobuf.Timestamp Timestamp = 2;
 	int32 Integer = 3 [(webezy.SamplePackage.v1.ExtensionMessage.TestString) = "Test"];
-	domain.OtherPackage.v1.OtherMessage ChildMessage = 4 [
-		(webezy.SamplePackage.v1.ExtensionMessage.testChild) = {name:"Test"},
-		(webezy.SamplePackage.v1.ExtensionMessage.testChild) = {name:"Other"}
-	];
+	webezy.OtherPackage.v1.OtherMessage ChildMessage = 4 [(webezy.SamplePackage.v1.ExtensionMessage.testChild) = {name : "Test",aBool : false}];
 	map<string, string> test = 5;
-	map<string, domain.OtherPackage.v1.OtherMessage> testNestedMap = 6;
-	map<string, webezy.SamplePackage.v1.SampleEnum> testEnumMap = 7;
+	map<string, webezy.OtherPackage.v1.OtherMessage> testNestedMap = 6 [(webezy.SamplePackage.v1.ExtensionMessage.enum_field) = TEST];
+	map<string, webezy.SamplePackage.v1.SampleEnum> testEnumMap = 7 [
+		(webezy.SamplePackage.v1.ExtensionMessage.list_enum_field) = TEST,
+		(webezy.SamplePackage.v1.ExtensionMessage.list_enum_field) = ANOTHER];
 }
 
+// [webezyio] - None
 message TestChild {
 	string name = 1;
+	bool aBool = 2;
 }
 
 // [webezyio] - None
@@ -31,7 +34,9 @@ message ExtensionMessage {
 	extend google.protobuf.FieldOptions {
 		repeated bool BoolExtend = 55556;
 		string TestString = 55557;
-		repeated TestChild testChild = 55558;
+		webezy.SamplePackage.v1.TestChild testChild = 55558;
+		webezy.SamplePackage.v1.SampleEnum enum_field = 55559;
+		repeated webezy.SamplePackage.v1.SampleEnum list_enum_field = 55560;
 	}
 }
 
@@ -41,4 +46,6 @@ enum SampleEnum {
 	UNKNWON = 0;
 	// [webezyio] - None
 	TEST = 1;
+	// [webezyio] - None
+	ANOTHER = 2;
 }

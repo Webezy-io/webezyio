@@ -133,7 +133,8 @@ Some of the features are listed below:
 
 - [Templating](./docs/templating.md) - Wrap your project and re-share them among team members or to your won base project templates into other future or existing Webezy.io projects.
 - [Custom Configurations](./docs/custom_configurations.md) - Learn how to define custom configurations for a project to make your life easier.
-- [Migration](/docs/commands.md#wz-migrate) - You can now migrate your existing gRPC project to unified structure and resources of Webezy.io projects.
+- [Migration](./docs/commands.md#wz-migrate) - You can now migrate your existing gRPC project to unified structure and resources of Webezy.io projects.
+- [Extending Protobuf Functionality](./docs/extensions.md) - You can configure a custom extension for your resources.
 
 # Batteries Included
 Webezy.io goal is to make development lifecycles quick and meaningfull while coding a distrubted-system using state of the art technologies.

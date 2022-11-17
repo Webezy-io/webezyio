@@ -583,7 +583,7 @@ class WZProto():
 
             options = next((m for m in self._messages if m.get(
                 'extensionType') is not None), None)
-            if options is not None:
+            if options is not None and 'google.protobuf.Descriptor' not in self._imports :
                 temp_imports.append(
                     'import "google/protobuf/descriptor.proto";')
             return '\n'.join(temp_imports)
@@ -693,19 +693,47 @@ class WZProto():
                                 ext_v = f.get('extensions')[ext]
                                 type_ext = field.get(
                                     'fieldType').split('_')[-1].lower()
-                                if 'int' in type_ext:
-                                    ext_v = int(ext_v)
-                                elif type_ext == 'float' or type_ext == 'double':
-                                    ext_v = float(ext_v)
-                                elif type_ext == 'string':
-                                    ext_v = f'"{ext_v}"'
-                                elif type_ext == 'bool':
-                                    if ext_v == 0:
-                                        ext_v = "false"
-                                    elif ext_v == 1:
-                                        ext_v = "true"
                                 label_ext = field.get(
                                     'label').split('_')[-1].lower()
+                                if label_ext != 'repeated':
+                                    if 'int' in type_ext:
+                                        ext_v = int(ext_v)
+                                    elif type_ext == 'float' or type_ext == 'double':
+                                        ext_v = float(ext_v)
+                                    elif type_ext == 'string':
+                                        ext_v = f'"{ext_v}"'
+                                    elif type_ext == 'bool':
+                                        if ext_v == 0:
+                                            ext_v = "false"
+                                        elif ext_v == 1:
+                                            ext_v = "true"
+                                    elif type_ext == 'message':
+                                        ext_msg = next((m for m in self._messages if m.get(
+                                            'name') == field.get('messageType').split('.')[-1]), None)
+                                        temp_v_list = []
+                                        for k in ext_v:
+                                            field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == k),None)
+                                            if field_in_ext is not None:
+                                                field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
+                                                if 'int' in field_ext_in_type:
+                                                    temp_v = int(ext_v[k])
+                                                elif field_ext_in_type == 'float' or field_ext_in_type == 'double':
+                                                    temp_v = float(ext_v[k])
+                                                elif field_ext_in_type == 'string':
+                                                    temp_v = f'"{ext_v[k]}"'
+                                                elif field_ext_in_type == 'bool':
+                                                    if ext_v[k] == 0:
+                                                        temp_v = "false"
+                                                    elif ext_v[k] == 1:
+                                                        temp_v = "true"
+                                                temp_v_list.append('{0} : {1}'.format(k,temp_v))
+                                                
+                                        joined_fields = ','.join(temp_v_list)
+                                        ext_v = f'{_OPEN_BRCK}{joined_fields}{_CLOSING_BRCK}'
+                                        pretty.print_note(ext_v)
+                                        # joined_fields = ','.join(temp_v_list)
+                                        # ext_v = f'{_OPEN_BRCK}{}{_CL/OSING_BRCK}
+                                
                                 if label_ext == 'repeated':
                                     for v in ext_v:
                                         if 'int' in type_ext:
@@ -719,8 +747,39 @@ class WZProto():
                                                 temp_v = "false"
                                             elif v == 1:
                                                 temp_v = "true"
-                                        pretty.print_info(v)
-                                        fOptions.append(f'({ext}) = {temp_v}')
+                                        elif type_ext == 'message':
+                                            # if self._package not in field.get('messageType'):
+                                            ext_msg = next((m for m in self._messages if m.get(
+                                                'name') == field.get('messageType').split('.')[-1]), None)
+                                            temp_v_list = []
+                                            if ext_msg is not None:
+                                                for value_nested in v:
+
+                                                    field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == value_nested),None)
+                                                    if field_in_ext is not None:
+                                                        field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
+                                                        if 'int' in field_ext_in_type:
+                                                            temp_v = int(v[value_nested])
+                                                        elif field_ext_in_type == 'float' or field_ext_in_type == 'double':
+                                                            temp_v = float(v[value_nested])
+                                                        elif field_ext_in_type == 'string':
+                                                            temp_v = f'"{v[value_nested]}"'
+                                                        elif field_ext_in_type == 'bool':
+                                                            if v[value_nested] == 0:
+                                                                temp_v = "false"
+                                                            elif v[value_nested] == 1:
+                                                                temp_v = "true"
+                                                        temp_v_list.append('{0} : {1}'.format(value_nested,temp_v))
+                                                joined_fields = ','.join(temp_v_list)
+                                                temp_v = f'{_OPEN_BRCK}{joined_fields}{_CLOSING_BRCK}'
+                                            else:
+                                                pretty.print_error("Canot parse extension values for {} because it is nested message from another package please move {} to current package {}".format(value_nested,field.get('messageType'),self._package))
+                                        elif type_ext == 'enum':
+                                            temp_v = v
+                                            # pretty.print_info(self._enums)
+                                        else:
+                                            pretty.print_warning("Not supported parsing of: {} for extension values".format(type_ext))
+                                        fOptions.append(f'\n\t\t({ext}) = {temp_v}')
 
                                 else:
                                     fOptions.append(f'({ext}) = {ext_v}')

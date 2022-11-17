@@ -2,7 +2,7 @@
 syntax = "proto3";
 
 
-package domain.OtherPackage.v1;
+package webezy.OtherPackage.v1;
 
 
 
