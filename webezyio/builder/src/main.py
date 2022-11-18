@@ -7,9 +7,11 @@ import pluggy
 from webezyio.builder.src import hookspecs, lru
 from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
 from webezyio.commons import file_system, helpers, resources, errors
+from webezyio.commons.pretty import print_error
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
 _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,
                         WebezyReadme]  # Many More To Come
+log = logging.getLogger('webezyio.cli.main')
 
 
 class WebezyBuilder:
@@ -53,12 +55,12 @@ class WebezyBuilder:
                         self._protos_map[svc] = resources.parse_proto(
                             file_system.join_path('protos', f'{svc}.proto'))
                     except Exception:
-                        logging.debug("Error while parsing existing protos")
+                        log.debug("Error while parsing existing protos")
 
     def _register_hooks(self) -> None:
         for hook in self.hooks:
             self._pm.register(hook)
-            logging.info(f'Registerd plugin -> {self._pm.get_name(hook)}')
+            log.info(f'Registerd plugin -> {self._pm.get_name(hook)}')
 
     def _auto_register_hooks(self):
         server_lang = self._webezy_json.get_server_language()
@@ -99,7 +101,7 @@ class WebezyBuilder:
         for p in _WELL_KNOWN_PLUGINS:
             plug_name = self._pm.get_name(p)
             if plug_name is not None:
-                logging.debug(f'Registerd plugin -> {plug_name}')
+                log.debug(f'Registerd plugin -> {plug_name}')
 
     def _parse_webezy_json(self, path):
         try:
@@ -117,7 +119,7 @@ class WebezyBuilder:
             # print(self._webezy_context)
 
         except Exception:
-            logging.warning(
+            log.warning(
                 "No .webezy/context.json file ! - Init .webezy/context.json")
             results = self._pm.hook.init_context(
                 wz_json=self._webezy_json, wz_context=None)
@@ -127,7 +129,7 @@ class WebezyBuilder:
                 context = file_system.rFile(path=path, json=True)
                 self._webezy_context = helpers.WZContext(context)
             except Exception as e:
-                logging.error(
+                log.warning(
                     "Error init context, make sure you import a plugin that implement the `init_context` hook")
 
     def InitProjectStructure(self):
@@ -207,15 +209,15 @@ class WebezyBuilder:
         results = list(itertools.chain(*results))
         return results
 
-    def ParseProtosToResource(self, protos_dir=None, project_name=None, server_language=None, clients=[]):
+    def ParseProtosToResource(self, protos_dir=None, project_name=None, server_language=None, clients=[],domain=None):
         """Executing the :func:`webezyio.builder.src.hookspecs.parse_protos_to_resource` hook"""
         path = self._path.replace(
             'webezy.json', 'protos') if protos_dir is None else protos_dir
-        server_language = self._server_language if server_language is None else 'python'
+        server_language = self._server_language if server_language is None else server_language
         project_name = self._project_name if project_name is None else project_name if self._project_name is None else 'unknown-project'
         clients = self._clients if len(clients) == 0 else clients
         results = self._pm.hook.parse_protos_to_resource(
-            protos_dir=path, project_name=project_name, server_language=server_language, clients=clients)
+            protos_dir=path, project_name=project_name, server_language=server_language, clients=clients,domain=domain)
         results = list(itertools.chain(*results))
         return results
 

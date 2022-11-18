@@ -163,12 +163,19 @@ optional arguments:
 Migrate existing gRPC project to a __Webezy.io__ project
 
 ```sh
+usage: webezy migrate [-h] [--format {json,python}] [--server-language {python,typescript}] [--clients [{python,typescript} [{python,typescript} ...]]] protos
+
+positional arguments:
+  protos                Relative path of proto directory
+
 optional arguments:
   -h, --help            show this help message and exit
-  --protos PROTOS       Relative path of proto directory
   --format {json,python}
-                        Migrate output file format
-
+                        Relative path of proto directory
+  --server-language {python,typescript}
+                        Chose a server language for migration
+  --clients [{python,typescript} [{python,typescript} ...]]
+                        Enter one or more clients
 ```
 
 Go to exisitng gRPC project which hold `.proto` files in __ONE__ parent directory.

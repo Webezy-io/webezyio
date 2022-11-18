@@ -1,0 +1,353 @@
+{
+    "domain": "webezy",
+    "project": {
+        "uri": ".",
+        "name": "TEST-PROJECT",
+        "packageName": "testproject",
+        "version": "0.0.1",
+        "type": "projects",
+        "kind": "Webezy.project/tier1",
+        "serverLanguage": "python",
+        "server": {
+            "language": "python"
+        },
+        "clients": [
+            {
+                "outDir": "./clients/typescript",
+                "language": "typescript"
+            },
+            {
+                "outDir": "./clients/python",
+                "language": "python"
+            }
+        ]
+    },
+    "services": {
+        "SampleService": {
+            "uri": "./protos/SampleService.proto",
+            "name": "SampleService",
+            "fullName": "webezy.SampleService.v1",
+            "methods": [
+                {
+                    "uri": "./methods/SampleRPC",
+                    "name": "SampleRPC",
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/method",
+                    "inputType": "webezy.SamplePackage.v1.SampleMessage",
+                    "outputType": "webezy.SamplePackage.v1.SampleMessage"
+                },
+                {
+                    "uri": "./methods/TestRPC",
+                    "name": "TestRPC",
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/method",
+                    "inputType": "webezy.OtherPackage.v1.OtherMessage",
+                    "outputType": "webezy.OtherPackage.v1.OtherMessage",
+                    "clientStreaming": true
+                },
+                {
+                    "uri": "./methods/OtherRPC",
+                    "name": "OtherRPC",
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/method",
+                    "inputType": "webezy.OtherPackage.v1.OtherMessage",
+                    "outputType": "webezy.SamplePackage.v1.SampleMessage",
+                    "clientStreaming": true
+                }
+            ],
+            "version": "0.0.1",
+            "dependencies": [
+                "webezy.SamplePackage.v1",
+                "webezy.OtherPackage.v1"
+            ],
+            "type": "services"
+        }
+    },
+    "packages": {
+        "protos/v1/OtherPackage.proto": {
+            "uri": "./packages/webezy.OtherPackage.v1",
+            "name": "OtherPackage",
+            "package": "webezy.OtherPackage.v1",
+            "messages": [
+                {
+                    "uri": "./messages/webezy.OtherPackage.v1.OtherMessage",
+                    "name": "OtherMessage",
+                    "fullName": "webezy.OtherPackage.v1.OtherMessage",
+                    "fields": [
+                        {
+                            "uri": "./fields/webezy.OtherPackage.v1.OtherMessage.StringField",
+                            "name": "StringField",
+                            "fullName": "webezy.OtherPackage.v1.OtherMessage.StringField",
+                            "index": 1,
+                            "fieldType": "TYPE_STRING",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        }
+                    ],
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/message"
+                }
+            ],
+            "version": "0.0.1",
+            "type": "packages"
+        },
+        "protos/v1/SamplePackage.proto": {
+            "uri": "./packages/webezy.SamplePackage.v1",
+            "name": "SamplePackage",
+            "package": "webezy.SamplePackage.v1",
+            "messages": [
+                {
+                    "uri": "./messages/webezy.SamplePackage.v1.SampleMessage",
+                    "name": "SampleMessage",
+                    "fullName": "webezy.SamplePackage.v1.SampleMessage",
+                    "fields": [
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.ExtendedField",
+                            "name": "ExtendedField",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.ExtendedField",
+                            "index": 1,
+                            "fieldType": "TYPE_BOOL",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "extensions": {
+                                "webezy.SamplePackage.v1.ExtensionMessage.BoolExtend": [
+                                    false,
+                                    true
+                                ]
+                            }
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.Timestamp",
+                            "name": "Timestamp",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.Timestamp",
+                            "index": 2,
+                            "fieldType": "TYPE_MESSAGE",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "messageType": "google.protobuf.Timestamp"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.Integer",
+                            "name": "Integer",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.Integer",
+                            "index": 3,
+                            "fieldType": "TYPE_INT32",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "extensions": {
+                                "webezy.SamplePackage.v1.ExtensionMessage.TestString": "Test"
+                            }
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.ChildMessage",
+                            "name": "ChildMessage",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.ChildMessage",
+                            "index": 4,
+                            "fieldType": "TYPE_MESSAGE",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "messageType": "webezy.OtherPackage.v1.OtherMessage",
+                            "extensions": {
+                                "webezy.SamplePackage.v1.ExtensionMessage.testChild": {
+                                    "name": "Test",
+                                    "aBool": false
+                                }
+                            }
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.test",
+                            "name": "test",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.test",
+                            "index": 5,
+                            "fieldType": "TYPE_MAP",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "keyType": "TYPE_STRING",
+                            "valueType": "TYPE_STRING"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.testNestedMap",
+                            "name": "testNestedMap",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.testNestedMap",
+                            "index": 6,
+                            "fieldType": "TYPE_MAP",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "messageType": "webezy.OtherPackage.v1.OtherMessage",
+                            "extensions": {
+                                "webezy.SamplePackage.v1.ExtensionMessage.enum_field": "TEST"
+                            },
+                            "keyType": "TYPE_STRING",
+                            "valueType": "TYPE_MESSAGE"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.SampleMessage.testEnumMap",
+                            "name": "testEnumMap",
+                            "fullName": "webezy.SamplePackage.v1.SampleMessage.testEnumMap",
+                            "index": 7,
+                            "fieldType": "TYPE_MAP",
+                            "label": "LABEL_OPTIONAL",
+                            "enumType": "webezy.SamplePackage.v1.SampleEnum",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "extensions": {
+                                "webezy.SamplePackage.v1.ExtensionMessage.list_enum_field": [
+                                    "TEST",
+                                    "ANOTHER"
+                                ]
+                            },
+                            "keyType": "TYPE_STRING",
+                            "valueType": "TYPE_ENUM"
+                        }
+                    ],
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/message"
+                },
+                {
+                    "uri": "./messages/webezy.SamplePackage.v1.TestChild",
+                    "name": "TestChild",
+                    "fullName": "webezy.SamplePackage.v1.TestChild",
+                    "fields": [
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.TestChild.name",
+                            "name": "name",
+                            "fullName": "webezy.SamplePackage.v1.TestChild.name",
+                            "index": 1,
+                            "fieldType": "TYPE_STRING",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.TestChild.aBool",
+                            "name": "aBool",
+                            "fullName": "webezy.SamplePackage.v1.TestChild.aBool",
+                            "index": 2,
+                            "fieldType": "TYPE_BOOL",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        }
+                    ],
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/message"
+                },
+                {
+                    "uri": "./messages/webezy.SamplePackage.v1.ExtensionMessage",
+                    "name": "ExtensionMessage",
+                    "fullName": "webezy.SamplePackage.v1.ExtensionMessage",
+                    "fields": [
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.ExtensionMessage.BoolExtend",
+                            "name": "BoolExtend",
+                            "fullName": "webezy.SamplePackage.v1.ExtensionMessage.BoolExtend",
+                            "index": 55556,
+                            "fieldType": "TYPE_BOOL",
+                            "label": "LABEL_REPEATED",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.ExtensionMessage.TestString",
+                            "name": "TestString",
+                            "fullName": "webezy.SamplePackage.v1.ExtensionMessage.TestString",
+                            "index": 55557,
+                            "fieldType": "TYPE_STRING",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.ExtensionMessage.testChild",
+                            "name": "testChild",
+                            "fullName": "webezy.SamplePackage.v1.ExtensionMessage.testChild",
+                            "index": 55558,
+                            "fieldType": "TYPE_MESSAGE",
+                            "label": "LABEL_OPTIONAL",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field",
+                            "messageType": "webezy.SamplePackage.v1.TestChild"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.ExtensionMessage.enum_field",
+                            "name": "enum_field",
+                            "fullName": "webezy.SamplePackage.v1.ExtensionMessage.enum_field",
+                            "index": 55559,
+                            "fieldType": "TYPE_ENUM",
+                            "label": "LABEL_OPTIONAL",
+                            "enumType": "webezy.SamplePackage.v1.SampleEnum",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        },
+                        {
+                            "uri": "./fields/webezy.SamplePackage.v1.ExtensionMessage.list_enum_field",
+                            "name": "list_enum_field",
+                            "fullName": "webezy.SamplePackage.v1.ExtensionMessage.list_enum_field",
+                            "index": 55560,
+                            "fieldType": "TYPE_ENUM",
+                            "label": "LABEL_REPEATED",
+                            "enumType": "webezy.SamplePackage.v1.SampleEnum",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/field"
+                        }
+                    ],
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/message",
+                    "extensionType": "FieldOptions"
+                }
+            ],
+            "version": "0.0.1",
+            "dependencies": [
+                "google.protobuf.Timestamp",
+                "webezy.OtherPackage.v1",
+                "google.protobuf.Descriptor"
+            ],
+            "enums": [
+                {
+                    "uri": "./enums/webezy.SamplePackage.v1.SampleEnum",
+                    "name": "SampleEnum",
+                    "fullName": "webezy.SamplePackage.v1.SampleEnum",
+                    "values": [
+                        {
+                            "uri": "./enums/webezy.SamplePackage.v1.SampleEnum.UNKNWON",
+                            "name": "UNKNWON",
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/enum_value"
+                        },
+                        {
+                            "uri": "./enums/webezy.SamplePackage.v1.SampleEnum.TEST",
+                            "name": "TEST",
+                            "number": 1,
+                            "index": 1,
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/enum_value"
+                        },
+                        {
+                            "uri": "./enums/webezy.SamplePackage.v1.SampleEnum.ANOTHER",
+                            "name": "ANOTHER",
+                            "number": 2,
+                            "index": 1,
+                            "type": "descriptors",
+                            "kind": "Webezy.descriptor/enum_value"
+                        }
+                    ],
+                    "type": "descriptors",
+                    "kind": "Webezy.descriptor/enum"
+                }
+            ],
+            "type": "packages"
+        }
+    },
+    "config": {
+        "host": "localhost",
+        "port": 50051,
+        "deployment": "LOCAL"
+    }
+}

@@ -217,6 +217,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
         else:
             temp_type = '{1}'.format(
                 enumType.split('.')[1], enumType.split('.')[-1])
+        temp_type = 'enum_type_wrapper.EnumTypeWrapper'
     elif type == 'bool':
         temp_type = 'bool'
     elif type == 'map':

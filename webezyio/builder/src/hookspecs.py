@@ -59,7 +59,7 @@ def init_context(wz_json:WZJson, wz_context: WZContext):
     """Init context object"""
 
 @hookspec
-def parse_protos_to_resource(protos_dir,project_name,server_language,clients):
+def parse_protos_to_resource(protos_dir,project_name,server_language,clients,domain):
     """Parse .proto files into :class:`webezyio.commons.helpers.WZJson` object"""
 
 @hookspec

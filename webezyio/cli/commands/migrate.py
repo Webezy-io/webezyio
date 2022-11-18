@@ -28,14 +28,13 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from webezyio.commons.protos.webezy_pb2 import Language
 
-def migrate_project(protos_directory:str,output_path:str,format:Literal['json','python']='json',server_language=Language.python,clients=[Language.python]):
+def migrate_project(protos_directory:str,output_path:str,format:Literal['json','python']='json',server_language=Language.Name(Language.python),clients=[Language.Name(Language.python)]):
     if format == 'python':
         raise Exception("Cannot process a migration plan into python file ! only json format is supported right now.")
-        
     _pretty.print_info((output_path,format),True,'Starting migration process ->')
     wzcoder = WebezyBuilder(path=output_path,hooks=[WebezyMigrate])
     # wzcoder.PreBuild()
     if _fs.get_current_location() not in sys.path:
         sys.path.append(_fs.get_current_location())
-    wzcoder.ParseProtosToResource(protos_dir=protos_directory,project_name='TEST-PROJECT',server_language=Language.Name(server_language),clients=clients)
+    wzcoder.ParseProtosToResource(protos_dir=protos_directory,project_name='TEST-PROJECT',server_language=server_language,clients=clients)
     wzcoder.PostBuild()

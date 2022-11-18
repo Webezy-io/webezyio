@@ -239,7 +239,7 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                                                      'field_type'),
                                                  label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions'),key_type=f.get('key_type'),value_type=f.get('value_type'),oneof_fields=fields_oneof))
         else:
-            logging.error(
+            logging.warning(
                 f"Cannot insert field {f.get('name')} already exists under {name} message")
     msg = WZDescriptor(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,
                        kind=ResourceKinds.message.value, extension_type=Options.Name(option), description=description)

@@ -535,6 +535,25 @@ class WZJson():
     def get_server_language(self):
         return self.project.get('server').get('language').lower()
 
+    def get_extended_fields(self,message_full_name:str):
+        """This function should be used when trying to iterate a specific message fields options
+        
+        Args
+        ----
+            message_full_name - Full valid name for the message we want to get fields that are extended
+
+        Returns
+        -------
+            A list of fields under passed message that holds an extension value
+        """
+        list_fields = None
+        temp_msg = self.get_message(message_full_name)
+
+        if temp_msg is not None:
+            list_fields = next((f for f in temp_msg.get('fields') if f.get('extensions') is not None),None)
+            
+        return list_fields
+
     @property
     def domain(self):
         """str: Project domain."""
@@ -558,6 +577,10 @@ class WZJson():
     def path(self):
         return self._path
 
+def load_wz_json(path:str):
+    WEBEZY_JSON = file_system.rFile(path, json=True)
+    WEBEZY_JSON = WZJson(webezy_json=WEBEZY_JSON)
+    return WEBEZY_JSON
 
 class WZProto():
 

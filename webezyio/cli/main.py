@@ -279,8 +279,10 @@ def main(args=None):
 
     """Migrate command"""
     praser_migrate = subparsers.add_parser('migrate',help='Migrate existing gRPC project to Webezy.io project')
-    praser_migrate.add_argument('--protos',help='Relative path of proto directory')
+    praser_migrate.add_argument('protos',help='Relative path of proto directory')
     praser_migrate.add_argument('--format',choices=['json','python'],help='Relative path of proto directory')
+    praser_migrate.add_argument('--server-language',default='python',choices=['python','typescript'],help='Chose a server language for migration')
+    praser_migrate.add_argument('--clients',nargs='*',default=['python'],choices=['python','typescript'],help='Enter one or more clients')
 
     # Utils
     parser.add_argument('-v', '--version', action='store_true',
@@ -480,7 +482,7 @@ def main(args=None):
         
         else:
             if hasattr(args,'protos'):
-                migrate.migrate_project(args.protos,output_path=file_system.get_current_location(),format='json')
+                migrate.migrate_project(args.protos,output_path=file_system.get_current_location(),format='json',server_language=args.server_language,clients=args.clients)
             elif hasattr(args, 'path'):
                 template_commands(args)
             else:

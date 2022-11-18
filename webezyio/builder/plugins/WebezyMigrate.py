@@ -45,7 +45,8 @@ _WELL_KNOWN_LANGUAGED = Literal["python", "typescript"]
 
 
 @builder.hookimpl
-def parse_protos_to_resource(protos_dir, project_name, server_language, clients: List[int] = [Language.python],domain=None):
+def parse_protos_to_resource(protos_dir, project_name, server_language, clients: List[str],domain=None):
+    
     resources_added = []
     pkgs = {}
     services = []
@@ -56,12 +57,13 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
     print_info(project_path,True,tag='migrating project at path:')
 
     temp_clients = []
+    print_info(clients,True,"Clients languages")
+
     for c in clients:
-        temp_clients.append(WebezyClient(language=Language.Name(
-            c), out_dir=file_system.join_path(project_path, 'clients', Language.Name(c))))
+        temp_clients.append(WebezyClient(language=c, out_dir=file_system.join_path(project_path, 'clients', c)))
 
-    srvr = WebezyServer(language=Language.Name(Language.python))
-
+    srvr = WebezyServer(language=server_language)
+    print_info(srvr,True,"Server language")
     prj = Project(uri=project_path, name=project_name, package_name=project_name.replace('-', '').replace('_', ''), version='0.0.1',
                   type=resources.ResourceTypes.project.value, kind=resources.ResourceKinds.ezy_1.value, server=srvr, clients=temp_clients)
     resources_added.append(WzResourceWrapper(project=prj))
@@ -286,7 +288,7 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
         path=webezy_json_path, domain=domain, project_name=project.name)
     c_languages = []
     for client in project.clients:
-        print_info(client)
+        c_languages.append({'language':resources.Language.Name(client.language)})
         # if type(client) == str:
         #     client_lang = client
         # else:
@@ -296,7 +298,6 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
         # print_info(f'Adding client: {client_lang}')
         # c_languages.append(
         #     {'out_dir': out_dir, 'language': client_lang})
-
     ARCHITECT.AddProject(server_language=resources.Language.Name(project.server.language), clients=c_languages)
     ARCHITECT.SetDomain(domain)
     ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
@@ -322,3 +323,4 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
             ARCHITECT.AddRPC(temp_service,rpc_name,rpc_in_out,rpc_desc)
 
     ARCHITECT.Save()
+    print_success("Migrate process done !\n\t-> now you can create and edit resources with your new 'webezy.json' file.")
