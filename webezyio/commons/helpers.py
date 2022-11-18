@@ -23,8 +23,10 @@ import logging
 import os
 import re
 import socket
+import subprocess
 from typing import List, Literal
 from webezyio import __version__,config
+from webezyio.commons import file_system
 
 from webezyio.core import webezycore,WebezyAnalytics_pb2
 from webezyio.commons import errors, pretty
@@ -190,6 +192,11 @@ class WZField():
                         elif isinstance(dict(self.__dict__)[k][j], bool):
                             temp[k[1:]][j] = Value(
                                 bool_value=dict(self.__dict__)[k][j])
+                        else:
+                            if isinstance(dict(self.__dict__)[k][j], Value):
+                                temp[k[1:]][j] = dict(self.__dict__)[k][j]
+                            else:
+                                pretty.print_warning("Not supported extension type !")
             else:
                 temp[k[1:]] = dict(self.__dict__)[k]
 
@@ -203,7 +210,7 @@ class WZField():
                 exit(1)
         elif self._field_type == 'TYPE_MESSAGE':
             if self._message_type is None:    
-                pretty.print_error(f"Field {self._name} missing enum type and is configured as 'TYPE_ENUM'")
+                pretty.print_error(f"Field {self._name} missing enum type and is configured as 'TYPE_MESSAGE'")
                 exit(1)
 
     @property
@@ -528,6 +535,25 @@ class WZJson():
     def get_server_language(self):
         return self.project.get('server').get('language').lower()
 
+    def get_extended_fields(self,message_full_name:str):
+        """This function should be used when trying to iterate a specific message fields options
+        
+        Args
+        ----
+            message_full_name - Full valid name for the message we want to get fields that are extended
+
+        Returns
+        -------
+            A list of fields under passed message that holds an extension value
+        """
+        list_fields = None
+        temp_msg = self.get_message(message_full_name)
+
+        if temp_msg is not None:
+            list_fields = next((f for f in temp_msg.get('fields') if f.get('extensions') is not None),None)
+            
+        return list_fields
+
     @property
     def domain(self):
         """str: Project domain."""
@@ -551,6 +577,10 @@ class WZJson():
     def path(self):
         return self._path
 
+def load_wz_json(path:str):
+    WEBEZY_JSON = file_system.rFile(path, json=True)
+    WEBEZY_JSON = WZJson(webezy_json=WEBEZY_JSON)
+    return WEBEZY_JSON
 
 class WZProto():
 
@@ -576,7 +606,7 @@ class WZProto():
 
             options = next((m for m in self._messages if m.get(
                 'extensionType') is not None), None)
-            if options is not None:
+            if options is not None and 'google.protobuf.Descriptor' not in self._imports :
                 temp_imports.append(
                     'import "google/protobuf/descriptor.proto";')
             return '\n'.join(temp_imports)
@@ -620,7 +650,7 @@ class WZProto():
                 m_desc = m.get('description')
                 ext_type = m.get('extensionType')
                 for f in m.get('fields'):
-                    fLabel = '' if f.get('label') == 'LABEL_OPTIONAL' else '{0} '.format(
+                    fLabel = '' if f.get('label') == 'LABEL_OPTIONAL' or f.get('label') is None else '{0} '.format(
                         f.get('label').split('_')[-1].lower())
                     fType = f.get('fieldType').split('_')[-1].lower()
                     if fType == 'message':
@@ -629,7 +659,7 @@ class WZProto():
                         fType = f.get('enumType')
                     elif fType == 'map':
                         keyType = f.get('keyType').split('_')[-1].lower()
-                        valueType = f.get('valueType').split('_')[-1].lower() if f.get('valueType') != 'TYPE_MESSAGE' else f.get('messageType') if f.get('valueType') == 'TYPE_MESSAGE' else f.get('enumType') if f.get('valueType') == 'TYPE_ENUM' else None
+                        valueType = f.get('valueType').split('_')[-1].lower() if f.get('valueType') != 'TYPE_MESSAGE' and f.get('valueType') != 'TYPE_ENUM'  else f.get('messageType') if f.get('valueType') == 'TYPE_MESSAGE' else f.get('enumType') if f.get('valueType') == 'TYPE_ENUM' else None
                         if valueType is None:
                             pretty.print_error("Value type for 'map' is not valid ! {0}".format(f.get('valueType')))
                         else:
@@ -658,13 +688,18 @@ class WZProto():
                     if f.get('extensions') is not None:
                         for ext in f.get('extensions'):
                             list_names = ext.split('.')
+                            ext_msg = None
+
                             if len(list_names) > 2:
-                                ext_pkg = next((pkg for pkg in self._package if pkg == 'protos/{0}/{1}.proto'.format(
-                                    ext.split('.')[2], ext.split('.')[1])))
-                                if ext_pkg is not None:
-                                    ext_msg = next((m for m in self._messages[ext_pkg] if m.get(
-                                        'name') == ext.split('.')[3]), None)
-                                    logging.debug(f'{list_names} | {ext_msg}')
+                                if '.'.join(list_names[:3]) == self._package:
+                                    ext_msg = next((m for m in self._messages if m.get('name') == list_names[3]),None)
+
+                                # ext_pkg = next((pkg for pkg in self._package if pkg == 'protos/{0}/{1}.proto'.format(
+                                #     ext.split('.')[2], ext.split('.')[1])),None)
+                                # if ext_pkg is not None:
+                                #     ext_msg = next((m for m in self._messages[ext_pkg] if m.get(
+                                #         'name') == ext.split('.')[3]), None)
+                                #     logging.debug(f'{list_names} | {ext_msg}')
                             else:
                                 ext_msg = next((m for m in self._messages if m.get(
                                     'name') == ext.split('.')[0]), None)
@@ -681,18 +716,96 @@ class WZProto():
                                 ext_v = f.get('extensions')[ext]
                                 type_ext = field.get(
                                     'fieldType').split('_')[-1].lower()
-                                if 'int' in type_ext:
-                                    ext_v = int(ext_v)
-                                elif type_ext == 'float' or type_ext == 'double':
-                                    ext_v = float(ext_v)
-                                elif type_ext == 'string':
-                                    ext_v = f'"{ext_v}"'
-                                elif type_ext == 'bool':
-                                    if ext_v == 0:
-                                        ext_v = "false"
-                                    elif ext_v == 1:
-                                        ext_v = "true"
-                                fOptions.append(f'({ext}) = {ext_v}')
+                                label_ext = field.get(
+                                    'label').split('_')[-1].lower()
+                                if label_ext != 'repeated':
+                                    if 'int' in type_ext:
+                                        ext_v = int(ext_v)
+                                    elif type_ext == 'float' or type_ext == 'double':
+                                        ext_v = float(ext_v)
+                                    elif type_ext == 'string':
+                                        ext_v = f'"{ext_v}"'
+                                    elif type_ext == 'bool':
+                                        if ext_v == 0:
+                                            ext_v = "false"
+                                        elif ext_v == 1:
+                                            ext_v = "true"
+                                    elif type_ext == 'message':
+                                        ext_msg = next((m for m in self._messages if m.get(
+                                            'name') == field.get('messageType').split('.')[-1]), None)
+                                        temp_v_list = []
+                                        for k in ext_v:
+                                            field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == k),None)
+                                            if field_in_ext is not None:
+                                                field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
+                                                if 'int' in field_ext_in_type:
+                                                    temp_v = int(ext_v[k])
+                                                elif field_ext_in_type == 'float' or field_ext_in_type == 'double':
+                                                    temp_v = float(ext_v[k])
+                                                elif field_ext_in_type == 'string':
+                                                    temp_v = f'"{ext_v[k]}"'
+                                                elif field_ext_in_type == 'bool':
+                                                    if ext_v[k] == 0:
+                                                        temp_v = "false"
+                                                    elif ext_v[k] == 1:
+                                                        temp_v = "true"
+                                                temp_v_list.append('{0} : {1}'.format(k,temp_v))
+                                                
+                                        joined_fields = ','.join(temp_v_list)
+                                        ext_v = f'{_OPEN_BRCK}{joined_fields}{_CLOSING_BRCK}'
+                                        pretty.print_note(ext_v)
+                                        # joined_fields = ','.join(temp_v_list)
+                                        # ext_v = f'{_OPEN_BRCK}{}{_CL/OSING_BRCK}
+                                
+                                if label_ext == 'repeated':
+                                    for v in ext_v:
+                                        if 'int' in type_ext:
+                                            temp_v = int(v)
+                                        elif type_ext == 'float' or type_ext == 'double':
+                                            temp_v = float(v)
+                                        elif type_ext == 'string':
+                                            temp_v = f'"{v}"'
+                                        elif type_ext == 'bool':
+                                            if v == 0:
+                                                temp_v = "false"
+                                            elif v == 1:
+                                                temp_v = "true"
+                                        elif type_ext == 'message':
+                                            # if self._package not in field.get('messageType'):
+                                            ext_msg = next((m for m in self._messages if m.get(
+                                                'name') == field.get('messageType').split('.')[-1]), None)
+                                            temp_v_list = []
+                                            if ext_msg is not None:
+                                                for value_nested in v:
+
+                                                    field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == value_nested),None)
+                                                    if field_in_ext is not None:
+                                                        field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
+                                                        if 'int' in field_ext_in_type:
+                                                            temp_v = int(v[value_nested])
+                                                        elif field_ext_in_type == 'float' or field_ext_in_type == 'double':
+                                                            temp_v = float(v[value_nested])
+                                                        elif field_ext_in_type == 'string':
+                                                            temp_v = f'"{v[value_nested]}"'
+                                                        elif field_ext_in_type == 'bool':
+                                                            if v[value_nested] == 0:
+                                                                temp_v = "false"
+                                                            elif v[value_nested] == 1:
+                                                                temp_v = "true"
+                                                        temp_v_list.append('{0} : {1}'.format(value_nested,temp_v))
+                                                joined_fields = ','.join(temp_v_list)
+                                                temp_v = f'{_OPEN_BRCK}{joined_fields}{_CLOSING_BRCK}'
+                                            else:
+                                                pretty.print_error("Canot parse extension values for {} because it is nested message from another package please move {} to current package {}".format(value_nested,field.get('messageType'),self._package))
+                                        elif type_ext == 'enum':
+                                            temp_v = v
+                                            # pretty.print_info(self._enums)
+                                        else:
+                                            pretty.print_warning("Not supported parsing of: {} for extension values".format(type_ext))
+                                        fOptions.append(f'\n\t\t({ext}) = {temp_v}')
+
+                                else:
+                                    fOptions.append(f'({ext}) = {ext_v}')
                         fOptions = ','.join(fOptions)
                     fOptions = f' [{fOptions}]' if len(fOptions) > 0 else ''
                     fDesc = f.get('description')
@@ -893,7 +1006,7 @@ class WZServicePy():
                         out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
                     code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
             rpcs.append(
-                f'\t# @rpc @@webezyio - DO NOT REMOVE\n\tdef {rpc_name}(self, request: {open_in_type}{rpc_in_pkg}_pb2.{rpc_in_name}{closing_in_type}, context) -> {open_out_type}{rpc_out_pkg}_pb2.{rpc_out_name}{close_out_type}:\n{code}')
+                f'\t# @rpc @@webezyio - DO NOT REMOVE\n\tdef {rpc_name}(self, request: {open_in_type}{rpc_in_pkg}_pb2.{rpc_in_name}{closing_in_type}, context: grpc.ServicerContext) -> {open_out_type}{rpc_out_pkg}_pb2.{rpc_out_name}{close_out_type}:\n{code}')
         rpcs = ''.join(rpcs)
         return f'class {self._name}({self._name}_pb2_grpc.{self._name}Servicer):\n\n{rpcs}'
 
@@ -901,7 +1014,7 @@ class WZServicePy():
         return self.__str__()
 
     def __str__(self):
-        return f'{self.write_imports()}\n\n{self.write_class()}'
+        return f'"""Webezy.io service implemantation for -> {self._name}"""\nimport grpc\n{self.write_imports()}\n\n{self.write_class()}'
 
 class WZServiceTs():
     
@@ -1166,4 +1279,20 @@ def send_analytic_event(args):
             ))
     except Exception as e:
         pretty.print_warning(e)
-    
+
+_BUILTINS_TEMPLATES = Literal[
+    "@webezyio/Blank",
+    "@webezyio/SamplePy",
+    "@webezyio/SampleTs",
+    "@webezyio/PubSubTs",
+    "@webezyio/HelloWorldPy",
+    "@webezyio/HelloWorldTs"]
+
+def attach_template(ARCHITECT,template:_BUILTINS_TEMPLATES):
+    if template != '@webezyio/Blank':
+        file_dir = os.path.dirname(__file__)
+        template_domain_name = template.split('/')[0].split('@')[-1]
+        template_name = template.split('/')[-1]
+        pretty.print_note(file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name))
+        os.chdir(ARCHITECT._path.split('webezy.json')[0])
+        subprocess.run(['python',file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--domain',ARCHITECT._domain,'--project-name',ARCHITECT._project_name])

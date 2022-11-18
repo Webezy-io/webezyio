@@ -45,6 +45,7 @@ webezyio/cli/commands/call.py
 webezyio/cli/commands/edit.py
 webezyio/cli/commands/generate.py
 webezyio/cli/commands/ls.py
+webezyio/cli/commands/migrate.py
 webezyio/cli/commands/new.py
 webezyio/cli/commands/package.py
 webezyio/cli/commands/run.py

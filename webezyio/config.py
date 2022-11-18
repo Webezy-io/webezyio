@@ -7,6 +7,15 @@
                                    |___/              .configs
 
 webezyio cli module configuration"""
+# Supported builtins templates
+webezyio_templates = [
+    "@webezyio/Blank",
+    "@webezyio/SamplePy",
+    "@webezyio/SampleTs",
+    "@webezyio/PubSubTs",
+    "@webezyio/HelloWorldPy",
+    "@webezyio/HelloWorldTs"
+]
 # Analytic gathering approval
 analytics=True
 # First run flag

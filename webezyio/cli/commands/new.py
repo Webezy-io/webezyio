@@ -24,7 +24,7 @@ import subprocess
 from typing import List, Literal
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import file_system
-from webezyio.commons.helpers import WZEnumValue, WZField
+from webezyio.commons.helpers import WZEnumValue, WZField,_BUILTINS_TEMPLATES
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 from webezyio.commons.file_system import join_path,mkdir
 from webezyio.commons.protos.webezy_pb2 import Language,WebezyDeploymentType
@@ -33,7 +33,7 @@ import os
 import inquirer
 from inquirer import errors
 
-_TEMPLATES = Literal["@webezyio/Blank", "@webezyio/Sample"]
+_TEMPLATES = _BUILTINS_TEMPLATES
 
 def validate_client(answers, current):
     if len(current) ==0:

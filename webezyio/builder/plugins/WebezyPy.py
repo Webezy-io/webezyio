@@ -158,60 +158,61 @@ if __name__ == "__main__":\n\
 
 @builder.hookimpl
 def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-    for svc in wz_json.services:
-        try:
-            svcFile = file_system.rFile(file_system.join_path(
-                wz_json.path, 'services', f'{svc}.py'))
-            is_init = False
-            for l in svcFile:
-                if '__init__' in l:
-                    is_init = True
-                    break
-            # Non RPC functions should have # @skip line above func name
-            function_code_inlines = helpers.parse_code_file(svcFile, '@skip')
-            # Parse all rpc's in file by default # @rpc seperator
-            rpc_code_inlines = helpers.parse_code_file(svcFile)
-            for f in wz_context.files:
+    if wz_json.services is not None:
+        for svc in wz_json.services:
+            try:
+                svcFile = file_system.rFile(file_system.join_path(
+                    wz_json.path, 'services', f'{svc}.py'))
+                is_init = False
+                for l in svcFile:
+                    if '__init__' in l:
+                        is_init = True
+                        break
+                # Non RPC functions should have # @skip line above func name
+                function_code_inlines = helpers.parse_code_file(svcFile, '@skip')
+                # Parse all rpc's in file by default # @rpc seperator
+                rpc_code_inlines = helpers.parse_code_file(svcFile)
+                for f in wz_context.files:
 
-                if svc in f.get('file'):
-                    # Iterating all regular functions
-                    for func in function_code_inlines:
-                        func_code = []
-                        for l in func:
-                            if '@rpc @@webezyio' in l:
-                                break
+                    if svc in f.get('file'):
+                        # Iterating all regular functions
+                        for func in function_code_inlines:
+                            func_code = []
+                            for l in func:
+                                if '@rpc @@webezyio' in l:
+                                    break
 
-                            func_code.append(l)
+                                func_code.append(l)
 
-                        wz_context.set_method_code(svc, func_code[0].split(
-                            'def ')[1].split('(')[0], ''.join(func_code))
-                    methods_i = 0
-                    for r in wz_json.services[svc]['methods']:
-                        if next((m for m in f.get('methods') if m['name'] == r['name']),None) is None:
-                            new_rpc_context = {'name': r.get('name'), 'type': 'rpc', 'code': '\t\tpass'}
-                            wz_context.new_rpc(svc, new_rpc_context)
-                    # Iterating all RPC's functions
-                    for m in f.get('methods'):
-                        if m['type'] == 'rpc':
-                            # Checking if edit to method has happened - meaning canot find in webezy.json all context methods
-                            if next((r for r in wz_json.services[svc]['methods'] if r['name'] == m['name']), None) == None:
-                                # Getting method details from webezy.json
-                                new_method = wz_json.services[svc]['methods'][methods_i]
-                                # Building new context with old func code
-                                new_rpc_context = {'name': new_method.get(
-                                    'name'), 'type': 'rpc', 'code': ''.join(rpc_code_inlines[methods_i][1:])}
-                                # Editing inplace the RPC context
-                                wz_context.edit_rpc(
-                                    svc, m.get('name'), new_rpc_context)
-                            else:
-                                # Setting new context
-                                wz_context.set_rpc_code(svc, m.get('name'), ''.join(
-                                    rpc_code_inlines[methods_i][1:]))
+                            wz_context.set_method_code(svc, func_code[0].split(
+                                'def ')[1].split('(')[0], ''.join(func_code))
+                        methods_i = 0
+                        for r in wz_json.services[svc]['methods']:
+                            if next((m for m in f.get('methods') if m['name'] == r['name']),None) is None:
+                                new_rpc_context = {'name': r.get('name'), 'type': 'rpc', 'code': '\t\tpass'}
+                                wz_context.new_rpc(svc, new_rpc_context)
+                        # Iterating all RPC's functions
+                        for m in f.get('methods'):
+                            if m['type'] == 'rpc':
+                                # Checking if edit to method has happened - meaning canot find in webezy.json all context methods
+                                if next((r for r in wz_json.services[svc]['methods'] if r['name'] == m['name']), None) == None:
+                                    # Getting method details from webezy.json
+                                    new_method = wz_json.services[svc]['methods'][methods_i]
+                                    # Building new context with old func code
+                                    new_rpc_context = {'name': new_method.get(
+                                        'name'), 'type': 'rpc', 'code': ''.join(rpc_code_inlines[methods_i][1:])}
+                                    # Editing inplace the RPC context
+                                    wz_context.edit_rpc(
+                                        svc, m.get('name'), new_rpc_context)
+                                else:
+                                    # Setting new context
+                                    wz_context.set_rpc_code(svc, m.get('name'), ''.join(
+                                        rpc_code_inlines[methods_i][1:]))
 
-                            methods_i += 1
+                                methods_i += 1
 
-        except Exception as e:
-            logging.debug(e)
+            except Exception as e:
+                logging.debug(e)
 
     file_system.wFile(file_system.join_path(
         wz_json.path, '.webezy', 'context.json'), wz_context.dump(), True, True)
@@ -300,28 +301,29 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     files = []
 
     path = wz_json.project.get('uri')
-    for svc in wz_json.services:
-        methods = []
-        for rpc in wz_json.services[svc].get('methods'):
-            rpc_name = rpc.get('name')
-            rpc_type_out = rpc.get('serverStreaming')
-            rpc_out_name = rpc.get('inputType').split('.')[-1]
-            rpc_out_pkg = rpc.get('outputType').split('.')[1]
-            rpc_output = rpc.get('outputType')
-            msg = wz_json.get_message(rpc_output)
-            fields = []
-            for f in msg.get('fields'):
-                fields.append('{0}=None'.format(f.get('name')))
-            fields = ','.join(fields)
-            if rpc_type_out:
-                out_prototype = f'\t\t# responses = [{rpc_out_pkg}_pb2.{rpc_out_name}({fields})]\n\t\t# for res in responses:\n\t\t#    yield res\n'
-            else:
-                out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
-            code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
-            methods.append(resources.WZMethodContext(
-                name=rpc_name, code=code, type='rpc'))
-        files.append(resources.WZFileContext(
-            file=f'./services/{svc}.py', methods=methods))
+    if wz_json.services is not None:
+        for svc in wz_json.services:
+            methods = []
+            for rpc in wz_json.services[svc].get('methods'):
+                rpc_name = rpc.get('name')
+                rpc_type_out = rpc.get('serverStreaming')
+                rpc_out_name = rpc.get('inputType').split('.')[-1]
+                rpc_out_pkg = rpc.get('outputType').split('.')[1]
+                rpc_output = rpc.get('outputType')
+                msg = wz_json.get_message(rpc_output)
+                fields = []
+                for f in msg.get('fields'):
+                    fields.append('{0}=None'.format(f.get('name')))
+                fields = ','.join(fields)
+                if rpc_type_out:
+                    out_prototype = f'\t\t# responses = [{rpc_out_pkg}_pb2.{rpc_out_name}({fields})]\n\t\t# for res in responses:\n\t\t#    yield res\n'
+                else:
+                    out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
+                code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
+                methods.append(resources.WZMethodContext(
+                    name=rpc_name, code=code, type='rpc'))
+            files.append(resources.WZFileContext(
+                file=f'./services/{svc}.py', methods=methods))
     context = resources.proto_to_dict(resources.WZContext(files=files))
     logging.debug("Writing new context")
     file_system.mkdir(file_system.join_path(path, '.webezy'))
@@ -359,6 +361,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
         else:
             temp_type = '{1}'.format(
                 enumType.split('.')[1], enumType.split('.')[-1])
+        temp_type = 'enum_type_wrapper.EnumTypeWrapper'
     elif type == 'bool':
         temp_type = 'bool'
     elif type == 'map':

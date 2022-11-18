@@ -2,4 +2,3 @@ __pycache__/
 .vscode
 node_modules
 .pytest_cache
-docs/

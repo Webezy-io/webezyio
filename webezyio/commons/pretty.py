@@ -69,9 +69,11 @@ def print_version(version):
     sep = '*'*30
     print('',bcolors.OKCYAN+sep+bcolors.ENDC,'\n',f'\twebezyio : {version}\n',bcolors.OKCYAN+sep+bcolors.ENDC)
 
-def print_error(message,pprint=False):
+def print_error(message,pprint=False,tag=None):
     if pprint:
         sep = '-'*45
+        if tag is not None:
+            print_error(tag)
         print(bcolors.FAIL+sep+bcolors.ENDC)
         pretty(message)
         print(bcolors.FAIL+sep+bcolors.ENDC)

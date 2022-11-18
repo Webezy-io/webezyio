@@ -33,7 +33,8 @@ from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
     FieldDescriptor, ServiceDescriptor, EnumDescriptor
 from grpc_tools import command
-from webezyio.commons.pretty import print_info
+from webezyio.commons import errors
+from webezyio.commons.pretty import print_info, print_note
 
 from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson, Project, WebezyConfig,\
     Language, WebezyServer, WebezyClient,\
@@ -116,6 +117,8 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
         temp_langugae = Language.python
     elif server_langauge == 'typescript':
         temp_langugae = Language.typescript
+    else:
+        raise errors.WebezyValidationError('Server Language Error','Must pass a valid server language for your new project')
     server = WebezyServer(language=Language.Name(temp_langugae))
     # Parse clients
     temp_clients = []
@@ -152,6 +155,7 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     temp_methods = []
     if methods:
         for m in methods:
+            print_info(m,True)
             temp_methods.append(ParseDict(m,WZMethodDescriptor()))
     service = WZServiceDescriptor(uri=get_uri_service(path, name, service_language.lower()),
                                   name=name, full_name=get_service_full_name(domain, name), dependencies=dependencies,
@@ -193,6 +197,9 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
     msg_uri = get_uri_message(path, msg_fName)
     if option is None:
         option = Options.UNKNOWN_EXTENSION
+    else:
+        if 'google.protobuf.descriptor' not in package.dependencies:
+            package.dependencies.append('google.protobuf.Descriptor')
     index = 0 if option == Options.UNKNOWN_EXTENSION else 55555
     for f in fields:
         if next((n for n in temp_fields if n.name == f.get('name')), None) is None:
@@ -201,8 +208,9 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                 domain, package.name, name, f.get('name'))
             msg_type = None
             if f.get('message_type') is not None:
-                if f.get('message_type') not in package.dependencies and package.package not in f.get('message_type'):
-                    package.dependencies.append(f.get('message_type'))
+                package_name = '.'.join(f.get('message_type').split('.')[:3])
+                if package_name not in package.dependencies and package.package not in f.get('message_type'):
+                    package.dependencies.append(package_name)
                 if 'google.protobuf' in f.get('message_type'):
                     msg_type = '{0}.{1}.{2}'.format(f.get('message_type').split('.')[0],f.get('message_type').split('.')[1],f.get('message_type').split('.')[-1].capitalize()) if f.get('message_type') is not None else None
                 else:
@@ -231,8 +239,8 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                                                      'field_type'),
                                                  label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions'),key_type=f.get('key_type'),value_type=f.get('value_type'),oneof_fields=fields_oneof))
         else:
-            logging.error(
-                f"Connot insert field {f.get('name')} already exists under {name} message")
+            logging.warning(
+                f"Cannot insert field {f.get('name')} already exists under {name} message")
     msg = WZDescriptor(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,
                        kind=ResourceKinds.message.value, extension_type=Options.Name(option), description=description)
 
@@ -267,7 +275,7 @@ def generate_rpc(path, name, client_streaming, server_streaming, in_type, out_ty
 
 
 def parse_proto(proto_path) -> FileDescriptor:
-    print_info(f"Parsing proto file -> {proto_path}")
+    print_note(f"Parsing proto file into python module -> {proto_path}")
     # command.build_package_protos(proto_path)
     # os.chdir(os.getcwd()+'/protos')
     try:

@@ -41,11 +41,11 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def write_protos(wz_json: helpers.WZJson):
     if wz_json.services is None:
-        print_error("Cannot build project without services !")
+        print_error("Not supporting building project without any services",True,'Build process error')
         exit(1)
 
     if wz_json.packages is None:
-        print_error("Cannot build project without packages !")
+        print_error("Not supporting building project without any packages",True,'Build process error')
         exit(1)
 
     for svc in wz_json.services:
