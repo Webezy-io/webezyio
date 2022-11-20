@@ -10,6 +10,7 @@ webezyio cli module configuration"""
 # Supported builtins templates
 webezyio_templates = [
     "@webezyio/Blank",
+    "@webezyio/io",
     "@webezyio/SamplePy",
     "@webezyio/SampleTs",
     "@webezyio/PubSubTs",

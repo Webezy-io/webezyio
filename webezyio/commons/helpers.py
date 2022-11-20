@@ -259,7 +259,7 @@ class WZRPC():
 class WZService():
     """webezyio service level object that defines the required meta data properties."""
 
-    def __init__(self, name, methods: List[WZRPC] = [], dependencies: List[str] = [], description=None) -> None:
+    def __init__(self, name, methods: List[WZRPC] = [], dependencies: List[str] = [], description=None,extensions=None) -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.ServiceDescriptor` representation.
 
         Parameters
@@ -273,12 +273,13 @@ class WZService():
         self._methods = methods
         self._dependencies = dependencies
         self._description = description
+        self._extensions = extensions
 
     def to_tuple(self):
         rpcs = []
         for rpc in self._methods:
             rpcs.append(rpc.to_tuple())
-        return self._name, rpcs, self._dependencies, self._description
+        return self._name, rpcs, self._dependencies, self._description, self._extensions
 
     @property
     def name(self):
@@ -288,7 +289,7 @@ class WZService():
 class WZMessage():
     """webezyio message level object that defines the required meta data properties."""
 
-    def __init__(self, name, fields: List[WZField] = None, description: str = None, extension_type: _EXTENSIONS_TYPE = None) -> None:
+    def __init__(self, name, fields: List[WZField] = None, description: str = None, extension_type: _EXTENSIONS_TYPE = None,extensions=None,domain=None) -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Descriptor` representation.
 
         Parameters
@@ -302,6 +303,8 @@ class WZMessage():
         self._fields = fields
         self._description = description
         self._extension_type = extension_type
+        self._extensions = extensions
+        self._domain = domain
 
     def setFields(self, fields: List[WZField]):
         self._fields = fields
@@ -315,7 +318,7 @@ class WZMessage():
         for f in self._fields:
             f_array.append(f.to_dict())
 
-        return self._name, f_array, self._description, self._extension_type
+        return self._name, f_array, self._description, self._extension_type, self._domain
 
     @property
     def name(self):
@@ -364,7 +367,7 @@ class WZEnumValue():
 class WZEnum():
     """webezyio enum level object that defines the required meta data properties."""
 
-    def __init__(self, name, enum_values: List[WZEnumValue] = [],description:str = '') -> None:
+    def __init__(self, name, enum_values: List[WZEnumValue] = [],description:str = '',domain=None) -> None:
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.Enum` representation.
 
         Parameters
@@ -375,12 +378,13 @@ class WZEnum():
         self._name = name
         self._enum_values = enum_values
         self._description = description
+        self._domain = domain
 
     def to_tuple(self):
         enums_values = []
         for ev in self._enum_values:
             enums_values.append(ev.to_dict())
-        return self._name, enums_values, self._description
+        return self._name, enums_values, self._description, self._domain
 
     @property
     def name(self):
@@ -456,7 +460,7 @@ class WZContext():
 class WZPackage():
     """webezyio package level object that defines the required meta data properties."""
 
-    def __init__(self, name, messages: List[WZMessage] = [], enums: List[WZEnum] = []):
+    def __init__(self, name, messages: List[WZMessage] = [], enums: List[WZEnum] = [],extensions=None,domain=None):
         """Parses a fields into a :module:`webezyio.commons.protos.webezy_pb2.PackageDescriptor` representation.
 
         Parameters
@@ -468,6 +472,8 @@ class WZPackage():
         self._name = name
         self._messages = messages
         self._enums = enums
+        self._extensions = extensions
+        self._domain = domain
 
     def to_tuple(self):
         messages = []
@@ -476,7 +482,7 @@ class WZPackage():
             enums.append(e.to_tuple())
         for m in self._messages:
             messages.append(m.to_tuple())
-        return self._name, messages, enums
+        return self._name, messages, enums, self._extensions, self._domain
 
     @property
     def name(self):
@@ -517,6 +523,15 @@ class WZJson():
             msgs = self._packages[f'protos/v1/{name}.proto'].get('messages')
             enums = self._packages[f'protos/v1/{name}.proto'].get('enums')
             return generate_package(self.path,self.domain,name,depend if depend is not None else [],msgs if msgs is not None else [],enums if enums is not None else [])
+
+
+    def get_enum(self, full_name):
+        pkg_name = full_name.split('.')[1]
+        enums = self._packages[f'protos/v1/{pkg_name}.proto'].get('enums')
+        if enums is not None:
+            return next((e for e in enums if e['name'] == full_name.split('.')[-1]), None)
+        else:
+            return None
 
 
     def get_message(self, full_name):
@@ -584,7 +599,7 @@ def load_wz_json(path:str):
 
 class WZProto():
 
-    def __init__(self, name, imports=[], service=None, package=None, messages=[], enums=[], description=None):
+    def __init__(self, name, imports=[], service=None, package=None, messages=[], enums=[], description=None,extensions=None,wz_json:WZJson=None):
         self._name = name
         self._imports = imports
         self._service = service
@@ -592,6 +607,8 @@ class WZProto():
         self._messages = messages
         self._enums = enums
         self._description = description
+        self._extensions = extensions
+        self._wz_json = wz_json
 
     def write_imports(self):
         if self._imports is not None:
@@ -615,13 +632,31 @@ class WZProto():
 
     def write_package(self):
         if self._package is not None:
-            return f'package {self._package};'
+            if self._extensions is not None:
+                temp_extensions = []
+                for ext_key in self._extensions:
+
+                    ext_value = self._extensions[ext_key]
+                    extension_type = self._wz_json.get_message('.'.join(ext_key.split('.')[:4]))
+                    extensions_package = parse_extension_to_proto('FileOptions',extension_type,ext_key,ext_value,self._wz_json)
+                    temp_extensions.append(extensions_package)
+                joined_extensions = '\n'.join(temp_extensions)
+                return f'package {self._package};\n\n// Webezy.io Package Extensions\n{joined_extensions}'
+            else:
+                return f'package {self._package};'
         else:
             return ''
 
     def write_service(self):
         if self._service is not None:
             rpcs = []
+
+            if self._service.get('extensions') is not None:
+                for ext in self._service.get('extensions'):
+                    ext_msg = self._wz_json.get_message('.'.join(ext.split('.')[:4]))
+                    temp_svc_ext = parse_extension_to_proto('ServiceOptions',ext_msg,ext,self._service.get('extensions')[ext],self._wz_json)
+                    rpcs.append(temp_svc_ext)
+
             for m in self._service.get('methods'):
                 rpc_name = m.get('name')
                 msg_name_in = m.get('inputType')
@@ -633,6 +668,7 @@ class WZProto():
                     'clientStreaming') == True else ''
                 stream_out = 'stream ' if m.get('serverStreaming') is not None and m.get(
                     'serverStreaming') == True else ''
+                
                 rpcs.append(
                     f'// [webezyio] - {description}\n\trpc {rpc_name} ({stream_in}{msg_name_in}) returns ({stream_out}{msg_name_out});')
             rpcs = '\n\t'.join(rpcs)
@@ -647,11 +683,16 @@ class WZProto():
             for m in self._messages:
                 msg_name = m.get('name')
                 fields = []
+                # Adding MessageOptions
+                if m.get('extensions') is not None:
+                    for ext_key in m.get('extensions'):
+                        fields.append('option ({}) = {};'.format,ext_key(m.get('extensions')[ext_key]))
                 m_desc = m.get('description')
                 ext_type = m.get('extensionType')
                 for f in m.get('fields'):
                     fLabel = '' if f.get('label') == 'LABEL_OPTIONAL' or f.get('label') is None else '{0} '.format(
                         f.get('label').split('_')[-1].lower())
+                    pretty.print_error(f,True)
                     fType = f.get('fieldType').split('_')[-1].lower()
                     if fType == 'message':
                         fType = f.get('messageType')
@@ -693,123 +734,23 @@ class WZProto():
                             if len(list_names) > 2:
                                 if '.'.join(list_names[:3]) == self._package:
                                     ext_msg = next((m for m in self._messages if m.get('name') == list_names[3]),None)
-
-                                # ext_pkg = next((pkg for pkg in self._package if pkg == 'protos/{0}/{1}.proto'.format(
-                                #     ext.split('.')[2], ext.split('.')[1])),None)
-                                # if ext_pkg is not None:
-                                #     ext_msg = next((m for m in self._messages[ext_pkg] if m.get(
-                                #         'name') == ext.split('.')[3]), None)
-                                #     logging.debug(f'{list_names} | {ext_msg}')
                             else:
                                 ext_msg = next((m for m in self._messages if m.get(
                                     'name') == ext.split('.')[0]), None)
                                 logging.debug(f'{list_names} | {ext_msg}')
                             if ext_msg is None:
-                                raise WebezyValidationError(
-                                    'FieldOptions', f'Field Option [{ext}] specified for : "{fName}", is invalid !')
-                            field = next((f for f in ext_msg.get(
-                                'fields') if f.get('name') == list_names[-1]), None)
-                            if field is None:
-                                logging.error(
-                                    f"Cant parse extension field [{f.get('fullName')}] {ext}")
-                            else:
-                                ext_v = f.get('extensions')[ext]
-                                type_ext = field.get(
-                                    'fieldType').split('_')[-1].lower()
-                                label_ext = field.get(
-                                    'label').split('_')[-1].lower()
-                                if label_ext != 'repeated':
-                                    if 'int' in type_ext:
-                                        ext_v = int(ext_v)
-                                    elif type_ext == 'float' or type_ext == 'double':
-                                        ext_v = float(ext_v)
-                                    elif type_ext == 'string':
-                                        ext_v = f'"{ext_v}"'
-                                    elif type_ext == 'bool':
-                                        if ext_v == 0:
-                                            ext_v = "false"
-                                        elif ext_v == 1:
-                                            ext_v = "true"
-                                    elif type_ext == 'message':
-                                        ext_msg = next((m for m in self._messages if m.get(
-                                            'name') == field.get('messageType').split('.')[-1]), None)
-                                        temp_v_list = []
-                                        for k in ext_v:
-                                            field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == k),None)
-                                            if field_in_ext is not None:
-                                                field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
-                                                if 'int' in field_ext_in_type:
-                                                    temp_v = int(ext_v[k])
-                                                elif field_ext_in_type == 'float' or field_ext_in_type == 'double':
-                                                    temp_v = float(ext_v[k])
-                                                elif field_ext_in_type == 'string':
-                                                    temp_v = f'"{ext_v[k]}"'
-                                                elif field_ext_in_type == 'bool':
-                                                    if ext_v[k] == 0:
-                                                        temp_v = "false"
-                                                    elif ext_v[k] == 1:
-                                                        temp_v = "true"
-                                                temp_v_list.append('{0} : {1}'.format(k,temp_v))
-                                                
-                                        joined_fields = ','.join(temp_v_list)
-                                        ext_v = f'{_OPEN_BRCK}{joined_fields}{_CLOSING_BRCK}'
-                                        pretty.print_note(ext_v)
-                                        # joined_fields = ','.join(temp_v_list)
-                                        # ext_v = f'{_OPEN_BRCK}{}{_CL/OSING_BRCK}
-                                
-                                if label_ext == 'repeated':
-                                    for v in ext_v:
-                                        if 'int' in type_ext:
-                                            temp_v = int(v)
-                                        elif type_ext == 'float' or type_ext == 'double':
-                                            temp_v = float(v)
-                                        elif type_ext == 'string':
-                                            temp_v = f'"{v}"'
-                                        elif type_ext == 'bool':
-                                            if v == 0:
-                                                temp_v = "false"
-                                            elif v == 1:
-                                                temp_v = "true"
-                                        elif type_ext == 'message':
-                                            # if self._package not in field.get('messageType'):
-                                            ext_msg = next((m for m in self._messages if m.get(
-                                                'name') == field.get('messageType').split('.')[-1]), None)
-                                            temp_v_list = []
-                                            if ext_msg is not None:
-                                                for value_nested in v:
+                                ext_msg = self._wz_json.get_message('.'.join(ext.split('.')[:-1]))
+                                if ext_msg is None:
+                                    raise WebezyValidationError(
+                                        'FieldOptions', f'Field Option [{ext}] specified for : "{fName}", is invalid !')
+                            
+                            temp_field_extension_test = parse_extension_to_proto('FieldOptions',ext_msg,ext,f.get('extensions')[ext],self._wz_json)
+                            fOptions.append(temp_field_extension_test)
 
-                                                    field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == value_nested),None)
-                                                    if field_in_ext is not None:
-                                                        field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
-                                                        if 'int' in field_ext_in_type:
-                                                            temp_v = int(v[value_nested])
-                                                        elif field_ext_in_type == 'float' or field_ext_in_type == 'double':
-                                                            temp_v = float(v[value_nested])
-                                                        elif field_ext_in_type == 'string':
-                                                            temp_v = f'"{v[value_nested]}"'
-                                                        elif field_ext_in_type == 'bool':
-                                                            if v[value_nested] == 0:
-                                                                temp_v = "false"
-                                                            elif v[value_nested] == 1:
-                                                                temp_v = "true"
-                                                        temp_v_list.append('{0} : {1}'.format(value_nested,temp_v))
-                                                joined_fields = ','.join(temp_v_list)
-                                                temp_v = f'{_OPEN_BRCK}{joined_fields}{_CLOSING_BRCK}'
-                                            else:
-                                                pretty.print_error("Canot parse extension values for {} because it is nested message from another package please move {} to current package {}".format(value_nested,field.get('messageType'),self._package))
-                                        elif type_ext == 'enum':
-                                            temp_v = v
-                                            # pretty.print_info(self._enums)
-                                        else:
-                                            pretty.print_warning("Not supported parsing of: {} for extension values".format(type_ext))
-                                        fOptions.append(f'\n\t\t({ext}) = {temp_v}')
-
-                                else:
-                                    fOptions.append(f'({ext}) = {ext_v}')
                         fOptions = ','.join(fOptions)
                     fOptions = f' [{fOptions}]' if len(fOptions) > 0 else ''
                     fDesc = f.get('description')
-                    if ext_type == 'FieldOptions':
+                    if ext_type == 'FieldOptions' or ext_type == 'FileOptions' or ext_type == 'MessageOptions' or ext_type == 'ServiceOptions':
                         fDesc = f'// [webezyio] - {fDesc}\n\t\t' if fDesc is not None else ''
                     else:
                         fDesc = f'// [webezyio] - {fDesc}\n\t' if fDesc is not None else ''
@@ -825,7 +766,17 @@ class WZProto():
                     msgs.append(
                         f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FieldOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
                 elif ext_type == 'MessageOptions':
-                    logging.error(f"{ext_type} Not supported at the moment!")
+                    fields = '\n\t\t'.join(fields)
+                    msgs.append(
+                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.MessageOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                elif ext_type == 'FileOptions':
+                    fields = '\n\t\t'.join(fields)
+                    msgs.append(
+                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FileOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                elif ext_type == 'ServiceOptions':
+                    fields = '\n\t\t'.join(fields)
+                    msgs.append(
+                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.ServiceOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
                 else:
                     fields = '\n\t'.join(fields)
                     msgs.append(
@@ -1296,3 +1247,86 @@ def attach_template(ARCHITECT,template:_BUILTINS_TEMPLATES):
         pretty.print_note(file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name))
         os.chdir(ARCHITECT._path.split('webezy.json')[0])
         subprocess.run(['python',file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--domain',ARCHITECT._domain,'--project-name',ARCHITECT._project_name])
+
+def parse_extension_to_proto(
+    extension_type:Literal['FileOptions','MessageOptions','FieldOptions','ServiceOptions'],
+    extension_message,ext_key,ext_value,wz_json):
+    extension_value = None
+    # Get current key to parse
+    extension_field = next((f for f in extension_message.get('fields') if f.get('name') == ext_key.split('.')[-1]))
+    # Get type and label for the extension field
+    type_ext = extension_field.get(
+        'fieldType').split('_')[-1].lower()
+    label_ext = extension_field.get(
+        'label').split('_')[-1].lower()
+    # Handle FileOptions extensions
+    if extension_type == 'FileOptions' or  extension_type == 'MessageOptions':
+        if label_ext == 'repeated':
+            pass
+        else:
+            extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field)
+            if extension_value is not None:
+                extension_value = f'option ({ext_key}) = {extension_value};'
+    
+    elif extension_type == 'FieldOptions':
+        if label_ext == 'repeated':
+            pass
+        else:
+            extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
+            if extension_value is not None:
+                extension_value = f'({ext_key}) = {extension_value}'
+    elif extension_type == 'ServiceOptions':
+        if label_ext == 'repeated':
+            pass
+        else:
+            extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
+            if extension_value is not None:
+                extension_value = f'option ({ext_key}) = {extension_value};'
+
+    else:
+        raise errors.WebezyValidationError('Extension Type Error','Extension of type {} is not valid !'.format(extension_type))
+
+    return extension_value
+
+def parse_extension_value(type,value,wz_json:WZJson,field=None,num_tabs=1):
+    if 'int' in type:
+        value = int(value)
+    elif type == 'float' or type == 'double':
+        value = float(value)
+    elif type == 'string':
+        value = f'"{value}"'
+    elif type == 'bool':
+        if value == 0:
+            value = "false"
+        elif value == 1:
+            value = "true"
+    elif type == 'message':
+        if field is not None:
+            ext_msg = wz_json.get_message(field.get('messageType'))
+            temp_values = []
+            for k in value:
+                field_in_ext = next((f for f in ext_msg.get('fields') if f.get('name') == k),None)
+                if field_in_ext is not None:
+                    field_ext_in_type = field_in_ext.get('fieldType').split('_')[-1].lower()
+                    parsed_value_field = parse_extension_value(field_ext_in_type,value[k],wz_json,field_in_ext)
+                    if parsed_value_field is not None:
+                        temp_values.append('{} : {}'.format(k,parsed_value_field))
+            if num_tabs > 1:
+                value = ',\n\t\t'.join(temp_values)
+                value = f'{_OPEN_BRCK}\n\t\t{value}\n\t{_CLOSING_BRCK}'
+            else:
+                value = ',\n\t'.join(temp_values)
+                value = f'{_OPEN_BRCK}\n\t{value}\n{_CLOSING_BRCK}'
+    elif type == 'enum':
+        if isinstance(value,float) or isinstance(value,int):
+            if value != 0:
+                value = int(value)
+            else:
+                value = None
+        else:
+            if 'UNKNOWN' not in value:
+                value = value
+            else:    
+                value = None
+
+    return value

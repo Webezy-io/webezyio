@@ -24,6 +24,7 @@ import logging
 import os
 import sys
 from webezyio import _fs,_helpers,_pretty,config as _config
+from webezyio.commons.pretty import print_note
 log = logging.getLogger('webezyio.cli.main')
 
 class WebezyProjectConfig:
@@ -36,32 +37,44 @@ class WebezyProjectConfig:
             client_channel_opt (Tuple[Tuple[str,any]])
             custom_templates (List[Tuple(str,str)])
             custom_plugins (List[Tuple(str,str)])
+            template - Template options
 
         """
         self.client_channel_opt = kwargs.get('client_channel_opt')
         self.custom_templates = kwargs.get('custom_templates')
         self.custom_plugins = kwargs.get('custom_plugins')
+        self.template = kwargs.get('template')
 
     def config(self):
         return {
             'client_channel_opt': self.client_channel_opt,
             'custom_templates': self.custom_templates,
-            'custom_plugins': self.custom_plugins
+            'custom_plugins': self.custom_plugins,
+            'template': self.template
         }
 
 def parse_project_config(root_path:str):
 
     global_config = parse_global_config()
+    # print_note(global_config,True,'Global Configs')
+
     wz_json_configs = parse_webezy_json_configs(root_path)
+    # print_note(wz_json_configs,True,'webezy.json')
+
     config_file = parse_config_file(root_path)
+    print_note(config_file,True,'config.py')
+
     
     merged_configs = None 
     if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
         merged_configs = global_config | wz_json_configs
-        merged_configs = merged_configs | config_file
+        if config_file:
+            merged_configs = merged_configs | config_file 
     else:
-        merged_configs = {**global_config, **wz_json_configs, **config_file}
-    # _pretty.print_info({'config':config_file,'webezy':wz_json_configs},True,merged_configs)
+        merged_configs = {**global_config, **wz_json_configs } 
+
+        if config_file is not None:
+            merged_configs = {**merged_configs, **config_file }
     return merged_configs
 
 def parse_webezy_json_configs(root_path):
@@ -74,13 +87,13 @@ def parse_webezy_json_configs(root_path):
 
 def parse_config_file(root_path):
     custom_config_path = _fs.join_path(root_path,'config.py')
+    wz_prj_conf = None
     if _fs.check_if_file_exists(custom_config_path):
         
         if _fs.get_current_location() not in sys.path:
             sys.path.append(_fs.get_current_location())
         
         prj_conf_module = importlib.import_module('config')
-
         wz_prj_conf = WebezyProjectConfig(
             # Client channel options see:  https://github.com/grpc/grpc/blob/v1.46.x/include/grpc/impl/codegen/grpc_types.h
             client_channel_opt= prj_conf_module.client_channel_opt  if hasattr(prj_conf_module,'client_channel_opt') else None,
@@ -88,13 +101,14 @@ def parse_config_file(root_path):
             custom_templates= prj_conf_module.custom_templates  if hasattr(prj_conf_module,'custom_templates') else None,
             # Custom plugins
             custom_plugins= prj_conf_module.custom_plugins  if hasattr(prj_conf_module,'custom_plugins') else None,
+            # Templating options
+            template= prj_conf_module.template  if hasattr(prj_conf_module,'template') else None,
 
         )
 
     else:
         log.debug("No custom project config.py file")
-    
-    return wz_prj_conf.config() if wz_prj_conf is not None else None
+    return None if wz_prj_conf is None else wz_prj_conf.config()
 
 def parse_global_config():
     global_config_path = dict_from_module(_config)

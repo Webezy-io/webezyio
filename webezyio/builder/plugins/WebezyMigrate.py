@@ -24,13 +24,16 @@ import os
 from pathlib import Path
 import sys
 from typing import Dict, List, Literal
+
+import inquirer
 from webezyio.architect import WebezyArchitect
 import webezyio.builder as builder
+from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import helpers, file_system, resources, errors
 from webezyio.commons.pretty import print_error, print_info, print_note, print_success, print_warning
 from webezyio.commons.protos.webezy_pb2 import Descriptor, Language, Project, ServiceDescriptor, WebezyClient, WebezyDeploymentType, WebezyServer, WzResourceWrapper,google_dot_protobuf_dot_struct__pb2
-
-
+from google.protobuf.descriptor import Descriptor
+from google.protobuf.descriptor_pb2 import MessageOptions
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     logging.debug("Starting webezyio build process %s plugin" % (__name__))
@@ -78,21 +81,19 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
             """Init parse protos"""
             protos = resources.parse_proto(f)
             # pool = resources.parse_pool(protos.pool)
-            # print_info(dir(protos[0]),True,'Proto Module')
-            # print_info(dir(protos[1]),True,'Service Module')
 
             proto_module = protos[0].DESCRIPTOR
-            domain = proto_module.package.split('.')[0]
-
+            domain = proto_module.package.split('.')[0] if proto_module.package is not '' else domain
+ 
             """File options"""
             proto_file_opt = proto_module.GetOptions()
             proto_file_depend = proto_module.dependencies
 
             _services = proto_module.services_by_name
-            _package = proto_module.package
-
+            # _package = proto_module.package
             # print_note({'file_options':proto_file_opt,'file_dependencies':proto_file_depend},True)
-           
+
+
             """Validations"""
             # TODO Handle project with no service (For future use of protobuf as standalone feature)
 
@@ -110,35 +111,65 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                     service_full_name = _services[svc].full_name
                     service_methods = _services[svc].methods_by_name
                     service = helpers.WZService(service_name,methods=[],dependencies=[])
-
+                    service_options = _services[svc].GetOptions()
+                    temp_extensions = {}
+                    if service_options is not None:
+                        print_note('Service extension detected : {}'.format(service_options))
+                        for svc_ext in service_options.Extensions._extended_message.ListFields():
+                            ext_desc, ext_value = svc_ext
+                            temp_extensions[ext_desc.full_name] = None
+                            field_opt_type = resources.WZFieldDescriptor.Type.Name(ext_desc.type)
+                            field_opt_label = resources.WZFieldDescriptor.Label.Name(ext_desc.label)
+                            temp_extensions = parse_proto_extension(field_opt_type,field_opt_label,ext_desc,ext_value,temp_extensions)
+                        service._extensions = temp_extensions
+                        
                     for rpc in service_methods:
                         proto_rpc = service_methods[rpc]
                         service_rpc = helpers.WZRPC(proto_rpc.name,proto_rpc.input_type.full_name,proto_rpc.output_type.full_name,proto_rpc.client_streaming,proto_rpc.server_streaming)
                         service._methods.append(service_rpc)
                     
-                    # print_note({'index':_services[svc].index,'has_options':_services[svc].has_options},True,'[{0}] Service expanded'.format(service_full_name))
                     services.append(service)
 
             # Package
             if proto_module.package is not None and proto_module.package != '':
+
+               
                 pkg_name = proto_module.package.split('.')[1]
                 pkg_messages = proto_module.message_types_by_name
                 pkg_enums = proto_module.enum_types_by_name
-                package = helpers.WZPackage(pkg_name,messages=[],enums=[])
-                # print_note({'has_options':proto_module.has_options,'extensions':proto_module.extensions_by_name},True,'[{0}] Service expanded'.format(service_full_name))
+                package = helpers.WZPackage(pkg_name,messages=[],enums=[],domain=proto_module.package.split('.')[0])
+                
+                """Handle extensions for package"""
+                if proto_file_opt is not None:
+                    temp_extensions = {}
+
+                    for pkg_ext in proto_file_opt.Extensions._extended_message.ListFields():
+
+                        ext_desc, ext_value = pkg_ext
+                        temp_extensions[ext_desc.full_name] = None
+                        field_opt_type = resources.WZFieldDescriptor.Type.Name(ext_desc.type)
+                        field_opt_label = resources.WZFieldDescriptor.Label.Name(ext_desc.label)
+                        temp_extensions = parse_proto_extension(field_opt_type,field_opt_label,ext_desc,ext_value,temp_extensions)
+                       
+                    package._extensions = temp_extensions
+
                 print_info("Parsing \"Package\" proto file\n\t-> Messages : {}\n\t-> Enums : {}".format(len(pkg_messages),len(pkg_enums)))
 
                 # Iterating package messages
                 for msg in pkg_messages:
-                    message = helpers.WZMessage(pkg_messages[msg].name,fields=[])
-                    # print_note(dir(pkg_messages[msg]))
-                    # print_note(pkg_messages[msg].extensions,True,msg)
-                    # print_note(dir(pkg_messages[msg]),True)
-
+                    message = helpers.WZMessage(pkg_messages[msg].name,fields=[],domain=proto_module.package.split('.')[0])
                     for ext in pkg_messages[msg].extensions:
-                        # print_info(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name,True)
-                        # print_info(ext.extension_scope.extensions[0].name,True)
-                        extension_type = resources.Options.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
+
+                        extension_type = inquirer.prompt([inquirer.List('extension_type','Choose which type \'{}\' extending?'.format(message.name),choices=['FieldOptions','FileOptions','MessageOptions','ServiceOptions'])],theme=WebezyTheme())
+                        if extension_type is None:
+                            
+                            # Currently only supports FieldOptions as auto-detect
+                            extension_type = resources.Options.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
+                        
+                        else:
+                            extension_type = extension_type['extension_type']
+
+                        # TODO HANDLE MULTIPLE OPTIONS TYPES
                         message._extension_type = extension_type
                         for field_extended in ext.extension_scope.extensions:
                             extended_field_desc = helpers.WZField(field_extended.name,
@@ -154,7 +185,6 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                         field_key_type = None
                         field_value_type = None
                         
-                        # print_note(resources.WZFieldDescriptor.Type.Name(f.type),True,f.full_name)
                         # Handle message as field
                         if field.message_type is not None:
 
@@ -179,54 +209,11 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                             field_extensions = {}
                             field_options = field.GetOptions()
                             
-                            # print_note(field_options.Extensions,True,'Extensions {}'.format(f.name))
-                            # print_note(field_options.Extensions._extended_message.ListFields())
-
                             for f_ext in field_options.Extensions._extended_message.ListFields():
                                 field_opt_type = resources.WZFieldDescriptor.Type.Name(f_ext[0].type)
                                 field_opt_label = resources.WZFieldDescriptor.Label.Name(f_ext[0].label)
-                                if 'REPEATED' in field_opt_label:
-                                    list_values_temp = []
-                                    for field_opt_value in f_ext[1]:
-                                        if 'BOOL' in field_opt_type:
-                                            list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(bool_value=field_opt_value))
-                                        elif 'STRING' in field_opt_type:
-                                            list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value))
-                                        elif 'INT' in field_opt_type:
-                                            list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value))
-                                        elif 'MESSAGE' in field_opt_type:
-                                            struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
-                                            for field_ext_temp in f_ext[0].message_type.fields:
-                                                if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
-                                                    raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
-                                                struct_temp.update({field_ext_temp.name:getattr(field_opt_value,field_ext_temp.name)})
-                                            list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp))
-                                        elif 'ENUM' in field_opt_type:
-                                            list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[0].enum_type.values_by_number[field_opt_value].name))
-                                        else:
-                                            print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
-
-                                    list_values = google_dot_protobuf_dot_struct__pb2.ListValue(values=list_values_temp)
-                                    field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
-                                else:
-                                    if 'BOOL' in field_opt_type:
-                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(bool_value=f_ext[1])
-                                    elif 'STRING' in field_opt_type:
-                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[1])
-                                    elif 'INT' in field_opt_type:
-                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(number_value=f_ext[1])
-                                    elif 'MESSAGE' in field_opt_type:
-                                            struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
-                                            for field_ext_temp in f_ext[0].message_type.fields:
-                                                if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
-                                                    raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
-                                                struct_temp.update({field_ext_temp.name:getattr(f_ext[1],field_ext_temp.name)})
-                                            field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp)
-                                    elif 'ENUM' in field_opt_type:
-                                        field_extensions[f_ext[0].full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=f_ext[0].enum_type.values_by_number[f_ext[1]].name)
-                                    else:
-                                        print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,f_ext[0].full_name))
-                        
+                                field_extensions = parse_proto_extension(field_opt_type,field_opt_label,f_ext[0],f_ext[1],field_extensions)
+                              
 
                         field_message_type = field.message_type.full_name if hasattr(field.message_type,'full_name') else None
                         field_message_type = field_message_type if field_message_type is not None and field_message_type[-5:] != 'Entry' else None
@@ -238,9 +225,6 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                 elif resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_ENUM':
                                     field_enum_type = field.message_type.fields_by_name.get('value').enum_type.full_name
                                 
-                                # field_message_type = f.message_type.fields_by_name.get('value')
-                                # print_info(field_message_type.full_name,field_message_type.type)
-
                         field = helpers.WZField(field.name,
                                                 type=resources.WZFieldDescriptor.Type.Name(field.type if is_map_field == False else resources.WZFieldDescriptor.Type.TYPE_MAP),
                                                 label=resources.WZFieldDescriptor.Label.Name(field.label if field_key_type is None else 1),
@@ -257,7 +241,7 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                     for ev in pkg_enums[en].values:
                         e_value = helpers.WZEnumValue(ev.name,ev.number)
                         e_values.append(e_value)
-                    enum_desc = helpers.WZEnum(pkg_enums[en].name,enum_values=e_values)
+                    enum_desc = helpers.WZEnum(pkg_enums[en].name,enum_values=e_values,domain=proto_module.package.split('.')[0])
                     package._enums.append(enum_desc)
 
                 pkgs['protos/v1/{0}.proto'.format(package.name)] = package
@@ -266,15 +250,7 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
         except Exception as e:
             print_error(
                 f'Migration Exception occured during handling of [{f}] : {e}')
-
-    # for f in file_system.walkFiles(protos_dir):
-    #     index = 0
-    #     temp_file = file_system.rFile(f'{protos_dir}/{f}')
-    #     for l in temp_file:
-    #         if 'import "protos/' in l and 'google/protobuf' not in l:
-    #             temp_file[index] = l.replace('import "protos/', 'import "')
-    #         index += 1
-    #     file_system.wFile(f'{protos_dir}/{f}', ''.join(temp_file), True)
+   
     _migrate_to_webezy_json(file_system.join_path(project_path,'webezy.json'),domain if domain is not None else 'webezy',prj,pkgs,services)
     return resources_added
 
@@ -303,24 +279,69 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
     ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
 
     for p in packages:
-        package_name, package_messages, package_enums = packages[p].to_tuple()
-
-        package_temp = ARCHITECT.AddPackage(package_name)
+        package_name, package_messages, package_enums, package_extensions, package_domain = packages[p].to_tuple()
+        package_temp = ARCHITECT.AddPackage(package_name,domain=package_domain,extensions=package_extensions)
         for m in package_messages:
-            msg_name, msg_fields, msg_desc, msg_opt = m
-            msg_temp = ARCHITECT.AddMessage(package_temp, msg_name, msg_fields, msg_desc, msg_opt)
+            msg_name, msg_fields, msg_desc, msg_opt, msg_domain = m
+            msg_temp = ARCHITECT.AddMessage(package_temp, msg_name, msg_fields, msg_desc, msg_opt, msg_domain)
             msgs_map[msg_temp.full_name] = msg_temp
 
         for e in package_enums:
-            enum_name, enum_values, enum_desc = e
-            ARCHITECT.AddEnum(package_temp, enum_name, enum_values, enum_desc)
+            enum_name, enum_values, enum_desc, enum_domain = e
+            ARCHITECT.AddEnum(package_temp, enum_name, enum_values, enum_desc, enum_domain)
 
     for servc in services:
-        svc_name, svc_methods, svc_dependencies, svc_desc = servc.to_tuple()
-        temp_service = ARCHITECT.AddService(svc_name,svc_dependencies,svc_desc,[])
+        svc_name, svc_methods, svc_dependencies, svc_desc, svc_ext = servc.to_tuple()
+        print_note(svc_ext)
+        temp_service = ARCHITECT.AddService(svc_name,svc_dependencies,svc_desc,[],extensions=svc_ext)
         for rpc in svc_methods:
             rpc_name, rpc_in_out, rpc_desc = rpc
             ARCHITECT.AddRPC(temp_service,rpc_name,rpc_in_out,rpc_desc)
 
     ARCHITECT.Save()
     print_success("Migrate process done !\n\t-> now you can create and edit resources with your new 'webezy.json' file.")
+
+def parse_proto_extension(field_opt_type,field_opt_label,description,value,field_extensions):
+    if 'REPEATED' in field_opt_label:
+        list_values_temp = []
+        for field_opt_value in value:
+            if 'BOOL' in field_opt_type:
+                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(bool_value=field_opt_value))
+            elif 'STRING' in field_opt_type:
+                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value))
+            elif 'INT' in field_opt_type:
+                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value))
+            elif 'MESSAGE' in field_opt_type:
+                struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
+                for field_ext_temp in description.message_type.fields:
+                    if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
+                        raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
+                    struct_temp.update({field_ext_temp.name:getattr(field_opt_value,field_ext_temp.name)})
+                list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp))
+            elif 'ENUM' in field_opt_type:
+                list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(string_value=description.enum_type.values_by_number[field_opt_value].name))
+            else:
+                print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,description.full_name))
+
+        list_values = google_dot_protobuf_dot_struct__pb2.ListValue(values=list_values_temp)
+        field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
+    else:
+        if 'BOOL' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(bool_value=value)
+        elif 'STRING' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=value)
+        elif 'INT' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(number_value=value)
+        elif 'MESSAGE' in field_opt_type:
+                struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
+                for field_ext_temp in description.message_type.fields:
+                    if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
+                        raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
+                    struct_temp.update({field_ext_temp.name:getattr(value,field_ext_temp.name)})
+                field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp)
+        elif 'ENUM' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=description.enum_type.values_by_number[value].name)
+        else:
+            print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,description.full_name))
+    
+    return field_extensions

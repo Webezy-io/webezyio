@@ -54,7 +54,7 @@ def write_protos(wz_json: helpers.WZJson):
             exit(1)
 
         svc_def = helpers.WZProto(svc, wz_json.services[svc].get(
-            'dependencies'), wz_json.services[svc], description=wz_json.services[svc].get('description'))
+            'dependencies'), wz_json.services[svc], description=wz_json.services[svc].get('description'),extensions=wz_json.services[svc].get('extensions'),wz_json=wz_json)
         logging.debug(f"Writing proto file for service: {svc}")
         file_system.wFile(file_system.join_path(
             wz_json.path, 'protos', f'{svc}.proto'), svc_def.__str__(), True)
@@ -70,7 +70,9 @@ def write_protos(wz_json: helpers.WZJson):
                                   package=pkg_full_name,
                                   messages=wz_json.packages[pkg].get(
                                       'messages'),
-                                  enums=wz_json.packages[pkg].get('enums'))
+                                  enums=wz_json.packages[pkg].get('enums'),
+                                  extensions=wz_json.packages[pkg].get('extensions'),
+                                  wz_json=wz_json)
         logging.debug(f"Writing proto file for package: {pkg_name}")
         file_system.wFile(file_system.join_path(
             wz_json.path, 'protos', f'{pkg_name}.proto'), pkg_def.__str__(), True)

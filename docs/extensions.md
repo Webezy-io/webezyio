@@ -36,6 +36,21 @@ message MyMessage {
 
 ```
 
+
+## Quick Usage
+You can extend you resources with "Pre-built" package by Webezy.io, These ready to use messages can be a base to future extensions you may wish to implement in Webezy.io project.
+
+Run when inside one of your (Webezy.io) projects:
+```sh
+wz template @webezyio/io --load
+```
+> __Warning__ Do not start a new project with base template of `@webezyio/io` - it __MUST__ be used in already running webezy.io project with at least 1 valid `package` and `service`.
+
+Then you can extend your resources with:
+```sh
+wz extend <full.resource.name...>
+```
+
 > __Warning__ Extensions limitations:
   We have a strict rules on implementing a custom extension of yout own that __MUST__ be followed for supported feature and seemless integration with Webezy.io modules.
 
