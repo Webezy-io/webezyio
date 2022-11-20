@@ -18,7 +18,6 @@ webezyio_templates = [
     "@webezyio/HelloWorldTs"
 ]
 # Analytic gathering approval
-analytics=False
+analytics=True
 # First run flag
-first_run=False
-token="macOS-12.6-arm64-arm-64bit:2022-11-18T15:24:00.812064"
+first_run=True
