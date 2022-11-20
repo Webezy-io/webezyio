@@ -43,7 +43,7 @@ from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson, 
     Options, FieldDescriptor as WZFieldDescriptor,\
     Enum as WZEnumDescriptor, ServiceDescriptor as WZServiceDescriptor,\
     WebezyContext as WZContext, WebezyFileContext as WZFileContext, WebezyMethodContext as WZMethodContext,\
-    WzResourceWrapper
+    WzResourceWrapper, google_dot_protobuf_dot_struct__pb2
 
 
 class ResourceTypes(Enum):
@@ -177,13 +177,17 @@ def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],de
     path = path.split('/webezy.json')[0]
     temp_msgs = []
     temp_enums = []
-
+    temp_exts = {}
     for m in messages:
         temp_msgs.append(ParseDict(m,WZDescriptor()))
     if enums is not None:
         for e in enums:
             temp_enums.append(ParseDict(e,WZEnumDescriptor()))
-
+    # for ext in extensions:
+    #     ext_msg = 
+    #     parse_proto_extension()
+    #     temp_exts[ext] = google_dot_protobuf_dot_struct__pb2.Value()
+    #     print_note(extensions[ext],True,ext)
     full_name = get_package_full_name(domain, name)
     package = PackageDescriptor(uri=get_uri_package(
         path, full_name),type= ResourceTypes.package.value, name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description,extensions=extensions)
@@ -208,18 +212,20 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
             f_fName = get_field_full_name(
                 domain, package.name, name, f.get('name'))
             msg_type = None
-            if f.get('message_type') is not None:
-                package_name = '.'.join(f.get('message_type').split('.')[:3])
-                if package_name not in package.dependencies and package.package not in f.get('message_type'):
+            msg_type_temp  = f.get('message_type') if f.get('message_type') is not None else f.get('messageType')
+            if msg_type_temp is not None:
+                package_name = '.'.join(msg_type_temp.split('.')[:3])
+                if package_name not in package.dependencies and package.package not in msg_type_temp:
                     package.dependencies.append(package_name)
-                if 'google.protobuf' in f.get('message_type'):
-                    msg_type = '{0}.{1}.{2}'.format(f.get('message_type').split('.')[0],f.get('message_type').split('.')[1],f.get('message_type').split('.')[-1].capitalize()) if f.get('message_type') is not None else None
+                if 'google.protobuf' in msg_type_temp:
+                    msg_type = '{0}.{1}.{2}'.format(msg_type_temp.split('.')[0],msg_type_temp.split('.')[1],msg_type_temp.split('.')[-1].capitalize()) if msg_type_temp is not None else None
                 else:
-                    msg_type = f.get('message_type')
+                    msg_type = msg_type_temp
             f_uri = get_uri_field(path, f_fName)
             fields_oneof = []
-            if f.get('oneof_fields'):
-                for f_oneof in f.get('oneof_fields'):
+            oneofs_fields = f.get('oneof_fields') if f.get('oneof_fields')  is not None else f.get('oneofFields') 
+            if oneofs_fields :
+                for f_oneof in oneofs_fields:
                     f_oneof_full_name = get_oneof_field_full_name(domain=domain,package=package.name,message=name,parent_field=f.get('name'),name=f_oneof.get('name'))
                     f_oneof_uri = get_uri_oneof_field(path, f_oneof_full_name)
                     fields_oneof.append(WZFieldDescriptor(uri=f_oneof_uri,
@@ -243,8 +249,10 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                                                  description=f.get(
                                                      'description'),
                                                  index=index, field_type=f.get(
-                                                     'field_type'),
-                                                 label=f.get('label'), enum_type=f.get('enum_type'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions'),key_type=f.get('key_type'),value_type=f.get('value_type'),oneof_fields=fields_oneof))
+                                                     'field_type') if f.get(
+                                                     'field_type') is not None else f.get(
+                                                     'fieldType'),
+                                                 label=f.get('label'), enum_type=f.get('enum_type')if f.get('enum_type') is not None else f.get('enumType'), type=ResourceTypes.descriptor.value, kind=ResourceKinds.field.value, message_type=msg_type, extensions=f.get('extensions'),key_type=f.get('key_type') if f.get('key_type') is not None else f.get('keyType'),value_type=f.get('value_type') if f.get('value_type') is not None else f.get('valueType'),oneof_fields=fields_oneof))
         else:
             logging.warning(
                 f"Cannot insert field {f.get('name')} already exists under {name} message")
@@ -496,3 +504,48 @@ def construct_full_name(resource_type: ResourceTypes, resource_kind: ResourceKin
 
 def proto_to_dict(proto):
     return MessageToDict(proto)
+
+def parse_proto_extension(field_opt_type,field_opt_label,description,value,field_extensions):
+    if 'REPEATED' in field_opt_label:
+        list_values_temp = []
+        for field_opt_value in value:
+            if 'BOOL' in field_opt_type:
+                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(bool_value=field_opt_value))
+            elif 'STRING' in field_opt_type:
+                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value))
+            elif 'INT' in field_opt_type:
+                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value))
+            elif 'MESSAGE' in field_opt_type:
+                struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
+                for field_ext_temp in description.message_type.fields:
+                    if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
+                        raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
+                    struct_temp.update({field_ext_temp.name:getattr(field_opt_value,field_ext_temp.name)})
+                list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp))
+            elif 'ENUM' in field_opt_type:
+                list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(string_value=description.enum_type.values_by_number[field_opt_value].name))
+            else:
+                print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,description.full_name))
+
+        list_values = google_dot_protobuf_dot_struct__pb2.ListValue(values=list_values_temp)
+        field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
+    else:
+        if 'BOOL' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(bool_value=value)
+        elif 'STRING' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=value)
+        elif 'INT' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(number_value=value)
+        elif 'MESSAGE' in field_opt_type:
+                struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
+                for field_ext_temp in description.message_type.fields:
+                    if field_ext_temp.type == 'TYPE_MESSAGE' or field_ext_temp.type == 'TYPE_MAP' or field_ext_temp.type == 'TYPE_ENUM':
+                        raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
+                    struct_temp.update({field_ext_temp.name:getattr(value,field_ext_temp.name)})
+                field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp)
+        elif 'ENUM' in field_opt_type:
+            field_extensions[description.full_name] = google_dot_protobuf_dot_struct__pb2.Value(string_value=description.enum_type.values_by_number[value].name)
+        else:
+            print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,description.full_name))
+    
+    return field_extensions

@@ -708,7 +708,6 @@ def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
                 else:
                     if 'webezy.json' in args.path:
                         prj_configs = prj_conf.parse_project_config(wz_json.path)
-
                         WEBEZY_JSON = file_system.rFile(args.path, json=True)
                         WEBEZY_JSON = helpers.WZJson(webezy_json=WEBEZY_JSON)
                         filename = WEBEZY_JSON.project.get('packageName') if args.template_name is None else args.template_name

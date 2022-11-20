@@ -55,19 +55,19 @@ def extend_field(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:Web
             list_of_ext_fields.append((ext_field.get('name'),ext_field.get('fullName')))
         
         field_extension_result = inquirer.prompt([inquirer.List('extension_field','Chose which field you want to add / edit?',list_of_ext_fields)],theme=WebezyTheme())
-
+        if resource.get('extensions') is None:
+                resource['extensions'] = {}
         if field_extension_result is not None:
             temp_field_ext = next((f for f in results.get('fields') if f.get('fullName') == field_extension_result['extension_field']),None)
             if temp_field_ext.get('fieldType') == 'TYPE_MESSAGE':
                 value = handle_ext_field_message(temp_field_ext.get('messageType'),wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
             else:
                 raise errors.WebezyValidationError('Handle Extension Editing Failed','Error occured during handling of extensions {}'.format(temp_field_ext.get('fullName')))
-        if resource.get('extensions') is None:
-                resource['extensions'] = {}
+       
         temp_msg = wz_json.get_message('.'.join(resource.get('fullName').split('.')[:-1]))
         temp_pkg_desc = wz_json.get_package(resource.get('fullName').split(".")[1],False)
         resource['extensions'][temp_field_ext.get('fullName')] = value
-        
+
         ARCHITECT.EditMessage(temp_pkg_desc,temp_msg.get('name'),temp_msg.get('fields'),temp_msg.get('description'),temp_msg.get('extensionType'))
         ARCHITECT.Save()
 
@@ -127,7 +127,8 @@ def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Lite
                 avail_extensions.append(ext)
     for ext in _get_extensions(pkg_messages,ext_type):
         avail_extensions.append(ext)
-
+    if len(avail_extensions) == 0:
+        print_error("Make sure your package / service has been imported with the package wrapper for extensions !",True,"No available messages to extend")
     # Insert into prompt
     list_avail_ext = []
     for avail_ext in avail_extensions:

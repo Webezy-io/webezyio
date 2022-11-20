@@ -293,7 +293,7 @@ _msg_webezy_io_v1_FieldsExtensions = helpers.WZMessage(name='FieldsExtensions',
 _pkg_webezy_io_v1 = helpers.WZPackage(name='io',
                                                 messages=[_msg_webezy_io_v1_ConsoleLoggingOptions,_msg_webezy_io_v1_FieldValidation,_msg_webezy_io_v1_FileExtensions,_msg_webezy_io_v1_ServiceExtensions,_msg_webezy_io_v1_MessageExtensions,_msg_webezy_io_v1_FieldsExtensions],
                                                 enums=[_enum_webezy_io_v1_LoggingLevels,_enum_webezy_io_v1_ValidationTypes,_enum_webezy_io_v1_Validations],
-                                                extensions={'webezy.io.v1.FileExtensions.ConsoleLogger': {'level': 'DEBUG'}})
+                                                extensions=None)
 
 # Unpacking package [webezy_io_v1]
 _pkg_webezy_io_v1_name, _pkg_webezy_io_v1_messages, _pkg_webezy_io_v1_enums, _pkg_webezy_io_v1_ext, _pkg_webezy_io_v1_domain = _pkg_webezy_io_v1.to_tuple()

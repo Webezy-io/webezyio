@@ -59,18 +59,22 @@ def parse_project_config(root_path:str):
     # print_note(global_config,True,'Global Configs')
 
     wz_json_configs = parse_webezy_json_configs(root_path)
-    # print_note(global_config,True,'webezy.json')
+    # print_note(wz_json_configs,True,'webezy.json')
 
     config_file = parse_config_file(root_path)
-    # print_note(global_config,True,'config.py')
+    print_note(config_file,True,'config.py')
 
     
     merged_configs = None 
     if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
         merged_configs = global_config | wz_json_configs
-        merged_configs = merged_configs | config_file
+        if config_file:
+            merged_configs = merged_configs | config_file 
     else:
-        merged_configs = {**global_config, **wz_json_configs, **config_file}
+        merged_configs = {**global_config, **wz_json_configs } 
+
+        if config_file is not None:
+            merged_configs = {**merged_configs, **config_file }
     return merged_configs
 
 def parse_webezy_json_configs(root_path):
@@ -83,7 +87,7 @@ def parse_webezy_json_configs(root_path):
 
 def parse_config_file(root_path):
     custom_config_path = _fs.join_path(root_path,'config.py')
-    wz_prj_conf = {}
+    wz_prj_conf = None
     if _fs.check_if_file_exists(custom_config_path):
         
         if _fs.get_current_location() not in sys.path:
@@ -104,8 +108,7 @@ def parse_config_file(root_path):
 
     else:
         log.debug("No custom project config.py file")
-    
-    return None if wz_prj_conf is {} else wz_prj_conf.config()
+    return None if wz_prj_conf is None else wz_prj_conf.config()
 
 def parse_global_config():
     global_config_path = dict_from_module(_config)

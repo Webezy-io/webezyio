@@ -692,6 +692,7 @@ class WZProto():
                 for f in m.get('fields'):
                     fLabel = '' if f.get('label') == 'LABEL_OPTIONAL' or f.get('label') is None else '{0} '.format(
                         f.get('label').split('_')[-1].lower())
+                    pretty.print_error(f,True)
                     fType = f.get('fieldType').split('_')[-1].lower()
                     if fType == 'message':
                         fType = f.get('messageType')
