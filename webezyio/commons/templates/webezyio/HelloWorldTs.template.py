@@ -1,23 +1,3 @@
-# Copyright (c) 2022 Webezy.io.
-
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """Init script for webezy.io template HelloWorldTs
 Generated thanks to -
@@ -115,8 +95,8 @@ _field_webezy_HelloWorldPkg_v1_HelloWorldMsg_Hello = helpers.WZField(name='Hello
                               enum_type=None,
                               key_type=None,
                               value_type=None,
-                              oneof_fields=None # Not supporting templating with oneof_fields !
-)
+                              oneof_fields=None, # Not supporting templating with oneof_fields !
+                              extensions=None)
 
 # Packing all fields for [webezy_HelloWorldPkg_v1_HelloWorldMsg]
 _msg_fields_webezy_HelloWorldPkg_v1_HelloWorldMsg = [_field_webezy_HelloWorldPkg_v1_HelloWorldMsg_Hello]
@@ -126,58 +106,64 @@ _msg_fields_webezy_HelloWorldPkg_v1_HelloWorldMsg = [_field_webezy_HelloWorldPkg
 # Constructing message [webezy_HelloWorldPkg_v1_HelloWorldMsg]
 _msg_webezy_HelloWorldPkg_v1_HelloWorldMsg = helpers.WZMessage(name='HelloWorldMsg',
                                  description='This is a hello world message',
-                                 fields=_msg_fields_webezy_HelloWorldPkg_v1_HelloWorldMsg)
+                                 fields=_msg_fields_webezy_HelloWorldPkg_v1_HelloWorldMsg,
+                                 extension_type=None,
+                                 extensions=None)
 
     
 # Construct packages
 
 _pkg_webezy_HelloWorldPkg_v1 = helpers.WZPackage(name='HelloWorldPkg',
                                                 messages=[_msg_webezy_HelloWorldPkg_v1_HelloWorldMsg],
-                                                enums=[])
+                                                enums=[],
+                                                extensions=None)
 
 # Unpacking package [webezy_HelloWorldPkg_v1]
-_pkg_webezy_HelloWorldPkg_v1_name, _pkg_webezy_HelloWorldPkg_v1_messages, _pkg_webezy_HelloWorldPkg_v1_enums = _pkg_webezy_HelloWorldPkg_v1.to_tuple()
+_pkg_webezy_HelloWorldPkg_v1_name, _pkg_webezy_HelloWorldPkg_v1_messages, _pkg_webezy_HelloWorldPkg_v1_enums, _pkg_webezy_HelloWorldPkg_v1_ext, _pkg_webezy_HelloWorldPkg_v1_domain = _pkg_webezy_HelloWorldPkg_v1.to_tuple()
     
 # Add packages
 
 # Adding package [webezy_HelloWorldPkg_v1]
 _pkg_webezy_HelloWorldPkg_v1 = _architect.AddPackage(_pkg_webezy_HelloWorldPkg_v1_name,
                                                     dependencies=[],
-                                                    description='None')
+                                                    description='None',
+                                                    domain=_pkg_webezy_HelloWorldPkg_v1_domain,
+                                                    extensions=_pkg_webezy_HelloWorldPkg_v1_ext)
     
 msgs_map = {}
 
 # Add packages messages
 
 for m in _pkg_webezy_HelloWorldPkg_v1_messages:
-	msg_name, msg_fields, msg_desc, msg_opt = m
-	temp_msg = _architect.AddMessage(_pkg_webezy_HelloWorldPkg_v1, msg_name, msg_fields, msg_desc, msg_opt)
+	msg_name, msg_fields, msg_desc, msg_opt, msg_domain = m
+	temp_msg = _architect.AddMessage(_pkg_webezy_HelloWorldPkg_v1, msg_name, msg_fields, msg_desc, msg_opt, msg_domain)
 	msgs_map[temp_msg.full_name] = temp_msg
     
 # Add packages enums
 
 for e in _pkg_webezy_HelloWorldPkg_v1_enums:
-	enum_name, enum_values, enum_desc = e
-	_architect.AddEnum(_pkg_webezy_HelloWorldPkg_v1, enum_name, enum_values, enum_desc)
+	enum_name, enum_values, enum_desc, enum_domain = e
+	_architect.AddEnum(_pkg_webezy_HelloWorldPkg_v1, enum_name, enum_values, enum_desc, enum_domain)
     
 """Services and thier resources"""
 # Construct rpc's
 
 _rpc_webezy_HelloWorldSvc_v1_GetHelloWorld = helpers.WZRPC(name='GetHelloWorld',client_stream=None,server_stream=None,in_type=msgs_map[_DOMAIN+'.HelloWorldPkg.v1.HelloWorldMsg'].full_name, out_type=msgs_map[_DOMAIN+'.HelloWorldPkg.v1.HelloWorldMsg'].full_name, description='This is a simple unary call that uses HelloWorldPkg->HelloWorldMsg for input and output types')
-    
+        
 # Construct services
 
 _svc_HelloWorldSvc = helpers.WZService('HelloWorldSvc',
-                                              methods=[_rpc_webezy_HelloWorldSvc_v1_GetHelloWorld],
-                                              dependencies=[_pkg_webezy_HelloWorldPkg_v1.package],
-                                              description='None')
+                                                methods=[_rpc_webezy_HelloWorldSvc_v1_GetHelloWorld],
+                                                dependencies=[_pkg_webezy_HelloWorldPkg_v1.package],
+                                                description='None',
+                                                extensions=None)
 
-_svc_HelloWorldSvc_name, _svc_HelloWorldSvc_methods, _svc_HelloWorldSvc_dependencies, _svc_HelloWorldSvc_desc = _svc_HelloWorldSvc.to_tuple()
-    
+_svc_HelloWorldSvc_name, _svc_HelloWorldSvc_methods, _svc_HelloWorldSvc_dependencies, _svc_HelloWorldSvc_desc, _svc_HelloWorldSvc_ext = _svc_HelloWorldSvc.to_tuple()
+        
 # Add services
 
-_svc_HelloWorldSvc = _architect.AddService(_svc_HelloWorldSvc_name,_svc_HelloWorldSvc_dependencies,_svc_HelloWorldSvc_desc,[])
-    
+_svc_HelloWorldSvc = _architect.AddService(_svc_HelloWorldSvc_name,_svc_HelloWorldSvc_dependencies,_svc_HelloWorldSvc_desc,[],extensions=_svc_HelloWorldSvc_ext)
+        
 
 for rpc in _svc_HelloWorldSvc_methods:
 	rpc_name, rpc_in_out, rpc_desc = rpc

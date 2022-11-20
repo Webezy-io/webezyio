@@ -206,6 +206,7 @@ enum Options{
     FileOptions = 1;
     MessageOptions = 2;
     FieldOptions = 3;
+    ServiceOptions = 4;
 }
 
 // Descriptors essentially contain exactly the information found in a .proto file, in types that make this information accessible in Python.
@@ -237,6 +238,7 @@ message ServiceDescriptor {
     string description = 9;
     string type = 10;
     string kind = 11;
+    map<string, google.protobuf.Value> extensions = 12;
 }
 
 message PackageDescriptor {

@@ -40,7 +40,7 @@ from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
-from webezyio.cli.commands import call, migrate, new,build,generate,ls,package as pack,run,edit,template
+from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template
 from pathlib import Path
 
 _TEMPLATES = config.webezyio_templates
@@ -269,6 +269,12 @@ def main(args=None):
     parser_call.add_argument('--port',default=50051, help='Pass a port for service')
     parser_call.add_argument('--timeout',default=10, help='An optional duration of time in seconds to allow for the RPC')
 
+    """Extend command"""
+    
+    parser_extend = subparsers.add_parser(
+        'extend', help='Extend any webezy.io resource')
+    parser_extend.add_argument('name', help='Resource full name')
+    parser_extend.add_argument('--extension', help='Extension full name')
 
     """Run server"""
     parser_run_server = subparsers.add_parser(
@@ -324,6 +330,8 @@ def main(args=None):
         print_note(args,True,'Argument passed to webezy CLI')
 
     if hasattr(args, 'project'):
+        """New command process"""
+
         # print_info(args,True)
         new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain,template=args.template)
         exit(0)
@@ -347,6 +355,7 @@ def main(args=None):
                 print_note(WEBEZY_JSON._webezy_json, True, 'webezy.json')
 
             if hasattr(args, 'resource'):
+                """Generate command process"""
 
                 namespace = parse_namespace_resource(
                     args.resource, WEBEZY_JSON, args.parent)
@@ -383,12 +392,16 @@ def main(args=None):
                     build.build_all(webezy_json_path)
 
             elif hasattr(args, 'source') and hasattr(args, 'target'):
+                """Package command process"""
+
                 if args.remove:
                     pack.remove_import(args.source,args.target,webezy_json_path,WEBEZY_JSON)
                 else:
                     pack.import_package(args.source,args.target,webezy_json_path,WEBEZY_JSON)
             
             elif args.undo:
+                """Undo command process"""
+
                 path = webezy_json_path.replace('webezy.json','.webezy/cache')
             
                 cache_files = file_system.walkFiles(path)
@@ -400,6 +413,8 @@ def main(args=None):
                     # path=webezy_json_path,save=last_save)
                 # ARCHITECT.Save(undo_save=True)
             elif args.redo:
+                """Redo command process"""
+                
                 path = webezy_json_path.replace('webezy.json','.webezy/cache')
             
                 cache_files = file_system.walkFiles(path)
@@ -409,6 +424,8 @@ def main(args=None):
                 #     path=webezy_json_path,save=cache_files[len(cache_files)-2 if len(cache_files) > 1 else 1])
                 # ARCHITECT.Save()
             elif hasattr(args, 'protos') and hasattr(args, 'code'):
+                """Build command process"""
+
                 if args.code:
                     print_info("Building project resources code files")
                     build.build_code(webezy_json_path)
@@ -420,6 +437,8 @@ def main(args=None):
                     build.build_all(webezy_json_path)
                     
             elif args.purge:
+                """Purge command process"""
+
                 temp_path = webezy_json_path.replace('webezy.json','.webezy/context.json')
                 confirm =inquirer.prompt([inquirer.Confirm('confirm',False,message='You are about to purge the webezy context are you sure?')],theme=WebezyTheme())
                 if confirm.get('confirm'):
@@ -428,9 +447,13 @@ def main(args=None):
                 else:
                     print_warning("Cancelling purge for webezy context")
             elif hasattr(args,'debug'):
+                """Run command process"""
+
                 run.run_server(WEBEZY_JSON,args.debug)
 
-            elif hasattr(args, 'name'):
+            elif hasattr(args, 'name') and hasattr(args,'extension') == False:
+                """Edit command process"""
+
                 resource = parse_name_to_resource(args.name,WEBEZY_JSON)
                 type = resource.get('type')
                 ARCHITECT = WebezyArchitect(
@@ -451,11 +474,21 @@ def main(args=None):
                         edit.edit_message(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
                     elif kind == resources.ResourceKinds.method.value:
                         edit.edit_rpc(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+            
+            elif hasattr(args,'name') and hasattr(args,'extension'):
+                """Extend command process"""
+
+                resource = parse_name_to_resource(args.name,WEBEZY_JSON)
+                extend.extend_resource(resource,args.extension,WEBEZY_JSON)
+
             elif hasattr(args, 'path'):
+                """Template command process"""
                 ARCHITECT = WebezyArchitect(
                     path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
                 template_commands(args,WEBEZY_JSON,ARCHITECT)
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
+                """Call command process"""
+
                 call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug,timeout=int(args.timeout))
                 # if file_system.get_current_location() not in sys.path:
                 #     sys.path.append(file_system.get_current_location())

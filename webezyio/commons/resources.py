@@ -149,7 +149,7 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
     return project if json == False else MessageToDict(project)
 
  
-def generate_service(path, domain, name, service_language, dependencies, description=None,methods=[], json=False):
+def generate_service(path, domain, name, service_language, dependencies, description=None,methods=[],extensions=None, json=False):
     path = path.split('/webezy.json')[0]
     # Init service
     temp_methods = []
@@ -162,7 +162,8 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
                                   methods=temp_methods,
                                   description=description,
                                   type= ResourceTypes.service.value,
-                                  version='0.0.1')
+                                  version='0.0.1',
+                                  extensions=extensions)
     # Init methods
     # service.methods = dependencies
 
@@ -172,7 +173,7 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     return service if json == False else MessageToDict(service)
 
 
-def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],description=None, json=False):
+def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],description=None,extensions=None, json=False):
     path = path.split('/webezy.json')[0]
     temp_msgs = []
     temp_enums = []
@@ -185,7 +186,7 @@ def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],de
 
     full_name = get_package_full_name(domain, name)
     package = PackageDescriptor(uri=get_uri_package(
-        path, full_name),type= ResourceTypes.package.value, name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description)
+        path, full_name),type= ResourceTypes.package.value, name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description,extensions=extensions)
 
     return package if json == False else MessageToDict(package)
 
@@ -237,7 +238,7 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                 for ext in f.get('extensions'):
                     if '.'.join(ext.split('.')[:3]) not in package.dependencies:
                         package.dependencies.append('.'.join(ext.split('.')[:3]))
-                        
+
             temp_fields.append(WZFieldDescriptor(uri=f_uri, name=f.get('name'), full_name=f_fName,
                                                  description=f.get(
                                                      'description'),

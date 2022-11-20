@@ -267,7 +267,7 @@ def create_pckgs(packages):
                                                 messages=[{2}],\n\
                                                 enums=[{3}],\n\
                                                 extensions={4})\n\
-\n# Unpacking package [{0}]\n_pkg_{0}_name, _pkg_{0}_messages, _pkg_{0}_enums = _pkg_{0}.to_tuple()'.format(pkg.get('package').replace('.','_'),pkg.get('name'),','.join(msgs),','.join(enums),pkg.get('extensions'))
+\n# Unpacking package [{0}]\n_pkg_{0}_name, _pkg_{0}_messages, _pkg_{0}_enums, _pkg_{0}_ext, _pkg_{0}_domain = _pkg_{0}.to_tuple()'.format(pkg.get('package').replace('.','_'),pkg.get('name'),','.join(msgs),','.join(enums),pkg.get('extensions'))
     return """
 # Construct packages
 {0}
@@ -279,7 +279,9 @@ def add_packgs(packages):
         pkg = packages[p]
         code += '\n# Adding package [{0}]\n_pkg_{0} = _architect.AddPackage(_pkg_{0}_name,\n\
                                                     dependencies=[],\n\
-                                                    description=\'{1}\')'.format(pkg.get('package').replace('.','_'),str(pkg.get('description')).replace("'",'"'))
+                                                    description=\'{1}\',\n\
+                                                    domain=_pkg_{0}_domain,\n\
+                                                    extensions=_pkg_{0}_ext)'.format(pkg.get('package').replace('.','_'),str(pkg.get('description')).replace("'",'"'))
     return """
 # Add packages
 {0}
@@ -290,8 +292,8 @@ def add_msgs(packages):
     for p in packages:
         pkg = packages[p]
         code += '\nfor m in _pkg_{0}_messages:\n\
-\tmsg_name, msg_fields, msg_desc, msg_opt = m\n\
-\ttemp_msg = _architect.AddMessage(_pkg_{0}, msg_name, msg_fields, msg_desc, msg_opt)\n\
+\tmsg_name, msg_fields, msg_desc, msg_opt, msg_domain = m\n\
+\ttemp_msg = _architect.AddMessage(_pkg_{0}, msg_name, msg_fields, msg_desc, msg_opt, msg_domain)\n\
 \tmsgs_map[temp_msg.full_name] = temp_msg'.format(pkg.get('package').replace('.','_'))
     return """
 msgs_map = {1}{2}
@@ -305,8 +307,8 @@ def add_enums(packages):
     for p in packages:
         pkg = packages[p]
         code += '\nfor e in _pkg_{0}_enums:\n\
-\tenum_name, enum_values, enum_desc = e\n\
-\t_architect.AddEnum(_pkg_{0}, enum_name, enum_values, enum_desc)'.format(pkg.get('package').replace('.','_'))
+\tenum_name, enum_values, enum_desc, enum_domain = e\n\
+\t_architect.AddEnum(_pkg_{0}, enum_name, enum_values, enum_desc, enum_domain)'.format(pkg.get('package').replace('.','_'))
     return """
 # Add packages enums
 {0}
@@ -343,8 +345,9 @@ def create_services(services):
             code += '\n_svc_{0} = helpers.WZService(\'{0}\',\n\
                                                 methods=[{1}],\n\
                                                 dependencies=[{2}],\n\
-                                                description=\'{3}\')\n\
-\n_svc_{0}_name, _svc_{0}_methods, _svc_{0}_dependencies, _svc_{0}_desc = _svc_{0}.to_tuple()'.format(svc.get('name'),','.join(temp_rpcs),','.join(temp_dependencies),str(svc.get('description')).replace("'",'"'))
+                                                description=\'{3}\',\n\
+                                                extensions={4})\n\
+\n_svc_{0}_name, _svc_{0}_methods, _svc_{0}_dependencies, _svc_{0}_desc, _svc_{0}_ext = _svc_{0}.to_tuple()'.format(svc.get('name'),','.join(temp_rpcs),','.join(temp_dependencies),str(svc.get('description')).replace("'",'"'),svc.get('extensions'))
 
         return """
 # Construct services
@@ -358,7 +361,7 @@ def add_services(services):
     if services is not None:
         for s in services:
             svc = services[s]
-            code += '\n_svc_{0} = _architect.AddService(_svc_{0}_name,_svc_{0}_dependencies,_svc_{0}_desc,[])'.format(svc.get('name'))
+            code += '\n_svc_{0} = _architect.AddService(_svc_{0}_name,_svc_{0}_dependencies,_svc_{0}_desc,[],extensions=_svc_{0}_ext)'.format(svc.get('name'))
 
         return """
 # Add services

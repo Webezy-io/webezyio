@@ -83,8 +83,8 @@ _project = _architect.AddProject(server_language=_SERVER_LANGUAGE,
 _enum_values_webezy_io_v1_LoggingLevels = [helpers.WZEnumValue('UNKNWON_LOG_LEVEL',0),helpers.WZEnumValue('DEBUG',1),helpers.WZEnumValue('INFO',2),helpers.WZEnumValue('WARNING',3),helpers.WZEnumValue('ERROR',4)]
 # Instantiating all enum values for [webezy_io_v1_ValidationTypes]
 _enum_values_webezy_io_v1_ValidationTypes = [helpers.WZEnumValue('UNKNOWN_VALIDATION',0),helpers.WZEnumValue('NUMERIC',1),helpers.WZEnumValue('TEXT',2)]
-# Instantiating all enum values for [webezy_io_v1_NumericValidations]
-_enum_values_webezy_io_v1_NumericValidations = [helpers.WZEnumValue('UNKNOWN_NUM_VALIDATION',0),helpers.WZEnumValue('EQ',1),helpers.WZEnumValue('LT',2),helpers.WZEnumValue('GT',3),helpers.WZEnumValue('LTE',4),helpers.WZEnumValue('GTE',5),helpers.WZEnumValue('NOT',6)]
+# Instantiating all enum values for [webezy_io_v1_Validations]
+_enum_values_webezy_io_v1_Validations = [helpers.WZEnumValue('UNKNOWN_NUM_VALIDATION',0),helpers.WZEnumValue('EQ',1),helpers.WZEnumValue('LT',2),helpers.WZEnumValue('GT',3),helpers.WZEnumValue('LTE',4),helpers.WZEnumValue('GTE',5),helpers.WZEnumValue('NOT',6)]
         
 # Creating enums   
 
@@ -92,8 +92,8 @@ _enum_values_webezy_io_v1_NumericValidations = [helpers.WZEnumValue('UNKNOWN_NUM
 _enum_webezy_io_v1_LoggingLevels = helpers.WZEnum('LoggingLevels',enum_values=_enum_values_webezy_io_v1_LoggingLevels)
 # Constructing enum [webezy_io_v1_ValidationTypes]
 _enum_webezy_io_v1_ValidationTypes = helpers.WZEnum('ValidationTypes',enum_values=_enum_values_webezy_io_v1_ValidationTypes)
-# Constructing enum [webezy_io_v1_NumericValidations]
-_enum_webezy_io_v1_NumericValidations = helpers.WZEnum('NumericValidations',enum_values=_enum_values_webezy_io_v1_NumericValidations) 
+# Constructing enum [webezy_io_v1_Validations]
+_enum_webezy_io_v1_Validations = helpers.WZEnum('Validations',enum_values=_enum_values_webezy_io_v1_Validations) 
         
 """Packages and thier resources"""
 # Construct fields    
@@ -110,20 +110,8 @@ _field_webezy_io_v1_ConsoleLoggingOptions_level = helpers.WZField(name='level',
                               oneof_fields=None, # Not supporting templating with oneof_fields !
                               extensions=None)
 
-# Constructing a field for [webezy_io_v1_ClientLogging_ConsoleLogger]
-_field_webezy_io_v1_ClientLogging_ConsoleLogger = helpers.WZField(name='ConsoleLogger',
-                              description='None',
-                              label='LABEL_OPTIONAL',
-                              type='TYPE_MESSAGE',
-                              message_type=_DOMAIN + '.io.v1.ConsoleLoggingOptions',
-                              enum_type=None,
-                              key_type=None,
-                              value_type=None,
-                              oneof_fields=None, # Not supporting templating with oneof_fields !
-                              extensions=None)
-
-# Constructing a field for [webezy_io_v1_FieldInputValidation_field]
-_field_webezy_io_v1_FieldInputValidation_field = helpers.WZField(name='field',
+# Constructing a field for [webezy_io_v1_FieldValidation_field]
+_field_webezy_io_v1_FieldValidation_field = helpers.WZField(name='field',
                               description='None',
                               label='LABEL_OPTIONAL',
                               type='TYPE_STRING',
@@ -134,8 +122,8 @@ _field_webezy_io_v1_FieldInputValidation_field = helpers.WZField(name='field',
                               oneof_fields=None, # Not supporting templating with oneof_fields !
                               extensions=None)
 
-# Constructing a field for [webezy_io_v1_FieldInputValidation_validation]
-_field_webezy_io_v1_FieldInputValidation_validation = helpers.WZField(name='validation',
+# Constructing a field for [webezy_io_v1_FieldValidation_validation]
+_field_webezy_io_v1_FieldValidation_validation = helpers.WZField(name='validation',
                               description='None',
                               label='LABEL_OPTIONAL',
                               type='TYPE_ENUM',
@@ -146,20 +134,20 @@ _field_webezy_io_v1_FieldInputValidation_validation = helpers.WZField(name='vali
                               oneof_fields=None, # Not supporting templating with oneof_fields !
                               extensions=None)
 
-# Constructing a field for [webezy_io_v1_FieldInputValidation_numeric_filter]
-_field_webezy_io_v1_FieldInputValidation_numeric_filter = helpers.WZField(name='numeric_filter',
+# Constructing a field for [webezy_io_v1_FieldValidation_filter]
+_field_webezy_io_v1_FieldValidation_filter = helpers.WZField(name='filter',
                               description='None',
                               label='LABEL_OPTIONAL',
                               type='TYPE_ENUM',
                               message_type=None,
-                              enum_type=_DOMAIN+'.io.v1.NumericValidations',
+                              enum_type=_DOMAIN+'.io.v1.Validations',
                               key_type=None,
                               value_type=None,
                               oneof_fields=None, # Not supporting templating with oneof_fields !
                               extensions=None)
 
-# Constructing a field for [webezy_io_v1_FieldInputValidation_text_filter]
-_field_webezy_io_v1_FieldInputValidation_text_filter = helpers.WZField(name='text_filter',
+# Constructing a field for [webezy_io_v1_FieldValidation_regex]
+_field_webezy_io_v1_FieldValidation_regex = helpers.WZField(name='regex',
                               description='None',
                               label='LABEL_OPTIONAL',
                               type='TYPE_STRING',
@@ -170,24 +158,60 @@ _field_webezy_io_v1_FieldInputValidation_text_filter = helpers.WZField(name='tex
                               oneof_fields=None, # Not supporting templating with oneof_fields !
                               extensions=None)
 
-# Constructing a field for [webezy_io_v1_RequestValidation_fields]
-_field_webezy_io_v1_RequestValidation_fields = helpers.WZField(name='fields',
+# Constructing a field for [webezy_io_v1_FieldValidation_value]
+_field_webezy_io_v1_FieldValidation_value = helpers.WZField(name='value',
                               description='None',
-                              label='LABEL_REPEATED',
-                              type='TYPE_MESSAGE',
-                              message_type=_DOMAIN + '.io.v1.FieldInputValidation',
+                              label='LABEL_OPTIONAL',
+                              type='TYPE_FLOAT',
+                              message_type=None,
                               enum_type=None,
                               key_type=None,
                               value_type=None,
                               oneof_fields=None, # Not supporting templating with oneof_fields !
                               extensions=None)
 
-# Constructing a field for [webezy_io_v1_FieldValidation_field_validation]
-_field_webezy_io_v1_FieldValidation_field_validation = helpers.WZField(name='field_validation',
+# Constructing a field for [webezy_io_v1_FileExtensions_ConsoleLogger]
+_field_webezy_io_v1_FileExtensions_ConsoleLogger = helpers.WZField(name='ConsoleLogger',
                               description='None',
                               label='LABEL_OPTIONAL',
                               type='TYPE_MESSAGE',
-                              message_type=_DOMAIN + '.io.v1.FieldInputValidation',
+                              message_type=_DOMAIN + '.io.v1.ConsoleLoggingOptions',
+                              enum_type=None,
+                              key_type=None,
+                              value_type=None,
+                              oneof_fields=None, # Not supporting templating with oneof_fields !
+                              extensions=None)
+
+# Constructing a field for [webezy_io_v1_ServiceExtensions_ConsoleLogger]
+_field_webezy_io_v1_ServiceExtensions_ConsoleLogger = helpers.WZField(name='ConsoleLogger',
+                              description='None',
+                              label='LABEL_OPTIONAL',
+                              type='TYPE_MESSAGE',
+                              message_type=_DOMAIN + '.io.v1.ConsoleLoggingOptions',
+                              enum_type=None,
+                              key_type=None,
+                              value_type=None,
+                              oneof_fields=None, # Not supporting templating with oneof_fields !
+                              extensions=None)
+
+# Constructing a field for [webezy_io_v1_MessageExtensions_fields]
+_field_webezy_io_v1_MessageExtensions_fields = helpers.WZField(name='fields',
+                              description='None',
+                              label='LABEL_REPEATED',
+                              type='TYPE_MESSAGE',
+                              message_type=_DOMAIN + '.io.v1.FieldValidation',
+                              enum_type=None,
+                              key_type=None,
+                              value_type=None,
+                              oneof_fields=None, # Not supporting templating with oneof_fields !
+                              extensions=None)
+
+# Constructing a field for [webezy_io_v1_FieldsExtensions_validation]
+_field_webezy_io_v1_FieldsExtensions_validation = helpers.WZField(name='validation',
+                              description='None',
+                              label='LABEL_OPTIONAL',
+                              type='TYPE_MESSAGE',
+                              message_type=_DOMAIN + '.io.v1.FieldValidation',
                               enum_type=None,
                               key_type=None,
                               value_type=None,
@@ -196,14 +220,16 @@ _field_webezy_io_v1_FieldValidation_field_validation = helpers.WZField(name='fie
 
 # Packing all fields for [webezy_io_v1_ConsoleLoggingOptions]
 _msg_fields_webezy_io_v1_ConsoleLoggingOptions = [_field_webezy_io_v1_ConsoleLoggingOptions_level]
-# Packing all fields for [webezy_io_v1_ClientLogging]
-_msg_fields_webezy_io_v1_ClientLogging = [_field_webezy_io_v1_ClientLogging_ConsoleLogger]
-# Packing all fields for [webezy_io_v1_FieldInputValidation]
-_msg_fields_webezy_io_v1_FieldInputValidation = [_field_webezy_io_v1_FieldInputValidation_field,_field_webezy_io_v1_FieldInputValidation_validation,_field_webezy_io_v1_FieldInputValidation_numeric_filter,_field_webezy_io_v1_FieldInputValidation_text_filter]
-# Packing all fields for [webezy_io_v1_RequestValidation]
-_msg_fields_webezy_io_v1_RequestValidation = [_field_webezy_io_v1_RequestValidation_fields]
 # Packing all fields for [webezy_io_v1_FieldValidation]
-_msg_fields_webezy_io_v1_FieldValidation = [_field_webezy_io_v1_FieldValidation_field_validation]
+_msg_fields_webezy_io_v1_FieldValidation = [_field_webezy_io_v1_FieldValidation_field,_field_webezy_io_v1_FieldValidation_validation,_field_webezy_io_v1_FieldValidation_filter,_field_webezy_io_v1_FieldValidation_regex,_field_webezy_io_v1_FieldValidation_value]
+# Packing all fields for [webezy_io_v1_FileExtensions]
+_msg_fields_webezy_io_v1_FileExtensions = [_field_webezy_io_v1_FileExtensions_ConsoleLogger]
+# Packing all fields for [webezy_io_v1_ServiceExtensions]
+_msg_fields_webezy_io_v1_ServiceExtensions = [_field_webezy_io_v1_ServiceExtensions_ConsoleLogger]
+# Packing all fields for [webezy_io_v1_MessageExtensions]
+_msg_fields_webezy_io_v1_MessageExtensions = [_field_webezy_io_v1_MessageExtensions_fields]
+# Packing all fields for [webezy_io_v1_FieldsExtensions]
+_msg_fields_webezy_io_v1_FieldsExtensions = [_field_webezy_io_v1_FieldsExtensions_validation]
     
 # Construct messages
 
@@ -214,31 +240,38 @@ _msg_webezy_io_v1_ConsoleLoggingOptions = helpers.WZMessage(name='ConsoleLogging
                                  extension_type=None,
                                  extensions=None)
 
-# Constructing message [webezy_io_v1_ClientLogging]
-_msg_webezy_io_v1_ClientLogging = helpers.WZMessage(name='ClientLogging',
-                                 description='None',
-                                 fields=_msg_fields_webezy_io_v1_ClientLogging,
-                                 extension_type='FileOptions',
-                                 extensions=None)
-
-# Constructing message [webezy_io_v1_FieldInputValidation]
-_msg_webezy_io_v1_FieldInputValidation = helpers.WZMessage(name='FieldInputValidation',
-                                 description='None',
-                                 fields=_msg_fields_webezy_io_v1_FieldInputValidation,
-                                 extension_type=None,
-                                 extensions=None)
-
-# Constructing message [webezy_io_v1_RequestValidation]
-_msg_webezy_io_v1_RequestValidation = helpers.WZMessage(name='RequestValidation',
-                                 description='None',
-                                 fields=_msg_fields_webezy_io_v1_RequestValidation,
-                                 extension_type='MessageOptions',
-                                 extensions=None)
-
 # Constructing message [webezy_io_v1_FieldValidation]
 _msg_webezy_io_v1_FieldValidation = helpers.WZMessage(name='FieldValidation',
                                  description='None',
                                  fields=_msg_fields_webezy_io_v1_FieldValidation,
+                                 extension_type=None,
+                                 extensions=None)
+
+# Constructing message [webezy_io_v1_FileExtensions]
+_msg_webezy_io_v1_FileExtensions = helpers.WZMessage(name='FileExtensions',
+                                 description='None',
+                                 fields=_msg_fields_webezy_io_v1_FileExtensions,
+                                 extension_type='FileOptions',
+                                 extensions=None)
+
+# Constructing message [webezy_io_v1_ServiceExtensions]
+_msg_webezy_io_v1_ServiceExtensions = helpers.WZMessage(name='ServiceExtensions',
+                                 description='None',
+                                 fields=_msg_fields_webezy_io_v1_ServiceExtensions,
+                                 extension_type='ServiceOptions',
+                                 extensions=None)
+
+# Constructing message [webezy_io_v1_MessageExtensions]
+_msg_webezy_io_v1_MessageExtensions = helpers.WZMessage(name='MessageExtensions',
+                                 description='None',
+                                 fields=_msg_fields_webezy_io_v1_MessageExtensions,
+                                 extension_type='MessageOptions',
+                                 extensions=None)
+
+# Constructing message [webezy_io_v1_FieldsExtensions]
+_msg_webezy_io_v1_FieldsExtensions = helpers.WZMessage(name='FieldsExtensions',
+                                 description='None',
+                                 fields=_msg_fields_webezy_io_v1_FieldsExtensions,
                                  extension_type='FieldOptions',
                                  extensions=None)
 
@@ -246,34 +279,36 @@ _msg_webezy_io_v1_FieldValidation = helpers.WZMessage(name='FieldValidation',
 # Construct packages
 
 _pkg_webezy_io_v1 = helpers.WZPackage(name='io',
-                                                messages=[_msg_webezy_io_v1_ConsoleLoggingOptions,_msg_webezy_io_v1_ClientLogging,_msg_webezy_io_v1_FieldInputValidation,_msg_webezy_io_v1_RequestValidation,_msg_webezy_io_v1_FieldValidation],
-                                                enums=[_enum_webezy_io_v1_LoggingLevels,_enum_webezy_io_v1_ValidationTypes,_enum_webezy_io_v1_NumericValidations],
+                                                messages=[_msg_webezy_io_v1_ConsoleLoggingOptions,_msg_webezy_io_v1_FieldValidation,_msg_webezy_io_v1_FileExtensions,_msg_webezy_io_v1_ServiceExtensions,_msg_webezy_io_v1_MessageExtensions,_msg_webezy_io_v1_FieldsExtensions],
+                                                enums=[_enum_webezy_io_v1_LoggingLevels,_enum_webezy_io_v1_ValidationTypes,_enum_webezy_io_v1_Validations],
                                                 extensions=None)
 
 # Unpacking package [webezy_io_v1]
-_pkg_webezy_io_v1_name, _pkg_webezy_io_v1_messages, _pkg_webezy_io_v1_enums = _pkg_webezy_io_v1.to_tuple()
+_pkg_webezy_io_v1_name, _pkg_webezy_io_v1_messages, _pkg_webezy_io_v1_enums, _pkg_webezy_io_v1_ext, _pkg_webezy_io_v1_domain = _pkg_webezy_io_v1.to_tuple()
     
 # Add packages
 
 # Adding package [webezy_io_v1]
 _pkg_webezy_io_v1 = _architect.AddPackage(_pkg_webezy_io_v1_name,
                                                     dependencies=[],
-                                                    description='None')
+                                                    description='None',
+                                                    domain=_pkg_webezy_io_v1_domain,
+                                                    extensions=_pkg_webezy_io_v1_ext)
     
 msgs_map = {}
 
 # Add packages messages
 
 for m in _pkg_webezy_io_v1_messages:
-	msg_name, msg_fields, msg_desc, msg_opt = m
-	temp_msg = _architect.AddMessage(_pkg_webezy_io_v1, msg_name, msg_fields, msg_desc, msg_opt)
+	msg_name, msg_fields, msg_desc, msg_opt, msg_domain = m
+	temp_msg = _architect.AddMessage(_pkg_webezy_io_v1, msg_name, msg_fields, msg_desc, msg_opt, msg_domain)
 	msgs_map[temp_msg.full_name] = temp_msg
     
 # Add packages enums
 
 for e in _pkg_webezy_io_v1_enums:
-	enum_name, enum_values, enum_desc = e
-	_architect.AddEnum(_pkg_webezy_io_v1, enum_name, enum_values, enum_desc)
+	enum_name, enum_values, enum_desc, enum_domain = e
+	_architect.AddEnum(_pkg_webezy_io_v1, enum_name, enum_values, enum_desc, enum_domain)
     
 _architect.Save()
     

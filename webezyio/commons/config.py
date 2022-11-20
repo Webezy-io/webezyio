@@ -74,6 +74,7 @@ def parse_webezy_json_configs(root_path):
 
 def parse_config_file(root_path):
     custom_config_path = _fs.join_path(root_path,'config.py')
+    wz_prj_conf = {}
     if _fs.check_if_file_exists(custom_config_path):
         
         if _fs.get_current_location() not in sys.path:
@@ -94,7 +95,7 @@ def parse_config_file(root_path):
     else:
         log.debug("No custom project config.py file")
     
-    return wz_prj_conf.config() if wz_prj_conf is not None else None
+    return wz_prj_conf.config() if wz_prj_conf is {} else wz_prj_conf
 
 def parse_global_config():
     global_config_path = dict_from_module(_config)

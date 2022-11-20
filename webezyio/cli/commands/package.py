@@ -53,7 +53,7 @@ def import_package(source,target,path,webezy_json:WZJson):
         temp_msgs = []
         for m in pkg.messages:
             temp_msgs.append(MessageToDict(m))
-        ARCHITECT.EditPackage(old_pkg.get('name'), dep,temp_msgs,description=old_pkg.get('description'),enums=old_pkg.get('enums'))
+        ARCHITECT.EditPackage(old_pkg.get('name'), dep,temp_msgs,description=old_pkg.get('description'),enums=old_pkg.get('enums'),extensions=old_pkg.get('extensions'))
         ARCHITECT.Save()
 
     else:
@@ -74,7 +74,7 @@ def import_package(source,target,path,webezy_json:WZJson):
         else:
             dep.append(source)
 
-        ARCHITECT.EditService(old_svc.get('name'), dep, old_svc.get('description'),old_svc.get('methods'))
+        ARCHITECT.EditService(old_svc.get('name'), dep, old_svc.get('description'),old_svc.get('methods'),extensions=old_pkg.get('extensions'))
         ARCHITECT.Save()
 
     importing_into_pkg = 'package' if importing_into_pkg == True else 'service'
@@ -109,7 +109,7 @@ def remove_import(source,target,path,webezy_json:WZJson):
         temp_msgs = []
         for m in pkg.messages:
             temp_msgs.append(MessageToDict(m))
-        ARCHITECT.EditPackage(old_pkg.get('name'), dep,temp_msgs,description=old_pkg.get('description'),enums=old_pkg.get('enums'))
+        ARCHITECT.EditPackage(old_pkg.get('name'), dep,temp_msgs,description=old_pkg.get('description'),enums=old_pkg.get('enums'),extensions=old_pkg.get('extensions'))
         ARCHITECT.Save()
 
     else:
@@ -128,7 +128,7 @@ def remove_import(source,target,path,webezy_json:WZJson):
                 dep = old_svc.get('dependencies')
                 dep.remove(source)
         
-        ARCHITECT.EditPackage(old_svc.get('name'), dep, old_svc.get('description'),old_svc.get('methods'),description=old_svc.get('description'))
+        ARCHITECT.EditService(old_svc.get('name'), dep, old_svc.get('description'),old_svc.get('methods'),description=old_svc.get('description'),extensions=old_svc.get('extensions'))
         ARCHITECT.Save()
 
     print_warning(

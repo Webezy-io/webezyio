@@ -190,3 +190,18 @@ It will run the migration for all `.proto` files existing in the directory passe
 When the process succeeds we will get an output of all resources parsed into `webezy.json` format at the same path of our original project.
 
 > __Warning__ Migration of project is experimental feature
+
+# wz extend
+Extend a Webezy.io Resource from available extensions created by `wz --expand generate message` command
+
+```sh
+usage: webezy extend [-h] [--extension EXTENSION] name
+
+positional arguments:
+  name                  Resource full name
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --extension EXTENSION
+                        Extension full name
+```
