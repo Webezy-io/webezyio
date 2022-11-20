@@ -198,7 +198,7 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
     if option is None:
         option = Options.UNKNOWN_EXTENSION
     else:
-        if 'google.protobuf.descriptor' not in package.dependencies:
+        if 'google.protobuf.Descriptor' not in package.dependencies:
             package.dependencies.append('google.protobuf.Descriptor')
     index = 0 if option == Options.UNKNOWN_EXTENSION else 55555
     for f in fields:
@@ -232,6 +232,12 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
                         kind=ResourceKinds.oneof_field.value,
                         message_type=f_oneof.get('messageType')  if f_oneof.get('messageType') is not None else f_oneof.get('message_type')))
                     index += 1
+
+            if f.get('extensions') is not None:
+                for ext in f.get('extensions'):
+                    if '.'.join(ext.split('.')[:3]) not in package.dependencies:
+                        package.dependencies.append('.'.join(ext.split('.')[:3]))
+                        
             temp_fields.append(WZFieldDescriptor(uri=f_uri, name=f.get('name'), full_name=f_fName,
                                                  description=f.get(
                                                      'description'),
@@ -242,7 +248,7 @@ def generate_message(path, domain, package, name, fields=[], option=Options.UNKN
             logging.warning(
                 f"Cannot insert field {f.get('name')} already exists under {name} message")
     msg = WZDescriptor(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,
-                       kind=ResourceKinds.message.value, extension_type=Options.Name(option), description=description)
+                       kind=ResourceKinds.message.value, extension_type=Options.Name(option) if isinstance(option,int) else option, description=description)
 
     return msg if json == False else MessageToDict(msg)
 

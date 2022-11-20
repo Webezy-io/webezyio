@@ -122,11 +122,11 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
         attach_template(ARCHITECT,template)
         print_success(
         f'Success !\n\tCreated new project "{project_name}" from [{template}] template\n\t-> cd {root_dir}\n\t-> And then continue developing your awesome services !\n\t-> For more info on how to use the webezy.io CLI go to https://www.webezy.io/docs')
-        ARCHITECT = WebezyArchitect(
-            path=webezy_json_path, domain=domain_name, project_name=project_name)
+        # ARCHITECT = WebezyArchitect(
+            # path=webezy_json_path, domain=domain_name, project_name=project_name)
         # ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
-        ARCHITECT.SetDomain(domain_name)
-        ARCHITECT.Save()
+        # ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
+        # ARCHITECT.SetDomain(domain_name)
         exit(1)
 
     ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
@@ -148,7 +148,7 @@ def attach_template(ARCHITECT:WebezyArchitect,template:_TEMPLATES):
         os.chdir(ARCHITECT._path.split('webezy.json')[0])
         print(file_system.get_current_location())
 
-        subprocess.run(['python',file_dir + '/commons/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--domain',ARCHITECT._domain,'--project-name',ARCHITECT._project_name])
+        subprocess.run(['python',file_dir + '/commons/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--project-name',ARCHITECT._project_name])
     # if template == '@webezyio/Sample':
 
     #     pkg = ARCHITECT.AddPackage('SamplePackage',[],[],'This is a sample package to be used in "SampleService"')

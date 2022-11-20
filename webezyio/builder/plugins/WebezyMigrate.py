@@ -24,13 +24,16 @@ import os
 from pathlib import Path
 import sys
 from typing import Dict, List, Literal
+
+import inquirer
 from webezyio.architect import WebezyArchitect
 import webezyio.builder as builder
+from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import helpers, file_system, resources, errors
 from webezyio.commons.pretty import print_error, print_info, print_note, print_success, print_warning
 from webezyio.commons.protos.webezy_pb2 import Descriptor, Language, Project, ServiceDescriptor, WebezyClient, WebezyDeploymentType, WebezyServer, WzResourceWrapper,google_dot_protobuf_dot_struct__pb2
-
-
+from google.protobuf.descriptor import Descriptor
+from google.protobuf.descriptor_pb2 import MessageOptions
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     logging.debug("Starting webezyio build process %s plugin" % (__name__))
@@ -82,15 +85,15 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
             # print_info(dir(protos[1]),True,'Service Module')
 
             proto_module = protos[0].DESCRIPTOR
-            domain = proto_module.package.split('.')[0]
-
+            domain = proto_module.package.split('.')[0] if proto_module.package is not '' else domain
+ 
             """File options"""
             proto_file_opt = proto_module.GetOptions()
             proto_file_depend = proto_module.dependencies
 
             _services = proto_module.services_by_name
             _package = proto_module.package
-
+            print_note(domain,True,'Domain')
             # print_note({'file_options':proto_file_opt,'file_dependencies':proto_file_depend},True)
            
             """Validations"""
@@ -124,21 +127,32 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                 pkg_name = proto_module.package.split('.')[1]
                 pkg_messages = proto_module.message_types_by_name
                 pkg_enums = proto_module.enum_types_by_name
-                package = helpers.WZPackage(pkg_name,messages=[],enums=[])
-                # print_note({'has_options':proto_module.has_options,'extensions':proto_module.extensions_by_name},True,'[{0}] Service expanded'.format(service_full_name))
+                package = helpers.WZPackage(pkg_name,messages=[],enums=[],domain=proto_module.package.split('.')[0])
+                # print_note(proto_module.GetOptions())
+                # print_note({'has_options':proto_module.has_options,'extensions':proto_module.extensions_by_name},True)
                 print_info("Parsing \"Package\" proto file\n\t-> Messages : {}\n\t-> Enums : {}".format(len(pkg_messages),len(pkg_enums)))
-
+                # print_info(proto_module.extensions_by_name)
                 # Iterating package messages
                 for msg in pkg_messages:
-                    message = helpers.WZMessage(pkg_messages[msg].name,fields=[])
-                    # print_note(dir(pkg_messages[msg]))
-                    # print_note(pkg_messages[msg].extensions,True,msg)
+                    message = helpers.WZMessage(pkg_messages[msg].name,fields=[],domain=proto_module.package.split('.')[0])
+                    # print_note(pkg_messages[msg].nested_types_by_name,True,pkg_messages[msg].name)
+                    # print_note(dir(pkg_messages[msg]),True,pkg_messages[msg].name)
+
+                    # print_note(dir(pkg_messages[msg]),True,pkg_messages[msg].name)
                     # print_note(dir(pkg_messages[msg]),True)
+                    temp_msg:Descriptor =pkg_messages[msg]
 
                     for ext in pkg_messages[msg].extensions:
-                        # print_info(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name,True)
-                        # print_info(ext.extension_scope.extensions[0].name,True)
-                        extension_type = resources.Options.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
+
+                        # print_info(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.full_name,True)
+                        extension_type = inquirer.prompt([inquirer.List('extension_type','Choose which type \'{}\' extending?'.format(message.name),choices=['FieldOptions','FileOptions','MessageOptions','ServiceOptions'])],theme=WebezyTheme())
+                        if extension_type is None:
+                            # Currently only supports FieldOptions as auto-detect
+                            extension_type = resources.Options.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
+                        else:
+                            extension_type = extension_type['extension_type']
+
+                        # TODO HANDLE MULTIPLE OPTIONS TYPES
                         message._extension_type = extension_type
                         for field_extended in ext.extension_scope.extensions:
                             extended_field_desc = helpers.WZField(field_extended.name,
@@ -257,7 +271,7 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                     for ev in pkg_enums[en].values:
                         e_value = helpers.WZEnumValue(ev.name,ev.number)
                         e_values.append(e_value)
-                    enum_desc = helpers.WZEnum(pkg_enums[en].name,enum_values=e_values)
+                    enum_desc = helpers.WZEnum(pkg_enums[en].name,enum_values=e_values,domain=proto_module.package.split('.')[0])
                     package._enums.append(enum_desc)
 
                 pkgs['protos/v1/{0}.proto'.format(package.name)] = package
@@ -303,17 +317,16 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
     ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
 
     for p in packages:
-        package_name, package_messages, package_enums = packages[p].to_tuple()
-
-        package_temp = ARCHITECT.AddPackage(package_name)
+        package_name, package_messages, package_enums, package_domain = packages[p].to_tuple()
+        package_temp = ARCHITECT.AddPackage(package_name,domain=package_domain)
         for m in package_messages:
-            msg_name, msg_fields, msg_desc, msg_opt = m
-            msg_temp = ARCHITECT.AddMessage(package_temp, msg_name, msg_fields, msg_desc, msg_opt)
+            msg_name, msg_fields, msg_desc, msg_opt, msg_domain = m
+            msg_temp = ARCHITECT.AddMessage(package_temp, msg_name, msg_fields, msg_desc, msg_opt, msg_domain)
             msgs_map[msg_temp.full_name] = msg_temp
 
         for e in package_enums:
-            enum_name, enum_values, enum_desc = e
-            ARCHITECT.AddEnum(package_temp, enum_name, enum_values, enum_desc)
+            enum_name, enum_values, enum_desc, enum_domain = e
+            ARCHITECT.AddEnum(package_temp, enum_name, enum_values, enum_desc, enum_domain)
 
     for servc in services:
         svc_name, svc_methods, svc_dependencies, svc_desc = servc.to_tuple()

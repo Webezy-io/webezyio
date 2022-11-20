@@ -113,14 +113,14 @@ class WebezyArchitect():
             service.dependencies.append(out_package)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': { service_name : MessageToDict(service) } })
 
-    def AddPackage(self,name,dependencies=[],messages=[],description=None):
-        dict = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description,json=True)
-        package = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description)
+    def AddPackage(self,name,dependencies=[],messages=[],description=None,domain=None):
+        dict = generate_package(self._path,self._domain if domain is None else domain,name,dependencies=dependencies,messages=messages,description=description,json=True)
+        package = generate_package(self._path,self._domain if domain is None else domain,name,dependencies=dependencies,messages=messages,description=description)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages': { f'protos/v1/{name}.proto' : dict } })
         return package
 
-    def AddMessage(self,package,name,fields,description=None,options=None):
-        message = generate_message(self._path,self._domain,package,name,fields,option=options,description=description)
+    def AddMessage(self,package,name,fields,description=None,options=None,domain=None):
+        message = generate_message(self._path,self._domain if domain is None else domain,package,name,fields,option=options,description=description)
         if next((m for m in package.messages if m.name == message.name), None) is None:
             package.messages.append(message)
             self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
@@ -129,8 +129,8 @@ class WebezyArchitect():
             logging.error(f"Cannot create message '{message.name}' already exists under '{package.name}' package")
         return message
         
-    def AddEnum(self,package,name,enum_values,description=None):
-        enum = generate_enum(self._path,self._domain,package.name,name,enum_values,description=description)
+    def AddEnum(self,package,name,enum_values,description=None,domain=None):
+        enum = generate_enum(self._path,self._domain if domain is None else domain,package.name,name,enum_values,description=description)
         package.enums.append(enum)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
         return enum

@@ -42,7 +42,6 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
         print_warning("Couldnt find webezy.config.template object at webezy.json file")
     else:
         opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
-    print_info("Generating template from [{0}] project:\n\t- {1}".format(wz_json.project.get('name'),opts))
     host = wz_json._config.get('host')
     port = wz_json._config.get('port')
     project_pkg_name = wz_json.project['packageName'] if wz_json._config.get('template') is None else  wz_json._config.get('template').get('name')
@@ -55,6 +54,7 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
     excludes = None
     root_path = wz_json.path.split('webezy.json')[0]
     author = wz_json._config.get('template').get('author') if  wz_json._config.get('template') is not None else 'Unknown'
+
     if include_code:
         includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
         excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
@@ -65,6 +65,7 @@ def create_webezy_template_py(wz_json:WZJson,include_code:bool):
         if p.get('enums') is not None:
             for e in p.get('enums'):
                 enums.append(e)
+    print_info("Generating template from [{0}] project:\n\t- {1}".format(wz_json.project.get('name'),opts))
     return f'{create_init(project_pkg_name,description,author)}{create_constants(host=host,port=port,project_name=project_name,domain=wz_json.domain,server_language=wz_json.get_server_language())}{create_clients(clients)}{add_project()}{create_enums_values(enums)}{create_enums(enums)}{create_fields(messages)}{create_msgs(messages)}{create_pckgs(wz_json.packages)}{add_packgs(wz_json.packages)}{add_msgs(wz_json.packages)}{add_enums(wz_json.packages)}{create_rpcs(wz_json.services)}{create_services(wz_json.services)}{add_services(wz_json.services)}{add_rpcs(wz_json.services)}{create_file_context(root_path,include=includes,exclude=excludes) if include_code else ""}{save_architect()}'
 
 def create_init(project_name:str='webezy.io',description=None,author=None):
@@ -204,7 +205,8 @@ def create_fields(messages):
                               enum_type={5},\n\
                               key_type={7},\n\
                               value_type={8},\n\
-                              oneof_fields=None # Not supporting templating with oneof_fields !\n)\n'.format(
+                              oneof_fields=None, # Not supporting templating with oneof_fields !\n\
+                              extensions={9})\n'.format(
                                   f.get('name'),
                                   str(f.get('description')).replace("'",'"'),
                                   f.get('label'),
@@ -213,7 +215,8 @@ def create_fields(messages):
                                   '_DOMAIN+\'.{}\''.format('.'.join(f.get('enumType').split('.')[1:])) if f.get('enumType') is not None else None,
                                   '{}'.format(temp_msg_type),
                                   '\'{0}\''.format(f.get('keyType')) if f.get('keyType') is not None else None,
-                                  '\'{0}\''.format(f.get('valueType')) if f.get('valueType') is not None else None)
+                                  '\'{0}\''.format(f.get('valueType')) if f.get('valueType') is not None else None,
+                                  f.get('extensions'))
             fields[m.get('fullName')].append((f.get('fullName').replace('.','_'),field))
 
     code = ''
@@ -241,7 +244,9 @@ def create_msgs(messages):
     for m in messages:
         code += '\n# Constructing message [{0}]\n_msg_{0} = helpers.WZMessage(name=\'{1}\',\n\
                                  description=\'{2}\',\n\
-                                 fields=_msg_fields_{0})\n'.format(m.get('fullName').replace('.','_'),m.get('name'),str(m.get('description')))
+                                 fields=_msg_fields_{0},\n\
+                                 extension_type={3},\n\
+                                 extensions={4})\n'.format(m.get('fullName').replace('.','_'),m.get('name'),str(m.get('description')),'\'{}\''.format(m.get('extensionType')) if m.get('extensionType') is not None else None,m.get('extensions'))
     return """
 # Construct messages
 {0}
@@ -260,8 +265,9 @@ def create_pckgs(packages):
                 enums.append('_enum_{0}'.format(e.get('fullName').replace('.','_')))
         code += '\n_pkg_{0} = helpers.WZPackage(name=\'{1}\',\n\
                                                 messages=[{2}],\n\
-                                                enums=[{3}])\n\
-\n# Unpacking package [{0}]\n_pkg_{0}_name, _pkg_{0}_messages, _pkg_{0}_enums = _pkg_{0}.to_tuple()'.format(pkg.get('package').replace('.','_'),pkg.get('name'),','.join(msgs),','.join(enums))
+                                                enums=[{3}],\n\
+                                                extensions={4})\n\
+\n# Unpacking package [{0}]\n_pkg_{0}_name, _pkg_{0}_messages, _pkg_{0}_enums = _pkg_{0}.to_tuple()'.format(pkg.get('package').replace('.','_'),pkg.get('name'),','.join(msgs),','.join(enums),pkg.get('extensions'))
     return """
 # Construct packages
 {0}
@@ -308,61 +314,72 @@ def add_enums(packages):
 
 def create_rpcs(services):
     code = ''
-    for s in services:
-        svc = services.get(s)
-        for rpc in svc.get('methods'):
-            code += '\n_rpc_{0}_{4} = helpers.WZRPC(name=\'{4}\',client_stream={5},server_stream={6},in_type=msgs_map[_DOMAIN+\'.{1}\'].full_name, out_type=msgs_map[_DOMAIN+\'.{2}\'].full_name, description=\'{3}\')'.format(svc.get('fullName').replace('.','_'),'.'.join(rpc.get('inputType').split('.')[1:]),'.'.join(rpc.get('outputType').split('.')[1:]),str(rpc.get('description')).replace("'",'"'),rpc.get('name'),rpc.get('clientStreaming'),rpc.get('serverStreaming'))
-    return """
+    if services is not None:
+        for s in services:
+            svc = services.get(s)
+            for rpc in svc.get('methods'):
+                code += '\n_rpc_{0}_{4} = helpers.WZRPC(name=\'{4}\',client_stream={5},server_stream={6},in_type=msgs_map[_DOMAIN+\'.{1}\'].full_name, out_type=msgs_map[_DOMAIN+\'.{2}\'].full_name, description=\'{3}\')'.format(svc.get('fullName').replace('.','_'),'.'.join(rpc.get('inputType').split('.')[1:]),'.'.join(rpc.get('outputType').split('.')[1:]),str(rpc.get('description')).replace("'",'"'),rpc.get('name'),rpc.get('clientStreaming'),rpc.get('serverStreaming'))
+        return """
 \"\"\"Services and thier resources\"\"\"
 # Construct rpc's
 {0}
-    """.format(code)
+        """.format(code)
+    else:
+        return ''
 
 def create_services(services):
     code = ''
-    for s in services:
-        svc = services[s]
-        temp_rpcs = []
-        for rpc in svc.get('methods'):
-            temp_rpcs.append('_rpc_{0}_{1}'.format(svc.get('fullName').replace('.','_'),rpc.get('name'))) 
+    if services is not None:
+        for s in services:
+            svc = services[s]
+            temp_rpcs = []
+            for rpc in svc.get('methods'):
+                temp_rpcs.append('_rpc_{0}_{1}'.format(svc.get('fullName').replace('.','_'),rpc.get('name'))) 
 
-        temp_dependencies = []
-        for d in svc.get('dependencies'):
-            temp_dependencies.append('_pkg_{0}.package'.format(d.replace('.','_')))
+            temp_dependencies = []
+            for d in svc.get('dependencies'):
+                temp_dependencies.append('_pkg_{0}.package'.format(d.replace('.','_')))
 
-        code += '\n_svc_{0} = helpers.WZService(\'{0}\',\n\
-                                              methods=[{1}],\n\
-                                              dependencies=[{2}],\n\
-                                              description=\'{3}\')\n\
+            code += '\n_svc_{0} = helpers.WZService(\'{0}\',\n\
+                                                methods=[{1}],\n\
+                                                dependencies=[{2}],\n\
+                                                description=\'{3}\')\n\
 \n_svc_{0}_name, _svc_{0}_methods, _svc_{0}_dependencies, _svc_{0}_desc = _svc_{0}.to_tuple()'.format(svc.get('name'),','.join(temp_rpcs),','.join(temp_dependencies),str(svc.get('description')).replace("'",'"'))
 
-    return """
+        return """
 # Construct services
 {0}
-    """.format(code)
+        """.format(code)
+    else:
+        return ''
 
 def add_services(services):
     code = ''
-    for s in services:
-        svc = services[s]
-        code += '\n_svc_{0} = _architect.AddService(_svc_{0}_name,_svc_{0}_dependencies,_svc_{0}_desc,[])'.format(svc.get('name'))
+    if services is not None:
+        for s in services:
+            svc = services[s]
+            code += '\n_svc_{0} = _architect.AddService(_svc_{0}_name,_svc_{0}_dependencies,_svc_{0}_desc,[])'.format(svc.get('name'))
 
-    return """
+        return """
 # Add services
 {0}
-    """.format(code)
-
+        """.format(code)
+    else:
+        return ''
 
 def add_rpcs(services):
     code = ''
-    for s in services:
-        svc = services[s]
-        code += '\nfor rpc in _svc_{0}_methods:\n\
+    if services is not None:
+        for s in services:
+            svc = services[s]
+            code += '\nfor rpc in _svc_{0}_methods:\n\
 \trpc_name, rpc_in_out, rpc_desc = rpc\n\
 \t_architect.AddRPC(_svc_{0}, rpc_name, rpc_in_out, rpc_desc)'.format(svc.get('name'))            
-    return """
+        return """
 {0}
     """.format(code)
+    else:
+        return ''
 
 def save_architect():
     return """
