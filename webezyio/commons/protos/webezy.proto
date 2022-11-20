@@ -221,7 +221,7 @@ message Descriptor {
     string type = 5;
     string kind = 6;
     string description = 7;
-    repeated string extensions = 8;
+    map<string, google.protobuf.Value> extensions = 8;
     Options extension_type = 9;
 }
 

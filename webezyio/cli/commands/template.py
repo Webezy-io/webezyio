@@ -35,29 +35,29 @@ _CLOSING_BRCK = '}'
 def parse_wz_json():
     pass
 
-def create_webezy_template_py(wz_json:WZJson,include_code:bool):
-    opt_template = wz_json._config.get('template')
+def create_webezy_template_py(wz_json:WZJson,include_code:bool,prj_configs):
+    opt_template = prj_configs.get('template')
     opts = None
     if opt_template is None:
         print_warning("Couldnt find webezy.config.template object at webezy.json file")
     else:
         opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
-    host = wz_json._config.get('host')
-    port = wz_json._config.get('port')
-    project_pkg_name = wz_json.project['packageName'] if wz_json._config.get('template') is None else  wz_json._config.get('template').get('name')
-    project_name = wz_json.project['name'] if wz_json._config.get('template') is None else  wz_json._config.get('template').get('name')
+    host = prj_configs.get('host')
+    port = prj_configs.get('port')
+    project_pkg_name = wz_json.project['packageName'] if prj_configs.get('template') is None else  prj_configs.get('template').get('name')
+    project_name = wz_json.project['name'] if prj_configs.get('template') is None else  prj_configs.get('template').get('name')
     clients = wz_json.project.get('clients')
-    description = wz_json._config.get('template').get('description') if wz_json._config.get('template') is not None else ''
+    description = prj_configs.get('template').get('description') if prj_configs.get('template') is not None else ''
     messages = []
     enums = []
     includes = None
     excludes = None
     root_path = wz_json.path.split('webezy.json')[0]
-    author = wz_json._config.get('template').get('author') if  wz_json._config.get('template') is not None else 'Unknown'
+    author = prj_configs.get('template').get('author') if  prj_configs.get('template') is not None else 'Unknown'
 
     if include_code:
-        includes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('include') is None else wz_json._config.get('template').get('include')
-        excludes = [] if wz_json._config.get('template') is None or wz_json._config.get('template').get('exclude') is None else wz_json._config.get('template').get('exclude')
+        includes = [] if prj_configs.get('template') is None or prj_configs.get('template').get('include') is None else prj_configs.get('template').get('include')
+        excludes = [] if prj_configs.get('template') is None or prj_configs.get('template').get('exclude') is None else prj_configs.get('template').get('exclude')
     for pkg in wz_json.packages:
         p = wz_json.packages[pkg]
         for m in p.get('messages'):
@@ -163,8 +163,8 @@ def create_enums_values(enums):
         for e in enums:
             temp_enum_values = []
             for ev in e.get('values'):
-                temp_enum_values.append('helpers.WZEnumValue(\'{0}\',{1})'.format(ev.get('name'),ev.get('number') if ev.get('number') is not None else 0))
-            code += '\n# Instantiating all enum values for [{0}]\n_enum_values_{0} = [{1}]'.format(e.get('fullName').replace('.','_'),','.join(temp_enum_values))
+                temp_enum_values.append('helpers.WZEnumValue(\'{0}\',{1},description=\'{2}\')'.format(ev.get('name'),ev.get('number') if ev.get('number') is not None else 0,ev.get('description')))
+            code += '\n# Instantiating all enum values for [{0}]\n_enum_values_{0} = [{1}]'.format(e.get('fullName').replace('.','_'),',\n\t'.join(temp_enum_values))
     
         return """
 # Creating enums values

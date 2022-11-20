@@ -1,5 +1,5 @@
 
-"""Init script for webezy.io template testproject
+"""Init script for webezy.io template io
 Generated thanks to -
 
                  _                           _        
@@ -9,9 +9,9 @@ Generated thanks to -
    \_/\_/  \___||_.__/  \___|/___| \__, |(_)|_| \___/ 
                                    |___/              
 
+A basic sample project for webezyio.    It is included with examples for all RPC's types    and using Enums + Nested Messages, including 'Well Known'    messages from google
 
-
-Author: Unknown
+Author: Amit Shmulevitch
 """
 # Main webezyio class to create gRPC services programmatically
 # (Same inteface that webezyio cli is built as wrapper for
@@ -35,11 +35,11 @@ import zlib
     
 """Initialize constants and WebezyArchitect class"""
 parser = argparse.ArgumentParser(
-                    prog = 'TEST-PROJECT',
+                    prog = 'io',
                     description = 'What the program does',
                     epilog = 'Text at the bottom of help')
 parser.add_argument('--domain',default='webezy')           # optional argument
-parser.add_argument('--project-name',default='TEST-PROJECT')           # optional argument
+parser.add_argument('--project-name',default='io')           # optional argument
 
 args = parser.parse_args()
 
@@ -80,11 +80,23 @@ _project = _architect.AddProject(server_language=_SERVER_LANGUAGE,
 # Creating enums values
 
 # Instantiating all enum values for [webezy_io_v1_LoggingLevels]
-_enum_values_webezy_io_v1_LoggingLevels = [helpers.WZEnumValue('UNKNWON_LOG_LEVEL',0),helpers.WZEnumValue('DEBUG',1),helpers.WZEnumValue('INFO',2),helpers.WZEnumValue('WARNING',3),helpers.WZEnumValue('ERROR',4)]
+_enum_values_webezy_io_v1_LoggingLevels = [helpers.WZEnumValue('UNKNWON_LOG_LEVEL',0,description='None'),
+	helpers.WZEnumValue('DEBUG',1,description='The most verbose logging, will show all - DEBUG'),
+	helpers.WZEnumValue('INFO',2,description='Will show all log levels after - INFO'),
+	helpers.WZEnumValue('WARNING',3,description='Second most critical logging, wll show all log levels after - WARNING'),
+	helpers.WZEnumValue('ERROR',4,description='Most critical logging level, will show only - ERROR')]
 # Instantiating all enum values for [webezy_io_v1_ValidationTypes]
-_enum_values_webezy_io_v1_ValidationTypes = [helpers.WZEnumValue('UNKNOWN_VALIDATION',0),helpers.WZEnumValue('NUMERIC',1),helpers.WZEnumValue('TEXT',2)]
+_enum_values_webezy_io_v1_ValidationTypes = [helpers.WZEnumValue('UNKNOWN_VALIDATION',0,description='None'),
+	helpers.WZEnumValue('NUMERIC',1,description='Numeric validations using filters'),
+	helpers.WZEnumValue('TEXT',2,description='String validations using RegEx')]
 # Instantiating all enum values for [webezy_io_v1_Validations]
-_enum_values_webezy_io_v1_Validations = [helpers.WZEnumValue('UNKNOWN_NUM_VALIDATION',0),helpers.WZEnumValue('EQ',1),helpers.WZEnumValue('LT',2),helpers.WZEnumValue('GT',3),helpers.WZEnumValue('LTE',4),helpers.WZEnumValue('GTE',5),helpers.WZEnumValue('NOT',6)]
+_enum_values_webezy_io_v1_Validations = [helpers.WZEnumValue('UNKNOWN_NUM_VALIDATION',0,description='None'),
+	helpers.WZEnumValue('EQ',1,description='Equal to the value passed'),
+	helpers.WZEnumValue('LT',2,description='Less than to the value passed'),
+	helpers.WZEnumValue('GT',3,description='Greater than to the value passed'),
+	helpers.WZEnumValue('LTE',4,description='Less than or equal to the value passed'),
+	helpers.WZEnumValue('GTE',5,description='Greate than or equal to the value passed'),
+	helpers.WZEnumValue('NOT',6,description='Not equal to the value passed')]
         
 # Creating enums   
 
@@ -100,7 +112,7 @@ _enum_webezy_io_v1_Validations = helpers.WZEnum('Validations',enum_values=_enum_
 
 # Constructing a field for [webezy_io_v1_ConsoleLoggingOptions_level]
 _field_webezy_io_v1_ConsoleLoggingOptions_level = helpers.WZField(name='level',
-                              description='None',
+                              description='A logging level constant to be used at ConsoleLogger',
                               label='LABEL_OPTIONAL',
                               type='TYPE_ENUM',
                               message_type=None,
@@ -235,7 +247,7 @@ _msg_fields_webezy_io_v1_FieldsExtensions = [_field_webezy_io_v1_FieldsExtension
 
 # Constructing message [webezy_io_v1_ConsoleLoggingOptions]
 _msg_webezy_io_v1_ConsoleLoggingOptions = helpers.WZMessage(name='ConsoleLoggingOptions',
-                                 description='None',
+                                 description='The console logger options wrapper message',
                                  fields=_msg_fields_webezy_io_v1_ConsoleLoggingOptions,
                                  extension_type=None,
                                  extensions=None)
@@ -281,7 +293,7 @@ _msg_webezy_io_v1_FieldsExtensions = helpers.WZMessage(name='FieldsExtensions',
 _pkg_webezy_io_v1 = helpers.WZPackage(name='io',
                                                 messages=[_msg_webezy_io_v1_ConsoleLoggingOptions,_msg_webezy_io_v1_FieldValidation,_msg_webezy_io_v1_FileExtensions,_msg_webezy_io_v1_ServiceExtensions,_msg_webezy_io_v1_MessageExtensions,_msg_webezy_io_v1_FieldsExtensions],
                                                 enums=[_enum_webezy_io_v1_LoggingLevels,_enum_webezy_io_v1_ValidationTypes,_enum_webezy_io_v1_Validations],
-                                                extensions=None)
+                                                extensions={'webezy.io.v1.FileExtensions.ConsoleLogger': {'level': 'DEBUG'}})
 
 # Unpacking package [webezy_io_v1]
 _pkg_webezy_io_v1_name, _pkg_webezy_io_v1_messages, _pkg_webezy_io_v1_enums, _pkg_webezy_io_v1_ext, _pkg_webezy_io_v1_domain = _pkg_webezy_io_v1.to_tuple()
@@ -291,7 +303,7 @@ _pkg_webezy_io_v1_name, _pkg_webezy_io_v1_messages, _pkg_webezy_io_v1_enums, _pk
 # Adding package [webezy_io_v1]
 _pkg_webezy_io_v1 = _architect.AddPackage(_pkg_webezy_io_v1_name,
                                                     dependencies=[],
-                                                    description='None',
+                                                    description='This is the webezy.io package for most of the core modules that are handy to use at webezy.io projects.',
                                                     domain=_pkg_webezy_io_v1_domain,
                                                     extensions=_pkg_webezy_io_v1_ext)
     
