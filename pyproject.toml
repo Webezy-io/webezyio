@@ -46,6 +46,7 @@ push            = false
         'version = "{version}"',
     ]
     "webezyio/__version__.py" = ["{version}"]
+    "docs/source/conf.py" = ["{version}"]
 
 
 [tool.isort]
@@ -58,4 +59,4 @@ import_heading_firstparty = "Reader imports"
 strict = true
 
 [tool.setuptools.packages.find]
-exclude = ["docker"]  # alternatively: `exclude = ["additional*"]`
+exclude = ["docker","docs"]  # alternatively: `exclude = ["additional*"]`

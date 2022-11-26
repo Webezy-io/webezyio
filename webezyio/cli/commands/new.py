@@ -49,7 +49,7 @@ wz_new_q = [
     inquirer.List("server", message="Choose server language", choices=[
                   ('Python', Language.python), ('Typescript', Language.typescript)], default=Language.python),
     inquirer.Checkbox("clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
-                      ('Python', Language.python), ('Typescript', Language.typescript)], default=[Language.python],validate=validate_client),
+                      ('Python', Language.python), ('Typescript', Language.typescript), ('Go',Language.go)], default=[Language.python],validate=validate_client),
     inquirer.Text("domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
@@ -99,7 +99,7 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
                     client_lang = Language.Name(c)
                 out_dir = join_path(
                     result_path, 'clients', client_lang)
-                print_info(f'Adding client: {client_lang}')
+                print_info(f'Adding client: {client_lang}\n\t-> {out_dir}')
                 clients.append(
                     {'out_dir': out_dir, 'language': client_lang})
         if k == 'domain':
@@ -108,14 +108,14 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
     out_dir = join_path(
                     result_path, 'clients',results['server'] if type(results['server']) == str else Language.Name(results['server']))
     if next((c for c in clients if c.get('language') == (results['server'] if type(results['server']) == str else Language.Name(results['server'])) ),None) is None:
-        clients.append({'out_dir': out_dir, 'language': results['server']})
+        print_warning('Auto-Adding client {} - Any project by default is assigned with client in the server specified language !'.format(Language.Name(results['server']) if type(results['server']) != str else results['server'] ))
+        clients.append({'out_dir': out_dir, 'language': Language.Name(results['server']) if type(results['server']) != str else results['server'] })
     root_dir = result_path
     webezy_json_path = join_path(root_dir, 'webezy.json')
     mkdir(result_path)
 
     ARCHITECT = WebezyArchitect(
         path=webezy_json_path, domain=domain_name, project_name=project_name)
-
     if template != '@webezyio/Blank':
         print_info(webezy_json_path)
         print_info(f'Creating new webezy project "{project_name}" [{template}]')

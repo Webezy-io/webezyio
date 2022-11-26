@@ -135,8 +135,8 @@ class WebezyArchitect():
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
         return enum
 
-    def EditService(self,name,dependencies,description,methods):
-        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,methods=methods)
+    def EditService(self,name,dependencies,description,methods,extensions=None):
+        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,methods=methods,extensions=extensions)
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(service))
         return service
 
@@ -145,15 +145,19 @@ class WebezyArchitect():
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(package))
         return package
 
-    def EditMessage(self,package,name,fields,description=None,options=None):
+    def EditMessage(self,package,name,fields,description=None,options=None,old_name=None):
         message = generate_message(self._path,self._domain,package,name,fields,option=options,description=description)
-        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(message))
+        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(message),old_name=old_name)
         return message
 
     def EditEnum(self,package,name,enum_values):
         enum = generate_enum(self._path,self._domain,package.name,name,enum_values)
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(enum))
     
+    def EditRPC(self,service,name,input_type,output_type,client_stream,server_stream,description,extensions=None):
+        RPC = generate_rpc(self._path,name,client_stream,server_stream,input_type,output_type,description)
+        self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(RPC))
+
     def RemoveEnum(self,full_name):
         self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
     
@@ -162,6 +166,13 @@ class WebezyArchitect():
 
     def RemoveRpc(self, full_name):
         self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
+
+    def RemoveField(self, full_name):
+        self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
+
+    def RemoveEnumValue(self, full_name):
+        self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
+
 
     def Save(self):
         logging.info("Saving webezyio architect process")

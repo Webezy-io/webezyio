@@ -89,7 +89,10 @@ It will generate module and function documnetations based on DocsString written 
 ```sh
 cd ./docs && make html
 ```
-
+Run at `source` folder
+```sh
+sphinx-apidoc -o . <webezyio/path>
+```
 Open ```./docs/build/html/index.html``` in a browser.
 
 ### Build package checklist

@@ -43,6 +43,7 @@ webezyio/cli/commands/__init__.py
 webezyio/cli/commands/build.py
 webezyio/cli/commands/call.py
 webezyio/cli/commands/edit.py
+webezyio/cli/commands/extend.py
 webezyio/cli/commands/generate.py
 webezyio/cli/commands/ls.py
 webezyio/cli/commands/migrate.py
@@ -67,6 +68,7 @@ webezyio/commons/templates/webezyio/HelloWorldTs.template.py
 webezyio/commons/templates/webezyio/PubSubTs.template.py
 webezyio/commons/templates/webezyio/SamplePy.template.py
 webezyio/commons/templates/webezyio/SampleTs.template.py
+webezyio/commons/templates/webezyio/io.template.py
 webezyio/core/Analytics_pb2.py
 webezyio/core/Analytics_pb2_grpc.py
 webezyio/core/WebezyAnalytics_pb2.py

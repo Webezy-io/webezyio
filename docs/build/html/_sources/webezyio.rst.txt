@@ -11,7 +11,18 @@ Subpackages
    webezyio.builder
    webezyio.cli
    webezyio.commons
-   webezyio.parser
+   webezyio.core
+
+Submodules
+----------
+
+webezyio.config module
+----------------------
+
+.. automodule:: webezyio.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

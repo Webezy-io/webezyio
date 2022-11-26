@@ -95,6 +95,24 @@ ENV/\n\
 env.bak/\n\
 venv.bak/\n'
 
+gitignore_go = '# If you prefer the allow list template instead of the deny list, see community template:\n\
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore\n\
+#\n\
+# Binaries for programs and plugins\n\
+*.exe\n\
+*.exe~\n\
+*.dll\n\
+*.so\n\
+*.dylib\n\n\
+# Test binary, built with `go test -c`\n\
+*.test\n\n\
+# Output of the go coverage tool, specifically when used with LiteIDE\n\
+*.out\n\n\
+# Dependency directories (remove the comment below to include it)\n\n\
+# vendor/\n\n\
+# Go workspace file\n\
+go.work'
+
 gitignore_ts = 'lib-cov\n\
 *.seed\n\
 *.log\n\
@@ -128,6 +146,28 @@ dist/**/*\n\
 # ignore yarn.lock\n\
 yarn.lock\n\n\
 .webezy\n'
+_OPEN_BRCK='{'
+_CLOSING_BRCK = '}'
+def bash_init_script_go(project_package, services, packages):
+    services_protoc = []
+    packages_protoc = []
+    for s in services:
+        services_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR  --go-grpc_opt=paths=source_relative protos/{}.proto'.format(s))
+    for p in packages:
+        packages_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR  --go-grpc_opt=paths=source_relative protos/{}.proto'.format(p))
+    return '#!/bin/bash\n\n\
+echo "[WEBEZYIO] init.sh starting protoc compiler for Go"\n\
+go mod tidy\n\
+go test\n\
+statuscode=$?\n\
+echo "Exit code for go.mod tidy and test -> "$statuscode\n\
+[[ "$statuscode" != "0" ]] && {3} echo "Some error occured during init script for Go"; echo "Running init for : github.com/{0}"; go mod init github.com/{0}; {4}\n\
+go get -u google.golang.org/protobuf\n\
+go get -u google.golang.org/grpc\n\
+SRC_DIR="protos"\n\
+DST_DIR="services/protos"\n\
+{1}\n\
+{2}'.format(project_package,'\n'.join(services_protoc),'\n'.join(packages_protoc),_OPEN_BRCK,_CLOSING_BRCK)
 
 bash_init_script_ts = '#!/bin/bash\n\n\
 echo "[WEBEZYIO] init.sh starting protoc compiler"\n\

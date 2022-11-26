@@ -74,7 +74,7 @@ def import_package(source,target,path,webezy_json:WZJson):
         else:
             dep.append(source)
 
-        ARCHITECT.EditService(old_svc.get('name'), dep, old_svc.get('description'),old_svc.get('methods'),extensions=old_pkg.get('extensions'))
+        ARCHITECT.EditService(old_svc.get('name'), dep, old_svc.get('description'),old_svc.get('methods'),extensions=old_svc.get('extensions'))
         ARCHITECT.Save()
 
     importing_into_pkg = 'package' if importing_into_pkg == True else 'service'

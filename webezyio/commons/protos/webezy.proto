@@ -80,6 +80,7 @@ enum Language {
     unknown_language = 0;
     python = 1;
     typescript = 2;
+    go = 3;
 }
 
 message WebezyServer {
@@ -111,6 +112,8 @@ message Project {
     string server_language = 11;
     WebezyServer server = 12;
     repeated WebezyClient clients = 13;
+    string go_package = 14;
+
 }
 
 message ProjectDescriptor {

@@ -21,7 +21,7 @@
 
 import logging
 from webezyio.commons import resources
-from webezyio.commons.pretty import print_error
+from webezyio.commons.pretty import print_error, print_info
 
 from webezyio.commons.resources import get_blank_webezy_json
 from webezyio.commons.file_system import mkdir, rFile, wFile, get_current_location, join_path, check_if_file_exists
@@ -72,7 +72,8 @@ class Builder:
                     for j in request[k]:
                         webezyJson[k][j] = request[k][j]
 
-    def edit_resource(self,webezyJson,resource,*args):
+    def edit_resource(self,webezyJson,resource,args):
+
         resource = resource[0]
         type = resource.get('type')
         kind = resource.get('kind')
@@ -85,6 +86,10 @@ class Builder:
                     if package is not None:
                         index = 0
                         for m in package['messages']:
+                            if args[0] is not None:
+                                if m.get('name') == args[0].get('old_name'):
+                                    webezyJson['packages'][pkgname]['messages'][index] = resource
+                                    break
                             if m.get('fullName') == resource.get('fullName'):
                                 webezyJson['packages'][pkgname]['messages'][index] = resource
                                 break
@@ -116,23 +121,33 @@ class Builder:
                 webezyJson['services'][resource.get('name')] = resource
 
     def remove_resource(self,webezyJson,full_name,*args,**kwargs):
+        """Removing webezy.io resource by full name identifier"""
+
         removed = False
         full_name = full_name[0]
+        
         if len(full_name.split('.')) == 4:
+
             if webezyJson.get('packages') is not None:
                 pkg_name = 'protos/{0}/{1}.proto'.format(full_name.split('.')[2],full_name.split('.')[1])
                 if pkg_name in webezyJson.get('packages'):
+
+                    # Handling deletion of message
                     for m in webezyJson['packages'][pkg_name]['messages']:
                         if m.get('fullName') == full_name:
                             webezyJson['packages'][pkg_name]['messages'].remove(m)
                             removed = True
 
+                    # Handling deletion of enum
                     if removed == False and webezyJson['packages'][pkg_name].get('enums') is not None:
                         for e in webezyJson['packages'][pkg_name]['enums']:
                             if e.get('fullName') == full_name:
                                 webezyJson['packages'][pkg_name]['enums'].remove(e)
                                 removed = True
+                else:
+                    print_error("Coludnt find {} under packages".format(full_name))
 
+            # Handling deletion of RPC
             if removed == False and webezyJson.get('services') is not None:
                 if full_name.split('.')[1] in webezyJson.get('services'):
                     svc = webezyJson['services'][full_name.split('.')[1]]
@@ -140,8 +155,36 @@ class Builder:
                         if r.get('name') == full_name.split('.')[-1]:
                             svc['methods'].remove(r)
                             removed = True
+        else:
+            
+            if webezyJson.get('packages') is not None:
+                pkg_name = 'protos/{0}/{1}.proto'.format(full_name.split('.')[2],full_name.split('.')[1])
                 
-        
+                if pkg_name in webezyJson.get('packages'):
+
+                    # Handling deletion of message field
+                    if webezyJson['packages'][pkg_name].get('messages') is not None:
+                        index_msgs = 0
+                        for m in webezyJson['packages'][pkg_name].get('messages'):
+                            field = next((f for f in m.get('fields') if f.get('fullName') == full_name),None)
+                            if field is not None:
+                                webezyJson['packages'][pkg_name]['messages'][index_msgs]['fields'].remove(field)
+                                removed = True
+                                break
+                            index_msgs += 1
+
+                    # Handling deletion of enum value
+                    if webezyJson['packages'][pkg_name].get('enums') is not None:
+                        if removed == False:
+                            index_enums = 0
+                            for e in webezyJson['packages'][pkg_name].get('enums'):
+                                ev = next((ev for ev in e.get('values') if ev.get('fullName') == full_name),None)
+                                if ev is not None:
+                                    webezyJson['packages'][pkg_name]['enums'][index_enums]['values'].remove(ev)
+
+                            index_enums +=1
+
+                            
         log.debug("Removing resource "+full_name)
 
     def create_new_project(self,*args,**kwargs):
