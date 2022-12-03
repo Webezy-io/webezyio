@@ -22,13 +22,13 @@
 import logging
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system
-from webezyio.commons.pretty import print_error
+from webezyio.commons.pretty import print_error, print_info
 
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'protos')):
-        logging.debug("Starting webezyio build process %s plugin" % (__name__))
+        print_info("Starting webezyio build process %s plugin" % (__name__))
     else:
         file_system.mkdir(file_system.join_path(wz_json.path, 'protos'))
 

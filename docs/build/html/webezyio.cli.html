@@ -1,47 +1,88 @@
-
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-
-    <title>webezyio.cli package &#8212; webezyio 0.1.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>webezyio.cli package &mdash; webezyio 0.1.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">webezyio.cli package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/webezyio.cli.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="webezyio-cli-package">
-<h1>webezyio.cli package<a class="headerlink" href="#webezyio-cli-package" title="Permalink to this heading">¶</a></h1>
+<h1>webezyio.cli package<a class="headerlink" href="#webezyio-cli-package" title="Permalink to this heading"></a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="webezyio.cli.commands.html">webezyio.cli.commands package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#module-webezyio.cli.commands.build">webezyio.cli.commands.build module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#module-webezyio.cli.commands.call">webezyio.cli.commands.call module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#module-webezyio.cli.commands.config">webezyio.cli.commands.config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#module-webezyio.cli.commands.edit">webezyio.cli.commands.edit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#module-webezyio.cli.commands.extend">webezyio.cli.commands.extend module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="webezyio.cli.commands.html#module-webezyio.cli.commands.generate">webezyio.cli.commands.generate module</a></li>
@@ -58,121 +99,86 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-webezyio.cli.main">
-<span id="webezyio-cli-main-module"></span><h2>webezyio.cli.main module<a class="headerlink" href="#module-webezyio.cli.main" title="Permalink to this heading">¶</a></h2>
+<span id="webezyio-cli-main-module"></span><h2>webezyio.cli.main module<a class="headerlink" href="#module-webezyio.cli.main" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.enum_value_validate">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">enum_value_validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">answers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.enum_value_validate" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">enum_value_validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">answers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.enum_value_validate" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.field_exists_validation">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">field_exists_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.field_exists_validation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">field_exists_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.field_exists_validation" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.main">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.main" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.main" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.parse_name_to_resource">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">parse_name_to_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.parse_name_to_resource" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">parse_name_to_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.parse_name_to_resource" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.parse_namespace_resource">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">parse_namespace_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.parse_namespace_resource" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">parse_namespace_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.parse_namespace_resource" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.template_commands">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">template_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.template_commands" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">template_commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">architect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.template_commands" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.main.validation">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">answers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.validation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.main.</span></span><span class="sig-name descname"><span class="pre">validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">answers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.main.validation" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
 <section id="module-webezyio.cli.theme">
-<span id="webezyio-cli-theme-module"></span><h2>webezyio.cli.theme module<a class="headerlink" href="#module-webezyio.cli.theme" title="Permalink to this heading">¶</a></h2>
+<span id="webezyio-cli-theme-module"></span><h2>webezyio.cli.theme module<a class="headerlink" href="#module-webezyio.cli.theme" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="webezyio.cli.theme.WebezyTheme">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.cli.theme.</span></span><span class="sig-name descname"><span class="pre">WebezyTheme</span></span><a class="headerlink" href="#webezyio.cli.theme.WebezyTheme" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.cli.theme.</span></span><span class="sig-name descname"><span class="pre">WebezyTheme</span></span><a class="headerlink" href="#webezyio.cli.theme.WebezyTheme" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Theme</span></code></p>
 </dd></dl>
 
 </section>
 <section id="module-webezyio.cli">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-webezyio.cli" title="Permalink to this heading">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-webezyio.cli" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 
 
+           </div>
           </div>
-          
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">webezyio</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2022, Amit Shmulevitch.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.1.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/webezyio.cli.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

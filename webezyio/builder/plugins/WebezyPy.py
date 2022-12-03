@@ -241,7 +241,7 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                         index = 0
                         for l in file_content:
                             message_name = m['name']
-                            if f'{message_name} = _reflection' in l:
+                            if f'{message_name} = _reflection' in l[:len(message_name)+15]:
                                 temp_fields = []
                                 init_fields = []
                                 for field in m['fields']:

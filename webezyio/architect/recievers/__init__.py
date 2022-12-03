@@ -92,6 +92,9 @@ class Builder:
                                     break
                             if m.get('fullName') == resource.get('fullName'):
                                 webezyJson['packages'][pkgname]['messages'][index] = resource
+                                # removed_message = webezyJson['packages'][pkgname]['messages'][index]
+                                # webezyJson['packages'][pkgname]['messages'].remove(removed_message)
+                                # webezyJson['packages'][pkgname]['messages'].insert(len(webezyJson['packages'][pkgname]['messages']), removed_message)
                                 break
                             index += 1
                 elif kind == resources.ResourceKinds.method.value:

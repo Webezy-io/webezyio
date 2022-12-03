@@ -20,6 +20,14 @@ webezyio.cli.commands.call module
    :undoc-members:
    :show-inheritance:
 
+webezyio.cli.commands.config module
+-----------------------------------
+
+.. automodule:: webezyio.cli.commands.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 webezyio.cli.commands.edit module
 ---------------------------------
 

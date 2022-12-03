@@ -75,8 +75,17 @@ Init a Builder
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
+
+   commands
+   webezyio_concepts
+   typescript
+   templating
+   builder_api
+   custom_configurations
+   vscode_webezyio
+   contirbuting
 
 
 

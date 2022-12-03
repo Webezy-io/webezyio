@@ -1,64 +1,89 @@
 syntax = "proto3";
 import "google/protobuf/struct.proto";
+import "WebezyPrometheus.proto";
+import "WebezyConfig.proto";
 
 package webezy.core.v1;
 
-message WebezyProxyConfig {
-    repeated WebezyListener listeners = 1;
-}
+// enum WebezyDeploymentType {
+//     UNKNOWN_DEPLOYMENT = 0;
+//     LOCAL = 1;
+//     DOCKER = 2;
+// }
 
-enum WebezyDeploymentType {
-    UNKNOWN_DEPLOYMENT = 0;
-    LOCAL = 1;
-    DOCKER = 2;
-}
+// Webezy Template
 
-message WebezyListener {
-    WebezyServerAddress address = 1;
-    repeated WebezyRoutes routes = 2;
-}
+// message WebezyTemplate {
+//     string name = 1;
+//     string out_path = 2;
+//     repeated string include = 3;
+//     repeated string exclude = 4;
+//     repeated string tags = 5;
+//     string description = 6;
+//     string author = 7;
+//     bool include_code = 8;
+// }
 
-message WebezyServerAddress {
-    string address = 1;
-    int32 port_value = 2;
-}
+// message WebezyMonitor {
+//     WebezyMonitorGrafana grafana = 1;
+//     webezy.WebezyPrometheus.v1.Config prometheus = 2;
+// }
 
-message WebezyRoutes {
-    WebezyRouteMatch match = 1;
-    string cluster = 2;
-    google.protobuf.Struct properties = 3;
-}
+// message WebezyMonitorGrafana {
+//     string grafana_path = 1;
+// }
 
-message WebezyRouteMatch {
-    string prefix = 1;
-}
+// Webezy Proxy (Envoy)
 
-message WebezyTemplate {
-    string name = 1;
-    string out_path = 2;
-    repeated string include = 3;
-    repeated string exclude = 4;
-    repeated string tags = 5;
-    string description = 6;
-    string author = 7;
-    bool include_code = 8;
-}
+// message WebezyProxy {
+//     WebezyProxyAddress admin = 1;
+//     WebezyProxyStatsSink stats = 2;
+//     repeated WebezyProxyListener listeners = 3;
+//     repeated WebezyProxyCluster clusters = 4;
+// }
 
-message WebezyConfig {
-    string host = 1;
-    int32 port = 2;
-    WebezyDeploymentType deployment = 3;
-    WebezyProxyConfig proxy = 4;
-    google.protobuf.Struct docs = 5;
-    WebezyTemplate template = 6;
-}
+// message WebezyProxyStatsSink {
+//     string tcp_cluster_name = 1;
+//     string prefix = 2;
+// }
+
+// message WebezyProxyListener {
+//     string name = 1;
+//     WebezyProxyAddress address = 2;
+// }
+
+// message WebezyProxyAddress { 
+//     string address = 1;
+//     int32 port = 2;
+// }
+
+// message WebezyProxyCluster {
+//     string name = 1;
+//     repeated WebezyProxyEndpoint endpoints = 2; 
+// }
+
+// message WebezyProxyEndpoint {
+//     WebezyProxyAddress address = 1;
+// }
+
+// Webezy Config
+
+// message WebezyConfig {
+//     string host = 1;
+//     int32 port = 2;
+//     WebezyDeploymentType deployment = 3;
+//     WebezyProxy proxy = 4;
+//     google.protobuf.Struct docs = 5;
+//     WebezyTemplate template = 6;
+//     WebezyMonitor monitor = 7; 
+// }
 
 message WebezyJson {
     string domain = 1;
     Project project = 2;
     map<string, ServiceDescriptor> services = 3;
     map<string, PackageDescriptor> packages = 4;
-    WebezyConfig config = 5;
+    webezy.WebezyConfig.Config config = 5;
 }
 
 

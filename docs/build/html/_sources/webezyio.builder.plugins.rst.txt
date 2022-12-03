@@ -36,10 +36,26 @@ webezyio.builder.plugins.WebezyMigrate module
    :undoc-members:
    :show-inheritance:
 
+webezyio.builder.plugins.WebezyMonitor module
+---------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyMonitor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 webezyio.builder.plugins.WebezyProto module
 -------------------------------------------
 
 .. automodule:: webezyio.builder.plugins.WebezyProto
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.WebezyProxy module
+-------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyProxy
    :members:
    :undoc-members:
    :show-inheritance:

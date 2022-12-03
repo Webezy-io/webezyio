@@ -1,3 +1,4 @@
+from webezyio.commons.protos import WebezyConfig_pb2 as WebezyConfig
 """
                  _                           _        
  __      __ ___ | |__    ___  ____ _   _    (_)  ___  
@@ -7,18 +8,22 @@
                                    |___/              .configs
 
 webezyio cli module configuration"""
-# Supported builtins templates
-webezyio_templates = [
-    "@webezyio/Blank",
-    "@webezyio/io",
-    "@webezyio/SamplePy",
-    "@webezyio/SampleTs",
-    "@webezyio/PubSubTs",
-    "@webezyio/HelloWorldPy",
-    "@webezyio/HelloWorldTs"
-]
-# Analytic gathering approval
-analytics=False
-# First run flag
-first_run=False
-token="macOS-12.6-arm64-arm-64bit:2022-11-18T15:24:00.812064"
+configs=WebezyConfig.Config(
+    host="localhost",
+    port=50051,
+    # Analytic gathering approval
+    analytics=True,
+    # First run flag
+    first_run=True,
+    token="",
+    # Supported builtins templates
+    webezyio_templates = [
+        "@webezyio/Blank",
+        "@webezyio/io",
+        "@webezyio/SamplePy",
+        "@webezyio/SampleTs",
+        "@webezyio/PubSubTs",
+        "@webezyio/HelloWorldPy",
+        "@webezyio/HelloWorldTs"
+    ]
+)

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Webezy CLI Commands &mdash; webezyio 0.1.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Understanding Webezy.io" href="webezyio_concepts.html" />
+    <link rel="prev" title="Welcome to webezyio’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Webezy CLI Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#wz-new">wz new</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-generate">wz generate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-ls">wz ls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-package">wz package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-edit">wz edit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-build">wz build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-template">wz template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-call">wz call</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-run">wz run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-migrate">wz migrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wz-extend">wz extend</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Webezy CLI Commands</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/commands.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="webezy-cli-commands">
+<h1>Webezy CLI Commands<a class="headerlink" href="#webezy-cli-commands" title="Permalink to this heading"></a></h1>
+<p>Below listed all supported Webezy.io CLI commands and their supported arguments.</p>
+<section id="wz-new">
+<h2>wz new<a class="headerlink" href="#wz-new" title="Permalink to this heading"></a></h2>
+<p>Create new <code class="docutils literal notranslate"><span class="pre">webezy.io</span></code> projects, can be new blank project or refrenced from already existing template.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>positional arguments:
+  project               Project name
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  -p PATH, --path PATH  Path <span class="k">for</span> the project root directory
+  --port PORT           Port server will run on
+  --host HOST           Host name <span class="k">for</span> server
+  --domain DOMAIN       Project domain
+  --server-language SERVER_LANGUAGE
+                        Server language
+  --clients <span class="o">[</span>CLIENTS <span class="o">[</span>CLIENTS ...<span class="o">]]</span>
+                        Clients language list seprated by spaces
+  --build               Clients language list seprated by spaces
+  --template <span class="o">{</span>@webezyio/Blank,@webezyio/Sample<span class="o">}</span>
+                        Create new project based on template
+</pre></div>
+</div>
+</section>
+<section id="wz-generate">
+<h2>wz generate<a class="headerlink" href="#wz-generate" title="Permalink to this heading"></a></h2>
+<p>Generate new webezy.io resources under already existing project</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>positional arguments:
+  <span class="o">{</span>s,p,m,r,e<span class="o">}</span>           Generate a webezyio resource from specific resource type, <span class="k">for</span> e.x <span class="s2">&quot;s&quot;</span> stands <span class="k">for</span> <span class="s2">&quot;service&quot;</span>
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  -n NAME, --name NAME  Name <span class="k">for</span> the resource
+  -p PARENT, --parent PARENT
+                        Name <span class="k">for</span> the parent resource
+  --build               Auto build resources
+</pre></div>
+</div>
+</section>
+<section id="wz-ls">
+<h2>wz ls<a class="headerlink" href="#wz-ls" title="Permalink to this heading"></a></h2>
+<p>List your project resources</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --full-name fullName  Display a resource report <span class="k">for</span> specific resoource by passing <span class="k">in</span> a full name, <span class="k">for</span> e.x domain.test.GetTest will <span class="k">return</span> <span class="s2">&quot;GetTest&quot;</span> <span class="o">(</span>RPC<span class="o">)</span> which
+                        under <span class="s2">&quot;test&quot;</span> <span class="o">(</span>service<span class="o">)</span>
+  -t <span class="o">{</span>service,package,message,rpc,enum<span class="o">}</span>, --type <span class="o">{</span>service,package,message,rpc,enum<span class="o">}</span>
+                        List a webezyio resource from specific resource <span class="nb">type</span>
+</pre></div>
+</div>
+</section>
+<section id="wz-package">
+<h2>wz package<a class="headerlink" href="#wz-package" title="Permalink to this heading"></a></h2>
+<p>Mangae your dependencies inside your project</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>positional arguments:
+  <span class="nb">source</span>        Package full name
+  target        Package path or service name
+
+optional arguments:
+  -h, --help    show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  -r, --remove  Package path or service name
+</pre></div>
+</div>
+<p><strong>Import a package into service</strong></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz package &lt;domain.package.v1&gt; &lt;servicename&gt;
+</pre></div>
+</div>
+<p><strong>Import a package into another package</strong></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz package &lt;domain.package.v1&gt; &lt;domain.other.v1&gt; 
+</pre></div>
+</div>
+</section>
+<section id="wz-edit">
+<h2>wz edit<a class="headerlink" href="#wz-edit" title="Permalink to this heading"></a></h2>
+<p>Edit your webezy.io resources</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>positional arguments:
+  name                  Resource full name
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  -a <span class="o">{</span>add,remove,modify<span class="o">}</span>, --action <span class="o">{</span>add,remove,modify<span class="o">}</span>
+                        Choose which action to preform on resource
+  --sub-action SUB_ACTION
+                        Choose which sub-action to preform on resource
+</pre></div>
+</div>
+<p><strong>Edit a message</strong></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz edit &lt;domain.package.v1.message&gt;
+</pre></div>
+</div>
+</section>
+<section id="wz-build">
+<h2>wz build<a class="headerlink" href="#wz-build" title="Permalink to this heading"></a></h2>
+<p>Build the project resources</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>optional arguments:
+  -h, --help  show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --protos    Build resources protos files only
+  --code      Build resources code classes files only
+</pre></div>
+</div>
+</section>
+<section id="wz-template">
+<h2>wz template<a class="headerlink" href="#wz-template" title="Permalink to this heading"></a></h2>
+<p>Create or load a project template</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>positional arguments:
+  path                  Path <span class="k">for</span> webezy.json / protos files directory / webezy.template.py
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  -c, --code            Create a template including code files
+  --out-path OUT_PATH   Specify the template file location, defaulted to root project dir
+  --template-name TEMPLATE_NAME
+                        Specify the template name, defaulted to project package name
+  --load                Initalize a template
+</pre></div>
+</div>
+<p>See <span class="xref myst">Service Templating Section</span> for more information.</p>
+</section>
+<section id="wz-call">
+<h2>wz call<a class="headerlink" href="#wz-call" title="Permalink to this heading"></a></h2>
+<p>Call a service RPC for a running server host</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>positional arguments:
+  service      Service full path
+  rpc          RPC name
+
+optional arguments:
+  -h, --help   show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --debug      Debug the call process
+  --host HOST  Pass a host of service
+  --port PORT  Pass a port <span class="k">for</span> service
+</pre></div>
+</div>
+<p>For e.x if we want to run a service RPC called “GetUnary” in Service “Test”
+we would pass the following command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz call clients/python/Test_pb2_grpc.py GetUnary
+</pre></div>
+</div>
+<p>Not that we passed the relative path from the root directory of the project to the service module under “clients” directory and we used the python client module.</p>
+<p>Which will require us to verify we have attached and built a service client in <code class="docutils literal notranslate"><span class="pre">python</span></code>
+If you didnt started your prject with <code class="docutils literal notranslate"><span class="pre">Python</span></code> client add the following configuration under <code class="docutils literal notranslate"><span class="pre">project</span></code>.<code class="docutils literal notranslate"><span class="pre">clients</span></code> Array in <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file located on your project root directory:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;outDir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;path-to-project&gt;/clients/python&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;language&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Then make sure you re-built the project code so the client modules will be created properly:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz build
+</pre></div>
+</div>
+</section>
+<section id="wz-run">
+<h2>wz run<a class="headerlink" href="#wz-run" title="Permalink to this heading"></a></h2>
+<p>Run the project server with attached services</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>optional arguments:
+  -h, --help  show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --debug     Start the gRPC server with debug mode attached
+</pre></div>
+</div>
+</section>
+<section id="wz-migrate">
+<h2>wz migrate<a class="headerlink" href="#wz-migrate" title="Permalink to this heading"></a></h2>
+<p>Migrate existing gRPC project to a <strong>Webezy.io</strong> project</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>usage: webezy migrate <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--format <span class="o">{</span>json,python<span class="o">}]</span> <span class="o">[</span>--server-language <span class="o">{</span>python,typescript<span class="o">}]</span> <span class="o">[</span>--clients <span class="o">[{</span>python,typescript<span class="o">}</span> <span class="o">[{</span>python,typescript<span class="o">}</span> ...<span class="o">]]]</span> protos
+
+positional arguments:
+  protos                Relative path of proto directory
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --format <span class="o">{</span>json,python<span class="o">}</span>
+                        Relative path of proto directory
+  --server-language <span class="o">{</span>python,typescript<span class="o">}</span>
+                        Chose a server language <span class="k">for</span> migration
+  --clients <span class="o">[{</span>python,typescript<span class="o">}</span> <span class="o">[{</span>python,typescript<span class="o">}</span> ...<span class="o">]]</span>
+                        Enter one or more clients
+</pre></div>
+</div>
+<p>Go to exisitng gRPC project which hold <code class="docutils literal notranslate"><span class="pre">.proto</span></code> files in <strong>ONE</strong> parent directory.</p>
+<p>Lets say we have our proto file all in one directory under our project called <code class="docutils literal notranslate"><span class="pre">'Modules'</span></code>
+we can run the migration plan as follow from the root directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz migrate --protos Modules
+</pre></div>
+</div>
+<p>It will run the migration for all <code class="docutils literal notranslate"><span class="pre">.proto</span></code> files existing in the directory passed to <code class="docutils literal notranslate"><span class="pre">--protos</span></code> argument.</p>
+<p>When the process succeeds we will get an output of all resources parsed into <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> format at the same path of our original project.</p>
+<blockquote>
+<div><p><strong>Warning</strong> Migration of project is experimental feature</p>
+</div></blockquote>
+</section>
+<section id="wz-extend">
+<h2>wz extend<a class="headerlink" href="#wz-extend" title="Permalink to this heading"></a></h2>
+<p>Extend a Webezy.io Resource from available extensions created by <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">--expand</span> <span class="pre">generate</span> <span class="pre">message</span></code> command</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>usage: webezy extend <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>--extension EXTENSION<span class="o">]</span> name
+
+positional arguments:
+  name                  Resource full name
+
+optional arguments:
+  -h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+  --extension EXTENSION
+                        Extension full name
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to webezyio’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="webezyio_concepts.html" class="btn btn-neutral float-right" title="Understanding Webezy.io" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

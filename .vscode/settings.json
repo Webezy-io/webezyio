@@ -7,5 +7,6 @@
         "./webezyio/tests/blank/clients/python",
         "./webezyio/tests/blank/services",
         "./webezyio/tests/project/services/protos"
-    ]
+    ],
+    "esbonio.sphinx.confDir": ""
 }

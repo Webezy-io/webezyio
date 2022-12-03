@@ -5,7 +5,7 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.pretty import print_error
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
@@ -81,6 +81,8 @@ class WebezyBuilder:
         # Default docker
         if deployment_type == 'DOCKER':
             self._pm.register(WebezyDocker)
+            self._pm.register(WebezyProxy)
+            self._pm.register(WebezyMonitor)
 
         # Default proxy
         if proxy is not None:

@@ -1,0 +1,52 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyPrometheus.proto";
+import "WebezyProxy.proto";
+import "google/protobuf/struct.proto";
+import "WebezyTemplate.proto";
+package webezy.WebezyConfig.v1;
+
+
+
+// [webezyio] - The main configuration structure
+message Config {
+	// [webezyio] - The webezy.io server host
+	string host = 1;
+	// [webezyio] - The server port
+	int32 port = 2;
+	// [webezyio] - The project deployment type
+	webezy.WebezyConfig.v1.DeploymentType deployment = 3;
+	// [webezyio] - 
+	webezy.WebezyProxy.v1.Config proxy = 4;
+	// [webezyio] - 
+	google.protobuf.Struct docs = 5;
+	// [webezyio] - 
+	webezy.WebezyTemplate.v1.Config template = 6;
+	// [webezyio] - 
+	webezy.WebezyConfig.v1.WebezyMonitor monitor = 7;
+	// [webezyio] - 
+	bool analytics = 8;
+	// [webezyio] - 
+	string token = 9;
+	// [webezyio] - 
+	bool first_run = 10;
+	// [webezyio] - 
+	repeated string webezyio_templates = 11;
+}
+
+// [webezyio] - WebezyMonitor configurations
+message WebezyMonitor {
+	// [webezyio] - The prometheus client configurations
+	webezy.WebezyPrometheus.v1.Config prometheus = 1;
+}
+
+// [webezyio] - None
+enum DeploymentType {
+	// [webezyio] - None
+	UNKNOWN_DEPLOYMENTTYPE = 0;
+	// [webezyio] - None
+	LOCAL = 1;
+	// [webezyio] - None
+	DOCKER = 2;
+}
