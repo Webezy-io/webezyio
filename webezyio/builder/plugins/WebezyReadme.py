@@ -70,10 +70,10 @@ def get_readme(wz_json: helpers.WZJson):
                 type = 'Server stream'
             in_type = rpc.get('inputType')
             out_type = rpc.get('outputType')
-            in_type_name = in_type.split('.')[-1]
-            out_type_name = out_type.split('.')[-1]
+            in_type_name = in_type.split('.')[-1].lower()
+            out_type_name = out_type.split('.')[-1].lower()
 
-            rpcs.append(f'__{rpc_name}__ [{type}]\n- Input: [{in_type}](#{in_type_name})\n- Output: [{out_type}](#{out_type_name})')
+            rpcs.append(f'__`{rpc_name}`__ [{type}]\n- Input: [{in_type}](#{in_type_name})\n- Output: [{out_type}](#{out_type_name})')
 
         rpcs = '\n\n'.join(rpcs)
         svcs.append(f'## {svc}\n\n{rpcs}')
@@ -90,15 +90,15 @@ def get_readme(wz_json: helpers.WZJson):
             for f in msg['fields']:
                 field_name = f['name']
                 f_type = f['fieldType']
-                f_type = '[{0}](#{0})'.format(f['messageType'] .split('.')[-1]) if f['fieldType'] == 'TYPE_MESSAGE' else f_type
+                f_type = '[{0}](#{0})'.format(f['messageType'].split('.')[-1]) if f['fieldType'] == 'TYPE_MESSAGE' else f_type
                 f_type = '[{0}](#{0})'.format(f['enumType'].split('.')[-1]) if f['fieldType'] == 'TYPE_ENUM' else f_type
                 f_desc = '' if f.get('description') is None else f.get('description')
-                fields.append(f'__{field_name}__ [{f_type}]\n{f_desc}\n')
+                fields.append(f'* __{field_name}__ [{f_type}]\n{f_desc}\n')
             fields = '\n'.join(fields)
             msg_desc = '' if msg.get('description') is None else '{0}\n'.format(msg.get('description')) 
-            msgs.append(f'### {msg_name}\n{msg_desc}\n{fields}')
+            msgs.append(f'\n### __{msg_name}__\n{msg_desc}\n{fields}')
         msgs = '\n\n'.join(msgs)
-        pkgs.append(f'## {package_name}\n\n{msgs}')
+        pkgs.append(f'## `{package_name}`\n\n{msgs}')
     
     pkgs = '\n\n'.join(pkgs)
     svcs = '\n\n'.join(svcs)
@@ -107,12 +107,14 @@ def get_readme(wz_json: helpers.WZJson):
     for c in wz_json.project.get('clients'):
         client_lang = c.get('language')
         client_lang = client_lang[0].upper()+client_lang[1:]
-        clients_usage_i.append(f'- [{client_lang}](#{client_lang})')
+        clients_usage_i.append(f'- [{client_lang}](#{client_lang.lower()})')
         if client_lang=='Python':
             clients_usage.append(f'### Python\n\n```py\nfrom clients.python import {project_package_name}\n\nclient = {project_package_name}()\n\n# Unary call\nresponse = stub.<Unary>(<InMessage>())\nprint(response)\n\n# Server stream\nresponses = stub.<ServerStream>(<InMessage>())\nfor res in responses:\n\tprint(res)\n\n# Client Stream\nrequests = iter([<InMessage>(),<InMessage>()])\nresponse = client.<ClientStream>(requests)\nprint(response)\n\n# Bidi Stream\nresponses = client.<BidiStream>(requests)\nfor res in responses:\n\tprint(res)\n```\n')
         elif client_lang=='Typescript':
             clients_usage.append(f'### Typescript\n\n```ts\nimport {_OPEN_BRCK} {project_package_name} {_CLOSING_BRCK} from \'./clients/typescript/\';\n\nlet client = new {project_package_name}();\n\n// Unary call\nclient.<Unary>(<InMessage>)\n\t.then((res:<OutMessage>) => {_OPEN_BRCK}\n\t\tconsole.log(res);\n\t{_CLOSING_BRCK}).catch((err: any) => console.log(err));\n\n// Server Stream\nclient.<ServerStream>(<InMessage>)\n\t.subscribe((res: <OutMessage>) => {_OPEN_BRCK}\n\t\tconsole.log(res);\n\t{_CLOSING_BRCK})\n\n// Client Stream\n\n// Bidi Stream\nresponses = client.<BidiStream>()\n\t.subscribe((res: <OutMessage>) => {_OPEN_BRCK}\n\t\tconsole.log(res)\n\t{_CLOSING_BRCK})\n\nresponses.write(<InMessage>)\n```\n')
-
+        elif client_lang=='Go':
+            go_package_name = wz_json.project.get('goPackage')
+            clients_usage.append(f'### Go\n\n```go\npackage main\nimport (\n\t"fmt"\n\n\tclient "{go_package_name}/clients/go"\n)\n\nfunc main() {_OPEN_BRCK}\n\t//Init the client\n\tc := client.Default()\n\n\t// Construct a message\n\tmsg :=  <SomePackage>.<SomeMessage>{_OPEN_BRCK}{_CLOSING_BRCK}\n\n\t// Send unary\n\tres := c.<SomeRpc>(&msg)\n\tfm.tPrintf("Got server unary response: %v",res)\n\n\t// Client Stream\n\tListMessages := []*<Package>.<Message>{_OPEN_BRCK}\n\t\t{_OPEN_BRCK}{_CLOSING_BRCK},\n\t{_CLOSING_BRCK}\n\tclientStream := c.<ClientStreamingRPC>(ListMessages)\n\tfmt.Printf("Got response for client stream: %v", clientStream)\n\n\t// Server stream\n\tresponse_stream := c.<SomeServerStreamRPC>(&msg)\n\tfmt.Prontf("Got server stream response: %v", response_stream)\n\n{_CLOSING_BRCK}\n```\n')
     temp_index = []
     for k in index:
         for i in index[k]:
@@ -120,7 +122,7 @@ def get_readme(wz_json: helpers.WZJson):
             link = i
             if len(i.split('.')) > 1:
                 temp_i = i.split('.')[1]
-            temp_index.append(f'- [{temp_i}](#{link})')
+            temp_index.append(f'- [{temp_i}](#{temp_i.lower()})')
     index = '\n'.join(temp_index)
     clients_usage = '\n'.join(clients_usage)
     clients_usage_i = '\n'.join(clients_usage_i)

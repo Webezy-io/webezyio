@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Custom Configurations &mdash; webezyio 0.1.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Webezy.io VSCode Extension" href="vscode_webezyio.html" />
+    <link rel="prev" title="Builder plugins" href="builder_api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Project Custom Configurations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-configurations">Global Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#template-configurations">Template configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Project Custom Configurations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/custom_configurations.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="project-custom-configurations">
+<h1>Project Custom Configurations<a class="headerlink" href="#project-custom-configurations" title="Permalink to this heading"></a></h1>
+<p>Each Webezy.io project can be configured to developer needs with creating a <code class="docutils literal notranslate"><span class="pre">config.py</span></code> file at the root directory of yout Webezy.io project another place is the <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file under <code class="docutils literal notranslate"><span class="pre">configs</span></code> key or any <span class="xref myst">Global Configurations</span>.</p>
+<section id="global-configurations">
+<h2>Global Configurations<a class="headerlink" href="#global-configurations" title="Permalink to this heading"></a></h2>
+<p>Each <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> package install on your development environment will included with “Global” configuration file which is overided by default from one of the following sources:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">webzy.json</span></code> - Project main resource descriptions which located under each Webezy.io project at the root directory</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config.py</span></code> - Like <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file it may be included as optional override for developers and will overwrite any existing field at the “Global” level and at <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code></p></li>
+</ul>
+<blockquote>
+<div><p><strong>Warning</strong> Do not try and edit the <code class="docutils literal notranslate"><span class="pre">Global</span></code> configurations file as it can be override by other custom configuration locations (Mentioned above)</p>
+</div></blockquote>
+<p><strong>Supported Configurations</strong></p>
+</section>
+<section id="template-configurations">
+<h2>Template configurations<a class="headerlink" href="#template-configurations" title="Permalink to this heading"></a></h2>
+<p><strong><code class="docutils literal notranslate"><span class="pre">templates</span></code></strong> Make custom templates available for your project.
+You can make custom templates from local or remote project and “import” a template generator script to be used in your new project or already existing project.
+Configure in <code class="docutils literal notranslate"><span class="pre">config.py</span></code> file the following parameters:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">templates</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;&lt;TemplateId&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;TemplatePath&gt;&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;TemplateId&gt;</span></code> should be replaced with unique and valid id to be identified and imported at your project with Webezy.io CLI, for example our builtins are constructed the same way: <code class="docutils literal notranslate"><span class="pre">&#64;&lt;domain&gt;/&lt;name&gt;&lt;Py/Ts&gt;</span></code></p></li>
+</ul>
+<blockquote>
+<div><p><strong>Note</strong> That <code class="docutils literal notranslate"><span class="pre">&lt;Py/Ts&gt;</span></code> is acting as indicator for the supported server language for that specific template</p>
+</div></blockquote>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;TemplatePath&gt;</span></code> is the relative path to the template generator script - You can generate a template from already running project:</p></li>
+</ul>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz template webezy.json --template-name &lt;SomeTemplate&gt;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="builder_api.html" class="btn btn-neutral float-left" title="Builder plugins" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="vscode_webezyio.html" class="btn btn-neutral float-right" title="Webezy.io VSCode Extension" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

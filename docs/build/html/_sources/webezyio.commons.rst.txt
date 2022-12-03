@@ -12,6 +12,22 @@ Subpackages
 Submodules
 ----------
 
+webezyio.commons.client\_wrapper module
+---------------------------------------
+
+.. automodule:: webezyio.commons.client_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.commons.config module
+------------------------------
+
+.. automodule:: webezyio.commons.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 webezyio.commons.errors module
 ------------------------------
 
@@ -32,6 +48,14 @@ webezyio.commons.helpers module
 -------------------------------
 
 .. automodule:: webezyio.commons.helpers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.commons.parser module
+------------------------------
+
+.. automodule:: webezyio.commons.parser
    :members:
    :undoc-members:
    :show-inheritance:

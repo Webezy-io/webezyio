@@ -270,7 +270,7 @@ class Webezy(IUndoRedo):
                     reorder.append(index)
                     if dependency_in_pkg is not None:
                         if pkg.package in dependency_in_pkg.message_type:
-                            pretty.print_error(dependency_in_pkg)
+                            # pretty.print_error(dependency_in_pkg)
                             pretty.print_info(reorder,True,"{0} / {1}".format(index,max(reorder)))
                             if index > max(reorder):
                                 reorder = [x+1 for x in reorder]

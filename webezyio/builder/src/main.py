@@ -5,11 +5,11 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyProto, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.pretty import print_error
 from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
-_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,
+_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,WebezyTsClient,WebezyGoClient,
                         WebezyReadme]  # Many More To Come
 log = logging.getLogger('webezyio.cli.main')
 
@@ -76,10 +76,13 @@ class WebezyBuilder:
         self._pm.register(WebezyReadme)
         client_py = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'python'),False)
         client_ts = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'typescript'),False)
+        client_go = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'go'),False)
 
         # Default docker
         if deployment_type == 'DOCKER':
             self._pm.register(WebezyDocker)
+            self._pm.register(WebezyProxy)
+            self._pm.register(WebezyMonitor)
 
         # Default proxy
         if proxy is not None:
@@ -94,9 +97,11 @@ class WebezyBuilder:
         if client_ts:
             self._pm.register(WebezyTsClient)
 
+        if client_go:
+            self._pm.register(WebezyGoClient)
+
         if server_lang == 'typescript':
             self._pm.register(WebezyTsServer)
-     
         
         for p in _WELL_KNOWN_PLUGINS:
             plug_name = self._pm.get_name(p)

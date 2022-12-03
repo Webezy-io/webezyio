@@ -27,18 +27,34 @@ from webezyio.architect import WebezyArchitect
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import helpers,resources,errors
 from inquirer import errors as inquirerErrors
-from webezyio.commons.pretty import print_error, print_info,bcolors, print_success,print_warning
+from webezyio.commons.pretty import print_error, print_info,bcolors, print_note, print_success,print_warning
 log = logging.getLogger('webezyio.cli.main')
 
 
-def edit_message(resource,action,sub_action,wz_json:helpers.WZJson,architect:WebezyArchitect,expand):
+def edit_message(resource,action,sub_actions,wz_json:helpers.WZJson,architect:WebezyArchitect,expand):
+    """A function to edit a webezy.io message resource
+    Args:
+    ----
+    resource - a dictionary full resource description to be edited
+    action - remove / edit
+    sub_action - Deeper action fo edit option: fields / name
+    wz_json - webezy.json context
+    architect - The architect class instantiated to the webezy.json context
+    expand - If expanding optional inputs
+    """
+
     if action is None:
+        if sub_actions is not None:
+            print_warning("Passed sub actions before passing action")
         action = choose_action()
 
+    # Remove message
     if action.lower() == 'remove':
+        # Getting dependencies for resources
         dependencies = get_dependencies(full_name=resource.get('fullName'),wz_json=wz_json)
-        display_dependencies(dependencies,resource,wz_json)
-       
+        display_dependencies(dependencies,resource,'delete')
+        
+        # Prompting for deletion confirm
         confirm = inquirer.prompt(questions=[
             inquirer.Text('delete', bcolors.WARNING+'Please enter "{0}" to confirm delete'.format(resource.get('fullName'))+bcolors.ENDC)
         ],theme=WebezyTheme())
@@ -46,39 +62,70 @@ def edit_message(resource,action,sub_action,wz_json:helpers.WZJson,architect:Web
         if confirm is None:
             print_error("\nCancelling deletion process")
             exit(1)
-
+        # Deletion process
         else:
-            print('')
             if confirm.get('delete') == resource.get('fullName'):
-                for d in dependencies:
-                    for k in d:
-                        if d[k].get('kind') == resources.ResourceKinds.method.value:
-                            architect.RemoveRpc(k+'.'+d[k].get('name'))
-                            print_info("Removed {0} [{1}]".format(d[k].get('name'),d[k].get('kind')))
-                        else:
-                            print_error('Nout supported yet !')
+                # Removing resources that dependent on
+                if dependencies is not None:
+                    for d in dependencies:
+                        for k in d:
+                            # Remove RPC that have input / output type of the deleted message
+                            if isinstance(d[k],str) == False and  isinstance(d[k],list) == False and isinstance(d[k],int) == False:
+                                if d[k].get('kind') == resources.ResourceKinds.method.value:
+                                    architect.RemoveRpc(k+'.'+d[k].get('name'))
+                                    print_info("Removed {0} [{1}]".format(d[k].get('name'),d[k].get('kind')))
+                            else:
+                                if k == 'kind':
+                                    # Remove Messages that have only 1 field and is type of the deleted message
+                                    print_warning("[{}] Removing -> {}".format(d[k],d.get('fullName')))
+                                    if d[k] == resources.ResourceKinds.message.value:
+                                        architect.RemoveMessage(d.get('fullName'))
+                                    # Remove fields that have type of the deleted message
+                                    elif d[k] == resources.ResourceKinds.field.value:
+                                        architect.RemoveField(d.get('fullName'))
+                                    else:
+                                        print_error('Not supporting dependency removal for {} of kind {}'.format(k,d))
+                    
+                # Removing message
                 architect.RemoveMessage(resource.get('fullName'))
                 architect.Save()
                 print_success("Removed {0} [{1}] and all dependent resources".format(resource.get('fullName'),resource.get('kind')))
             else:
                 print_error("Cancelling deletion process")
-
+    # Edit
     else:
-        if sub_action is None:
-            sub_action = modify_resource([('Add fields','fields'),('Rename','name')])
-        if sub_action == 'fields' :
+        # Prompting for sub-action
+        if sub_actions is None:
+            sub_actions = modify_resource([('Add fields','fields'),('Rename','name')])
+        # Edit fields
+        if sub_actions[0] == 'fields' :
             add_fields(resource,wz_json,architect=architect,expand=expand)
+        # Renaming message
+        elif sub_actions[0] == 'name':
+            # Getting dependencies for resources
+            dependencies = get_dependencies(full_name=resource.get('fullName'),wz_json=wz_json)
+            display_dependencies(dependencies,resource,'rename')
+            rename_message(resource,wz_json,architect,dependencies)
+        # Not supporting option
         else:
-            print_error('Not supported yet !')
+            print_error("Not supporting editing {}".format(sub_actions))
             exit(1)
 
-def edit_enum(resource,action,sub_action,wz_json:helpers.WZJson,architect:WebezyArchitect,expand):
+def edit_enum(resource,action,sub_actions,wz_json:helpers.WZJson,architect:WebezyArchitect,expand):
+    """A function to edit enum resource type"""
+
     if action is None:
+        if sub_actions is not None:
+            print_warning("Passed sub actions before passing action")
         action = choose_action()
 
+    # Remove enum
     if action.lower() == 'remove':
+        # Getting all dependent resources
         dependencies = get_dependencies(full_name=resource.get('fullName'),wz_json=wz_json)
-        display_dependencies(dependencies,resource,wz_json)
+        display_dependencies(dependencies,resource,'delete')
+        
+        # Prompting for deletion confirm
         confirm = inquirer.prompt(questions=[
             inquirer.Text('delete', bcolors.WARNING+'Please enter "{0}" to confirm delete'.format(resource.get('fullName'))+bcolors.ENDC)
         ],theme=WebezyTheme())
@@ -86,40 +133,65 @@ def edit_enum(resource,action,sub_action,wz_json:helpers.WZJson,architect:Webezy
         if confirm is None:
             print_error("\nCancelling deletion process")
             exit(1)
-
+        
+        # Deletion process
         else:
             print('')
+            # TODO add dependent fields removal
             if confirm.get('delete') == resource.get('fullName'):
+                if dependencies is not None:
+                    for d in dependencies:
+                        print_warning("[{}] Removing -> {}".format(d.get('kind'),d.get('fullName')))
+                        if d.get('kind') == resources.ResourceKinds.field.value:
+                            architect.RemoveField(d.get('fullName'))
+                        elif d.get('kind') == resources.ResourceKinds.message.value:
+                            architect.RemoveMessage(d.get('fullName'))
+
                 architect.RemoveEnum(resource.get('fullName'))
                 architect.Save()
                 print_success("Removed {0} [{1}] and all dependent resources".format(resource.get('fullName'),resource.get('kind')))
             else:
                 print_error("Cancelling deletion process")
+    # Edit enum
     else:
-        if sub_action is None:
-            sub_action = modify_resource([('Add values','values'),('Rename','name')])
-        if sub_action == 'values' :
+        # Prompting for sub-action
+        if sub_actions is None:
+            modify_resource([('Add values','values'),('Rename','name')])
+        # Add values
+        if sub_actions[0] == 'values' :
             add_values(resource,wz_json,architect=architect,expand=expand)
+        # Not supported option for enum editing
         else:
-            print_error('Not supported yet !')
+            print_error('{} Not supported yet !'.format(sub_actions[0]))
             exit(1)
 
-def edit_rpc(resource,action,sub_action,wz_json:helpers.WZJson,architect:WebezyArchitect,expand):
+def edit_rpc(resource,action,sub_actions,wz_json:helpers.WZJson,architect:WebezyArchitect,expand):
+    """A function to edit RPC resource type"""
+
     if action is None:
+        if sub_actions is not None:
+            print_warning("Passed sub actions before passing action")
         action = choose_action()
 
+    # Constructing temporary RPC "full_name"
     temp_full_name = None
-    
-    for s in wz_json.services:
-        method = next((r for r in wz_json.services[s].get('methods') if r.get('name') == resource.get('name')),None)
-        if method is not None:
-            temp_full_name = wz_json.services[s].get('fullName') + '.' + resource.get('name')
-    
+    if wz_json.services is not None:
+        for s in wz_json.services:
+            method = next((r for r in wz_json.services[s].get('methods') if r.get('name') == resource.get('name')),None)
+            if method is not None:
+                temp_full_name = wz_json.services[s].get('fullName') + '.' + resource.get('name')
+    else:
+        print_error("No available RPC's to edit under {} project".format(wz_json.project.get('name')))
+        exit(1)
+
     if temp_full_name is None:
         print_error("Canot find RPC {0}".format(resource.get('name')))
         exit(1)
     
+    # Remove RPC
     if action.lower() == 'remove':
+        
+        # Prompting for deletion confirm
         confirm = inquirer.prompt(questions=[
             inquirer.Text('delete', bcolors.WARNING+'Please enter "{0}" to confirm delete'.format(temp_full_name)+bcolors.ENDC)
         ],theme=WebezyTheme())
@@ -127,6 +199,9 @@ def edit_rpc(resource,action,sub_action,wz_json:helpers.WZJson,architect:WebezyA
         if confirm is None:
             print_error("\nCancelling deletion process")
             exit(1)
+
+        # Deletion process of RPC
+        # TODO check if RPC is the last one available on service and handle that
         else:
             print('')
             if confirm.get('delete') == temp_full_name:
@@ -135,6 +210,7 @@ def edit_rpc(resource,action,sub_action,wz_json:helpers.WZJson,architect:WebezyA
                 print_success("Removed {0} [{1}]".format(temp_full_name,resource.get('kind')))
             else:
                 print_error("Cancelling deletion process")
+    # Editing RPC
     else:
         print_error('Not supported yet !')
         exit(1)
@@ -159,12 +235,208 @@ def edit_enum_value():
     exit(1)
 
 
-def edit_field():
-    print_error('Not supported yet !')
-    exit(1)
+def edit_field(resource,action,sub_actions,wz_json:helpers.WZJson,architect:WebezyArchitect,expand,no_save=False):
+    if action is None:
+        if sub_actions is not None:
+            print_warning("Passed sub actions before passing action")
+        action = choose_action()
+    # Remove Field
+    if action.lower() == 'remove':
 
+       # Prompting for deletion confirm
+        confirm = inquirer.prompt(questions=[
+            inquirer.Text('delete', bcolors.WARNING+'Please enter "{0}" to confirm delete'.format(resource.get('fullName'))+bcolors.ENDC)
+        ],theme=WebezyTheme())
+
+        if confirm is None:
+            print_error("\nCancelling deletion process")
+            exit(1)
+        else:
+            # TODO Check if message holding other field and handle it
+            if confirm.get('delete') == resource.get('fullName'):
+                architect.RemoveField(resource.get('fullName'))
+                architect.Save()
+                print_success("Removed {0} [{1}]".format(resource.get('fullName'),resource.get('kind')))
+            else:
+                print_error("Cancelling deletion process")
+
+    elif action.lower() == 'modify':
+        print_note('Sub Actions: {}'.format(sub_actions),True,'Modifying field')
+        # Prompting for sub-action
+        if sub_actions is None:
+            sub_actions = [('Change Label','label'),('Change Type','type'),('Rename','name')]
+            if resource.get('fieldType') == 'TYPE_MESSAGE':
+                sub_actions.append(('Change Message Type','message_type'))
+            if resource.get('fieldType') == 'TYPE_ENUM':
+                sub_actions.append(('Change Enum Type','enum_type'))
+            # TODO handle TYPE_MAP
+            sub_actions = modify_resource(sub_actions)
+        # Edit field type
+        if sub_actions[0] == 'type' :
+            print_error("Not supporting editing {}".format(sub_actions))
+            exit(1)
+
+        # Renaming field
+        elif sub_actions[0] == 'name':
+            print_error("Not supporting editing {}".format(sub_actions))
+            exit(1)
+
+        # Changing message_type if field type is TYPE_MESSAGE
+        elif sub_actions[0] == 'message_type':
+            # Getting message dict
+            _msg = wz_json.get_message('.'.join(resource.get('fullName').split('.')[:-1]))
+            # Getting package descriptor
+            _pkg = wz_json.get_package(resource.get('fullName').split('.')[1],False)
+            if _msg is not None:
+                if len(sub_actions) > 1 :
+                    if len(sub_actions[1].split('.')) == 4:
+                        if wz_json.get_message(sub_actions[1]) is not None:
+                            # TODO check for dependecy
+                            for f in _msg.get('fields'):
+                                if f.get('fullName') == resource.get('fullName'):
+                                    f['messageType'] = sub_actions[1]
+                                    print_success("Changing message type for {} -> {}".format(f.get('fullName'),f['messageType']))
+                            architect.EditMessage(_pkg, _msg.get('name'),
+                                _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
+                            if no_save==False:
+                                architect.Save()
+                        else:
+                            print_error('Message {} not exists under project !'.format(sub_actions[1]))
+                            exit(1)
+                    else:
+                        print_error('Message type {} is not valid !'.format(sub_actions[1]))
+                else:
+                    _pkg_name = resource.get('fullName').split('.')[1]
+                    _list_of_avail_messages = []
+                    _field_msg_name = '.'.join(resource.get('fullName').split('.')[:-1])
+                    if _pkg is not None:
+                        if _pkg.dependencies is not None:
+                            # Iterating pakcge dependencies
+                            for dep in _pkg.dependencies:
+                                if 'google.protobuf' not in dep:
+                                    temp_pkg = wz_json.get_package(dep.split('.')[1])
+                                    if temp_pkg.get('messages') is not None:
+                                        for m in temp_pkg.get('messages'):
+                                            if m.get('fullName') != resource.get('messageType'):
+                                                _list_of_avail_messages.append(('{} [{}]'.format(m.get('name'),dep),m.get('fullName')))
+                                else:
+                                    if resource.get('messageType') != dep:
+                                        _list_of_avail_messages.append(('{} [{}]'.format(dep.split('.')[-1],dep),dep))
+                                    
+                        # Adding own package messages
+                        for m in _pkg.messages:
+
+                            if m.full_name != resource.get('messageType') and m.full_name != _field_msg_name:
+                                _list_of_avail_messages.append(('{} [{}]'.format(m.name,_pkg.package),m.full_name))
+
+                        if len(_list_of_avail_messages) > 0 :
+                            message_type = inquirer.prompt([inquirer.List('message_type','Choose message type',_list_of_avail_messages)],theme=WebezyTheme())
+                            if message_type is not None:
+                                for f in _msg.get('fields'):
+                                    if f.get('fullName') == resource.get('fullName'):
+                                        f['messageType'] = message_type['message_type']
+                                        print_success("Changing message type for {} -> {}".format(f.get('fullName'),f['messageType']))
+                                    architect.EditMessage(_pkg, _msg.get('name'),
+                                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
+                                    if no_save==False:
+                                        architect.Save()
+                            # Handling user cancellation
+                            else:
+                                print_error('Must choose a valid message type to change field')
+                                exit(1)
+                        # Handling no available messages
+                        else:
+                            print_error("Canot find any available messages to change field {} [message_type] into".format(resource.get('fullName')))
+                    # Handling package not found - SHOULD NOT HAPPEN !
+                    else:
+                        print_error("Pakcgae {} is not found !".format(_pkg_name))
+            # Handling message not found - SHOULD NOT HAPPEN !
+            else:
+                print_error("Getting message {} has failed !".format('.'.join(resource.get('fullName').split('.')[:-1])))
+                exit(1)
+
+        # Changing enum_type if field type is TYPE_ENUM
+        elif sub_actions[0] == 'enum_type':
+            # Getting message dict
+            _msg = wz_json.get_message('.'.join(resource.get('fullName').split('.')[:-1]))
+            # Getting package descriptor
+            _pkg = wz_json.get_package(resource.get('fullName').split('.')[1],False)
+            if _msg is not None:
+                if len(sub_actions) > 1 :
+                    if len(sub_actions[1].split('.')) == 4:
+                        # TODO check for dependecy
+                        if wz_json.get_enum(sub_actions[1]) is not None:
+                            for f in _msg.get('fields'):
+                                if f.get('fullName') == resource.get('fullName'):
+                                    f['enumType'] = sub_actions[1]
+                                    print_success("Changing enum type for {} -> {}".format(f.get('fullName'),f['enumType']))
+                            architect.EditMessage(_pkg, _msg.get('name'),
+                                _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
+                            if no_save==False:
+                                architect.Save()
+                        else:
+                            print_error('Message {} not exists under project !'.format(sub_actions[1]))
+                            exit(1)
+                    else:
+                        print_error('Message type {} is not valid !'.format(sub_actions[1]))
+                else:
+                    _pkg_name = resource.get('fullName').split('.')[1]
+                    _list_of_avail_enums = []
+                    _field_msg_name = '.'.join(resource.get('fullName').split('.')[:-1])
+                    if _pkg is not None:
+                        if _pkg.dependencies is not None:
+                            # Iterating pakcge dependencies
+                            for dep in _pkg.dependencies:
+                                if 'google.protobuf' not in dep:
+                                    temp_pkg = wz_json.get_package(dep.split('.')[1])
+                                    if temp_pkg.get('enums') is not None:
+                                        for e in temp_pkg.get('enums'):
+                                            if e.get('fullName') != resource.get('enumType'):
+                                                _list_of_avail_enums.append(('{} [{}]'.format(e.get('name'),dep),e.get('fullName')))
+                                    
+                        # Adding own package messages
+                        for e in _pkg.enums:
+
+                            if e.full_name != resource.get('enumType') and e.full_name != _field_msg_name:
+                                _list_of_avail_enums.append(('{} [{}]'.format(e.name,_pkg.package),e.full_name))
+
+                        if len(_list_of_avail_enums) > 0 :
+                            enum_type = inquirer.prompt([inquirer.List('enum_type','Choose enum type',_list_of_avail_enums)],theme=WebezyTheme())
+                            if enum_type is not None:
+                                for f in _msg.get('fields'):
+                                    if f.get('fullName') == resource.get('fullName'):
+                                        f['enumType'] = enum_type['enum_type']
+                                        print_success("Changing enum type for {} -> {}".format(f.get('fullName'),f['enumType']))
+                                    architect.EditMessage(_pkg, _msg.get('name'),
+                                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
+                                    if no_save==False:
+                                        architect.Save()
+                            # Handling user cancellation
+                            else:
+                                print_error('Must choose a valid message type to change field')
+                                exit(1)
+                        # Handling no available messages
+                        else:
+                            print_error("Canot find any available messages to change field {} [message_type] into".format(resource.get('fullName')))
+                    # Handling package not found - SHOULD NOT HAPPEN !
+                    else:
+                        print_error("Pakcgae {} is not found !".format(_pkg_name))
+            # Handling message not found - SHOULD NOT HAPPEN !
+            else:
+                print_error("Getting message {} has failed !".format('.'.join(resource.get('fullName').split('.')[:-1])))
+                exit(1)
+
+            print_error("Not supporting editing {}".format(sub_actions))
+            exit(1)
+
+        # Not supporting option
+        else:
+            print_error("Not supporting editing {}".format(sub_actions))
+            exit(1)
 
 def choose_action():
+    """A function to choose action for edit command"""
+
     action = inquirer.prompt([
         inquirer.List('action',message='Choose an action on resource',choices=['Remove','Modify'])
     ],theme=WebezyTheme())
@@ -183,17 +455,18 @@ def choose_action():
         return action
 
 def modify_resource(choices):
-    
+    """A function to prompt for sub action"""
+
     mod = inquirer.prompt([
         inquirer.List('sub_action','Choose a modification',choices=choices)
-    ])
+    ],theme=WebezyTheme())
 
     if mod is None:
         print_error("Must choose an modification type for editing resource")
         exit(1)
 
     else:
-        return mod['sub_action']
+        return [mod['sub_action']]
 
 def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=False):
     add_field = True
@@ -250,7 +523,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     if expand:
         extend = inquirer.prompt([inquirer.Confirm('extend',message='Do you want to extend a message?')],theme=WebezyTheme())
         if extend.get('extend'):
-            extend = inquirer.prompt([inquirer.List('extend','Choose message extension',choices=[resources.Options.Name(resources.Options.FieldOptions),resources.Options.Name(resources.Options.MessageOptions),resources.Options.Name(resources.Options.FileOptions)])],theme=WebezyTheme())
+            extend = inquirer.prompt([inquirer.List('extend','Choose message extension',choices=[resources.Options.Name(resources.Options.FieldOptions),resources.Options.Name(resources.Options.MessageOptions),resources.Options.Name(resources.Options.FileOptions),resources.Options.Name(resources.Options.ServiceOptions)])],theme=WebezyTheme())
             extend=resources.Options.Value(extend['extend'])
         else:
             extend = None
@@ -524,11 +797,13 @@ def add_values(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     architect.Save()
 
 def get_dependencies(full_name,wz_json:helpers.WZJson):
+    """A function for getting a resource dependencies"""
+
     log.debug(f"Getting dependent resources on {full_name}")
     dependent_resources = []
+
     if len(full_name.split('.')) == 3:
         # Package
-
         for s in wz_json.services:
             svc = wz_json.services[s]
             if svc.get('dependencies'):
@@ -547,43 +822,56 @@ def get_dependencies(full_name,wz_json:helpers.WZJson):
         pkg_name = '.'.join(full_name.split('.')[:-1])
         # Descriptors
         log.debug(f'Got descriptor resource to check {pkg_name}')
-        for p in wz_json.packages:
-            pkg = wz_json.packages[p]
+        if wz_json.packages is not None:
+            for p in wz_json.packages:
+                pkg = wz_json.packages[p]
 
-            if pkg.get('dependencies'):
-                if pkg_name in pkg.get('dependencies'):
-                    for m in pkg.get('messages'):
-                        for f in m.get('fields'):
-                            if f.get('messageType'):
-                                if full_name in f.get('messageType'):
+                if pkg.get('dependencies'):
+                    if pkg_name in pkg.get('dependencies'):
+                        for m in pkg.get('messages'):
+                            if len(m.get('fields')) > 1:
+                                for f in m.get('fields'):
+                                    if f.get('messageType'):
+                                        if full_name in f.get('messageType'):
+                                            dependent_resources.append(f)
+                                    if f.get('enumType'):
+                                        if full_name in f.get('enumType'):
+                                            dependent_resources.append(f)
+                            else:
+                                if next((f for f in m.get('fields') if f.get('messageType') == full_name),None) is not None:
                                     dependent_resources.append(m)
-                                    break
-                elif pkg_name == pkg.get('package'):
-                    for m in pkg.get('messages'):
-                        for f in m.get('fields'):
-                            if f.get('messageType'):
-                                if full_name in f.get('messageType'):
+                                elif next((f for f in m.get('fields') if f.get('enumType') == full_name),None) is not None:
                                     dependent_resources.append(m)
-                                    break
-            elif pkg_name == pkg.get('package'):
-                for m in pkg.get('messages'):
-                    for f in m.get('fields'):
-                        if f.get('messageType'):
-                            if full_name in f.get('messageType'):
+                                    
+                                    
+                    
+                if pkg_name == pkg.get('package'):
+                    for m in pkg.get('messages'):
+                        if len(m.get('fields')) > 1:
+                            for f in m.get('fields'):
+                                if f.get('messageType'):
+                                    if full_name in f.get('messageType'):
+                                        dependent_resources.append(f)
+                                if f.get('enumType'):
+                                    if full_name in f.get('enumType'):
+                                        dependent_resources.append(f)
+                        else:
+                            if next((f for f in m.get('fields') if f.get('messageType') == full_name),None) is not None:
                                 dependent_resources.append(m)
-                                break
-            else:
-                pass
+                            elif next((f for f in m.get('fields') if f.get('enumType') == full_name),None) is not None:
+                                dependent_resources.append(m) 
 
-        for s in wz_json.services:
-            svc = wz_json.services[s]
-            if svc.get('dependencies'):
-                if pkg_name in svc.get('dependencies'):
-                    for rpc in svc.get('methods'):
-                        if full_name in rpc.get('outputType'):
-                            dependent_resources.append({ svc.get('fullName') : rpc})
-                        elif full_name in rpc.get('inputType'):
-                            dependent_resources.append({ svc.get('fullName') : rpc})
+
+        if wz_json.services is not None:
+            for s in wz_json.services:
+                svc = wz_json.services[s]
+                if svc.get('dependencies'):
+                    if pkg_name in svc.get('dependencies'):
+                        for rpc in svc.get('methods'):
+                            if full_name in rpc.get('outputType'):
+                                dependent_resources.append({ svc.get('fullName') : rpc})
+                            elif full_name in rpc.get('inputType'):
+                                dependent_resources.append({ svc.get('fullName') : rpc})
 
         if len(full_name.split('.')) > 4:
             """Unknown"""
@@ -592,10 +880,12 @@ def get_dependencies(full_name,wz_json:helpers.WZJson):
     return dependent_resources
     
 
-def display_dependencies(dependencies,resource,wz_json):
+def display_dependencies(dependencies,resource,action):
+    """Display the depndencies for the specified resources"""
+
     if len(dependencies) > 0:
-        print_info("The following resources are going to be affected from deleting {0}:\n".format(resource.get('fullName')))
-        for d in get_dependencies(full_name=resource.get('fullName'),wz_json=wz_json):
+        print_warning("The following resources are going to be affected from {0} {1}:\n".format(action,resource.get('fullName')))
+        for d in dependencies:
             if d.get('name') is not None:
                 print_warning('- {0} [{1}]'.format(d.get('name'),d.get('kind')))
             else:
@@ -604,3 +894,53 @@ def display_dependencies(dependencies,resource,wz_json):
 
                 print_warning('- {0} -> {1} [{2}]'.format(depend[0],depend[1].get('name'),depend[1].get('kind')))
     print('')
+
+
+def rename_message(resource,wz_json:helpers.WZJson,architect:WebezyArchitect,dependencies):
+    """A function to rename the message"""
+
+    message_name = inquirer.prompt([inquirer.Text('message_name','Enter new name for the message',validate=message_name_validation)],theme=WebezyTheme())
+    if message_name is None:
+        print_warning("Exiting editing process for message {}".format(resource.get('fullName')))
+        exit(1)
+    else:
+        message_name = message_name['message_name']
+    
+    _pkg = wz_json.get_package(resource.get('fullName').split('.')[1],False)
+    new_full_name = '{}.{}'.format('.'.join(resource.get('fullName').split('.')[:-1]),message_name)
+
+   
+
+    if next((msg for msg in _pkg.messages if msg.name == message_name),None) is None:
+        print_success("Renaming {} -> {}".format(resource.get('fullName'),new_full_name))
+        # Handling all dependencies and rename the type as well
+        for d in dependencies:
+            if d.get('kind') == resources.ResourceKinds.field.value:
+                edit_field(d,'modify',['message_type',new_full_name],wz_json,architect,False,True)
+
+        old_name = resource['name']
+        resource['name'] = message_name
+        resource['fullName'] = new_full_name
+        architect.EditMessage(_pkg, resource.get('name'),
+                            resource.get('fields'), resource.get('description'), resource.get('extensionType'),old_name)
+        architect.Save()
+    else:
+        print_error("{} is already existing under {} package !".format(message_name,resource.get('fullName').split('.')[1]))
+        exit(1)
+    
+
+    
+
+def message_name_validation(answers, current):
+    """Validate renaming of messages"""
+
+    if len(current) == 0:
+        raise inquirerErrors.ValidationError(
+            current, reason='Resource name must not be blank')
+    if len(re.findall('\s', current)) > 0:
+        raise inquirerErrors.ValidationError(
+            current, reason='Resource name must not include blank spaces')
+    if len(re.findall('-', current)) > 0:
+        raise inquirerErrors.ValidationError(
+            current, reason='Resource name must not include hyphens, underscores are allowed')
+    return True

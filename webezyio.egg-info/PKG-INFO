@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: webezyio
-Version: 0.0.10
+Version: 0.1.0
 Summary: Webezy.io CLI for generating gRPC micro-services
 Author-email: Amit Shmulevitch <amitsh1995@gmail.com>
 License: Copyright (c) 2022 Webezy.io.
@@ -44,7 +44,7 @@ License-File: LICENSE
 
 [webezyio](./docs/webezyio_concepts.md) is free and open-source project that aims to be a complete framework for developing micro-services projects.
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
-It utulize those communication protocol, message serialization / deserialization and code generator with [```gRPC```](https://grpc.io) opensource project by google. 
+It utulize those communication protocol, message serialization / deserialization and code generator with [```gRPC```](https://grpc.io) open-source project by google. 
 
 Webezy.io has been created to give devlopers quick and structerd way for building gRPC services without pain while keeping thins open for further modifications.
 
@@ -53,10 +53,11 @@ In result we are trying not to restrict the implemantations themselves but inste
 The current supported languages are:
 | **Language** | **Server** | **Client** |   **Status**   |
 |:------------:|:----------:|:----------:|:--------------:|
-|    Python    |    **V**   |    **V**   |     Stable     |
-|  Typescript  |    **V**   |    **V**   |     Stable     |
-| Go           |    **X**   |    **X**   | In-Development |
+|    [Python](./docs/python.md)    |    **V**   |    **V**   |     Stable     |
+|  [Typescript](./docs/typescript.md)  |    **V**   |    **V**   |     Stable     |
+| [Go](./docs/go.md)           |    **X**   |    **V**   | Experimental   |
 | C#.NET       |    **X**   |    **X**   |     Planned    |
+
 
 Get full explanation and many more details on usage at [```webezy.io```](https://www.webezy.io).
 
@@ -82,7 +83,21 @@ __Useful Resources__:
 
 - [API Design Guide From Google - Matches well into gRPC specific design patterns](https://cloud.google.com/apis/design/)
 
+# Features:
 
+- __CLI__ Well structerd CLI wrapper to create, edit, run and debug a RPC call to gRPC services
+- __Generated Code__ Auto-Generated code classes for Services implemantations and client stubs
+    * [Python](./docs/python.md)
+    * [Typescript](./docs/typescript.md)
+    * [Go](./docs/go.md) (Only Client For Now)
+- __Plugins__ Highly pluggable API allow us to create and publish "Extensions" without breaking the code:
+    * Readme generator
+    * Languages Builder - (Python, Typescript & Go)
+    * Proto Builder
+    * Dockerize (In-development)
+    * Migrate gRPC services to Webezy.io project
+- __Templating__ As a Webezy.io project grows you can template it and share it to your peers for remote work (Branching) or as a 'Built-in' template to be used by other co-workers
+- __Unified Extensions__ We have been working on unification process of `Protobuf` Extensions (Calles Custom Options) which will allow us in the future to release more pluggable features directly into your Webezy.io workspace
 
 __Tutorials:__
 - [Quick Start](https://www.webezy.io/docs/quick-start)

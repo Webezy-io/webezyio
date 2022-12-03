@@ -1,0 +1,28 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+
+package webezy.WebezyTemplate.v1;
+
+
+
+// [webezyio] - The main configurations for webezy.io template
+message Config {
+	// [webezyio] - The template name
+	string name = 1;
+	// [webezyio] - The output path for the template script
+	string out_path = 2;
+	// [webezyio] - The files to include when using 'include_code' field
+	repeated string include = 3;
+	// [webezyio] - The files to exclude when using 'include_code' field
+	repeated string exclude = 4;
+	// [webezyio] - The optional tags to associate with the template
+	repeated string tags = 5;
+	// [webezyio] - The template description
+	string description = 6;
+	// [webezyio] - The author email or name
+	string author = 7;
+	// [webezyio] - If to include code files in the generated template script
+	bool include_code = 8;
+}
+

@@ -1,0 +1,48 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+
+package webezy.WebezyPrometheus.v1;
+
+
+
+// [webezyio] - The prometheus global configs
+message GlobalConfig {
+	// [webezyio] - The global scrape interval in secondes
+	int32 scrape_interval = 1;
+}
+
+// [webezyio] - The label for the static config
+message StaticConfigLabel {
+	// [webezyio] - The service name
+	string service_name = 1;
+	// [webezyio] - the group
+	string group = 2;
+}
+
+// [webezyio] - The static config specified for job
+message StaticConfig {
+	// [webezyio] - The targets array consist of HOST:PORT value
+	repeated string targets = 1;
+	// [webezyio] - 
+	repeated webezy.WebezyPrometheus.v1.StaticConfigLabel labels = 2;
+}
+
+// [webezyio] - The prometheus scrape specific configs
+message ScrapeConfig {
+	// [webezyio] - The specified job name
+	string job_name = 1;
+	// [webezyio] - The scrape interval for the specified job - in secondes
+	int32 scrape_interval = 2;
+	// [webezyio] - 
+	repeated webezy.WebezyPrometheus.v1.StaticConfig static_configs = 3;
+}
+
+// [webezyio] - The prometheus description for configuration file
+message Config {
+	// [webezyio] - The global configurations for prometheus
+	webezy.WebezyPrometheus.v1.GlobalConfig global_config = 1;
+	// [webezyio] - The list of scrapes for prometheus
+	repeated webezy.WebezyPrometheus.v1.ScrapeConfig scrape_configs = 2;
+}
+

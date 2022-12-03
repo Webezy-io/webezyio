@@ -10,9 +10,9 @@ import sys
 
 
 project = 'webezyio'
-copyright = '2022, Amit Shmulevitch'
+copyright = 'Webezy.io 2022, Amit Shmulevitch'
 author = 'Amit Shmulevitch'
-release = '0.0.1'
+release = '0.1.1'
 
 sys.path.append('/Users/amitshmulevitch/Projects/wz/webezyio')
 # -- General configuration ---------------------------------------------------
@@ -21,16 +21,21 @@ extensions = [
     'sphinx.ext.duration',
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'myst_parser'
 ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']

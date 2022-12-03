@@ -40,10 +40,10 @@ from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
-from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template
+from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template, config as config_command
 from pathlib import Path
 
-_TEMPLATES = config.webezyio_templates
+_TEMPLATES = config.configs.webezyio_templates
 # templates_dir = os.path.dirname(os.path.dirname(__file__))+'/commons/templates'
 # for d in file_system.walkDirs(templates_dir):
 #     if d != templates_dir:
@@ -132,17 +132,15 @@ wz_g_e_q = [
 def main(args=None):
     print(theme.logo_ascii_art_color)
 
-    if config.first_run:
+    if config.configs.first_run:
         analytic = inquirer.prompt([inquirer.Confirm('analytic',default=True,message='We want to gather some basic usage and bug report while you are using webezyio CLI')],theme=WebezyTheme())
         p = Path(__file__).parents[1]
         hash_token=platform()+':'+datetime.today().isoformat()
 
         config_file = ''.join(file_system.rFile(file_system.join_path(p,'config.py')))
-        if 'token=' not in config_file:
-            config_file +='\ntoken="{0}"'.format(hash_token)
-            log.debug('Token already exists on current installation')
-       
+        config_file = config_file.replace('token=""','token="{}"'.format(hash_token))
         file_system.wFile(file_system.join_path(p,'config.py'),content=config_file,overwrite=True)
+
         if analytic is None or analytic.get('analytic') == False:
             reload(config)
             helpers.send_analytic_event({'DisabledAnalytic':hash_token})
@@ -242,7 +240,7 @@ def main(args=None):
         'edit', help='Edit any webezy.io resource')
     parser_edit.add_argument('name', help='Resource full name')
     parser_edit.add_argument('-a','--action',choices=['add','remove','modify'], help='Choose which action to preform on resource')
-    parser_edit.add_argument('--sub-action', help='Choose which sub-action to preform on resource')
+    parser_edit.add_argument('--sub-actions',nargs='*', help='Choose which sub-action to preform on resource')
 
     """Template command"""
     parser_template = subparsers.add_parser(
@@ -290,6 +288,13 @@ def main(args=None):
     praser_migrate.add_argument('--server-language',default='python',choices=['python','typescript'],help='Chose a server language for migration')
     praser_migrate.add_argument('--clients',nargs='*',default=['python'],choices=['python','typescript'],help='Enter one or more clients')
 
+    """Configs command"""
+    parse_configs = subparsers.add_parser(
+        'configs', help='Display Webezy.io Configurations')
+    parse_configs.add_argument('--edit',action="store_true", help='Edit configurations')
+    parse_configs.add_argument('--dict',action="store_true",default=False, help='Display all configs of of current project in dictionary mode')
+
+
     # Utils
     parser.add_argument('-v', '--version', action='store_true',
                         help='Display webezyio current installed version')
@@ -318,7 +323,7 @@ def main(args=None):
     log.setLevel(args.loglevel)
     log.debug(args)
 
-    if config.analytics:
+    if config.configs.analytics:
         helpers.send_analytic_event(args)
 
     # Logging version
@@ -446,7 +451,7 @@ def main(args=None):
                     print_success("Purged webezy context !")
                 else:
                     print_warning("Cancelling purge for webezy context")
-            elif hasattr(args,'debug'):
+            elif hasattr(args,'debug') and hasattr(args, 'rpc') == False:
                 """Run command process"""
 
                 run.run_server(WEBEZY_JSON,args.debug)
@@ -465,15 +470,15 @@ def main(args=None):
                 elif type == 'descriptors':
                     kind = resource.get('kind')
                     if kind == resources.ResourceKinds.enum.value:
-                        edit.edit_enum(resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+                        edit.edit_enum(resource,action=args.action,sub_actions=args.sub_actions,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
                     elif kind == resources.ResourceKinds.enum_value.value:
                         edit.edit_enum_value(resource,args.action,WEBEZY_JSON,ARCHITECT)
                     elif kind == resources.ResourceKinds.field.value:
-                        edit.edit_field(resource,args.action,WEBEZY_JSON,ARCHITECT)
+                        edit.edit_field(resource,action=args.action,sub_actions=args.sub_actions,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
                     elif kind == resources.ResourceKinds.message.value:
-                        edit.edit_message(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+                        edit.edit_message(resource=resource,action=args.action,sub_actions=args.sub_actions,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
                     elif kind == resources.ResourceKinds.method.value:
-                        edit.edit_rpc(resource=resource,action=args.action,sub_action=args.sub_action,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
+                        edit.edit_rpc(resource=resource,action=args.action,sub_actions=args.sub_actions,wz_json=WEBEZY_JSON,architect=ARCHITECT,expand=args.expand)
             
             elif hasattr(args,'name') and hasattr(args,'extension'):
                 """Extend command process"""
@@ -486,20 +491,18 @@ def main(args=None):
                 ARCHITECT = WebezyArchitect(
                     path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
                 template_commands(args,WEBEZY_JSON,ARCHITECT)
+            
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
                 """Call command process"""
-
+                print_note(f"Calling {args.service}->{args.rpc}")
                 call.CallRPC(args.service,args.rpc,WEBEZY_JSON,host=args.host,port=args.port,debug=args.debug,timeout=int(args.timeout))
-                # if file_system.get_current_location() not in sys.path:
-                #     sys.path.append(file_system.get_current_location())
-                # path = args.service.replace('/','.').replace('.py','')
-                # stub_name = path.split('.')[-1].replace('_pb2_grpc','')+'Stub'
-                # rpc = args.rpc
-                # print_info(f'{path = } {rpc = }')
-                # service_module = importlib.import_module(path)
-                # stub = client_wrapper.WebezyioClient(service_module,stub_name,'localhost',50051)
-                # response = getattr(stub, rpc)()
-                # print_info(f'{response = }')
+            
+            elif hasattr(args, 'edit'):
+                """Config command"""
+                if args.edit:
+                    print_warning('Nout supporting editing of webezy.io configurations through the CLI yet...')
+                else:
+                    config_command.display_configs(WEBEZY_JSON.path,dictionary=args.dict)
             else:
                 if hasattr(args, 'full_name'):
                     if args.full_name is None:
@@ -512,7 +515,7 @@ def main(args=None):
                         print_warning("Cant migrate existing Webezy.io project !")
                         exit(1)
                     parser.print_help()
-        
+            
         else:
             if hasattr(args,'protos'):
                 migrate.migrate_project(args.protos,output_path=file_system.get_current_location(),format='json',server_language=args.server_language,clients=args.clients)
@@ -583,7 +586,7 @@ def parse_name_to_resource(full_name,wz_json: helpers.WZJson):
            resource = wz_json.services.get(full_name)
 
     if resource is None:
-        print_error(f'Couldnt find any resource by the name -> {full_name}')
+        print_error(f'Can not find any resource by the name -> {full_name}\n\t-> Try running: $ wz ls')
         exit(1)
     else:
         log.debug('Found resource {0}:{1}'.format(resource.get('type'),resource.get('kind')))

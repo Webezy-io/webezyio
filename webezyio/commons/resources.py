@@ -33,8 +33,10 @@ from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
     FieldDescriptor, ServiceDescriptor, EnumDescriptor
 from grpc_tools import command
+import inquirer
+from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import errors
-from webezyio.commons.pretty import print_info, print_note
+from webezyio.commons.pretty import print_info, print_note, print_warning
 
 from webezyio.commons.protos.webezy_pb2 import EnumValueDescriptor, WebezyJson, Project, WebezyConfig,\
     Language, WebezyServer, WebezyClient,\
@@ -75,6 +77,7 @@ class ResourceKinds(Enum):
     file_ts = 'Webezy.file/typescript'
     file_py = 'Webezy.file/python'
     file_cs = 'Webezy.file/csharp'
+    file_go = 'Webezy.file/go'
     file_cpp = 'Webezy.file/cpp'
     file_java = 'Webezy.file/java'
     method = 'Webezy.descriptor/method'
@@ -120,16 +123,30 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
     else:
         raise errors.WebezyValidationError('Server Language Error','Must pass a valid server language for your new project')
     server = WebezyServer(language=Language.Name(temp_langugae))
+    
+    # Creating packaeg name for project
+    if package_name is None:
+        package_name = name.replace('-', '').replace('_', '').lower()
+
     # Parse clients
+    go_package = None
     temp_clients = []
     if len(clients) > 0:
         for c in clients:
-
             if c['language'] == 'python':
                 temp_c_lang = Language.python
             elif c['language'] == 'typescript':
                 temp_c_lang = Language.typescript
-
+            elif c['language'] == 'go':
+                temp_c_lang = Language.go
+                if json:
+                    go_package = inquirer.prompt([inquirer.Text('go_package','Enter a prefix to support Go package','github.com')],theme=WebezyTheme())
+                if go_package is not None:
+                    go_package = '{}/{}'.format(go_package['go_package'],package_name)
+                else:
+                    go_package = 'github.com/{}'.format(package_name)
+            else:
+                raise errors.WebezyValidationError('Client Language Error','Client {} is not supported'.format(c['language']))
             client = WebezyClient(out_dir=get_uri_client(
                 path, c['language']), language=Language.Name(temp_c_lang))
             temp_clients.append(client)
@@ -138,13 +155,11 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
         client = WebezyClient(out_dir=get_uri_client(
             path, 'python'), language='python')
         temp_clients.append(client)
-    # Creating packaeg name for project
-    if package_name is None:
-        package_name = name.replace('-', '').replace('_', '').lower()
+  
     # Init project
     project = Project(uri=get_uri_project(path, name), name=name, package_name=package_name,
                       version='0.0.1', type=ResourceTypes.project.value, kind=ResourceKinds.ezy_1.value,
-                      server_language=server_langauge, server=server, clients=temp_clients)
+                      server_language=server_langauge, server=server, clients=temp_clients,go_package=go_package)
     # Return project as message or dict
     return project if json == False else MessageToDict(project)
 
@@ -155,7 +170,6 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     temp_methods = []
     if methods:
         for m in methods:
-            print_info(m,True)
             temp_methods.append(ParseDict(m,WZMethodDescriptor()))
     service = WZServiceDescriptor(uri=get_uri_service(path, name, service_language.lower()),
                                   name=name, full_name=get_service_full_name(domain, name), dependencies=dependencies,
@@ -360,6 +374,10 @@ def get_uri_client(path, language):
         uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_py)
     elif language == 'typescript':
         uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_ts)
+    elif language == 'go':
+        uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_go)
+    else:
+        raise errors.WebezyValidationError('Client Not Supported','Client of type {} is not supported yet !'.format(language))
     return uri
 
 
@@ -549,3 +567,6 @@ def parse_proto_extension(field_opt_type,field_opt_label,description,value,field
             print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,description.full_name))
     
     return field_extensions
+
+def add_field_to_message():
+    pass

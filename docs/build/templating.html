@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service templating &mdash; webezyio 0.1.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Builder plugins" href="builder_api.html" />
+    <link rel="prev" title="Developing Webezy.io Projects With Typescript" href="typescript.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Service templating</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-template-from-service">Create a template from service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-a-template-for-blank-service">Load a template for blank service</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-template-options">Configure template options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#read-more">Read more</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Service templating</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/templating.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="service-templating">
+<h1>Service templating<a class="headerlink" href="#service-templating" title="Permalink to this heading"></a></h1>
+<p>A unique feature allow you to develop locally your project and generate a template or a “Snapshot” of your project resources which can be shared or built on top for versions or branches the generated script currently in <code class="docutils literal notranslate"><span class="pre">Python</span></code> only. (Future use may include Typescript as well)</p>
+<p>This script can be consumed by the <code class="docutils literal notranslate"><span class="pre">Webezy.io</span> <span class="pre">CLI</span></code> to generate your webezy.json and all other directories structure, then you can normally like every webezy project edit or add resources as you wish ! as it was your own services from scratch, allowing you to develop fast and even build your own “Opensource” template which can be reused or refactored as user wish.</p>
+<p>Also you can create a new template which holds generated code to <code class="docutils literal notranslate"><span class="pre">WebezyArchitect</span></code> class based on your already pre-defined services, which we use this technique to distribute services templates that can be installed on different projects.</p>
+<section id="create-a-template-from-service">
+<h2>Create a template from service<a class="headerlink" href="#create-a-template-from-service" title="Permalink to this heading"></a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>webezy template &lt;path/to/webezy.json&gt; --out-path templates --template-name &lt;SomeTemplate&gt;
+</pre></div>
+</div>
+</section>
+<section id="load-a-template-for-blank-service">
+<h2>Load a template for blank service<a class="headerlink" href="#load-a-template-for-blank-service" title="Permalink to this heading"></a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>webezy template &lt;mycustom.template.py&gt; --load
+</pre></div>
+</div>
+<p><a class="reference download internal" download="" href="_downloads/29a3c68eabc4dfce3cc2b8f28cbf7499/test.py"><span class="xref download myst">WebezyArchitect API Example</span></a></p>
+<p><strong>Builtins Templates</strong>:</p>
+<p>You can use quick start templates that are built in the webezyio.commons.template module as follows:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># A sample python server</span>
+wz new &lt;SomeProject&gt; --template @webezyio/SamplePy
+<span class="c1"># A sample typescript server</span>
+wz new &lt;SomeProject&gt; --template @webezyio/SampleTs
+</pre></div>
+</div>
+<p><a class="reference download internal" download="" href="_downloads/a8af61e20b3888c79a5cc6ff79c43632/HelloWorldPy.template.py"><span class="xref download myst">HelloWorld Python Template</span></a> - <code class="docutils literal notranslate"><span class="pre">&#64;webezyio/HelloWorldPy</span></code></p>
+<p><a class="reference download internal" download="" href="_downloads/cb75f7c5c4638fa0c1e352dc3e3ce4c7/HelloWorldTs.template.py"><span class="xref download myst">HelloWorld Typescript Template</span></a> - <code class="docutils literal notranslate"><span class="pre">&#64;webezyio/HelloWorldTs</span></code></p>
+<p><a class="reference external" href="https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py">SamplePy Template</a> - <code class="docutils literal notranslate"><span class="pre">&#64;webezyio/SamplePy</span></code></p>
+<p><a class="reference external" href="https://github.com/Webezy-io/webezyio/blob/main/webezyio/commons/templates/webezyio/SamplePy.template.py">SampleTs Template</a> - <code class="docutils literal notranslate"><span class="pre">&#64;webezyio/SamplePy</span></code></p>
+<p><a class="reference download internal" download="" href="_downloads/9a3170560eff0e8080a7006943761820/PubSubTs.template.py"><span class="xref download myst">Publisher Subscriber Typescript Template</span></a> - <code class="docutils literal notranslate"><span class="pre">&#64;webezyio/PubSubTs</span></code></p>
+<blockquote>
+<div><p><strong>Note</strong> You can list all available templates with the following command: <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">template</span> <span class="pre">list</span></code></p>
+</div></blockquote>
+</section>
+<section id="configure-template-options">
+<h2>Configure template options<a class="headerlink" href="#configure-template-options" title="Permalink to this heading"></a></h2>
+<p>Each template can be configured in <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file under <code class="docutils literal notranslate"><span class="pre">&quot;config&quot;</span></code> value for easy generating without elborate CLI commands:</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">webezy.json</span></code></strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;template&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;outPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;template&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SamplePy&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A basic sample project for webezyio. It is included with examples for all RPC&#39;s types and using Enums + Nested Messages, including &#39;Well Known&#39; messages from google&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;include&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">        </span><span class="s2">&quot;typescript.ts&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="s2">&quot;python.py&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="s2">&quot;services&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p">],</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Amit Shmulevitch&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;includeCode&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Or alternatively <strong><code class="docutils literal notranslate"><span class="pre">config.py</span></code></strong></p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">template</span><span class="o">=</span><span class="p">{</span>
+  <span class="s2">&quot;outPath&quot;</span><span class="p">:</span> <span class="s2">&quot;template&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SamplePy&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A basic sample project for webezyio.</span><span class="se">\</span>
+<span class="s2">    It is included with examples for all RPC&#39;s types</span><span class="se">\</span>
+<span class="s2">    and using Enums + Nested Messages, including &#39;Well Known&#39;</span><span class="se">\</span>
+<span class="s2">    messages from google&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;typescript.ts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;python.py&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;services&quot;</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Amit Shmulevitch&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;includeCode&quot;</span><span class="p">:</span> <span class="kc">True</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>With those specifications described above we can now call the <code class="docutils literal notranslate"><span class="pre">template</span></code> command without any further arguments.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz template webezy.json
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong> the “includeCode” key it can be passed as <code class="docutils literal notranslate"><span class="pre">-c</span></code> / <code class="docutils literal notranslate"><span class="pre">--code</span></code> argument to <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">template</span></code> command, it is passed to the exporter of template and includes all files listed under project while searching for <code class="docutils literal notranslate"><span class="pre">&quot;include&quot;</span></code> list of files and folders then cross checking the <code class="docutils literal notranslate"><span class="pre">&quot;exclude&quot;</span></code> list against them - Each file listed in the “includes” array will be compressed and attached to the template script.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Warning</strong> DO NOT set sensitive information on template code files that are included on template, such as keys and secrets as it will be copied to the template script.</p>
+</div></blockquote>
+</section>
+<section id="read-more">
+<h2>Read more<a class="headerlink" href="#read-more" title="Permalink to this heading"></a></h2>
+<p>See more info on <span class="xref myst">templating and project configurations</span></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="typescript.html" class="btn btn-neutral float-left" title="Developing Webezy.io Projects With Typescript" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="builder_api.html" class="btn btn-neutral float-right" title="Builder plugins" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

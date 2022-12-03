@@ -12,10 +12,34 @@ webezyio.builder.plugins.WebezyBase module
    :undoc-members:
    :show-inheritance:
 
+webezyio.builder.plugins.WebezyDocker module
+--------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyDocker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.WebezyGoClient module
+----------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyGoClient
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 webezyio.builder.plugins.WebezyMigrate module
 ---------------------------------------------
 
 .. automodule:: webezyio.builder.plugins.WebezyMigrate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.WebezyMonitor module
+---------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyMonitor
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,10 +52,26 @@ webezyio.builder.plugins.WebezyProto module
    :undoc-members:
    :show-inheritance:
 
+webezyio.builder.plugins.WebezyProxy module
+-------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyProxy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 webezyio.builder.plugins.WebezyPy module
 ----------------------------------------
 
 .. automodule:: webezyio.builder.plugins.WebezyPy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.WebezyPyClient module
+----------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyPyClient
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,10 +84,34 @@ webezyio.builder.plugins.WebezyReadme module
    :undoc-members:
    :show-inheritance:
 
-webezyio.builder.plugins.WebezyTs module
-----------------------------------------
+webezyio.builder.plugins.WebezyTsClient module
+----------------------------------------------
 
-.. automodule:: webezyio.builder.plugins.WebezyTs
+.. automodule:: webezyio.builder.plugins.WebezyTsClient
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.WebezyTsServer module
+----------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyTsServer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.WebezyUnitPy module
+--------------------------------------------
+
+.. automodule:: webezyio.builder.plugins.WebezyUnitPy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+webezyio.builder.plugins.static module
+--------------------------------------
+
+.. automodule:: webezyio.builder.plugins.static
    :members:
    :undoc-members:
    :show-inheritance:

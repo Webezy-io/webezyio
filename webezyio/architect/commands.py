@@ -58,7 +58,7 @@ class EditResource(ICommand):
         self._builder = builder
 
     def execute(self,webezyJson,resource,*args):
-        self._builder.edit_resource(webezyJson,resource=resource)
+        self._builder.edit_resource(webezyJson,resource,args)
 
 class RemoveResource(ICommand):
     def __init__(self, builder:Builder):
