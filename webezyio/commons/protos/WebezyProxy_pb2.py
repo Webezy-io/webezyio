@@ -16,7 +16,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11WebezyProxy.proto\x12\x15webezy.WebezyProxy.v1\"-\n\x0cProxyAddress\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\":\n\x0eProxyStatsSink\x12\x18\n\x10tcp_cluster_name\x18\x01 \x01(\t\x12\x0e\n\x06prefix\x18\x02 \x01(\t\"S\n\rProxyListener\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x34\n\x07\x61\x64\x64ress\x18\x02 \x01(\x0b\x32#.webezy.WebezyProxy.v1.ProxyAddress\"E\n\rProxyEndpoint\x12\x34\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32#.webezy.WebezyProxy.v1.ProxyAddress\"U\n\x0cProxyCluster\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x37\n\tendpoints\x18\x02 \x03(\x0b\x32$.webezy.WebezyProxy.v1.ProxyEndpoint\"\xe2\x01\n\x06\x43onfig\x12\x32\n\x05\x61\x64min\x18\x01 \x01(\x0b\x32#.webezy.WebezyProxy.v1.ProxyAddress\x12\x34\n\x05stats\x18\x02 \x01(\x0b\x32%.webezy.WebezyProxy.v1.ProxyStatsSink\x12\x37\n\tlisteners\x18\x03 \x03(\x0b\x32$.webezy.WebezyProxy.v1.ProxyListener\x12\x35\n\x08\x63lusters\x18\x04 \x03(\x0b\x32#.webezy.WebezyProxy.v1.ProxyClusterb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11WebezyProxy.proto\x12\x15webezy.WebezyProxy.v1\"-\n\x0cProxyAddress\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\":\n\x0eProxyStatsSink\x12\x18\n\x10tcp_cluster_name\x18\x01 \x01(\t\x12\x0e\n\x06prefix\x18\x02 \x01(\t\"S\n\rProxyListener\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x34\n\x07\x61\x64\x64ress\x18\x02 \x01(\x0b\x32#.webezy.WebezyProxy.v1.ProxyAddress\"E\n\rProxyEndpoint\x12\x34\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32#.webezy.WebezyProxy.v1.ProxyAddress\"U\n\x0cProxyCluster\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x37\n\tendpoints\x18\x02 \x03(\x0b\x32$.webezy.WebezyProxy.v1.ProxyEndpoint\"\xe7\x01\n\x0bProxyConfig\x12\x32\n\x05\x61\x64min\x18\x01 \x01(\x0b\x32#.webezy.WebezyProxy.v1.ProxyAddress\x12\x34\n\x05stats\x18\x02 \x01(\x0b\x32%.webezy.WebezyProxy.v1.ProxyStatsSink\x12\x37\n\tlisteners\x18\x03 \x03(\x0b\x32$.webezy.WebezyProxy.v1.ProxyListener\x12\x35\n\x08\x63lusters\x18\x04 \x03(\x0b\x32#.webezy.WebezyProxy.v1.ProxyClusterb\x06proto3')
 
 
 
@@ -25,17 +25,26 @@ _PROXYSTATSSINK = DESCRIPTOR.message_types_by_name['ProxyStatsSink']
 _PROXYLISTENER = DESCRIPTOR.message_types_by_name['ProxyListener']
 _PROXYENDPOINT = DESCRIPTOR.message_types_by_name['ProxyEndpoint']
 _PROXYCLUSTER = DESCRIPTOR.message_types_by_name['ProxyCluster']
-_CONFIG = DESCRIPTOR.message_types_by_name['Config']
+_PROXYCONFIG = DESCRIPTOR.message_types_by_name['ProxyConfig']
 
 @overload
-class ProxyAddress:
+class ProxyAddress(_message.Message):
 	"""webezyio generated message [webezy.WebezyProxy.v1.ProxyAddress]
 	A class respresent a ProxyAddress type
-	"""
+	The proxy settings global address
+		"""
 	address = str # type: str
 	port = int # type: int
 
 	def __init__(self, address=str, port=int):
+		"""
+		Attributes:
+		----------
+		address : str
+			The address for the proxy
+		port : int
+			The proxy address port
+		"""
 		pass
 ProxyAddress = _reflection.GeneratedProtocolMessageType('ProxyAddress', (_message.Message,), {
   'DESCRIPTOR' : _PROXYADDRESS,
@@ -46,14 +55,23 @@ _sym_db.RegisterMessage(ProxyAddress)
 
 
 @overload
-class ProxyStatsSink:
+class ProxyStatsSink(_message.Message):
 	"""webezyio generated message [webezy.WebezyProxy.v1.ProxyStatsSink]
 	A class respresent a ProxyStatsSink type
-	"""
+	The proxy stats sink
+		"""
 	tcp_cluster_name = str # type: str
 	prefix = str # type: str
 
 	def __init__(self, tcp_cluster_name=str, prefix=str):
+		"""
+		Attributes:
+		----------
+		tcp_cluster_name : str
+			The same cluster name as specified at the clusters array
+		prefix : str
+			
+		"""
 		pass
 ProxyStatsSink = _reflection.GeneratedProtocolMessageType('ProxyStatsSink', (_message.Message,), {
   'DESCRIPTOR' : _PROXYSTATSSINK,
@@ -64,14 +82,23 @@ _sym_db.RegisterMessage(ProxyStatsSink)
 
 
 @overload
-class ProxyListener:
+class ProxyListener(_message.Message):
 	"""webezyio generated message [webezy.WebezyProxy.v1.ProxyListener]
 	A class respresent a ProxyListener type
-	"""
+	The proxy listener configs
+		"""
 	name = str # type: str
 	address = ProxyAddress # type: ProxyAddress
 
 	def __init__(self, name=str, address=ProxyAddress):
+		"""
+		Attributes:
+		----------
+		name : str
+			The listsener name
+		address : ProxyAddress
+			The listener address details
+		"""
 		pass
 ProxyListener = _reflection.GeneratedProtocolMessageType('ProxyListener', (_message.Message,), {
   'DESCRIPTOR' : _PROXYLISTENER,
@@ -82,13 +109,20 @@ _sym_db.RegisterMessage(ProxyListener)
 
 
 @overload
-class ProxyEndpoint:
+class ProxyEndpoint(_message.Message):
 	"""webezyio generated message [webezy.WebezyProxy.v1.ProxyEndpoint]
 	A class respresent a ProxyEndpoint type
-	"""
+	The proxy endpoint config
+		"""
 	address = ProxyAddress # type: ProxyAddress
 
 	def __init__(self, address=ProxyAddress):
+		"""
+		Attributes:
+		----------
+		address : ProxyAddress
+			The endpoint address
+		"""
 		pass
 ProxyEndpoint = _reflection.GeneratedProtocolMessageType('ProxyEndpoint', (_message.Message,), {
   'DESCRIPTOR' : _PROXYENDPOINT,
@@ -99,14 +133,23 @@ _sym_db.RegisterMessage(ProxyEndpoint)
 
 
 @overload
-class ProxyCluster:
+class ProxyCluster(_message.Message):
 	"""webezyio generated message [webezy.WebezyProxy.v1.ProxyCluster]
 	A class respresent a ProxyCluster type
-	"""
+	The proxy cluster details
+		"""
 	name = str # type: str
 	endpoints = List[ProxyEndpoint] # type: List[ProxyEndpoint]
 
 	def __init__(self, name=str, endpoints=List[ProxyEndpoint]):
+		"""
+		Attributes:
+		----------
+		name : str
+			The cluster name
+		endpoints : List[ProxyEndpoint]
+			The cluster endpoints
+		"""
 		pass
 ProxyCluster = _reflection.GeneratedProtocolMessageType('ProxyCluster', (_message.Message,), {
   'DESCRIPTOR' : _PROXYCLUSTER,
@@ -117,23 +160,36 @@ _sym_db.RegisterMessage(ProxyCluster)
 
 
 @overload
-class Config:
-	"""webezyio generated message [webezy.WebezyProxy.v1.Config]
-	A class respresent a Config type
-	"""
+class ProxyConfig(_message.Message):
+	"""webezyio generated message [webezy.WebezyProxy.v1.ProxyConfig]
+	A class respresent a ProxyConfig type
+	The main configurations for envoy proxy
+		"""
 	admin = ProxyAddress # type: ProxyAddress
 	stats = ProxyStatsSink # type: ProxyStatsSink
 	listeners = List[ProxyListener] # type: List[ProxyListener]
 	clusters = List[ProxyCluster] # type: List[ProxyCluster]
 
 	def __init__(self, admin=ProxyAddress, stats=ProxyStatsSink, listeners=List[ProxyListener], clusters=List[ProxyCluster]):
+		"""
+		Attributes:
+		----------
+		admin : ProxyAddress
+			The admin configurations
+		stats : ProxyStatsSink
+			The proxy stats sink configurations
+		listeners : List[ProxyListener]
+			The proxy listeners
+		clusters : List[ProxyCluster]
+			The proxy clusters
+		"""
 		pass
-Config = _reflection.GeneratedProtocolMessageType('Config', (_message.Message,), {
-  'DESCRIPTOR' : _CONFIG,
+ProxyConfig = _reflection.GeneratedProtocolMessageType('ProxyConfig', (_message.Message,), {
+  'DESCRIPTOR' : _PROXYCONFIG,
   '__module__' : 'WebezyProxy_pb2'
-  # @@protoc_insertion_point(class_scope:webezy.WebezyProxy.v1.Config)
+  # @@protoc_insertion_point(class_scope:webezy.WebezyProxy.v1.ProxyConfig)
   })
-_sym_db.RegisterMessage(Config)
+_sym_db.RegisterMessage(ProxyConfig)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
@@ -148,6 +204,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _PROXYENDPOINT._serialized_end=305
   _PROXYCLUSTER._serialized_start=307
   _PROXYCLUSTER._serialized_end=392
-  _CONFIG._serialized_start=395
-  _CONFIG._serialized_end=621
+  _PROXYCONFIG._serialized_start=395
+  _PROXYCONFIG._serialized_end=626
 # @@protoc_insertion_point(module_scope)

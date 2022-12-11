@@ -25,7 +25,7 @@ import re
 import inquirer
 from webezyio.architect import WebezyArchitect
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import helpers,resources,errors
+from webezyio.commons import helpers,resources,errors,protos
 from inquirer import errors as inquirerErrors
 from webezyio.commons.pretty import print_error, print_info,bcolors, print_note, print_success,print_warning
 log = logging.getLogger('webezyio.cli.main')
@@ -156,7 +156,7 @@ def edit_enum(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webez
     else:
         # Prompting for sub-action
         if sub_actions is None:
-            modify_resource([('Add values','values'),('Rename','name')])
+            sub_actions = modify_resource([('Add values','values'),('Rename','name')])
         # Add values
         if sub_actions[0] == 'values' :
             add_values(resource,wz_json,architect=architect,expand=expand)
@@ -261,15 +261,26 @@ def edit_field(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webe
                 print_error("Cancelling deletion process")
 
     elif action.lower() == 'modify':
-        print_note('Sub Actions: {}'.format(sub_actions),True,'Modifying field')
+        resource_full_name = resource.get('fullName')
+        print_note('[{}] Sub Actions: {}'.format(resource_full_name,sub_actions),True,'Modifying field')
         # Prompting for sub-action
         if sub_actions is None:
-            sub_actions = [('Change Label','label'),('Change Type','type'),('Rename','name')]
+            # Not supporting by intention changing label for ONEOF + MAP fields
+            if resource.get('fieldType') != 'TYPE_ONEOF' and resource.get('fieldType') != 'TYPE_MAP':
+                sub_actions = [('Change Label','label'),('Change Type','type'),('Rename','name')]
+            else:
+                sub_actions = [('Rename','name')]
+
+            # TODO add handling of map type TYPE_MAP
+            # One of type handling
+            if resource.get('fieldType') == 'TYPE_ONEOF':
+                sub_actions.append(('Modify oneof fields','oneof_modify'))
+            # Message type handling
             if resource.get('fieldType') == 'TYPE_MESSAGE':
                 sub_actions.append(('Change Message Type','message_type'))
+            # Enum type handling
             if resource.get('fieldType') == 'TYPE_ENUM':
                 sub_actions.append(('Change Enum Type','enum_type'))
-            # TODO handle TYPE_MAP
             sub_actions = modify_resource(sub_actions)
         # Edit field type
         if sub_actions[0] == 'type' :
@@ -284,25 +295,27 @@ def edit_field(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webe
         # Changing message_type if field type is TYPE_MESSAGE
         elif sub_actions[0] == 'message_type':
             # Getting message dict
-            _msg = wz_json.get_message('.'.join(resource.get('fullName').split('.')[:-1]))
+            msg_name = '.'.join(resource.get('fullName').split('.')[:-1])
+            _msg = wz_json.get_message(msg_name)
+
             # Getting package descriptor
             _pkg = wz_json.get_package(resource.get('fullName').split('.')[1],False)
             if _msg is not None:
                 if len(sub_actions) > 1 :
                     if len(sub_actions[1].split('.')) == 4:
-                        if wz_json.get_message(sub_actions[1]) is not None:
-                            # TODO check for dependecy
-                            for f in _msg.get('fields'):
-                                if f.get('fullName') == resource.get('fullName'):
-                                    f['messageType'] = sub_actions[1]
-                                    print_success("Changing message type for {} -> {}".format(f.get('fullName'),f['messageType']))
-                            architect.EditMessage(_pkg, _msg.get('name'),
-                                _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
-                            if no_save==False:
-                                architect.Save()
-                        else:
-                            print_error('Message {} not exists under project !'.format(sub_actions[1]))
-                            exit(1)
+                        # if wz_json.get_message(sub_actions[1]) is not None:
+                        # TODO check for dependecy
+                        for f in _msg.get('fields'):
+                            if f.get('fullName') == resource.get('fullName'):
+                                f['messageType'] = sub_actions[1]
+                                print_success("Changing message type for {} -> {}".format(f.get('fullName'),f['messageType']))
+                        architect.EditMessage(_pkg, _msg.get('name'),
+                            _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'),extensions=_msg.get('extensions'))
+                        if no_save==False:
+                            architect.Save()
+                        # else:
+                        #     print_error('Message {} not exists under project !'.format(sub_actions[1]))
+                        #     exit(1)
                     else:
                         print_error('Message type {} is not valid !'.format(sub_actions[1]))
                 else:
@@ -337,7 +350,7 @@ def edit_field(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webe
                                         f['messageType'] = message_type['message_type']
                                         print_success("Changing message type for {} -> {}".format(f.get('fullName'),f['messageType']))
                                     architect.EditMessage(_pkg, _msg.get('name'),
-                                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
+                                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'),extensions=_msg.get('extensions'))
                                     if no_save==False:
                                         architect.Save()
                             # Handling user cancellation
@@ -408,7 +421,7 @@ def edit_field(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webe
                                         f['enumType'] = enum_type['enum_type']
                                         print_success("Changing enum type for {} -> {}".format(f.get('fullName'),f['enumType']))
                                     architect.EditMessage(_pkg, _msg.get('name'),
-                                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'))
+                                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'),extensions=_msg.get('extensions'))
                                     if no_save==False:
                                         architect.Save()
                             # Handling user cancellation
@@ -428,7 +441,68 @@ def edit_field(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webe
 
             print_error("Not supporting editing {}".format(sub_actions))
             exit(1)
+        # Changing label type
+        elif sub_actions[0] == 'label': 
+            # Getting message dict
+            msg_name = '.'.join(resource.get('fullName').split('.')[:-1])
+            _msg = wz_json.get_message(msg_name)
+            # Getting package descriptor
+            _pkg = wz_json.get_package(resource.get('fullName').split('.')[1],False)
+            if _msg is not None:
+                _list_of_avail_labels = [('Optional',protos.LABEL_OPTIONAL),('Repeated',protos.LABEL_REPEATED)]
+                label = inquirer.prompt([inquirer.List('label','Choose field label',_list_of_avail_labels)],theme=WebezyTheme())
+                if label is not None:
+                    label = label['label']
+                    for f in _msg.get('fields'):
+                        if f.get('fullName') == resource.get('fullName'):
+                            f['label'] = protos.WebezyFieldLabel.Name(label)
+                            print_success("Changing field label for {} -> {}".format(f.get('fullName'),f['label']))
 
+                    architect.EditMessage(_pkg, _msg.get('name'),
+                        _msg.get('fields'), _msg.get('description'), _msg.get('extensionType'),extensions=_msg.get('extensions'))
+                    if no_save==False:
+                        architect.Save()
+                else:
+                    print_error('Must choose a label type')
+                    exit(1)
+            else:
+                print_error("Getting message {} has failed !".format('.'.join(resource.get('fullName').split('.')[:-1])))
+                exit(1)
+        # Changing oneof field
+        elif sub_actions[0] == 'oneof_modify':
+            
+            oneof_sub_action = inquirer.prompt([inquirer.List('oneof_sub_action','Choose an action on oneof fields',[('Modify existing fields','modify_oneof_field'),('Add new fields','add_oneof_field'),('Remove oneof field','remove_oneof_field')])],theme=WebezyTheme())
+            if oneof_sub_action is not None:
+                if oneof_sub_action['oneof_sub_action'] == 'modify_oneof_field' or oneof_sub_action['oneof_sub_action'] == 'remove_oneof_field':
+                    _list_of_avail_oneof_fields = list(map(lambda x: (x.get('name'),x.get('fullName')), resource.get('oneofFields')))
+                    oneof_field = inquirer.prompt([inquirer.List('oneof_field','Choose which field to modify',_list_of_avail_oneof_fields)],theme=WebezyTheme())
+                    print_note(f'{oneof_field=}')
+                    if oneof_field is not None:
+                        if oneof_sub_action['oneof_sub_action'] == 'remove_oneof_field':
+                            if len(resource.get('oneofFields')) == 1:
+                                print_error("Can not remove the last oneof field under {}".format(resource.get('fullName')))
+                                exit(1)
+                            else:
+                                architect.RemoveOneofField(oneof_field['oneof_field'])
+                                architect.Save()
+                                print_success('Removed {} from oneof fields'.format(resource.get('fullName')))
+                        else:
+                            # TODO
+                            print_error("Not supporting editing {}:{}".format(sub_actions,oneof_sub_action['oneof_sub_action']))
+                            exit(1)
+                    else:
+                        print_error("Aborting process of deletion [one of field]")
+                        exit(1)
+                    
+
+                # TODO oneof_sub_action['oneof_sub_action'] == 'add_oneof_field':
+                else:
+                    print_error("Not supporting editing {}:{}".format(sub_actions,oneof_sub_action['oneof_sub_action']))
+                    exit(1)
+            else:
+                print_error('Must choose a oneof field action')
+                exit(1)
+           
         # Not supporting option
         else:
             print_error("Not supporting editing {}".format(sub_actions))
@@ -489,7 +563,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                 desc=''
             avail_msgs.append((f'{msg.name}{desc}', msg.full_name))
         else:
-            if resources.Options.Name(msg.extension_type) == 'FieldOptions':
+            if protos.WebezyExtension.Name(msg.extension_type) == 'FieldOptions':
                 for f in msg.fields:
                     avail_field_ext.append((f.name,f.full_name))
 
@@ -516,15 +590,15 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     
             for m in d_package.messages:
                 if m.extension_type is not None:
-                    if resources.Options.Name(m.extension_type) == 'FieldOptions':
+                    if protos.WebezyExtension.Name(m.extension_type) == 'FieldOptions':
                         for f in m.fields:
                             avail_field_ext.append((f.name,f.full_name))
     extend = None
     if expand:
         extend = inquirer.prompt([inquirer.Confirm('extend',message='Do you want to extend a message?')],theme=WebezyTheme())
         if extend.get('extend'):
-            extend = inquirer.prompt([inquirer.List('extend','Choose message extension',choices=[resources.Options.Name(resources.Options.FieldOptions),resources.Options.Name(resources.Options.MessageOptions),resources.Options.Name(resources.Options.FileOptions),resources.Options.Name(resources.Options.ServiceOptions)])],theme=WebezyTheme())
-            extend=resources.Options.Value(extend['extend'])
+            extend = inquirer.prompt([inquirer.List('extend','Choose message extension',choices=[protos.WebezyExtension.Name(protos.WebezyExtension.FieldOptions),protos.WebezyExtension.Name(protos.WebezyExtension.MessageOptions),protos.WebezyExtension.Name(protos.WebezyExtension.FileOptions),protos.WebezyExtension.Name(protos.WebezyExtension.ServiceOptions)])],theme=WebezyTheme())
+            extend=protos.WebezyExtension.Value(extend['extend'])
         else:
             extend = None
         description = inquirer.prompt([inquirer.Text('description','Enter message description','')],theme=WebezyTheme())
@@ -555,7 +629,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
         message_type = None
         enum_type = None
 
-        if field['fieldType'] == resources.WZFieldDescriptor.Type.Name(resources.WZFieldDescriptor.Type.TYPE_MESSAGE):
+        if field['fieldType'] == protos.WebezyFieldType.Name(protos.WebezyFieldType.TYPE_MESSAGE):
             if len(avail_msgs) == 0:
                 print_warning("No messages availabe for field")
                 exit(1)
@@ -566,7 +640,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                 ], theme=WebezyTheme())
                 message_type = message['message']
 
-        elif field['fieldType'] == resources.WZFieldDescriptor.Type.Name(resources.WZFieldDescriptor.Type.TYPE_ENUM):
+        elif field['fieldType'] == protos.WebezyFieldType.Name(protos.WebezyFieldType.TYPE_ENUM):
             if len(avail_enums) == 0:
                 print_warning("No enums available for field")
                 exit(1)
@@ -592,23 +666,23 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                         temp_pkg = wz_json.get_package(f_ext['extensions'].split('.')[1],False)
                         temp_msg = next((m for m in temp_pkg.messages if m.name == f_ext['extensions'].split('.')[3]),None)
                         temp_field = next((f for f in temp_msg.fields if f.name == f_ext['extensions'].split('.')[-1]),None)
-                        if resources.WZFieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_BOOL':
+                        if protos.WebezyFieldType.Name(temp_field.field_type) == 'TYPE_BOOL':
                             f_ext_v = inquirer.prompt([inquirer.Confirm('ext_value','Enter extension bool value',default=False)],theme=WebezyTheme())
-                        elif resources.WZFieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_DOUBLE' or resources.WZFieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_FLOAT':
+                        elif protos.WebezyFieldType.Name(temp_field.field_type) == 'TYPE_DOUBLE' or protos.WebezyFieldType.Name(temp_field.field_type) == 'TYPE_FLOAT':
                             f_ext_v = inquirer.prompt([inquirer.Text('ext_value','Enter extension float value',validate=helpers.float_value_validate)],theme=WebezyTheme())
                             try:
                                 f_ext_v = float(f_ext_v['ext_value'])
                             except Exception as e:
                                 logging.exception(e)
                                 exit(1)
-                        elif resources.WZFieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_INT32' or resources.WZFieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_INT64':
+                        elif protos.WebezyFieldType.Name(temp_field.field_type) == 'TYPE_INT32' or protos.WebezyFieldType.Name(temp_field.field_type) == 'TYPE_INT64':
                             f_ext_v = inquirer.prompt([inquirer.Text('ext_value','Enter extension integer value',validate=helpers.int_value_validate)],theme=WebezyTheme())
                             try:
                                 f_ext_v = int(f_ext_v['ext_value'])
                             except Exception as e:
                                 logging.exception(e)
                                 exit(1)
-                        elif resources.WZFieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_STRING':
+                        elif protos.WebezyFieldType.Name(temp_field.field_type) == 'TYPE_STRING':
                             f_ext_v = inquirer.prompt([inquirer.Text('ext_value','Enter extension string value')],theme=WebezyTheme())
                         temp_ext_name = f_ext['extensions'].split('.')
                         if '.'.join(temp_ext_name[:-2]) == pkg:
@@ -674,7 +748,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                 if nextfield['continue'] == False:
                     add_field = False
     architect.EditMessage(package, resource.get('name'),
-                            msg_fields, description, extend)
+                            msg_fields, description, extend,extensions=resource.get('extensions'))
     architect.Save()
 
 def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_name):
@@ -699,7 +773,7 @@ def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_n
         message_type = None
         enum_type = None
 
-        if field['fieldType'] == resources.FieldDescriptor.Type.Name(resources.FieldDescriptor.Type.TYPE_MESSAGE):
+        if field['fieldType'] == resources.WebezyFieldType.Name(resources.WebezyFieldType.TYPE_MESSAGE):
             if len(avail_msgs) == 0:
                 print_warning("[ONEOF] No messages availabe for field")
                 exit(1)
@@ -710,7 +784,7 @@ def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_n
                 ], theme=WebezyTheme())
                 message_type = message['message']
 
-        elif field['fieldType'] == resources.FieldDescriptor.Type.Name(resources.FieldDescriptor.Type.TYPE_ENUM):
+        elif field['fieldType'] == resources.WebezyFieldType.Name(resources.WebezyFieldType.TYPE_ENUM):
             if len(avail_enums) == 0:
                 print_warning("[ONEOF] No enums available for field")
                 exit(1)
@@ -756,7 +830,6 @@ def add_values(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     e_values = []
     for ev in resource.get('values'):
         e_values.append(helpers.WZEnumValue(ev.get('name'),ev.get('number')).to_dict())
-    print_info(e_values)
     while add_value:
         ev = inquirer.prompt([
             inquirer.Text(
@@ -922,7 +995,7 @@ def rename_message(resource,wz_json:helpers.WZJson,architect:WebezyArchitect,dep
         resource['name'] = message_name
         resource['fullName'] = new_full_name
         architect.EditMessage(_pkg, resource.get('name'),
-                            resource.get('fields'), resource.get('description'), resource.get('extensionType'),old_name)
+                            resource.get('fields'), resource.get('description'), resource.get('extensionType'),old_name=old_name,extensions=resource.get('extensions'))
         architect.Save()
     else:
         print_error("{} is already existing under {} package !".format(message_name,resource.get('fullName').split('.')[1]))

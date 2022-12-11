@@ -33,7 +33,7 @@ from webezyio.commons import errors, pretty
 from webezyio.commons.resources import generate_package, generate_service
 from webezyio.commons.errors import WebezyCoderError, WebezyValidationError
 from webezyio.commons.file_system import check_if_file_exists, join_path
-from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, WebezyJson
+from webezyio.commons.protos import WebezyJson
 from itertools import groupby
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import ParseDict, MessageToDict
@@ -50,7 +50,7 @@ _WELL_KNOWN_TS_IMPORTS = ["import { \n\thandleUnaryCall,\n\thandleClientStreamin
 _FIELD_TYPES = Literal["TYPE_INT32", "TYPE_INT64", "TYPE_STRING", "TYPE_BOOL",
                        "TYPE_MESSAGE", "TYPE_ENUM", "TYPE_DOUBLE", "TYPE_FLOAT", "TYPE_BYTE"]
 _FIELD_LABELS = Literal["LABEL_OPTIONAL", "LABEL_REPEATED"]
-_EXTENSIONS_TYPE = Literal["FileOptions", "MessageOptions", "FieldOptions"]
+_EXTENSIONS_TYPE = Literal["FileOptions", "MessageOptions", "FieldOptions","ServiceOptions","MethodOptions"]
 
 _OPEN_BRCK = '{'
 _CLOSING_BRCK = '}'
@@ -110,7 +110,13 @@ def wzJsonToMessage(wz_json,validate:bool=False) -> WebezyJson:
         #     pretty.print_info(mylist,True,"Last step")
         #     wz_json['packages'][p] = pkg
         #     pretty.print_info(wz_json['packages'][p],True,"Package After Change step")
-         
+    
+    # DEPRECATED webezy.project.serverLanguage field -> webezy.project.server.langugae
+    # Removing the deprecated field to not have any errors
+    if wz_json.get('project').get('serverLanguage') :
+        pretty.print_warning('Deprecated field \'webezy.project.serverLanguage\' -> Moved to \'webezy.project.server.langugae\' Since 0.1.2')
+        del wz_json['project']['serverLanguage']
+
     return ParseDict(wz_json, WebezyJson())
 
 
@@ -685,11 +691,16 @@ class WZProto():
             msgs = []
             for m in self._messages:
                 msg_name = m.get('name')
+                msgFullName = m.get('fullName')
                 fields = []
                 # Adding MessageOptions
                 if m.get('extensions') is not None:
                     for ext_key in m.get('extensions'):
-                        fields.append('option ({}) = {};'.format,ext_key(m.get('extensions')[ext_key]))
+                        ext_msg = self._wz_json.get_message('.'.join(ext_key.split('.')[:-1]))
+                        if ext_msg is None:
+                            raise WebezyValidationError(
+                                'FieldOptions', f'Field Option [{ext}] specified for : "{fName}", is invalid !')
+                        fields.append('{}'.format(parse_extension_to_proto('MessageOptions',ext_msg,ext_key,m.get('extensions')[ext_key],self._wz_json)))
                 m_desc = m.get('description')
                 ext_type = m.get('extensionType')
                 for f in m.get('fields'):
@@ -739,7 +750,6 @@ class WZProto():
                             else:
                                 ext_msg = next((m for m in self._messages if m.get(
                                     'name') == ext.split('.')[0]), None)
-                                logging.debug(f'{list_names} | {ext_msg}')
                             if ext_msg is None:
                                 ext_msg = self._wz_json.get_message('.'.join(ext.split('.')[:-1]))
                                 if ext_msg is None:
@@ -752,10 +762,11 @@ class WZProto():
                         fOptions = ','.join(fOptions)
                     fOptions = f' [{fOptions}]' if len(fOptions) > 0 else ''
                     fDesc = f.get('description')
-                    if ext_type == 'FieldOptions' or ext_type == 'FileOptions' or ext_type == 'MessageOptions' or ext_type == 'ServiceOptions':
-                        fDesc = f'// [webezyio] - {fDesc}\n\t\t' if fDesc is not None else ''
+                    fFullName = f.get('fullName')
+                    if ext_type == 'FieldOptions' or ext_type == 'FileOptions' or ext_type == 'MessageOptions' or ext_type == 'ServiceOptions' or ext_type == 'MethodOptions':
+                        fDesc = f'// [{fFullName}] - {fDesc}\n\t\t' if fDesc is not None else ''
                     else:
-                        fDesc = f'// [webezyio] - {fDesc}\n\t' if fDesc is not None else ''
+                        fDesc = f'// [{fFullName}] - {fDesc}\n\t' if fDesc is not None else ''
                     if f.get('fieldType') == 'TYPE_ONEOF':
                         fields.append(
                             f'{fDesc}{fType}')
@@ -766,23 +777,27 @@ class WZProto():
                 if ext_type == 'FieldOptions':
                     fields = '\n\t\t'.join(fields)
                     msgs.append(
-                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FieldOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                        f'// [{msgFullName}] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FieldOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
                 elif ext_type == 'MessageOptions':
                     fields = '\n\t\t'.join(fields)
                     msgs.append(
-                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.MessageOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                        f'// [{msgFullName}] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.MessageOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
                 elif ext_type == 'FileOptions':
                     fields = '\n\t\t'.join(fields)
                     msgs.append(
-                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FileOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                        f'// [{msgFullName}] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.FileOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
                 elif ext_type == 'ServiceOptions':
                     fields = '\n\t\t'.join(fields)
                     msgs.append(
-                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.ServiceOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                        f'// [{msgFullName}] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.ServiceOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
+                elif ext_type == 'MethodOptions':
+                    fields = '\n\t\t'.join(fields)
+                    msgs.append(
+                        f'// [{msgFullName}] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\textend google.protobuf.MethodOptions {_OPEN_BRCK}\n\t\t{fields}\n\t{_CLOSING_BRCK}\n{_CLOSING_BRCK}\n')
                 else:
                     fields = '\n\t'.join(fields)
                     msgs.append(
-                        f'// [webezyio] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\t{fields}\n{_CLOSING_BRCK}\n')
+                        f'// [{msgFullName}] - {m_desc}\nmessage {msg_name} {_OPEN_BRCK}\n\t{fields}\n{_CLOSING_BRCK}\n')
 
             msgs = '\n'.join(msgs)
             return msgs
@@ -794,18 +809,18 @@ class WZProto():
             enums = []
             for e in self._enums:
                 enum_name = e.get('name')
-                enum_full_name = e.get('full_name')
+                enum_full_name = e.get('fullName')
                 values = []
                 for v in e.get('values'):
                     value_name = v.get('name')
                     value_number = 0 if v.get(
                         'number') is None else v.get('number')
                     v_desc = v.get('description')
-                    values.append(f'// [webezyio] - {v_desc}\n\t{value_name} = {value_number};')
+                    values.append(f'// [{enum_full_name}] - {v_desc}\n\t{value_name} = {value_number};')
                 values = '\n\t'.join(values)
                 e_desc = e.get('description')
                 enums.append(
-                    f'// [webezyio] - {e_desc}\nenum {enum_name} {_OPEN_BRCK}\n\t{values}\n{_CLOSING_BRCK}\n')
+                    f'// [{enum_full_name}] - {e_desc}\nenum {enum_name} {_OPEN_BRCK}\n\t{values}\n{_CLOSING_BRCK}\n')
             return '\n'.join(enums)
 
         else:
@@ -1342,7 +1357,7 @@ def attach_template(ARCHITECT,template:_BUILTINS_TEMPLATES):
         subprocess.run(['python',file_dir + '/templates/{0}/{1}.template.py'.format(template_domain_name,template_name),'--domain',ARCHITECT._domain,'--project-name',ARCHITECT._project_name])
 
 def parse_extension_to_proto(
-    extension_type:Literal['FileOptions','MessageOptions','FieldOptions','ServiceOptions'],
+    extension_type:Literal['FileOptions','MessageOptions','FieldOptions','ServiceOptions','MethodOptions'],
     extension_message,ext_key,ext_value,wz_json):
     extension_value = None
     # Get current key to parse
@@ -1375,6 +1390,13 @@ def parse_extension_to_proto(
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
             if extension_value is not None:
                 extension_value = f'option ({ext_key}) = {extension_value};'
+    elif extension_type == 'MethodOptions':
+        if label_ext == 'repeated':
+            pass
+        else:
+            extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
+            if extension_value is not None:
+                extension_value = f'option ({ext_key}) = {extension_value};'
 
     else:
         raise errors.WebezyValidationError('Extension Type Error','Extension of type {} is not valid !'.format(extension_type))
@@ -1382,6 +1404,9 @@ def parse_extension_to_proto(
     return extension_value
 
 def parse_extension_value(type,value,wz_json:WZJson,field=None,num_tabs=1):
+    """
+    This function serve as util for returning an extension proto value
+    """
     if 'int' in type:
         value = int(value)
     elif type == 'float' or type == 'double':

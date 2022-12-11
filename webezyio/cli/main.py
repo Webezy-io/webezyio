@@ -37,9 +37,8 @@ from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf
+from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf, protos
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
-from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Language
 from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template, config as config_command
 from pathlib import Path
 
@@ -89,19 +88,19 @@ log = logging.getLogger(__name__)
 well_known_type = ['google.protobuf.Timestamp','google.protobuf.Struct']
 
 fields_opt = [
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_DOUBLE),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_FLOAT),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_INT64),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_INT32),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_BOOL),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_STRING),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_MESSAGE),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_BYTES),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_ENUM),
+    protos.WebezyFieldType.Name(protos.TYPE_DOUBLE),
+    protos.WebezyFieldType.Name(protos.TYPE_FLOAT),
+    protos.WebezyFieldType.Name(protos.TYPE_INT64),
+    protos.WebezyFieldType.Name(protos.TYPE_INT32),
+    protos.WebezyFieldType.Name(protos.TYPE_BOOL),
+    protos.WebezyFieldType.Name(protos.TYPE_STRING),
+    protos.WebezyFieldType.Name(protos.TYPE_MESSAGE),
+    protos.WebezyFieldType.Name(protos.TYPE_BYTES),
+    protos.WebezyFieldType.Name(protos.TYPE_ENUM),
 ]
 field_label = [
-    FieldDescriptor.Label.Name(FieldDescriptor.Label.LABEL_OPTIONAL),
-    FieldDescriptor.Label.Name(FieldDescriptor.Label.LABEL_REPEATED)
+    protos.WebezyFieldLabel.Name(protos.LABEL_OPTIONAL),
+    protos.WebezyFieldLabel.Name(protos.LABEL_REPEATED)
 ]
 
 

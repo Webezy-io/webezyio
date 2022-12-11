@@ -1,4 +1,4 @@
-from webezyio.commons.protos import WebezyConfig_pb2 as WebezyConfig
+from webezyio.commons.protos import WebezyConfig,WebezyMonitor
 """
                  _                           _        
  __      __ ___ | |__    ___  ____ _   _    (_)  ___  
@@ -8,7 +8,7 @@ from webezyio.commons.protos import WebezyConfig_pb2 as WebezyConfig
                                    |___/              .configs
 
 webezyio cli module configuration"""
-configs=WebezyConfig.Config(
+configs=WebezyConfig(
     host="localhost",
     port=50051,
     # Analytic gathering approval

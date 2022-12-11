@@ -8,7 +8,6 @@ from webezyio.builder.src import hookspecs, lru
 from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.pretty import print_error
-from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
 _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,WebezyTsClient,WebezyGoClient,
                         WebezyReadme]  # Many More To Come
 log = logging.getLogger('webezyio.cli.main')
@@ -25,7 +24,7 @@ class WebezyBuilder:
         self._pm.add_hookspecs(hookspecs)
         self._pm.load_setuptools_entrypoints("builder")
         self._webezy_json = self._parse_webezy_json(path)
-        self._cache = lru.LruCache[resources.WzResourceWrapper](100)
+        # self._cache = lru.LruCache[resources.WzResourceWrapper](100)
         self.hooks = hooks
         self._protos_map = {}
         self._path = path

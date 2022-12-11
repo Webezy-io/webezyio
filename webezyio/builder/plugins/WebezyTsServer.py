@@ -22,7 +22,7 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers, file_system, resources,pretty
+from webezyio.commons import helpers, file_system, resources,pretty, protos
 from webezyio.builder.plugins.static import gitignore_ts,utils_errors_ts,utils_interfaces,package_json,bash_init_script_ts,bash_run_server_script_ts,protos_compile_script_ts,main_ts_config,clients_ts_configs,protos_ts_config
 
 
@@ -162,11 +162,11 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                 else:
                     out_prototype = f'\t\t// let response:{rpc_out_pkg}.{rpc_out_name} = {_OPEN_BRCK} {fields} {_CLOSING_BRCK};\n\t\t// callback(null,response);\n\t\tcallback(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
                 code = f'{out_prototype}\n'
-                methods.append(resources.WZMethodContext(
+                methods.append(protos.WebezyMethodContext(
                     name=rpc_name, code=code, type='rpc'))
-            files.append(resources.WZFileContext(
+            files.append(protos.WebezyFileContext(
                 file=f'./services/{svc}.ts', methods=methods))
-    context = resources.proto_to_dict(resources.WZContext(files=files))
+    context = resources.proto_to_dict(protos.WebezyContext(files=files))
     logging.debug("Writing new context")
     file_system.mkdir(file_system.join_path(path, '.webezy'))
     file_system.wFile(file_system.join_path(

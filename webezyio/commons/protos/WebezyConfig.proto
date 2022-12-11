@@ -9,44 +9,46 @@ package webezy.WebezyConfig.v1;
 
 
 
-// [webezyio] - The main configuration structure
-message Config {
-	// [webezyio] - The webezy.io server host
-	string host = 1;
-	// [webezyio] - The server port
-	int32 port = 2;
-	// [webezyio] - The project deployment type
-	webezy.WebezyConfig.v1.DeploymentType deployment = 3;
-	// [webezyio] - 
-	webezy.WebezyProxy.v1.Config proxy = 4;
-	// [webezyio] - 
-	google.protobuf.Struct docs = 5;
-	// [webezyio] - 
-	webezy.WebezyTemplate.v1.Config template = 6;
-	// [webezyio] - 
-	webezy.WebezyConfig.v1.WebezyMonitor monitor = 7;
-	// [webezyio] - 
-	bool analytics = 8;
-	// [webezyio] - 
-	string token = 9;
-	// [webezyio] - 
-	bool first_run = 10;
-	// [webezyio] - 
-	repeated string webezyio_templates = 11;
-}
-
-// [webezyio] - WebezyMonitor configurations
+// [webezy.WebezyConfig.v1.WebezyMonitor] - WebezyMonitor configurations
 message WebezyMonitor {
-	// [webezyio] - The prometheus client configurations
-	webezy.WebezyPrometheus.v1.Config prometheus = 1;
+	// [webezy.WebezyConfig.v1.WebezyMonitor.prometheus] - The prometheus client configurations
+	webezy.WebezyPrometheus.v1.PrometheusConfig prometheus = 1;
 }
 
-// [webezyio] - None
+// [webezy.WebezyConfig.v1.WebezyConfig] - The main configuration structure
+message WebezyConfig {
+	// [webezy.WebezyConfig.v1.WebezyConfig.host] - The webezy.io server host
+	string host = 1;
+	// [webezy.WebezyConfig.v1.WebezyConfig.port] - The server port
+	int32 port = 2;
+	// [webezy.WebezyConfig.v1.WebezyConfig.deployment] - The project deployment type
+	webezy.WebezyConfig.v1.DeploymentType deployment = 3;
+	// [webezy.WebezyConfig.v1.WebezyConfig.proxy] - 
+	webezy.WebezyProxy.v1.ProxyConfig proxy = 4;
+	// [webezy.WebezyConfig.v1.WebezyConfig.docs] - 
+	google.protobuf.Struct docs = 5;
+	// [webezy.WebezyConfig.v1.WebezyConfig.template] - 
+	webezy.WebezyTemplate.v1.TemplateConfig template = 6;
+	// [webezy.WebezyConfig.v1.WebezyConfig.monitor] - 
+	webezy.WebezyConfig.v1.WebezyMonitor monitor = 7;
+	// [webezy.WebezyConfig.v1.WebezyConfig.analytics] - 
+	bool analytics = 8;
+	// [webezy.WebezyConfig.v1.WebezyConfig.token] - 
+	string token = 9;
+	// [webezy.WebezyConfig.v1.WebezyConfig.first_run] - 
+	bool first_run = 10;
+	// [webezy.WebezyConfig.v1.WebezyConfig.webezyio_templates] - 
+	repeated string webezyio_templates = 11;
+	// [webezy.WebezyConfig.v1.WebezyConfig.features] - 
+	map<string, bool> features = 12;
+}
+
+// [webezy.WebezyConfig.v1.DeploymentType] - None
 enum DeploymentType {
-	// [webezyio] - None
+	// [webezy.WebezyConfig.v1.DeploymentType] - None
 	UNKNOWN_DEPLOYMENTTYPE = 0;
-	// [webezyio] - None
+	// [webezy.WebezyConfig.v1.DeploymentType] - None
 	LOCAL = 1;
-	// [webezyio] - None
+	// [webezy.WebezyConfig.v1.DeploymentType] - None
 	DOCKER = 2;
 }

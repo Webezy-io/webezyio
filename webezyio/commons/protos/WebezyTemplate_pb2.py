@@ -16,17 +16,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14WebezyTemplate.proto\x12\x18webezy.WebezyTemplate.v1\"\x93\x01\n\x06\x43onfig\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08out_path\x18\x02 \x01(\t\x12\x0f\n\x07include\x18\x03 \x03(\t\x12\x0f\n\x07\x65xclude\x18\x04 \x03(\t\x12\x0c\n\x04tags\x18\x05 \x03(\t\x12\x13\n\x0b\x64\x65scription\x18\x06 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x07 \x01(\t\x12\x14\n\x0cinclude_code\x18\x08 \x01(\x08\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14WebezyTemplate.proto\x12\x18webezy.WebezyTemplate.v1\"\x9b\x01\n\x0eTemplateConfig\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08out_path\x18\x02 \x01(\t\x12\x0f\n\x07include\x18\x03 \x03(\t\x12\x0f\n\x07\x65xclude\x18\x04 \x03(\t\x12\x0c\n\x04tags\x18\x05 \x03(\t\x12\x13\n\x0b\x64\x65scription\x18\x06 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x07 \x01(\t\x12\x14\n\x0cinclude_code\x18\x08 \x01(\x08\"?\n\x13WebezyMethodContext\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\"o\n\x11WebezyFileContext\x12\x0c\n\x04\x66ile\x18\x01 \x01(\t\x12>\n\x07methods\x18\x02 \x03(\x0b\x32-.webezy.WebezyTemplate.v1.WebezyMethodContext\x12\x0c\n\x04\x63ode\x18\x03 \x01(\x0c\"K\n\rWebezyContext\x12:\n\x05\x66iles\x18\x01 \x03(\x0b\x32+.webezy.WebezyTemplate.v1.WebezyFileContextb\x06proto3')
 
 
 
-_CONFIG = DESCRIPTOR.message_types_by_name['Config']
+_TEMPLATECONFIG = DESCRIPTOR.message_types_by_name['TemplateConfig']
+_WEBEZYMETHODCONTEXT = DESCRIPTOR.message_types_by_name['WebezyMethodContext']
+_WEBEZYFILECONTEXT = DESCRIPTOR.message_types_by_name['WebezyFileContext']
+_WEBEZYCONTEXT = DESCRIPTOR.message_types_by_name['WebezyContext']
 
 @overload
-class Config:
-	"""webezyio generated message [webezy.WebezyTemplate.v1.Config]
-	A class respresent a Config type
-	"""
+class TemplateConfig(_message.Message):
+	"""webezyio generated message [webezy.WebezyTemplate.v1.TemplateConfig]
+	A class respresent a TemplateConfig type
+	The main configurations for webezy.io template
+		"""
 	name = str # type: str
 	out_path = str # type: str
 	include = List[str] # type: List[str]
@@ -37,17 +41,127 @@ class Config:
 	include_code = bool # type: bool
 
 	def __init__(self, name=str, out_path=str, include=List[str], exclude=List[str], tags=List[str], description=str, author=str, include_code=bool):
+		"""
+		Attributes:
+		----------
+		name : str
+			The template name
+		out_path : str
+			The output path for the template script
+		include : List[str]
+			The files to include when using 'include_code' field
+		exclude : List[str]
+			The files to exclude when using 'include_code' field
+		tags : List[str]
+			The optional tags to associate with the template
+		description : str
+			The template description
+		author : str
+			The author email or name
+		include_code : bool
+			If to include code files in the generated template script
+		"""
 		pass
-Config = _reflection.GeneratedProtocolMessageType('Config', (_message.Message,), {
-  'DESCRIPTOR' : _CONFIG,
+TemplateConfig = _reflection.GeneratedProtocolMessageType('TemplateConfig', (_message.Message,), {
+  'DESCRIPTOR' : _TEMPLATECONFIG,
   '__module__' : 'WebezyTemplate_pb2'
-  # @@protoc_insertion_point(class_scope:webezy.WebezyTemplate.v1.Config)
+  # @@protoc_insertion_point(class_scope:webezy.WebezyTemplate.v1.TemplateConfig)
   })
-_sym_db.RegisterMessage(Config)
+_sym_db.RegisterMessage(TemplateConfig)
+
+
+@overload
+class WebezyMethodContext(_message.Message):
+	"""webezyio generated message [webezy.WebezyTemplate.v1.WebezyMethodContext]
+	A class respresent a WebezyMethodContext type
+	
+		"""
+	name = str # type: str
+	code = str # type: str
+	type = str # type: str
+
+	def __init__(self, name=str, code=str, type=str):
+		"""
+		Attributes:
+		----------
+		name : str
+			
+		code : str
+			
+		type : str
+			
+		"""
+		pass
+WebezyMethodContext = _reflection.GeneratedProtocolMessageType('WebezyMethodContext', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYMETHODCONTEXT,
+  '__module__' : 'WebezyTemplate_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.WebezyTemplate.v1.WebezyMethodContext)
+  })
+_sym_db.RegisterMessage(WebezyMethodContext)
+
+
+@overload
+class WebezyFileContext(_message.Message):
+	"""webezyio generated message [webezy.WebezyTemplate.v1.WebezyFileContext]
+	A class respresent a WebezyFileContext type
+	
+		"""
+	file = str # type: str
+	methods = List[WebezyMethodContext] # type: List[WebezyMethodContext]
+	code = None # type: None
+
+	def __init__(self, file=str, methods=List[WebezyMethodContext], code=None):
+		"""
+		Attributes:
+		----------
+		file : str
+			
+		methods : List[WebezyMethodContext]
+			
+		code : None
+			
+		"""
+		pass
+WebezyFileContext = _reflection.GeneratedProtocolMessageType('WebezyFileContext', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYFILECONTEXT,
+  '__module__' : 'WebezyTemplate_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.WebezyTemplate.v1.WebezyFileContext)
+  })
+_sym_db.RegisterMessage(WebezyFileContext)
+
+
+@overload
+class WebezyContext(_message.Message):
+	"""webezyio generated message [webezy.WebezyTemplate.v1.WebezyContext]
+	A class respresent a WebezyContext type
+	
+		"""
+	files = List[WebezyFileContext] # type: List[WebezyFileContext]
+
+	def __init__(self, files=List[WebezyFileContext]):
+		"""
+		Attributes:
+		----------
+		files : List[WebezyFileContext]
+			
+		"""
+		pass
+WebezyContext = _reflection.GeneratedProtocolMessageType('WebezyContext', (_message.Message,), {
+  'DESCRIPTOR' : _WEBEZYCONTEXT,
+  '__module__' : 'WebezyTemplate_pb2'
+  # @@protoc_insertion_point(class_scope:webezy.WebezyTemplate.v1.WebezyContext)
+  })
+_sym_db.RegisterMessage(WebezyContext)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _CONFIG._serialized_start=51
-  _CONFIG._serialized_end=198
+  _TEMPLATECONFIG._serialized_start=51
+  _TEMPLATECONFIG._serialized_end=206
+  _WEBEZYMETHODCONTEXT._serialized_start=208
+  _WEBEZYMETHODCONTEXT._serialized_end=271
+  _WEBEZYFILECONTEXT._serialized_start=273
+  _WEBEZYFILECONTEXT._serialized_end=384
+  _WEBEZYCONTEXT._serialized_start=386
+  _WEBEZYCONTEXT._serialized_end=461
 # @@protoc_insertion_point(module_scope)

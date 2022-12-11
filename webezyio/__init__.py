@@ -1,6 +1,5 @@
 import logging
 """Commons"""
-from .commons.protos.webezy_pb2 import Options as extensionOpt
 from .commons.protos import WebezyPrometheus_pb2 as WebezyPrometheus,WebezyProxy_pb2 as WebezyProxy,WebezyTemplate_pb2 as WebezyTemplate, WebezyConfig_pb2 as WebezyConfig
 from .commons import file_system as _fs,resources as _resources,helpers as _helpers,pretty as _pretty
 from .commons.helpers import load_wz_json

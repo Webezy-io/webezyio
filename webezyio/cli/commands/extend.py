@@ -27,7 +27,7 @@ from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import file_system, helpers,resources,errors
 from inquirer import errors as inquirerErrors
 from webezyio.commons.pretty import print_error, print_info,bcolors, print_note, print_success,print_warning
-from webezyio.commons.protos.webezy_pb2 import Descriptor, Language, Project, ServiceDescriptor, WebezyClient, WebezyDeploymentType, WebezyServer, WzResourceWrapper,google_dot_protobuf_dot_struct__pb2
+from webezyio.commons.protos import google_dot_protobuf_dot_struct__pb2
 log = logging.getLogger('webezyio.cli.main')
 
 def extend_resource(resource,extension,wz_json:helpers.WZJson):
@@ -46,6 +46,31 @@ def extend_resource(resource,extension,wz_json:helpers.WZJson):
         if resource.get('kind') == resources.ResourceKinds.field.value:
             results = handle_extension_by_type(resource,extension,wz_json,'field')
             extend_field(results,resource,extension,wz_json,ARCHITECT)    
+        elif resource.get('kind') == resources.ResourceKinds.message.value:
+            results = handle_extension_by_type(resource,extension,wz_json,'message')
+            extend_message(results,resource,extension,wz_json,ARCHITECT)    
+
+def extend_message(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:WebezyArchitect):
+    if results is not None:
+        list_of_ext_fields = []
+        for ext_field in results.get('fields'):
+            list_of_ext_fields.append((ext_field.get('name'),ext_field.get('fullName')))
+        
+        field_extension_result = inquirer.prompt([inquirer.List('extension_field','Chose which field you want to add / edit?',list_of_ext_fields)],theme=WebezyTheme())
+        if resource.get('extensions') is None:
+            resource['extensions'] = {}
+        if field_extension_result is not None:
+            temp_field_ext = next((f for f in results.get('fields') if f.get('fullName') == field_extension_result['extension_field']),None)
+            if temp_field_ext.get('fieldType') == 'TYPE_MESSAGE':
+                value = handle_ext_field_message(temp_field_ext.get('messageType'),wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
+            else:
+                value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
+        print_info(value)
+        temp_pkg_desc = wz_json.get_package(resource.get('fullName').split(".")[1],False)
+        resource['extensions'][temp_field_ext.get('fullName')] = value
+
+        ARCHITECT.EditMessage(temp_pkg_desc,resource.get('name'),resource.get('fields'),resource.get('description'),resource.get('extensionType'),extensions=resource.get('extensions'))
+        ARCHITECT.Save()
 
 def extend_field(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:WebezyArchitect):
     if results is not None:
@@ -62,13 +87,13 @@ def extend_field(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:Web
             if temp_field_ext.get('fieldType') == 'TYPE_MESSAGE':
                 value = handle_ext_field_message(temp_field_ext.get('messageType'),wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
             else:
-                raise errors.WebezyValidationError('Handle Extension Editing Failed','Error occured during handling of extensions {}'.format(temp_field_ext.get('fullName')))
+                value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
        
         temp_msg = wz_json.get_message('.'.join(resource.get('fullName').split('.')[:-1]))
         temp_pkg_desc = wz_json.get_package(resource.get('fullName').split(".")[1],False)
         resource['extensions'][temp_field_ext.get('fullName')] = value
 
-        ARCHITECT.EditMessage(temp_pkg_desc,temp_msg.get('name'),temp_msg.get('fields'),temp_msg.get('description'),temp_msg.get('extensionType'))
+        ARCHITECT.EditMessage(temp_pkg_desc,temp_msg.get('name'),temp_msg.get('fields'),temp_msg.get('description'),temp_msg.get('extensionType'),extensions=temp_msg.get('extensions'))
         ARCHITECT.Save()
 
 def extend_package(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:WebezyArchitect):
@@ -92,7 +117,8 @@ def extend_package(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:W
                 if temp_field_ext.get('fieldType') == 'TYPE_MESSAGE':
                     value = handle_ext_field_message(temp_field_ext.get('messageType'),wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
                 else:
-                    raise errors.WebezyValidationError('Handle Extension Editing Failed','Error occured during handling of extensions {}'.format(temp_field_ext.get('fullName')))
+                    value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
+                    # raise errors.WebezyValidationError('Handle Extension Editing Failed','Error occured during handling of extensions {}'.format(temp_field_ext.get('fullName')))
 
                 resource['extensions'][temp_field_ext.get('fullName')] = value
 
@@ -103,7 +129,7 @@ def _get_extensions(messages, type):
     """Helper function for getting extensions from messages array"""
     return [m for m in messages if m.get('extensionType') == type]
 
-def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Literal['package','service','message','field']):
+def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Literal['package','service','message','field','method']):
     """Package extensions"""
     ext_type = None
 
@@ -117,6 +143,12 @@ def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Lite
         pkg_dependencies = temp_pkg.get('dependencies')
         pkg_messages = temp_pkg.get('messages') 
         ext_type = 'FieldOptions'
+    
+    elif type == 'message':
+        temp_pkg = wz_json.get_package(resource.get('fullName').split('.')[1])
+        pkg_dependencies = temp_pkg.get('dependencies')
+        pkg_messages = temp_pkg.get('messages') 
+        ext_type = 'MessageOptions'
 
     # Iterating available packages and extendable messages
     avail_extensions = []
@@ -203,7 +235,52 @@ def handle_ext_field_message(message_full_name,wz_json:helpers.WZJson,old_ext=No
             return google_dot_protobuf_dot_struct__pb2.Value(struct_value=temp_struct)
                 
         elif 'LABEL_REPEATED' == temp_extended_field.get('label'):
-            pass
+            print_error("Not supporting repeated type yet")
+            exit(1)
         else:
             raise errors.WebezyValidationError('Unsupported label type','Unsupporting label {} for extensions'.format(temp_extended_field.get('label'))) 
         
+
+
+def handle_ext_field(ext_field,wz_json:helpers.WZJson,old_ext=None):
+    value = None
+    # temp_msg = wz_json.get_message(message_full_name)
+    # avail_extension_message_fields = []
+
+    # for f in temp_msg.get('fields'):
+        # avail_extension_message_fields.append((f.get('name'),f.get('fullName')))
+    if ext_field.get('fieldType') == 'TYPE_STRING':
+        
+        value = inquirer.prompt([inquirer.Text('string_value','Enter string value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
+        
+        if value.get('string_value') is not None:
+            return google_dot_protobuf_dot_struct__pb2.Value(string_value=value.get('string_value'))
+        else:
+            print_error("Must enter a valid string !")
+            exit(1)
+    elif ext_field.get('fieldType') == 'TYPE_INT32' or ext_field.get('fieldType') == 'TYPE_INT64':
+        value = inquirer.prompt([inquirer.Text('num_value','Enter integer value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
+        
+        if value.get('num_value') is not None:
+            return google_dot_protobuf_dot_struct__pb2.Value(number_value=int(value.get('num_value')))
+        else:
+            print_error("Must enter a valid integer !")
+            exit(1)
+    elif ext_field.get('fieldType') == 'TYPE_FLOAT' or ext_field.get('fieldType') == 'TYPE_DOUBLE':
+        value = inquirer.prompt([inquirer.Text('num_value','Enter float value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
+        
+        if value.get('num_value') is not None:
+            return google_dot_protobuf_dot_struct__pb2.Value(number_value=float(value.get('num_value')))
+        else:
+            print_error("Must enter a valid float !")
+            exit(1)
+    elif ext_field.get('fieldType') == 'TYPE_BOOL':
+        value = inquirer.prompt([inquirer.Confirm('bool_value','Enter boolean value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
+        
+        if value.get('bool_value') is not None:
+            return google_dot_protobuf_dot_struct__pb2.Value(bool_value=value.get('bool_value'))
+        else:
+            print_error("Must enter a valid boolean !")
+            exit(1)
+    # extended_message_field = inquirer.prompt([inquirer.List('extension_message_field','Enter an extension value for',avail_extension_message_fields)],theme=WebezyTheme())
+    # return google_dot_protobuf_dot_struct__pb2.Value()
