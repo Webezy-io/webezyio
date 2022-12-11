@@ -26,7 +26,7 @@ import sys
 from typing import overload
 from webezyio import _fs,_helpers,_pretty,config as _config
 from webezyio.commons.pretty import print_error, print_note, print_warning
-from webezyio.commons.protos.WebezyConfig_pb2 import Config
+from webezyio.commons.protos import WebezyConfig
 from google.protobuf.json_format import MessageToDict,ParseDict
 
 log = logging.getLogger('webezyio.cli.main')
@@ -72,14 +72,19 @@ class WebezyProjectConfig:
 
 def parse_project_config(root_path:str,proto=False):
     if proto:
-        webezy_configurations = Config()
+        webezy_config = WebezyConfig()
         global_config = parse_global_config_proto()
         print_note(f'{global_config.host = }\n{global_config.port = }\n{global_config.docs = }\n{global_config.template = }\n{global_config.monitor = }\n{global_config.proxy = }\n{global_config.webezyio_templates = }\n{global_config.first_run = }\n{global_config.token = }\n{global_config.analytics = }\n')
-        # config_file = parse_config_file_proto(root_path)
+        webezy_config.MergeFrom(global_config)
+        
+        config_file = parse_config_file_proto(root_path)
         # print_note(f'{config_file.host = }\n{config_file.port = }\n{config_file.docs = }\n{config_file.template = }\n{config_file.monitor = }\n{config_file.proxy = }\n{config_file.webezyio_templates = }\n{config_file.first_run = }\n{config_file.token = }\n{config_file.analytics = }\n')
         # print_note(type(config_file))
-        
-        print_note(webezy_configurations.MergeFrom(global_config))
+        if config_file is not None:
+            webezy_config.MergeFrom(config_file)
+
+        print_note(f'{webezy_config.host = }\n{webezy_config.port = }\n{webezy_config.docs = }\n{webezy_config.template = }\n{webezy_config.monitor = }\n{webezy_config.proxy = }\n{webezy_config.webezyio_templates = }\n{webezy_config.first_run = }\n{webezy_config.token = }\n{webezy_config.analytics = }\n')
+
     else:
         global_config = parse_global_config_dict()
         # print_note(global_config,True,'Global Configs')
@@ -105,7 +110,7 @@ def parse_project_config(root_path:str,proto=False):
             if config_file is not None:
                 merged_configs = {**merged_configs, **config_file }
     # print_note(merged_configs,True,'Merged Config')
-    return global_config
+    return webezy_config
 
 def parse_webezy_json_configs(root_path):
     webezy_json_path = _fs.join_path(root_path,'webezy.json')
@@ -115,7 +120,7 @@ def parse_webezy_json_configs(root_path):
         WEBEZY_JSON = _helpers.WZJson(webezy_json=WEBEZY_JSON)
     return WEBEZY_JSON._config if WEBEZY_JSON is not None else None
 
-def parse_config_file_proto(root_path) -> Config:
+def parse_config_file_proto(root_path) -> WebezyConfig:
     custom_config_path = _fs.join_path(root_path,'config.py')
     wz_prj_conf = None
     if _fs.check_if_file_exists(custom_config_path):
@@ -206,5 +211,5 @@ def dict_from_module(module):
             context[setting] = getattr(module, setting)
     return context
 
-def get_file_config(prj_config_module) -> Config:
+def get_file_config(prj_config_module) -> WebezyConfig:
     return prj_config_module.configs

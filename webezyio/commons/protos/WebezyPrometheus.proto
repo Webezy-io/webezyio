@@ -6,43 +6,43 @@ package webezy.WebezyPrometheus.v1;
 
 
 
-// [webezyio] - The prometheus global configs
+// [webezy.WebezyPrometheus.v1.GlobalConfig] - The prometheus global configs
 message GlobalConfig {
-	// [webezyio] - The global scrape interval in secondes
+	// [webezy.WebezyPrometheus.v1.GlobalConfig.scrape_interval] - The global scrape interval in secondes
 	int32 scrape_interval = 1;
 }
 
-// [webezyio] - The label for the static config
+// [webezy.WebezyPrometheus.v1.StaticConfigLabel] - The label for the static config
 message StaticConfigLabel {
-	// [webezyio] - The service name
+	// [webezy.WebezyPrometheus.v1.StaticConfigLabel.service_name] - The service name
 	string service_name = 1;
-	// [webezyio] - the group
+	// [webezy.WebezyPrometheus.v1.StaticConfigLabel.group] - the group
 	string group = 2;
 }
 
-// [webezyio] - The static config specified for job
+// [webezy.WebezyPrometheus.v1.StaticConfig] - The static config specified for job
 message StaticConfig {
-	// [webezyio] - The targets array consist of HOST:PORT value
+	// [webezy.WebezyPrometheus.v1.StaticConfig.targets] - The targets array consist of HOST:PORT value
 	repeated string targets = 1;
-	// [webezyio] - 
+	// [webezy.WebezyPrometheus.v1.StaticConfig.labels] - 
 	repeated webezy.WebezyPrometheus.v1.StaticConfigLabel labels = 2;
 }
 
-// [webezyio] - The prometheus scrape specific configs
+// [webezy.WebezyPrometheus.v1.ScrapeConfig] - The prometheus scrape specific configs
 message ScrapeConfig {
-	// [webezyio] - The specified job name
+	// [webezy.WebezyPrometheus.v1.ScrapeConfig.job_name] - The specified job name
 	string job_name = 1;
-	// [webezyio] - The scrape interval for the specified job - in secondes
+	// [webezy.WebezyPrometheus.v1.ScrapeConfig.scrape_interval] - The scrape interval for the specified job - in secondes
 	int32 scrape_interval = 2;
-	// [webezyio] - 
+	// [webezy.WebezyPrometheus.v1.ScrapeConfig.static_configs] - 
 	repeated webezy.WebezyPrometheus.v1.StaticConfig static_configs = 3;
 }
 
-// [webezyio] - The prometheus description for configuration file
-message Config {
-	// [webezyio] - The global configurations for prometheus
+// [webezy.WebezyPrometheus.v1.PrometheusConfig] - The prometheus description for configuration file
+message PrometheusConfig {
+	// [webezy.WebezyPrometheus.v1.PrometheusConfig.global_config] - The global configurations for prometheus
 	webezy.WebezyPrometheus.v1.GlobalConfig global_config = 1;
-	// [webezyio] - The list of scrapes for prometheus
+	// [webezy.WebezyPrometheus.v1.PrometheusConfig.scrape_configs] - The list of scrapes for prometheus
 	repeated webezy.WebezyPrometheus.v1.ScrapeConfig scrape_configs = 2;
 }
 

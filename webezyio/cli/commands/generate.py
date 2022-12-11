@@ -26,29 +26,29 @@ from webezyio.architect import WebezyArchitect
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons.helpers import WZJson, WZField, WZEnumValue
 from webezyio.commons.pretty import print_info, print_warning, print_error, print_note, print_success, bcolors
-from webezyio.commons.protos.webezy_pb2 import FieldDescriptor, Options
+from webezyio.commons.protos import WebezyFieldType, WebezyFieldLabel, WebezyExtension
 from webezyio.commons.errors import WebezyProtoError
 import inquirer
 from inquirer import errors
 import re
 
 fields_opt = [
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_DOUBLE),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_FLOAT),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_INT64),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_INT32),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_BOOL),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_STRING),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_MESSAGE),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_BYTES),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_ENUM),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_ONEOF),
-    FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_MAP),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_DOUBLE),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_FLOAT),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_INT64),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_INT32),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_BOOL),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_STRING),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_MESSAGE),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_BYTES),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_ENUM),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_ONEOF),
+    WebezyFieldType.Name(WebezyFieldType.TYPE_MAP),
 
 ]
 field_label = [
-    FieldDescriptor.Label.Name(FieldDescriptor.Label.LABEL_OPTIONAL),
-    FieldDescriptor.Label.Name(FieldDescriptor.Label.LABEL_REPEATED),
+    WebezyFieldLabel.Name(WebezyFieldLabel.LABEL_OPTIONAL),
+    WebezyFieldLabel.Name(WebezyFieldLabel.LABEL_REPEATED),
 ]
 
 well_known_type = ['google.protobuf.Timestamp', 'google.protobuf.Struct']
@@ -145,6 +145,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
     package = webezy_json.get_package(pkg.split('.')[1], False)
     avail_msgs = []
     avail_field_ext = []
+    avail_msg_ext = []
 
     for msg in package.messages:
         if msg.extension_type == 0:
@@ -154,9 +155,12 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                 desc = ''
             avail_msgs.append((f'{msg.name}{desc}', msg.full_name))
         else:
-            if Options.Name(msg.extension_type) == 'FieldOptions':
+            if WebezyExtension.Name(msg.extension_type) == 'FieldOptions':
                 for f in msg.fields:
-                    avail_field_ext.append((f.name, f.full_name))
+                    avail_field_ext.append((f'FieldOptions | {f.name}', f.full_name))
+            elif WebezyExtension.Name(msg.extension_type) == 'MessageOptions':
+                for f in msg.fields:
+                    avail_msg_ext.append((f'MessageOptions | {f.name}', f.full_name))
 
     avail_enums = []
     for enum in package.enums:
@@ -182,19 +186,25 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
 
             for m in d_package.messages:
                 if m.extension_type is not None:
-                    if Options.Name(m.extension_type) == 'FieldOptions':
-                        for f in m.fields:
-                            avail_field_ext.append((f.name, f.full_name))
+                    if WebezyExtension.Name(msg.extension_type) == 'FieldOptions':
+                        for f in msg.fields:
+                            avail_field_ext.append((f'FieldOptions | {f.name}', f.full_name))
+                    elif WebezyExtension.Name(msg.extension_type) == 'MessageOptions':
+                        for f in msg.fields:
+                            avail_msg_ext.append((f'MessageOptions | {f.name}', f.full_name))
     extend = None
     if expand:
         extend = inquirer.prompt([inquirer.Confirm(
             'extend', message='Do you want to extend a message?')], theme=WebezyTheme())
+        
         if extend.get('extend'):
-            extend = inquirer.prompt([inquirer.List('extend', 'Choose message extension', choices=[Options.Name(
-                Options.FieldOptions), Options.Name(Options.MessageOptions), Options.Name(Options.FileOptions)])], theme=WebezyTheme())
-            extend = Options.Value(extend['extend'])
+            extend = inquirer.prompt([inquirer.List('extend', 'Choose message extension', choices=[WebezyExtension.Name(
+                WebezyExtension.FieldOptions), WebezyExtension.Name(WebezyExtension.MessageOptions), WebezyExtension.Name(WebezyExtension.FileOptions),WebezyExtension.Name(WebezyExtension.ServiceOptions),WebezyExtension.Name(WebezyExtension.MethodOptions)])], theme=WebezyTheme())
+            extend = WebezyExtension.Value(extend['extend'])
         else:
             extend = None
+            add_extension = inquirer.prompt([inquirer.List('add_message_extension','Do you want to add message level extension?')],theme=WebezyTheme())
+        
         description = inquirer.prompt([inquirer.Text(
             'description', 'Enter message description', '')], theme=WebezyTheme())
         if description is not None:
@@ -225,7 +235,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
         message_type = None
         enum_type = None
 
-        if field['fieldType'] == FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_MESSAGE):
+        if field['fieldType'] == WebezyFieldType.Name(WebezyFieldType.TYPE_MESSAGE):
             if len(avail_msgs) == 0:
                 print_warning("No messages availabe for field")
                 exit(1)
@@ -236,7 +246,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                 ], theme=WebezyTheme())
                 message_type = message['message']
 
-        elif field['fieldType'] == FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_ENUM):
+        elif field['fieldType'] == WebezyFieldType.Name(WebezyFieldType.TYPE_ENUM):
             if len(avail_enums) == 0:
                 print_warning("No enums available for field")
                 exit(1)
@@ -267,10 +277,10 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                             (m for m in temp_pkg.messages if m.name == f_ext['extensions'].split('.')[3]), None)
                         temp_field = next(
                             (f for f in temp_msg.fields if f.name == f_ext['extensions'].split('.')[-1]), None)
-                        if FieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_BOOL':
+                        if WebezyFieldType.Name(temp_field.field_type) == 'TYPE_BOOL':
                             f_ext_v = inquirer.prompt([inquirer.Confirm(
                                 'ext_value', 'Enter extension bool value', default=False)], theme=WebezyTheme())
-                        elif FieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_DOUBLE' or FieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_FLOAT':
+                        elif WebezyFieldType.Name(temp_field.field_type) == 'TYPE_DOUBLE' or WebezyFieldType.Name(temp_field.field_type) == 'TYPE_FLOAT':
                             f_ext_v = inquirer.prompt([inquirer.Text(
                                 'ext_value', 'Enter extension float value', validate=float_value_validate)], theme=WebezyTheme())
                             try:
@@ -278,7 +288,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                             except Exception as e:
                                 logging.exception(e)
                                 exit(1)
-                        elif FieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_INT32' or FieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_INT64':
+                        elif WebezyFieldType.Name(temp_field.field_type) == 'TYPE_INT32' or WebezyFieldType.Name(temp_field.field_type) == 'TYPE_INT64':
                             f_ext_v = inquirer.prompt([inquirer.Text(
                                 'ext_value', 'Enter extension integer value', validate=int_value_validate)], theme=WebezyTheme())
                             try:
@@ -286,7 +296,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                             except Exception as e:
                                 logging.exception(e)
                                 exit(1)
-                        elif FieldDescriptor.Type.Name(temp_field.field_type) == 'TYPE_STRING':
+                        elif WebezyFieldType.Name(temp_field.field_type) == 'TYPE_STRING':
                             f_ext_v = inquirer.prompt([inquirer.Text(
                                 'ext_value', 'Enter extension string value')], theme=WebezyTheme())
                         temp_ext_name = f_ext['extensions'].split('.')
@@ -391,7 +401,7 @@ def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_n
         message_type = None
         enum_type = None
 
-        if field['fieldType'] == FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_MESSAGE):
+        if field['fieldType'] == WebezyFieldType.Name(WebezyFieldType.TYPE_MESSAGE):
             if len(avail_msgs) == 0:
                 print_warning("[ONEOF] No messages availabe for field")
                 exit(1)
@@ -402,7 +412,7 @@ def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_n
                 ], theme=WebezyTheme())
                 message_type = message['message']
 
-        elif field['fieldType'] == FieldDescriptor.Type.Name(FieldDescriptor.Type.TYPE_ENUM):
+        elif field['fieldType'] == WebezyFieldType.Name(WebezyFieldType.TYPE_ENUM):
             if len(avail_enums) == 0:
                 print_warning("[ONEOF] No enums available for field")
                 exit(1)

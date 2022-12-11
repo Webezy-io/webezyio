@@ -128,13 +128,16 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                         index = 0
                         for l in file_content:
                             message_name = m['name']
+                            message_description = m.get('description') if m.get('description') is not None else ''
                             if f'{message_name} = _reflection' in l[:len(message_name)+15]:
                                 temp_fields = []
                                 init_fields = []
+                                docstring_fields = []
                                 # pretty.print_info(init_fields)
                                 for field in m['fields']:
 
                                     fName = field['name']
+                                    fDescription = field.get('description') if field.get('description') is not None else ''
                                     key_type = field.get('keyType').split('_')[-1].lower() if field.get('keyType') is not None else None
                                     value_type = field.get('valueType').split('_')[-1].lower() if field.get('keyType') is not None else None
                                     fType = parse_proto_type_to_py(field['fieldType'].split(
@@ -168,11 +171,14 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                                             fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
                                                 '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
                                             init_fields.append(f'{fOneofName}={fOneofType}')
+                                    docstring_fields.append(f'{fName} : {fType}\n\t\t\t{fDescription}')
 
                                 temp_fields = '\n\t'.join(temp_fields)
                                 init_fields = ', '.join(init_fields)
+                                docstring = 'Attributes:\n\t\t----------\n\t\t{0}'.format('\n\t\t'.join(docstring_fields))
+
                                 file_content.insert(
-                                    index, f'\n@overload\nclass {message_name}:\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\tpass\n')
+                                    index, f'\n@overload\nclass {message_name}(_message.Message):\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t{message_description}\n\t\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\t"""\n\t\t{docstring}\n\t\t"""\n\t\tpass\n')
                                 break
                             index += 1
                     file_system.wFile(file_system.join_path(
@@ -203,7 +209,11 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
         # pretty.print_info(current_pkg)
         if messageType.split('.')[1] != current_pkg:
             if messageType.split('.')[1] == 'protobuf':
-                temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(messageType.split('.')[-1].lower(),messageType.split('.')[-1])
+                package_temp_name = messageType.split('.')[-1].lower()
+                msg_temp_name = messageType.split('.')[-1]
+                if messageType.split('.')[-1].lower() == 'value':
+                    package_temp_name = 'struct'
+                temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(package_temp_name,msg_temp_name)
             else:
                 temp_type = '{0}__pb2.{1}'.format(
                     messageType.split('.')[1], messageType.split('.')[-1])

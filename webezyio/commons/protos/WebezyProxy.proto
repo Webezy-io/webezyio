@@ -6,53 +6,53 @@ package webezy.WebezyProxy.v1;
 
 
 
-// [webezyio] - The proxy settings global address
+// [webezy.WebezyProxy.v1.ProxyAddress] - The proxy settings global address
 message ProxyAddress {
-	// [webezyio] - The address for the proxy
+	// [webezy.WebezyProxy.v1.ProxyAddress.address] - The address for the proxy
 	string address = 1;
-	// [webezyio] - The proxy address port
+	// [webezy.WebezyProxy.v1.ProxyAddress.port] - The proxy address port
 	int32 port = 2;
 }
 
-// [webezyio] - The proxy stats sink
+// [webezy.WebezyProxy.v1.ProxyStatsSink] - The proxy stats sink
 message ProxyStatsSink {
-	// [webezyio] - The same cluster name as specified at the clusters array
+	// [webezy.WebezyProxy.v1.ProxyStatsSink.tcp_cluster_name] - The same cluster name as specified at the clusters array
 	string tcp_cluster_name = 1;
-	// [webezyio] - 
+	// [webezy.WebezyProxy.v1.ProxyStatsSink.prefix] - 
 	string prefix = 2;
 }
 
-// [webezyio] - The proxy listener configs
+// [webezy.WebezyProxy.v1.ProxyListener] - The proxy listener configs
 message ProxyListener {
-	// [webezyio] - The listsener name
+	// [webezy.WebezyProxy.v1.ProxyListener.name] - The listsener name
 	string name = 1;
-	// [webezyio] - The listener address details
+	// [webezy.WebezyProxy.v1.ProxyListener.address] - The listener address details
 	webezy.WebezyProxy.v1.ProxyAddress address = 2;
 }
 
-// [webezyio] - The proxy endpoint config
+// [webezy.WebezyProxy.v1.ProxyEndpoint] - The proxy endpoint config
 message ProxyEndpoint {
-	// [webezyio] - The endpoint address
+	// [webezy.WebezyProxy.v1.ProxyEndpoint.address] - The endpoint address
 	webezy.WebezyProxy.v1.ProxyAddress address = 1;
 }
 
-// [webezyio] - The proxy cluster details
+// [webezy.WebezyProxy.v1.ProxyCluster] - The proxy cluster details
 message ProxyCluster {
-	// [webezyio] - The cluster name
+	// [webezy.WebezyProxy.v1.ProxyCluster.name] - The cluster name
 	string name = 1;
-	// [webezyio] - The cluster endpoints
+	// [webezy.WebezyProxy.v1.ProxyCluster.endpoints] - The cluster endpoints
 	repeated webezy.WebezyProxy.v1.ProxyEndpoint endpoints = 2;
 }
 
-// [webezyio] - The main configurations for envoy proxy
-message Config {
-	// [webezyio] - The admin configurations
+// [webezy.WebezyProxy.v1.ProxyConfig] - The main configurations for envoy proxy
+message ProxyConfig {
+	// [webezy.WebezyProxy.v1.ProxyConfig.admin] - The admin configurations
 	webezy.WebezyProxy.v1.ProxyAddress admin = 1;
-	// [webezyio] - The proxy stats sink configurations
+	// [webezy.WebezyProxy.v1.ProxyConfig.stats] - The proxy stats sink configurations
 	webezy.WebezyProxy.v1.ProxyStatsSink stats = 2;
-	// [webezyio] - The proxy listeners
+	// [webezy.WebezyProxy.v1.ProxyConfig.listeners] - The proxy listeners
 	repeated webezy.WebezyProxy.v1.ProxyListener listeners = 3;
-	// [webezyio] - The proxy clusters
+	// [webezy.WebezyProxy.v1.ProxyConfig.clusters] - The proxy clusters
 	repeated webezy.WebezyProxy.v1.ProxyCluster clusters = 4;
 }
 

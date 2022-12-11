@@ -114,7 +114,7 @@ optional arguments:
   --load                Initalize a template
 ```
 
-See [Service Templating Section](./docs//templating.md) for more information.
+See [Service Templating Section](./docs/templating.md) for more information.
 
 ## wz call
 Call a service RPC for a running server host

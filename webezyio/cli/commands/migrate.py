@@ -26,9 +26,9 @@ from webezyio import _fs,_pretty
 import sys
 from google.protobuf.timestamp_pb2 import Timestamp
 
-from webezyio.commons.protos.webezy_pb2 import Language
+from webezyio.commons.protos import WebezyLanguage, python
 
-def migrate_project(protos_directory:str,output_path:str,format:Literal['json','python']='json',server_language=Language.Name(Language.python),clients=[Language.Name(Language.python)]):
+def migrate_project(protos_directory:str,output_path:str,format:Literal['json','python']='json',server_language=WebezyLanguage.Name(python),clients=[WebezyLanguage.Name(python)]):
     if format == 'python':
         raise Exception("Cannot process a migration plan into python file ! only json format is supported right now.")
     _pretty.print_info((output_path,format),True,'Starting migration process ->')

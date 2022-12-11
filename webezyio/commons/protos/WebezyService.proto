@@ -1,0 +1,58 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+package webezy.WebezyService.v1;
+
+
+
+// [webezy.WebezyService.v1.WebezyMethod] - The webezy service method (RPC) description
+message WebezyMethod {
+	// [webezy.WebezyService.v1.WebezyMethod.uri] - The method URI
+	string uri = 1;
+	// [webezy.WebezyService.v1.WebezyMethod.name] - Method name
+	string name = 2;
+	// [webezy.WebezyService.v1.WebezyMethod.full_name] - Method full name
+	string full_name = 3;
+	// [webezy.WebezyService.v1.WebezyMethod.type] - The resource type
+	string type = 4;
+	// [webezy.WebezyService.v1.WebezyMethod.kind] - The resource kind
+	string kind = 5;
+	// [webezy.WebezyService.v1.WebezyMethod.input_type] - The full resource name (message full name) for input type
+	string input_type = 6;
+	// [webezy.WebezyService.v1.WebezyMethod.output_type] - The full resource name (message full name) for output type
+	string output_type = 7;
+	// [webezy.WebezyService.v1.WebezyMethod.client_streaming] - If method is client stream flag
+	bool client_streaming = 8;
+	// [webezy.WebezyService.v1.WebezyMethod.server_streaming] - If method is server stream flag
+	bool server_streaming = 9;
+	// [webezy.WebezyService.v1.WebezyMethod.description] - The method human readable description
+	string description = 10;
+	// [webezy.WebezyService.v1.WebezyMethod.extensions] - The method (RPC) pluggable extensions configurations
+	map<string, google.protobuf.Value> extensions = 11;
+}
+
+// [webezy.WebezyService.v1.WebezyService] - The webezy service descripiton
+message WebezyService {
+	// [webezy.WebezyService.v1.WebezyService.uri] - The service URI for the resource
+	string uri = 1;
+	// [webezy.WebezyService.v1.WebezyService.name] - Service name - MUST not hold any blank spaces and SHOULD be Capitalized CamelCased
+	string name = 2;
+	// [webezy.WebezyService.v1.WebezyService.full_name] - The service full name consisting of - <domain>.<name>.<version>
+	string full_name = 3;
+	// [webezy.WebezyService.v1.WebezyService.methods] - 
+	repeated webezy.WebezyService.v1.WebezyMethod methods = 4;
+	// [webezy.WebezyService.v1.WebezyService.version] - 
+	string version = 5;
+	// [webezy.WebezyService.v1.WebezyService.dependencies] - 
+	repeated string dependencies = 6;
+	// [webezy.WebezyService.v1.WebezyService.description] - 
+	string description = 7;
+	// [webezy.WebezyService.v1.WebezyService.type] - 
+	string type = 8;
+	// [webezy.WebezyService.v1.WebezyService.kind] - 
+	string kind = 9;
+	// [webezy.WebezyService.v1.WebezyService.extensions] - 
+	map<string, google.protobuf.Value> extensions = 10;
+}
+

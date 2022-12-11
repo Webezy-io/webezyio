@@ -29,10 +29,9 @@ import inquirer
 from webezyio.architect import WebezyArchitect
 import webezyio.builder as builder
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import helpers, file_system, resources, errors
+from webezyio.commons import helpers, file_system, resources, errors,protos as webezy_protos
 from webezyio.commons.pretty import print_error, print_info, print_note, print_success, print_warning
-from webezyio.commons.protos.webezy_pb2 import Descriptor, Language, Project, ServiceDescriptor, WebezyClient, WebezyDeploymentType, WebezyServer, WzResourceWrapper,google_dot_protobuf_dot_struct__pb2
-from google.protobuf.descriptor import Descriptor
+from webezyio.commons.protos import WebezyLanguage, WebezyProject, WebezyClient, DOCKER,LOCAL,DeploymentType, WebezyServer,google_dot_protobuf_dot_struct__pb2
 from google.protobuf.descriptor_pb2 import MessageOptions
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
@@ -67,9 +66,9 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
 
     srvr = WebezyServer(language=server_language)
     print_info(srvr,True,"Server language")
-    prj = Project(uri=project_path, name=project_name, package_name=project_name.replace('-', '').replace('_', ''), version='0.0.1',
+    prj = WebezyProject(uri=project_path, name=project_name, package_name=project_name.replace('-', '').replace('_', ''), version='0.0.1',
                   type=resources.ResourceTypes.project.value, kind=resources.ResourceKinds.ezy_1.value, server=srvr, clients=temp_clients)
-    resources_added.append(WzResourceWrapper(project=prj))
+    resources_added.append(prj)
 
     if file_system.walkFiles(protos_dir) is None:
         raise errors.WebezyProtoError(
@@ -118,8 +117,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                         for svc_ext in service_options.Extensions._extended_message.ListFields():
                             ext_desc, ext_value = svc_ext
                             temp_extensions[ext_desc.full_name] = None
-                            field_opt_type = resources.WZFieldDescriptor.Type.Name(ext_desc.type)
-                            field_opt_label = resources.WZFieldDescriptor.Label.Name(ext_desc.label)
+                            field_opt_type = webezy_protos.WebezyFieldType.Name(ext_desc.type)
+                            field_opt_label = webezy_protos.WebezyFieldLabel.Name(ext_desc.label)
                             temp_extensions = parse_proto_extension(field_opt_type,field_opt_label,ext_desc,ext_value,temp_extensions)
                         service._extensions = temp_extensions
                         
@@ -147,8 +146,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
 
                         ext_desc, ext_value = pkg_ext
                         temp_extensions[ext_desc.full_name] = None
-                        field_opt_type = resources.WZFieldDescriptor.Type.Name(ext_desc.type)
-                        field_opt_label = resources.WZFieldDescriptor.Label.Name(ext_desc.label)
+                        field_opt_type = webezy_protos.WebezyFieldType.Name(ext_desc.type)
+                        field_opt_label = webezy_protos.WebezyFieldLabel.Name(ext_desc.label)
                         temp_extensions = parse_proto_extension(field_opt_type,field_opt_label,ext_desc,ext_value,temp_extensions)
                        
                     package._extensions = temp_extensions
@@ -164,7 +163,7 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                         if extension_type is None:
                             
                             # Currently only supports FieldOptions as auto-detect
-                            extension_type = resources.Options.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
+                            extension_type = resources.WebezyExtension.Value(ext.GetOptions().Extensions._extended_message.DESCRIPTOR.name)
                         
                         else:
                             extension_type = extension_type['extension_type']
@@ -173,8 +172,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                         message._extension_type = extension_type
                         for field_extended in ext.extension_scope.extensions:
                             extended_field_desc = helpers.WZField(field_extended.name,
-                                type=resources.WZFieldDescriptor.Type.Name(field_extended.type),
-                                label=resources.WZFieldDescriptor.Label.Name(field_extended.label),
+                                type=webezy_protos.WebezyFieldType.Name(field_extended.type),
+                                label=webezy_protos.WebezyFieldLabel.Name(field_extended.label),
                                 enum_type=field_extended.enum_type.full_name if field_extended.enum_type is not None else None,message_type=field_extended.message_type.full_name if field_extended.message_type is not None else None)
                             
                             message._fields.append(extended_field_desc)
@@ -193,9 +192,9 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                                 is_map_field = True
                                 for entry in field.message_type.fields_by_name:
                                     if 'key' == entry:
-                                        field_key_type = resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name[entry].type)
+                                        field_key_type = webezy_protos.WebezyFieldType.Name(field.message_type.fields_by_name[entry].type)
                                     elif 'value' == entry:
-                                        field_value_type = resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name[entry].type)
+                                        field_value_type = webezy_protos.WebezyFieldType.Name(field.message_type.fields_by_name[entry].type)
                                     else:
                                         # Not a map message
                                         field_key_type = None
@@ -210,8 +209,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                             field_options = field.GetOptions()
                             
                             for f_ext in field_options.Extensions._extended_message.ListFields():
-                                field_opt_type = resources.WZFieldDescriptor.Type.Name(f_ext[0].type)
-                                field_opt_label = resources.WZFieldDescriptor.Label.Name(f_ext[0].label)
+                                field_opt_type = webezy_protos.WebezyFieldType.Name(f_ext[0].type)
+                                field_opt_label = webezy_protos.WebezyFieldLabel.Name(f_ext[0].label)
                                 field_extensions = parse_proto_extension(field_opt_type,field_opt_label,f_ext[0],f_ext[1],field_extensions)
                               
 
@@ -220,14 +219,14 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                         field_enum_type = field.enum_type.full_name if hasattr(field.enum_type,'full_name') else None
                         if field_message_type == None:
                             if hasattr(field.message_type,'fields_by_name'):
-                                if resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_MESSAGE':
+                                if webezy_protos.WebezyFieldType.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_MESSAGE':
                                     field_message_type = field.message_type.fields_by_name.get('value').message_type.full_name
-                                elif resources.WZFieldDescriptor.Type.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_ENUM':
+                                elif webezy_protos.WebezyFieldType.Name(field.message_type.fields_by_name.get('value').type) == 'TYPE_ENUM':
                                     field_enum_type = field.message_type.fields_by_name.get('value').enum_type.full_name
                                 
                         field = helpers.WZField(field.name,
-                                                type=resources.WZFieldDescriptor.Type.Name(field.type if is_map_field == False else resources.WZFieldDescriptor.Type.TYPE_MAP),
-                                                label=resources.WZFieldDescriptor.Label.Name(field.label if field_key_type is None else 1),
+                                                type=webezy_protos.WebezyFieldType.Name(field.type if is_map_field == False else webezy_protos.WebezyFieldType.TYPE_MAP),
+                                                label=webezy_protos.WebezyFieldLabel.Name(field.label if field_key_type is None else 1),
                                                 message_type=field_message_type,
                                                 enum_type=field_enum_type,
                                                 extensions=field_extensions,key_type=field_key_type,value_type=field_value_type
@@ -264,7 +263,7 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
         path=webezy_json_path, domain=domain, project_name=project.name)
     c_languages = []
     for client in project.clients:
-        c_languages.append({'language':resources.Language.Name(client.language)})
+        c_languages.append({'language':WebezyLanguage.Name(client.language)})
         # if type(client) == str:
         #     client_lang = client
         # else:
@@ -274,9 +273,9 @@ def _migrate_to_webezy_json(webezy_json_path:str,domain,project,packages:Dict[st
         # print_info(f'Adding client: {client_lang}')
         # c_languages.append(
         #     {'out_dir': out_dir, 'language': client_lang})
-    ARCHITECT.AddProject(server_language=resources.Language.Name(project.server.language), clients=c_languages)
+    ARCHITECT.AddProject(server_language=WebezyLanguage.Name(project.server.language), clients=c_languages)
     ARCHITECT.SetDomain(domain)
-    ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
+    ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': DeploymentType.Name(LOCAL) })
 
     for p in packages:
         package_name, package_messages, package_enums, package_extensions, package_domain = packages[p].to_tuple()

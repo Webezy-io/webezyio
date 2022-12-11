@@ -1,0 +1,225 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+package webezy.WebezyPackage.v1;
+
+
+
+// [webezy.WebezyPackage.v1.WebezyField] - The webezy field descriptor
+message WebezyField {
+	// [webezy.WebezyPackage.v1.WebezyField.uri] - The field URI
+	string uri = 1;
+	// [webezy.WebezyPackage.v1.WebezyField.name] - The field name
+	string name = 2;
+	// [webezy.WebezyPackage.v1.WebezyField.full_name] - The field full name <domain>.<package>.<version>.<message>.<field>
+	string full_name = 3;
+	// [webezy.WebezyPackage.v1.WebezyField.index] - The field index at the message level hierarchy
+	int32 index = 4;
+	// [webezy.WebezyPackage.v1.WebezyField.field_type] - The field type
+	webezy.WebezyPackage.v1.WebezyFieldType field_type = 5;
+	// [webezy.WebezyPackage.v1.WebezyField.label] - The field label
+	webezy.WebezyPackage.v1.WebezyFieldLabel label = 6;
+	// [webezy.WebezyPackage.v1.WebezyField.enum_type] - If field is type ENUM this field MUST be populated with full resource name of the ENUM
+	string enum_type = 7;
+	// [webezy.WebezyPackage.v1.WebezyField.message_type] - If the field type is of type MESSAGE then this field MUST be populated with the full resource name of the MESSAGE
+	string message_type = 8;
+	// [webezy.WebezyPackage.v1.WebezyField.type] - The message resource type
+	string type = 9;
+	// [webezy.WebezyPackage.v1.WebezyField.kind] - The message resource kind
+	string kind = 10;
+	// [webezy.WebezyPackage.v1.WebezyField.description] - The field human readable description
+	string description = 11;
+	// [webezy.WebezyPackage.v1.WebezyField.key_type] - If field is of type MAP then this field MUST be populated with the map< KEY,> type
+	webezy.WebezyPackage.v1.WebezyFieldType key_type = 12;
+	// [webezy.WebezyPackage.v1.WebezyField.value_type] - If field is of type MAP then this field MUST be populated with the map<, VALUE> type
+	webezy.WebezyPackage.v1.WebezyFieldType value_type = 13;
+	// [webezy.WebezyPackage.v1.WebezyField.extensions] - The field extensions
+	map<string, google.protobuf.Value> extensions = 14;
+	// [webezy.WebezyPackage.v1.WebezyField.oneof_fields] - 
+	repeated webezy.WebezyPackage.v1.WebezyOneOfField oneof_fields = 15;
+}
+
+// [webezy.WebezyPackage.v1.WebezyEnumValue] - The webezy enum value descriptor
+message WebezyEnumValue {
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.uri] - Enum value URI
+	string uri = 1;
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.name] - Enum value name
+	string name = 2;
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.number] - Enum value number (value)
+	int32 number = 3;
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.index] - The enum value index at the enum values array
+	int32 index = 4;
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.type] - Enum value type
+	string type = 5;
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.kind] - Enum value kind
+	string kind = 6;
+	// [webezy.WebezyPackage.v1.WebezyEnumValue.description] - Human readable description for the enum value
+	string description = 7;
+}
+
+// [webezy.WebezyPackage.v1.WebezyEnum] - The webezy enum descriptor
+message WebezyEnum {
+	// [webezy.WebezyPackage.v1.WebezyEnum.uri] - Enum URI
+	string uri = 1;
+	// [webezy.WebezyPackage.v1.WebezyEnum.name] - Enum name
+	string name = 2;
+	// [webezy.WebezyPackage.v1.WebezyEnum.full_name] - Enum full name <domain>.<package>.<version>.<enum>
+	string full_name = 3;
+	// [webezy.WebezyPackage.v1.WebezyEnum.values] - Array of enum value
+	repeated webezy.WebezyPackage.v1.WebezyEnumValue values = 4;
+	// [webezy.WebezyPackage.v1.WebezyEnum.type] - Enum type
+	string type = 5;
+	// [webezy.WebezyPackage.v1.WebezyEnum.kind] - Enum kind
+	string kind = 6;
+	// [webezy.WebezyPackage.v1.WebezyEnum.description] - Enum human readable description
+	string description = 7;
+}
+
+// [webezy.WebezyPackage.v1.WebezyMessage] - The webezy message descriptor
+message WebezyMessage {
+	// [webezy.WebezyPackage.v1.WebezyMessage.uri] - Message URI
+	string uri = 1;
+	// [webezy.WebezyPackage.v1.WebezyMessage.name] - Message name
+	string name = 2;
+	// [webezy.WebezyPackage.v1.WebezyMessage.full_name] - Message full name <domain>.<package>.<version>.<message>
+	string full_name = 3;
+	// [webezy.WebezyPackage.v1.WebezyMessage.fields] - The fields array under the specified message type
+	repeated webezy.WebezyPackage.v1.WebezyField fields = 4;
+	// [webezy.WebezyPackage.v1.WebezyMessage.type] - Message type
+	string type = 5;
+	// [webezy.WebezyPackage.v1.WebezyMessage.kind] - Message kind
+	string kind = 6;
+	// [webezy.WebezyPackage.v1.WebezyMessage.description] - Human readable message description
+	string description = 7;
+	// [webezy.WebezyPackage.v1.WebezyMessage.extension_type] - Optional if to extend this message
+	webezy.WebezyPackage.v1.WebezyExtension extension_type = 8;
+	// [webezy.WebezyPackage.v1.WebezyMessage.extensions] - A map of pluggable extensions into message
+	map<string, google.protobuf.Value> extensions = 9;
+}
+
+// [webezy.WebezyPackage.v1.WebezyPackage] - The webezy package descriptor
+message WebezyPackage {
+	// [webezy.WebezyPackage.v1.WebezyPackage.uri] - Package URI
+	string uri = 1;
+	// [webezy.WebezyPackage.v1.WebezyPackage.name] - Package name
+	string name = 2;
+	// [webezy.WebezyPackage.v1.WebezyPackage.package] - The package unique full name
+	string package = 3;
+	// [webezy.WebezyPackage.v1.WebezyPackage.version] - Package version
+	string version = 4;
+	// [webezy.WebezyPackage.v1.WebezyPackage.description] - Package human readable description
+	string description = 5;
+	// [webezy.WebezyPackage.v1.WebezyPackage.type] - Package type
+	string type = 6;
+	// [webezy.WebezyPackage.v1.WebezyPackage.kind] - Pakcage king
+	string kind = 7;
+	// [webezy.WebezyPackage.v1.WebezyPackage.messages] - The package messages array
+	repeated webezy.WebezyPackage.v1.WebezyMessage messages = 8;
+	// [webezy.WebezyPackage.v1.WebezyPackage.enums] - The package enums array
+	repeated webezy.WebezyPackage.v1.WebezyEnum enums = 9;
+	// [webezy.WebezyPackage.v1.WebezyPackage.extensions] - The package pluggable extensions
+	map<string, google.protobuf.Value> extensions = 10;
+	// [webezy.WebezyPackage.v1.WebezyPackage.dependencies] - 
+	repeated string dependencies = 11;
+}
+
+// [webezy.WebezyPackage.v1.WebezyOneOfField] - None
+message WebezyOneOfField {
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.uri] - 
+	string uri = 1;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.name] - 
+	string name = 2;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.full_name] - 
+	string full_name = 3;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.index] - 
+	int32 index = 4;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.enum_type] - 
+	string enum_type = 5;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.message_type] - 
+	string message_type = 6;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.type] - 
+	string type = 7;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.kind] - 
+	string kind = 8;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.description] - 
+	string description = 9;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.extensions] - A map of pluggable extensions into field
+	map<string, google.protobuf.Value> extensions = 10;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.field_type] - 
+	webezy.WebezyPackage.v1.WebezyFieldType field_type = 11;
+}
+
+// [webezy.WebezyPackage.v1.WebezyFieldLabel] - None
+enum WebezyFieldLabel {
+	// [webezy.WebezyPackage.v1.WebezyFieldLabel] - None
+	UNKNOWN_WEBEZYFIELDLABEL = 0;
+	// [webezy.WebezyPackage.v1.WebezyFieldLabel] - None
+	LABEL_OPTIONAL = 1;
+	// [webezy.WebezyPackage.v1.WebezyFieldLabel] - None
+	LABEL_REQUIRED = 2;
+	// [webezy.WebezyPackage.v1.WebezyFieldLabel] - None
+	LABEL_REPEATED = 3;
+}
+
+// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+enum WebezyFieldType {
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	UNKNOWN_WEBEZYFIELDTYPE = 0;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_DOUBLE = 1;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_FLOAT = 2;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_INT64 = 3;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_UINT64 = 4;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_INT32 = 5;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_FIXED64 = 6;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_FIXED32 = 7;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_BOOL = 8;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_STRING = 9;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_GROUP = 10;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_MESSAGE = 11;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_BYTES = 12;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_UINT32 = 13;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_ENUM = 14;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_SFIXED32 = 15;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_SFIXED64 = 16;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_SINT32 = 17;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_SINT64 = 18;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_MAP = 19;
+	// [webezy.WebezyPackage.v1.WebezyFieldType] - None
+	TYPE_ONEOF = 20;
+}
+
+// [webezy.WebezyPackage.v1.WebezyExtension] - None
+enum WebezyExtension {
+	// [webezy.WebezyPackage.v1.WebezyExtension] - None
+	UNKNOWN_WEBEZYEXTENSION = 0;
+	// [webezy.WebezyPackage.v1.WebezyExtension] - None
+	FileOptions = 1;
+	// [webezy.WebezyPackage.v1.WebezyExtension] - None
+	MessageOptions = 2;
+	// [webezy.WebezyPackage.v1.WebezyExtension] - None
+	FieldOptions = 3;
+	// [webezy.WebezyPackage.v1.WebezyExtension] - None
+	ServiceOptions = 4;
+	// [webezy.WebezyPackage.v1.WebezyExtension] - None
+	MethodOptions = 5;
+}

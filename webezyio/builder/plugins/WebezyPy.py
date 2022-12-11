@@ -22,7 +22,7 @@
 import logging
 import subprocess
 import webezyio.builder as builder
-from webezyio.commons import helpers, file_system, pretty, resources
+from webezyio.commons import helpers, file_system, pretty, resources, protos
 from webezyio.builder.plugins.static import gitignore_py
 
 
@@ -240,14 +240,18 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                     for m in wz_json.packages[pkg_proto].get('messages'):
                         index = 0
                         for l in file_content:
+                            message_description = m.get('description') if m.get('description') is not None else ''
                             message_name = m['name']
                             if f'{message_name} = _reflection' in l[:len(message_name)+15]:
                                 temp_fields = []
                                 init_fields = []
+                                docstring_fields = []
                                 for field in m['fields']:
                                     key_type = field.get('keyType').split('_')[-1].lower() if field.get('keyType') is not None else None
                                     value_type = field.get('valueType').split('_')[-1].lower() if field.get('keyType') is not None else None
                                     fName = field['name']
+                                    fDescription = field.get('description') if field.get('description') is not None else ''
+
                                     fType = parse_proto_type_to_py(field['fieldType'].split(
                                         '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name,key_type=key_type,value_type=value_type)
                                     if field['fieldType'].split(
@@ -279,6 +283,8 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                                             fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
                                                 '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
                                             init_fields.append(f'{fOneofName}={fOneofType}')
+                                    docstring_fields.append(f'{fName} : {fType}\n\t\t\t{fDescription}')
+
                                 # for field in m['fields']:
                                 #     fName = field['name']
                                 #     fType = parse_proto_type_to_py(field['fieldType'].split(
@@ -288,8 +294,9 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
                                 #     init_fields.append(f'{fName}={fType}')
                                 temp_fields = '\n\t'.join(temp_fields)
                                 init_fields = ', '.join(init_fields)
+                                docstring = 'Attributes:\n\t\t----------\n\t\t{0}'.format('\n\t\t'.join(docstring_fields))
                                 file_content.insert(
-                                    index, f'\n@overload\nclass {message_name}:\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\tpass\n')
+                                    index, f'\n@overload\nclass {message_name}(_message.Message):\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t{message_description}\n\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\t"""\n\t\t{docstring}\n\t\t"""\n\t\tpass\n')
                                 break
                             index += 1
                     file_system.wFile(file_system.join_path(
@@ -320,11 +327,11 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
                 else:
                     out_prototype = f'\t\t# response = {rpc_out_pkg}_pb2.{rpc_out_name}({fields})\n\t\t# return response\n'
                 code = f'{out_prototype}\n\t\tsuper().{rpc_name}(request, context)\n\n'
-                methods.append(resources.WZMethodContext(
+                methods.append(protos.WebezyMethodContext(
                     name=rpc_name, code=code, type='rpc'))
-            files.append(resources.WZFileContext(
+            files.append(protos.WebezyFileContext(
                 file=f'./services/{svc}.py', methods=methods))
-    context = resources.proto_to_dict(resources.WZContext(files=files))
+    context = resources.proto_to_dict(protos.WebezyContext(files=files))
     logging.debug("Writing new context")
     file_system.mkdir(file_system.join_path(path, '.webezy'))
     file_system.wFile(file_system.join_path(
@@ -347,7 +354,11 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
         # pretty.print_info(current_pkg)
         if messageType.split('.')[1] != current_pkg:
             if messageType.split('.')[1] == 'protobuf':
-                temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(messageType.split('.')[-1].lower(),messageType.split('.')[-1])
+                package_temp_name = messageType.split('.')[-1].lower()
+                msg_temp_name = messageType.split('.')[-1]
+                if messageType.split('.')[-1].lower() == 'value':
+                    package_temp_name = 'struct'
+                temp_type = 'google_dot_protobuf_dot_{0}__pb2.{1}'.format(package_temp_name,msg_temp_name)
             else:
                 temp_type = '{0}__pb2.{1}'.format(
                     messageType.split('.')[1], messageType.split('.')[-1])

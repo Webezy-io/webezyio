@@ -56,14 +56,41 @@ def list_by_name(full_name,webezy_json:WZJson):
     # Enums list
     elif args_split > 3 and args_split <= 4:
         try:
-            header = ['Field','Field type','Enum Type', 'Message Type']
-            tab = PrettyTable(header)
-            msg = webezy_json.get_message(full_name)
-            for f in msg.get('fields'):
-                tab.add_row([f['name'],f.get('fieldType'),f.get('enumType'),f.get('messageType')])
-            print_info(tab,True,'Listing message [{0}] fields'.format(msg.get('fullName')))
-        except Exception:
-            print_warning(f'Resource {full_name} wasnt found on messages')
+            enum = webezy_json.get_enum(full_name)
+            if enum is not None:
+                header = ['Name', 'Value']
+                tab = PrettyTable(header)
+                for v in enum.get('values'):
+                    tab.add_row([v['name'],v.get('number')])
+                print_info(tab,True,'Listing enum [{0}] values'.format(enum.get('fullName')))
+            else:
+                msg = webezy_json.get_message(full_name)
+                header = ['Field', 'Field type', 'Enum type', 'Message type']
+                oneof_exist = next((f for f in msg.get('fields') if f.get('fieldType') == 'TYPE_ONEOF'),False)
+                map_exist = next((f for f in msg.get('fields') if f.get('fieldType') == 'TYPE_MAP'),False)
+                
+                if oneof_exist:
+                    header.append('Oneof')
+                if map_exist:
+                    header.append('Key type')
+                    header.append('Value type')
+                tab = PrettyTable(header)
+
+                for f in msg.get('fields'):
+                    
+                    temp_row = [f['name'],f.get('fieldType','-'),f.get('enumType','-'),f.get('messageType','-')]
+
+                    if oneof_exist:
+                        temp_row.append(list(map(lambda x: x.get('name'),f.get('oneofFields'))))
+                    if map_exist:
+                        temp_row.append(f.get('keyType','-'))
+                        temp_row.append(f.get('valueType','-'))
+
+                    tab.add_row(temp_row)
+                print_info(tab,True,'Listing message [{0}] fields'.format(msg.get('fullName')))
+        except Exception as e:
+            print_error(e)
+            print_warning(f'Resource {full_name} wasnt found on enums or messages')
     # Fields list ?
     else:
         try:

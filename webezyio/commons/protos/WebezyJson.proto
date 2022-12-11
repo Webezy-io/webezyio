@@ -1,0 +1,25 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyConfig.proto";
+import "WebezyCore.proto";
+import "WebezyService.proto";
+import "WebezyPackage.proto";
+package webezy.WebezyJson.v1;
+
+
+
+// [webezy.WebezyJson.v1.WebezyJson] - The webezy.json file schema
+message WebezyJson {
+	// [webezy.WebezyJson.v1.WebezyJson.domain] - The domain name without any prefix or suffix
+	string domain = 1;
+	// [webezy.WebezyJson.v1.WebezyJson.project] - The webezy project description
+	webezy.WebezyCore.v1.WebezyProject project = 2;
+	// [webezy.WebezyJson.v1.WebezyJson.config] - The webezy project configs
+	webezy.WebezyConfig.v1.WebezyConfig config = 3;
+	// [webezy.WebezyJson.v1.WebezyJson.services] - 
+	map<string, webezy.WebezyService.v1.WebezyService> services = 4;
+	// [webezy.WebezyJson.v1.WebezyJson.packages] - 
+	map<string, webezy.WebezyPackage.v1.WebezyPackage> packages = 5;
+}
+

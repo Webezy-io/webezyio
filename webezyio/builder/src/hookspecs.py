@@ -1,7 +1,6 @@
 import pluggy
 
 from webezyio.commons.helpers import WZContext, WZJson
-from webezyio.commons.protos.webezy_pb2 import WzResourceWrapper
 
 hookspec = pluggy.HookspecMarker("builder")
 

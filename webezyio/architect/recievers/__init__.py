@@ -128,7 +128,7 @@ class Builder:
 
         removed = False
         full_name = full_name[0]
-        
+
         if len(full_name.split('.')) == 4:
 
             if webezyJson.get('packages') is not None:
@@ -158,8 +158,28 @@ class Builder:
                         if r.get('name') == full_name.split('.')[-1]:
                             svc['methods'].remove(r)
                             removed = True
+        elif len(full_name.split('.')) == 6:
+            # Handling removal of oneof fields
+            if webezyJson.get('packages') is not None:
+                pkg_name = 'protos/{0}/{1}.proto'.format(full_name.split('.')[2],full_name.split('.')[1])
+                if pkg_name in webezyJson.get('packages'):
+                    if webezyJson['packages'][pkg_name].get('messages') is not None:
+                        index_msgs = 0
+                        for m in webezyJson['packages'][pkg_name].get('messages'):
+                            field_name = '.'.join(full_name.split('.')[:-1])
+                            field = next((f for f in m.get('fields') if f.get('fullName') == field_name),None)
+                            if field is not None:
+                                field_index = m.get('fields').index(field)
+                                oneof_field = next((one_f for one_f in field.get('oneofFields') if one_f.get('fullName') == full_name),None)
+                                if oneof_field is not None:
+                                    print_info(f'{pkg_name=} | {index_msgs=} | {field_index=}')
+                                    webezyJson['packages'][pkg_name]['messages'][index_msgs]['fields'][field_index]['oneofFields'].remove(oneof_field)
+                                    removed = True
+                                    break
+                            index_msgs += 1
+
         else:
-            
+            # Removing fields or enum values
             if webezyJson.get('packages') is not None:
                 pkg_name = 'protos/{0}/{1}.proto'.format(full_name.split('.')[2],full_name.split('.')[1])
                 
@@ -187,7 +207,9 @@ class Builder:
 
                             index_enums +=1
 
-                            
+        if removed == False:
+            print_error("Some error occured during deletion process !")
+            exit(1)
         log.debug("Removing resource "+full_name)
 
     def create_new_project(self,*args,**kwargs):

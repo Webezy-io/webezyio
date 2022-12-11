@@ -25,7 +25,7 @@ from webezyio.commons.errors import WebezyProtoError
 from webezyio.commons.file_system import join_path
 from webezyio.commons.pretty import print_info, print_note
 
-from webezyio.commons.protos.webezy_pb2 import Language, PackageDescriptor,Project
+from webezyio.commons.protos import WebezyLanguage, python, go, typescript,WebezyProject
 from google.protobuf.json_format import MessageToDict
 from webezyio.commons.resources import generate_enum, generate_message, generate_package, generate_project,\
                                      generate_rpc, generate_service
@@ -78,7 +78,7 @@ class WebezyArchitect():
     def SetConfig(self,config):
         self._webezy.execute(CommandMap._ADD_RESOURCE, {'config':config})
 
-    def AddProject(self,name=None,server_language=Language.Name(Language.python),clients=[]) -> Project:
+    def AddProject(self,name=None,server_language=WebezyLanguage.Name(python),clients=[]) -> WebezyProject:
         name = name if name is not None else self._project_name
         dict = generate_project(self._path,name,server_language,clients,json=True)
         project = generate_project(self._path,name,server_language,clients)
@@ -119,8 +119,8 @@ class WebezyArchitect():
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages': { f'protos/v1/{name}.proto' : dict } })
         return package
 
-    def AddMessage(self,package,name,fields,description=None,options=None,domain=None):
-        message = generate_message(self._path,self._domain if domain is None else domain,package,name,fields,option=options,description=description)
+    def AddMessage(self,package,name,fields,description=None,options=None,extensions=None,domain=None):
+        message = generate_message(self._path,self._domain if domain is None else domain,package,name,fields,option=options,description=description,extensions=extensions,wz_json=self._webezy.webezyJson)
         if next((m for m in package.messages if m.name == message.name), None) is None:
             package.messages.append(message)
             self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages':{f'protos/v1/{package.name}.proto': MessageToDict(package)}})
@@ -145,8 +145,8 @@ class WebezyArchitect():
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(package))
         return package
 
-    def EditMessage(self,package,name,fields,description=None,options=None,old_name=None):
-        message = generate_message(self._path,self._domain,package,name,fields,option=options,description=description)
+    def EditMessage(self,package,name,fields,description=None,options=None,old_name=None,extensions=None):
+        message = generate_message(self._path,self._domain,package,name,fields,option=options,description=description,extensions=extensions,wz_json=self._webezy.webezyJson)
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(message),old_name=old_name)
         return message
 
@@ -170,6 +170,9 @@ class WebezyArchitect():
     def RemoveField(self, full_name):
         self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
 
+    def RemoveOneofField(self, full_name):
+        self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
+        
     def RemoveEnumValue(self, full_name):
         self._webezy.execute(CommandMap._REMOVE_RESOURCE,full_name)
 

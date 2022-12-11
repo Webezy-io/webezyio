@@ -23,11 +23,10 @@ import logging
 import subprocess
 from typing import List, Literal
 from webezyio.cli.theme import WebezyTheme
-from webezyio.commons import file_system
+from webezyio.commons import file_system,protos
 from webezyio.commons.helpers import WZEnumValue, WZField,_BUILTINS_TEMPLATES
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 from webezyio.commons.file_system import join_path,mkdir
-from webezyio.commons.protos.webezy_pb2 import Language,WebezyDeploymentType
 from webezyio.architect import WebezyArchitect
 import os
 import inquirer
@@ -47,9 +46,9 @@ def validate_domain(answers, current):
 
 wz_new_q = [
     inquirer.List("server", message="Choose server language", choices=[
-                  ('Python', Language.python), ('Typescript', Language.typescript)], default=Language.python),
+                  ('Python', protos.python), ('Typescript', protos.typescript)], default=protos.python),
     inquirer.Checkbox("clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
-                      ('Python', Language.python), ('Typescript', Language.typescript), ('Go',Language.go)], default=[Language.python],validate=validate_client),
+                      ('Python', protos.python), ('Typescript', protos.typescript), ('Go',protos.go)], default=[protos.python],validate=validate_client),
     inquirer.Text("domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
@@ -89,14 +88,14 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
             if type(results[k]) == str:
                 server_langugae = results[k]
             else:
-                server_langugae = Language.Name(results[k])
+                server_langugae = protos.WebezyLanguage.Name(results[k])
             print_info(f'Server language: {server_langugae}')
         if k == 'clients':
             for c in results[k]:
                 if type(c) == str:
                     client_lang = c
                 else:
-                    client_lang = Language.Name(c)
+                    client_lang = protos.WebezyLanguage.Name(c)
                 out_dir = join_path(
                     result_path, 'clients', client_lang)
                 print_info(f'Adding client: {client_lang}\n\t-> {out_dir}')
@@ -106,10 +105,10 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
             domain_name = results[k]
 
     out_dir = join_path(
-                    result_path, 'clients',results['server'] if type(results['server']) == str else Language.Name(results['server']))
-    if next((c for c in clients if c.get('language') == (results['server'] if type(results['server']) == str else Language.Name(results['server'])) ),None) is None:
-        print_warning('Auto-Adding client {} - Any project by default is assigned with client in the server specified language !'.format(Language.Name(results['server']) if type(results['server']) != str else results['server'] ))
-        clients.append({'out_dir': out_dir, 'language': Language.Name(results['server']) if type(results['server']) != str else results['server'] })
+                    result_path, 'clients',results['server'] if type(results['server']) == str else protos.WebezyLanguage.Name(results['server']))
+    if next((c for c in clients if c.get('language') == (results['server'] if type(results['server']) == str else protos.WebezyLanguage.Name(results['server'])) ),None) is None:
+        print_warning('Auto-Adding client {} - Any project by default is assigned with client in the server specified language !'.format(protos.WebezyLanguage.Name(results['server']) if type(results['server']) != str else results['server'] ))
+        clients.append({'out_dir': out_dir, 'language': protos.WebezyLanguage.Name(results['server']) if type(results['server']) != str else results['server'] })
     root_dir = result_path
     webezy_json_path = join_path(root_dir, 'webezy.json')
     mkdir(result_path)
@@ -131,7 +130,7 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
 
     ARCHITECT.AddProject(server_language=server_langugae, clients=clients)
     ARCHITECT.SetDomain(domain_name)
-    ARCHITECT.SetConfig({'host': host, 'port': int(port), 'deployment': WebezyDeploymentType.Name(WebezyDeploymentType.LOCAL) })
+    ARCHITECT.SetConfig({'host': host, 'port': int(port), 'deployment': protos.DeploymentType.Name(protos.LOCAL) })
 
     ARCHITECT.Save()
     

@@ -16,7 +16,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16WebezyPrometheus.proto\x12\x1awebezy.WebezyPrometheus.v1\"\'\n\x0cGlobalConfig\x12\x17\n\x0fscrape_interval\x18\x01 \x01(\x05\"8\n\x11StaticConfigLabel\x12\x14\n\x0cservice_name\x18\x01 \x01(\t\x12\r\n\x05group\x18\x02 \x01(\t\"^\n\x0cStaticConfig\x12\x0f\n\x07targets\x18\x01 \x03(\t\x12=\n\x06labels\x18\x02 \x03(\x0b\x32-.webezy.WebezyPrometheus.v1.StaticConfigLabel\"{\n\x0cScrapeConfig\x12\x10\n\x08job_name\x18\x01 \x01(\t\x12\x17\n\x0fscrape_interval\x18\x02 \x01(\x05\x12@\n\x0estatic_configs\x18\x03 \x03(\x0b\x32(.webezy.WebezyPrometheus.v1.StaticConfig\"\x8b\x01\n\x06\x43onfig\x12?\n\rglobal_config\x18\x01 \x01(\x0b\x32(.webezy.WebezyPrometheus.v1.GlobalConfig\x12@\n\x0escrape_configs\x18\x02 \x03(\x0b\x32(.webezy.WebezyPrometheus.v1.ScrapeConfigb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16WebezyPrometheus.proto\x12\x1awebezy.WebezyPrometheus.v1\"\'\n\x0cGlobalConfig\x12\x17\n\x0fscrape_interval\x18\x01 \x01(\x05\"8\n\x11StaticConfigLabel\x12\x14\n\x0cservice_name\x18\x01 \x01(\t\x12\r\n\x05group\x18\x02 \x01(\t\"^\n\x0cStaticConfig\x12\x0f\n\x07targets\x18\x01 \x03(\t\x12=\n\x06labels\x18\x02 \x03(\x0b\x32-.webezy.WebezyPrometheus.v1.StaticConfigLabel\"{\n\x0cScrapeConfig\x12\x10\n\x08job_name\x18\x01 \x01(\t\x12\x17\n\x0fscrape_interval\x18\x02 \x01(\x05\x12@\n\x0estatic_configs\x18\x03 \x03(\x0b\x32(.webezy.WebezyPrometheus.v1.StaticConfig\"\x95\x01\n\x10PrometheusConfig\x12?\n\rglobal_config\x18\x01 \x01(\x0b\x32(.webezy.WebezyPrometheus.v1.GlobalConfig\x12@\n\x0escrape_configs\x18\x02 \x03(\x0b\x32(.webezy.WebezyPrometheus.v1.ScrapeConfigb\x06proto3')
 
 
 
@@ -24,16 +24,23 @@ _GLOBALCONFIG = DESCRIPTOR.message_types_by_name['GlobalConfig']
 _STATICCONFIGLABEL = DESCRIPTOR.message_types_by_name['StaticConfigLabel']
 _STATICCONFIG = DESCRIPTOR.message_types_by_name['StaticConfig']
 _SCRAPECONFIG = DESCRIPTOR.message_types_by_name['ScrapeConfig']
-_CONFIG = DESCRIPTOR.message_types_by_name['Config']
+_PROMETHEUSCONFIG = DESCRIPTOR.message_types_by_name['PrometheusConfig']
 
 @overload
-class GlobalConfig:
+class GlobalConfig(_message.Message):
 	"""webezyio generated message [webezy.WebezyPrometheus.v1.GlobalConfig]
 	A class respresent a GlobalConfig type
-	"""
+	The prometheus global configs
+		"""
 	scrape_interval = int # type: int
 
 	def __init__(self, scrape_interval=int):
+		"""
+		Attributes:
+		----------
+		scrape_interval : int
+			The global scrape interval in secondes
+		"""
 		pass
 GlobalConfig = _reflection.GeneratedProtocolMessageType('GlobalConfig', (_message.Message,), {
   'DESCRIPTOR' : _GLOBALCONFIG,
@@ -44,14 +51,23 @@ _sym_db.RegisterMessage(GlobalConfig)
 
 
 @overload
-class StaticConfigLabel:
+class StaticConfigLabel(_message.Message):
 	"""webezyio generated message [webezy.WebezyPrometheus.v1.StaticConfigLabel]
 	A class respresent a StaticConfigLabel type
-	"""
+	The label for the static config
+		"""
 	service_name = str # type: str
 	group = str # type: str
 
 	def __init__(self, service_name=str, group=str):
+		"""
+		Attributes:
+		----------
+		service_name : str
+			The service name
+		group : str
+			the group
+		"""
 		pass
 StaticConfigLabel = _reflection.GeneratedProtocolMessageType('StaticConfigLabel', (_message.Message,), {
   'DESCRIPTOR' : _STATICCONFIGLABEL,
@@ -62,14 +78,23 @@ _sym_db.RegisterMessage(StaticConfigLabel)
 
 
 @overload
-class StaticConfig:
+class StaticConfig(_message.Message):
 	"""webezyio generated message [webezy.WebezyPrometheus.v1.StaticConfig]
 	A class respresent a StaticConfig type
-	"""
+	The static config specified for job
+		"""
 	targets = List[str] # type: List[str]
 	labels = List[StaticConfigLabel] # type: List[StaticConfigLabel]
 
 	def __init__(self, targets=List[str], labels=List[StaticConfigLabel]):
+		"""
+		Attributes:
+		----------
+		targets : List[str]
+			The targets array consist of HOST:PORT value
+		labels : List[StaticConfigLabel]
+			
+		"""
 		pass
 StaticConfig = _reflection.GeneratedProtocolMessageType('StaticConfig', (_message.Message,), {
   'DESCRIPTOR' : _STATICCONFIG,
@@ -80,15 +105,26 @@ _sym_db.RegisterMessage(StaticConfig)
 
 
 @overload
-class ScrapeConfig:
+class ScrapeConfig(_message.Message):
 	"""webezyio generated message [webezy.WebezyPrometheus.v1.ScrapeConfig]
 	A class respresent a ScrapeConfig type
-	"""
+	The prometheus scrape specific configs
+		"""
 	job_name = str # type: str
 	scrape_interval = int # type: int
 	static_configs = List[StaticConfig] # type: List[StaticConfig]
 
 	def __init__(self, job_name=str, scrape_interval=int, static_configs=List[StaticConfig]):
+		"""
+		Attributes:
+		----------
+		job_name : str
+			The specified job name
+		scrape_interval : int
+			The scrape interval for the specified job - in secondes
+		static_configs : List[StaticConfig]
+			
+		"""
 		pass
 ScrapeConfig = _reflection.GeneratedProtocolMessageType('ScrapeConfig', (_message.Message,), {
   'DESCRIPTOR' : _SCRAPECONFIG,
@@ -99,21 +135,30 @@ _sym_db.RegisterMessage(ScrapeConfig)
 
 
 @overload
-class Config:
-	"""webezyio generated message [webezy.WebezyPrometheus.v1.Config]
-	A class respresent a Config type
-	"""
+class PrometheusConfig(_message.Message):
+	"""webezyio generated message [webezy.WebezyPrometheus.v1.PrometheusConfig]
+	A class respresent a PrometheusConfig type
+	The prometheus description for configuration file
+		"""
 	global_config = GlobalConfig # type: GlobalConfig
 	scrape_configs = List[ScrapeConfig] # type: List[ScrapeConfig]
 
 	def __init__(self, global_config=GlobalConfig, scrape_configs=List[ScrapeConfig]):
+		"""
+		Attributes:
+		----------
+		global_config : GlobalConfig
+			The global configurations for prometheus
+		scrape_configs : List[ScrapeConfig]
+			The list of scrapes for prometheus
+		"""
 		pass
-Config = _reflection.GeneratedProtocolMessageType('Config', (_message.Message,), {
-  'DESCRIPTOR' : _CONFIG,
+PrometheusConfig = _reflection.GeneratedProtocolMessageType('PrometheusConfig', (_message.Message,), {
+  'DESCRIPTOR' : _PROMETHEUSCONFIG,
   '__module__' : 'WebezyPrometheus_pb2'
-  # @@protoc_insertion_point(class_scope:webezy.WebezyPrometheus.v1.Config)
+  # @@protoc_insertion_point(class_scope:webezy.WebezyPrometheus.v1.PrometheusConfig)
   })
-_sym_db.RegisterMessage(Config)
+_sym_db.RegisterMessage(PrometheusConfig)
 
 if _descriptor._USE_C_DESCRIPTORS == False:
 
@@ -126,6 +171,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _STATICCONFIG._serialized_end=247
   _SCRAPECONFIG._serialized_start=249
   _SCRAPECONFIG._serialized_end=372
-  _CONFIG._serialized_start=375
-  _CONFIG._serialized_end=514
+  _PROMETHEUSCONFIG._serialized_start=375
+  _PROMETHEUSCONFIG._serialized_end=524
 # @@protoc_insertion_point(module_scope)

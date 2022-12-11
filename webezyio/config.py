@@ -1,4 +1,4 @@
-from webezyio.commons.protos import WebezyConfig_pb2 as WebezyConfig
+from webezyio.commons.protos import WebezyConfig,WebezyMonitor
 """
                  _                           _        
  __      __ ___ | |__    ___  ____ _   _    (_)  ___  
@@ -8,14 +8,14 @@ from webezyio.commons.protos import WebezyConfig_pb2 as WebezyConfig
                                    |___/              .configs
 
 webezyio cli module configuration"""
-configs=WebezyConfig.Config(
+configs=WebezyConfig(
     host="localhost",
     port=50051,
     # Analytic gathering approval
-    analytics=True,
+    analytics=False,
     # First run flag
-    first_run=True,
-    token="",
+    first_run=False,
+    token="macOS-12.6-arm64-arm-64bit:2022-12-04T11:05:32.199518",
     # Supported builtins templates
     webezyio_templates = [
         "@webezyio/Blank",

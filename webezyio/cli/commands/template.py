@@ -88,7 +88,7 @@ from webezyio.commons import helpers, file_system
 
 # Webezy proto modules also helps us here to construct our services
 # gRPC used to create another gRPC ! :)
-from webezyio.commons.protos.webezy_pb2 import Language, WebezyContext, WebezyFileContext
+from webezyio.commons.protos import WebezyLanguage, WebezyContext, WebezyFileContext
 
 # Default system imports
 import os
