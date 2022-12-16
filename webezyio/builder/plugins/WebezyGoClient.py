@@ -23,7 +23,7 @@ import logging
 import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources, pretty
-from webezyio.builder.plugins.static import gitignore_ts,package_json,bash_init_script_go
+from webezyio.builder.plugins.static import gitignore_go,package_json,bash_init_script_go
 
 
 @builder.hookimpl
@@ -60,11 +60,16 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     if wz_json.services is not None:
         for s in wz_json.services:
             services_protoc.append(s)
+            if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'services', 'protos', s)) == False:
+                file_system.mkdir(file_system.join_path(wz_json.path, 'services', 'protos',s))
     if wz_json.packages is not None:
         for p in wz_json.packages:
             packages_protoc.append(wz_json.packages[p].get('name'))
-    file_system.wFile(file_system.join_path(
-        wz_json.path, 'bin', 'init-go.sh'), bash_init_script_go(wz_json.project.get('packageName'),services_protoc,packages_protoc))
+            if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'services', 'protos', wz_json.packages[p].get('name'))) == False:
+                file_system.mkdir(file_system.join_path(wz_json.path, 'services', 'protos', wz_json.packages[p].get('name')))
+
+    # file_system.wFile(file_system.join_path(
+        # wz_json.path, 'bin', 'init-go.sh'), bash_init_script_go(wz_json.project.get('packageName'),services_protoc,packages_protoc))
     # file_system.wFile(file_system.join_path(
         # wz_json.path, 'bin', 'proto.js'), protos_compile_script_ts)
 
@@ -76,7 +81,12 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
     # file_system.wFile(file_system.join_path(wz_json.path,'.webezy','contxt.json'),'{"files":[]}')
     
     # .gitignore
-    file_system.wFile(file_system.join_path(wz_json.path,'.gitignore'),gitignore_ts)
+    gitignore_path = file_system.join_path(wz_json.path,'.gitignore')
+    if file_system.check_if_file_exists(gitignore_path):
+        gitignore_file = ''.join(file_system.rFile(gitignore_path))
+        gitignore_file += gitignore_go
+        file_system.wFile(file_system.join_path(wz_json.path,'.gitignore'),gitignore_file,True)
+    file_system.wFile(file_system.join_path(wz_json.path,'.gitignore'),gitignore_go)
 
     return [directories]
 
@@ -92,7 +102,7 @@ def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
             packages_protoc.append(wz_json.packages[p].get('name'))
     file_system.wFile(file_system.join_path(
         wz_json.path, 'bin', 'init-go.sh'), bash_init_script_go(wz_json.project.get('packageName'),services_protoc,packages_protoc),True)
-    # Running ./bin/init-ts.sh script for compiling protos
+    # Running ./bin/init-go.sh script for compiling protos
     if wz_json.get_server_language() != 'go':
         logging.info("Running ./bin/init-go.sh script for 'protoc' compiler")
         subprocess.run(['bash', file_system.join_path(

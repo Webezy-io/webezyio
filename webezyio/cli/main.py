@@ -36,7 +36,6 @@ from webezyio.builder.plugins import WebezyMigrate
 from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
-from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf, protos
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template, config as config_command
@@ -369,7 +368,7 @@ def main(args=None):
                     f"Generating new resource '{namespace[0]}'{resource_name}")
 
                 results = inquirer.prompt(
-                    namespace[1] if args.name is None else namespace[1][1:], theme=WebezyTheme())
+                    namespace[1] if args.name is None else namespace[1][1:], theme=theme.WebezyTheme())
 
                 if results is None:
                     print_error('Must answer all questions')
@@ -444,7 +443,7 @@ def main(args=None):
                 """Purge command process"""
 
                 temp_path = webezy_json_path.replace('webezy.json','.webezy/context.json')
-                confirm =inquirer.prompt([inquirer.Confirm('confirm',False,message='You are about to purge the webezy context are you sure?')],theme=WebezyTheme())
+                confirm =inquirer.prompt([inquirer.Confirm('confirm',False,message='You are about to purge the webezy context are you sure?')],theme=theme.WebezyTheme())
                 if confirm.get('confirm'):
                     file_system.removeFile(temp_path)
                     print_success("Purged webezy context !")

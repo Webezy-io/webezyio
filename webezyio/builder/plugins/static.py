@@ -152,22 +152,22 @@ def bash_init_script_go(project_package, services, packages):
     services_protoc = []
     packages_protoc = []
     for s in services:
-        services_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR  --go-grpc_opt=paths=source_relative protos/{}.proto'.format(s))
+        services_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR"/{0}"  --go-grpc_opt=paths=source_relative protos/{0}.proto'.format(s))
     for p in packages:
-        packages_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR  --go-grpc_opt=paths=source_relative protos/{}.proto'.format(p))
+        packages_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR"/{0}"  --go-grpc_opt=paths=source_relative protos/{0}.proto'.format(p))
     return '#!/bin/bash\n\n\
 echo "[WEBEZYIO] init.sh starting protoc compiler for Go"\n\
-go mod tidy\n\
-go test\n\
-statuscode=$?\n\
-echo "Exit code for go.mod tidy and test -> "$statuscode\n\
-[[ "$statuscode" != "0" ]] && {3} echo "Some error occured during init script for Go"; echo "Running init for : github.com/{0}"; go mod init github.com/{0}; {4}\n\
 go get -u google.golang.org/protobuf\n\
 go get -u google.golang.org/grpc\n\
 SRC_DIR="protos"\n\
 DST_DIR="services/protos"\n\
 {1}\n\
-{2}'.format(project_package,'\n'.join(services_protoc),'\n'.join(packages_protoc),_OPEN_BRCK,_CLOSING_BRCK)
+{2}\n\
+go mod tidy\n\
+go test\n\
+statuscode=$?\n\
+echo "Exit code for go.mod tidy and test -> "$statuscode\n\
+[[ "$statuscode" != "0" ]] && {3} echo "Some error occured during init script for Go"; echo "Running init for : github.com/{0}"; go mod init github.com/{0}; {4}\n'.format(project_package,'\n'.join(services_protoc),'\n'.join(packages_protoc),_OPEN_BRCK,_CLOSING_BRCK)
 
 bash_init_script_ts = '#!/bin/bash\n\n\
 echo "[WEBEZYIO] init.sh starting protoc compiler"\n\
@@ -178,6 +178,22 @@ statuscode=$?\n\
 echo "Exit code for protoc -> "$statuscode\n\
 [[ "$statuscode" != "0" ]] && { echo "Some error occured during init script"; exit 1; }\n\
 exit 0'
+
+bash_init_script_webpack = '#!/bin/bash\n\
+declare -a services=("protos")\n\
+for SERVICE in "${0}services[@]{1}"; do\n\
+    echo $SERVICE\n\
+    cd $SERVICE\n\
+    for FILE in *; do\n\
+        filename=$FILE\n\
+        search="protos\/"\n\
+        replace=""\n\
+        sed -i\'.bak\' -e "1,8 s/$search/$replace/gi" $filename\n\
+        rm -f *.bak\n\
+        echo "[webezy-script] Compiling -> "$filename\n\
+        sudo protoc -I=../protos $filename  --js_out=import_style=commonjs,binary:../clients/webpack   --grpc-web_out=import_style=typescript,mode=grpcwebtext:../clients/webpack\n\
+    done\n\
+done'.format(_OPEN_BRCK,_CLOSING_BRCK)
 
 bash_run_server_script_ts = '#!/bin/bash\n\n\
 if [[ $1 == "debug" ]]\n\
@@ -195,7 +211,7 @@ const PROTO_DIR = path.join(__dirname, "../protos");\n\
 const MODEL_DIR = path.join(__dirname, "../services/protos");\n\
 const PROTOC_PATH = path.join(__dirname, "../node_modules/grpc-tools/bin/protoc");\n\
 const PLUGIN_PATH = path.join(__dirname, "../node_modules/.bin/protoc-gen-ts_proto");\n\n\
-rimraf.sync(`${MODEL_DIR}/*`, {\n\
+rimraf.sync(`${MODEL_DIR}/*.ts`, {\n\
   glob: { ignore: `${MODEL_DIR}/tsconfig.json` },\n\
 });\n\n\
 const protoConfig = [\n\
@@ -244,6 +260,36 @@ package_json ='{\n\
         "typescript": "^4.8.2",\n\
         "ts-node": "^10.9.1"\n\
     }\n\
+}'
+
+package_json_webpack = '{\n\
+  "name": "REPLACEME",\n\
+  "version": "1.0.0",\n\
+  "description": "This project has been generated thanks to ```Webezy.io``` CLI. For start using it please run  ```webezy build && wz run```  and see the magic in action. For more information please visit https://www.webezy.io/docs",\n\
+  "scripts": {\n\
+    "build": "echo \\"Error: no build specified\\" && exit 1",\n\
+    "test": "echo \\"Error: no test specified\\" && exit 1",\n\
+    "dev": "echo \\"Error: no dev specified\\" && exit 1",\n\
+    "start": "echo \\"Error: no start specified\\" && exit 1"\n\
+  },\n\
+  "author": "",\n\
+  "license": "Apache-2.0",\n\
+  "devDependencies": {\n\
+    "@types/google-protobuf": "^3.15.6"\n\
+  },\n\
+  "engines": {\n\
+    "node": ">=14"\n\
+  },\n\
+  "dependencies": {\n\
+    "@grpc/grpc-js": "~1.1.8",\n\
+    "@grpc/proto-loader": "~0.5.4",\n\
+    "async": "~3.2.3",\n\
+    "google-protobuf": "~3.14.0",\n\
+    "grpc-web": "~1.4.2",\n\
+    "lodash": "~4.17.0",\n\
+    "webpack": "~4.43.0",\n\
+    "webpack-cli": "~3.3.11"\n\
+  }\n\
 }'
 
 utils_errors_ts = 'import { Metadata, ServiceError as grpcServiceError, status } from \'@grpc/grpc-js\';\n\n\

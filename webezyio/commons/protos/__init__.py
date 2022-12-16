@@ -13,7 +13,7 @@ from .WebezyCore_pb2 import WebezyProject, \
     WebezyServer, \
     WebezyClient, \
     WebezyLanguage, \
-    go,python,typescript # Supported languages
+    go,python,typescript,webpack,java,javascript,csharp # Supported languages
 
 """WebezyPackage"""
 from .WebezyPackage_pb2 import WebezyField, \
@@ -63,3 +63,6 @@ from .WebezyProxy_pb2 import ProxyAddress, ProxyCluster, ProxyConfig, ProxyEndpo
 
 """WebezyTemplate"""
 from .WebezyTemplate_pb2 import TemplateConfig, WebezyContext, WebezyFileContext, WebezyMethodContext
+
+"""Webezy core client"""
+from .client import webezycore

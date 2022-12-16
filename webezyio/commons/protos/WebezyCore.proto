@@ -20,6 +20,16 @@ message WebezyServer {
 	webezy.WebezyCore.v1.WebezyLanguage language = 1;
 }
 
+// [webezy.WebezyCore.v1.WebezyNpm] - Webezy Node Package Manager integration configurations for wrapping the Typescript / Javascript packages directly to npm with every build command
+message WebezyNpm {
+	// [webezy.WebezyCore.v1.WebezyNpm.scope] - The user or organization scope see: https://docs.npmjs.com/about-scopes
+	string scope = 1;
+	// [webezy.WebezyCore.v1.WebezyNpm.public] - If package access is public see: https://docs.npmjs.com/about-public-packages
+	bool public = 2;
+	// [webezy.WebezyCore.v1.WebezyNpm.token] - The npm access token see: https://docs.npmjs.com/creating-and-viewing-access-tokens
+	string token = 3;
+}
+
 // [webezy.WebezyCore.v1.WebezyClient] - The description for webezy client
 message WebezyClient {
 	// [webezy.WebezyCore.v1.WebezyClient.language] - The client language
@@ -57,16 +67,6 @@ message WebezyProject {
 	string go_package = 10;
 }
 
-// [webezy.WebezyCore.v1.WebezyNpm] - Webezy Node Package Manager integration configurations for wrapping the Typescript / Javascript packages directly to npm with every build command
-message WebezyNpm {
-	// [webezy.WebezyCore.v1.WebezyNpm.scope] - The user or organization scope see: https://docs.npmjs.com/about-scopes
-	string scope = 1;
-	// [webezy.WebezyCore.v1.WebezyNpm.public] - If package access is public see: https://docs.npmjs.com/about-public-packages
-	bool public = 2;
-	// [webezy.WebezyCore.v1.WebezyNpm.token] - The npm access token see: https://docs.npmjs.com/creating-and-viewing-access-tokens
-	string token = 3;
-}
-
 // [webezy.WebezyCore.v1.WebezyLanguage] - None
 enum WebezyLanguage {
 	// [webezy.WebezyCore.v1.WebezyLanguage] - None
@@ -77,4 +77,12 @@ enum WebezyLanguage {
 	typescript = 2;
 	// [webezy.WebezyCore.v1.WebezyLanguage] - None
 	go = 3;
+	// [webezy.WebezyCore.v1.WebezyLanguage] - None
+	webpack = 4;
+	// [webezy.WebezyCore.v1.WebezyLanguage] - None
+	javascript = 5;
+	// [webezy.WebezyCore.v1.WebezyLanguage] - None
+	csharp = 6;
+	// [webezy.WebezyCore.v1.WebezyLanguage] - None
+	java = 7;
 }

@@ -5,10 +5,10 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient,WebezyWebpack
 from webezyio.commons import file_system, helpers, resources, errors
-from webezyio.commons.pretty import print_error
-_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,WebezyTsClient,WebezyGoClient,
+from webezyio.commons.pretty import print_error, print_warning
+_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,WebezyTsClient,WebezyGoClient,WebezyWebpack,
                         WebezyReadme]  # Many More To Come
 log = logging.getLogger('webezyio.cli.main')
 
@@ -76,9 +76,11 @@ class WebezyBuilder:
         client_py = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'python'),False)
         client_ts = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'typescript'),False)
         client_go = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'go'),False)
+        client_webpack = next((c for c in self._webezy_json.project.get('clients') if c.get('language') == 'webpack'),False)
 
         # Default docker
         if deployment_type == 'DOCKER':
+            print_error("WebezyDocker plugins not supported yet !")
             self._pm.register(WebezyDocker)
             self._pm.register(WebezyProxy)
             self._pm.register(WebezyMonitor)
@@ -98,6 +100,9 @@ class WebezyBuilder:
 
         if client_go:
             self._pm.register(WebezyGoClient)
+
+        if client_webpack:
+            self._pm.register(WebezyWebpack)
 
         if server_lang == 'typescript':
             self._pm.register(WebezyTsServer)

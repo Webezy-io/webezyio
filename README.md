@@ -13,13 +13,13 @@ Webezy.io has been created to give devlopers quick and structerd way for buildin
 In result we are trying not to restrict the implemantations themselves but instead applying small restrictions on the project structure for well defined, re-usable structure that can be used by many languages and scenarios.
 
 The current supported languages are:
-| **Language** | **Server** | **Client** |   **Status**   |
-|:------------:|:----------:|:----------:|:--------------:|
-|    [Python](./docs/source/python.md)    |    **V**   |    **V**   |     Stable     |
-|  [Typescript](./docs/source/typescript.md)  |    **V**   |    **V**   |     Stable     |
-| [Go](./docs/source/go.md)           |    **X**   |    **V**   | Experimental   |
-| C#.NET       |    **X**   |    **X**   |     Planned    |
-
+|                **Language**               | **Server** | **Client** |  **Status**  |
+|:-----------------------------------------:|:----------:|:----------:|:------------:|
+|     [Python](./docs/source/python.md)     |    **V**   |    **V**   |    Stable    |
+| [Typescript](./docs/source/typescript.md) |    **V**   |    **V**   |    Stable    |
+|         [Go](./docs/source/go.md)         |    **X**   |    **V**   | Experimental |
+| [Webpack-js](./docs/source/webpack-js.md) |     --     |    **V**   | Experimental |
+|                   C#.NET                  |    **X**   |    **V**   |    Planned   |
 
 Get full explanation and many more details on usage at [```webezy.io```](https://www.webezy.io).
 

@@ -28,12 +28,11 @@ from typing import List, Literal
 from webezyio import __version__,config
 from webezyio.commons import file_system
 
-from webezyio.core import webezycore,WebezyAnalytics_pb2
 from webezyio.commons import errors, pretty
 from webezyio.commons.resources import generate_package, generate_service
 from webezyio.commons.errors import WebezyCoderError, WebezyValidationError
 from webezyio.commons.file_system import check_if_file_exists, join_path
-from webezyio.commons.protos import WebezyJson
+from webezyio.commons.protos import WebezyJson,WebezyAnalytics_pb2,webezycore
 from itertools import groupby
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import ParseDict, MessageToDict
@@ -1186,7 +1185,7 @@ class WZClientGo:
         for p in self._packages:
             list_of_packages.append('"{}/services/protos/{}"'.format(self._wz_json.project.get('goPackage'),self._packages[p].get('name')))
 
-        _default_imports = ['"fmt"','"io"','"context"','"log"','"time"','"google.golang.org/grpc"','"google.golang.org/grpc/credentials/insecure"','\n','\n\t'.join(list_of_services),'\n\t'.join(list_of_packages)]
+        _default_imports = ['"fmt"','"io"','"context"','"log"','"time"','"google.golang.org/grpc"','"google.golang.org/grpc/credentials/insecure"','"google.golang.org/grpc/metadata"','\n','\n\t'.join(list_of_services),'\n\t'.join(list_of_packages)]
 
         return 'package {}\n\nimport (\n\t{}\n)'.format(self._project_package,'\n\t'.join(_default_imports))
 
@@ -1197,7 +1196,9 @@ class WZClientGo:
                           'callOpts []grpc.CallOption // Connection call options',
                           'conn *grpc.ClientConn // A client connection object']
         for s in self._services:
-            client_options.append(f'{s.lower()} {s}.{s}Client')
+            temp_svc = s[0].upper() + s[1:]
+            temp_lower_svc = s.lower()
+            client_options.append(f'{temp_lower_svc} {s}.{temp_svc}Client')
         return '\n\n// \'{0}\' represents the project services facing client side\ntype {0} struct {1}\n\t{2}\n{3}\n\n'.format(self._wz_json.project.get('packageName'),_OPEN_BRCK,'\n\t'.join(client_options),_CLOSING_BRCK)
     
     def write_new(self):
@@ -1210,11 +1211,13 @@ class WZClientGo:
             _list_of_client_opts_none_types.append(i.split()[0])
 
         for s in self._services:
-            _list_of_services_clients.append('{0}Client := {1}.New{1}Client(conn)'.format(s.lower(),s))
+            temp_service = s[0].upper() + s[1:]
+            _list_of_services_clients.append('{0}Client := {1}.New{2}Client(conn)'.format(s.lower(),s,temp_service))
             _temp_svc_list.append('{0}Client'.format(s.lower()))
         
         _new_client_init = ['\n\tlog.SetFlags(log.Lshortfile + log.Ltime)',
-                            '\n\tif len(dialOpts) == 0 {}\n\t\tdialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))\n\t{}'.format(_OPEN_BRCK,_CLOSING_BRCK),
+                            '\n\tsize := 1024 * 1024 * 50 // Max Recv / Send message 50MB as default',
+                            '\n\tif len(dialOpts) == 0 {}\n\t\tdialOpts = append(dialOpts,\ngrpc.WithTransportCredentials(insecure.NewCredentials()),\ngrpc.WithDefaultCallOptions(\ngrpc.MaxCallRecvMsgSize(size),\ngrpc.MaxCallSendMsgSize(size),))\n\t{}'.format(_OPEN_BRCK,_CLOSING_BRCK),
                             '\n\tif host == "" {}\n\t\thost = defaultHost\n\t{}'.format(_OPEN_BRCK,_CLOSING_BRCK),
                             '\n\tif port == 0 {}\n\t\tport = defaultPort\n\t{}'.format(_OPEN_BRCK,_CLOSING_BRCK),
                             '// Dailing to client target\n\tconn, err := grpc.Dial(fmt.Sprintf("%s:%d", host, port), dialOpts...)',
@@ -1231,23 +1234,25 @@ class WZClientGo:
             svc = self._services[s]
             for r in svc.get('methods'):
                 rpc_msg_in_pkg = r.get('inputType').split('.')[1]
-                rpc_msg_input_type = r.get('inputType').split('.')[-1]
+                rpc_msg_input_type = r.get('inputType').split('.')[-1][0].upper() + r.get('inputType').split('.')[-1][1:]
                 rpc_msg_out_pkg = r.get('outputType').split('.')[1]
-                rpc_msg_output_type = r.get('outputType').split('.')[-1]
+                rpc_msg_output_type = r.get('outputType').split('.')[-1][0].upper() + r.get('outputType').split('.')[-1][1:]
                 rpc_client_stream = r.get('clientStreaming') if r.get('clientStreaming') is not None else False
                 rpc_server_stream = r.get('serverStreaming') if r.get('serverStreaming') is not None else False
+                rpc_name = r.get('name')[0].upper() + r.get('name')[1:]
                 # Unary
                 if rpc_server_stream == False and rpc_client_stream == False:
-                    list_of_rpcs.append('\n\n// [webezy.io] - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/unary-call\nfunc (c *{0}) {1}(message *{2}.{3}) *{7}.{8} {4}\n\tlog.Printf("Calling {1} %v", message)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tresponse, err := c.{5}.{1}(ctx, message)\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\treturn response\n{6}'.format(self._project_package,r.get('name'),rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
+                    list_of_rpcs.append('\n\n// [webezy.io] - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/unary-call\nfunc (c *{0}) {1}(message *{2}.{3}) (*{7}.{8}, metadata.MD, metadata.MD) {4}\n\tlog.Printf("Calling {1} %v", message)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tvar header, trailer metadata.MD\n\n\tresponse, err := c.{5}.{1}(ctx, message, grpc.Header(&header), grpc.Trailer(&trailer))\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\treturn response, header, trailer\n{6}'.format(self._project_package,rpc_name,rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
                 # Client stream
                 elif rpc_client_stream == True and rpc_server_stream == False:
-                    list_of_rpcs.append('\n\n// [webezy.io] - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/client-stream\nfunc (c *{0}) {1}(messages []*{2}.{3}) *{7}.{8} {4}\n\tlog.Printf("Calling {1} %v", messages)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tstream, err := c.{5}.{1}(ctx)\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\tfor _, message := range messages {4}\n\t\tif err := stream.Send(message); err != nil {4}\n\t\t\tlog.Fatalf("Client sending message %v stream failed: %v", message, err)\n\t\t{6}\n\t{6}\n\tresponse, err := stream.CloseAndRecv()\n\tif err != nil {4}\n\t\tlog.Fatalf("Client stream failed on getting response: %v", err)\n\t{6}\n\n\treturn response\n{6}'.format(self._project_package,r.get('name'),rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
+                    list_of_rpcs.append('\n\n// [webezy.io] - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/client-stream\nfunc (c *{0}) {1}(messages []*{2}.{3}) *{7}.{8} {4}\n\tlog.Printf("Calling {1} %v", messages)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tstream, err := c.{5}.{1}(ctx)\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\tfor _, message := range messages {4}\n\t\tif err := stream.Send(message); err != nil {4}\n\t\t\tlog.Fatalf("Client sending message %v stream failed: %v", message, err)\n\t\t{6}\n\t{6}\n\tresponse, err := stream.CloseAndRecv()\n\tif err != nil {4}\n\t\tlog.Fatalf("Client stream failed on getting response: %v", err)\n\t{6}\n\n\treturn response\n{6}'.format(self._project_package,rpc_name,rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
                 # Server stream
                 elif rpc_client_stream == False and rpc_server_stream == True:
-                    list_of_rpcs.append('\n\n// webezy.io - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/server-stream\nfunc (c *{0}) {1}(message *{2}.{3}) []*{7}.{8} {4}\n\tlog.Printf("Calling {1} %v", message)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tstream, err := c.{5}.{1}(ctx, message)\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\tvar listResponses []*{7}.{8}\n\n\twaitc := make(chan struct{4}{6})\n\n\tgo func() {4}\n\t\tfor {4}\n\t\t\t{8}, err := stream.Recv()\n\t\t\tif err == io.EOF {4}\n\t\t\t\tclose(waitc)\n\t\t\t\tbreak\n\t\t\t{6}\n\t\t\tif err != nil {4}\n\t\t\t\tlog.Fatalf("Client call {1} stream message failed: %v", err)\n\t\t\t{6}\n\t\t\tlistResponses = append(listResponses, {8})\n\t\t{6}\n\t{6}()\n\t<-waitc\n\treturn listResponses\n{6}'.format(self._project_package,r.get('name'),rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
+                    list_of_rpcs.append('\n\n// webezy.io - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/server-stream\nfunc (c *{0}) {1}(message *{2}.{3}) []*{7}.{8} {4}\n\tlog.Printf("Calling {1} %v", message)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tstream, err := c.{5}.{1}(ctx, message)\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\tvar listResponses []*{7}.{8}\n\n\twaitc := make(chan struct{4}{6})\n\n\tgo func() {4}\n\t\tfor {4}\n\t\t\t{8}, err := stream.Recv()\n\t\t\tif err == io.EOF {4}\n\t\t\t\tclose(waitc)\n\t\t\t\tbreak\n\t\t\t{6}\n\t\t\tif err != nil {4}\n\t\t\t\tlog.Fatalf("Client call {1} stream message failed: %v", err)\n\t\t\t{6}\n\t\t\tlistResponses = append(listResponses, {8})\n\t\t{6}\n\t{6}()\n\t<-waitc\n\treturn listResponses\n{6}'.format(self._project_package,rpc_name,rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
                 # BidiStream
-                # TODO
-                # elif rpc_client_stream and rpc_server_stream:
+                elif rpc_client_stream and rpc_server_stream:
+                    list_of_rpcs.append('\n\n// webezy.io - {10}.{1}\n// Description: {9}\n// Read: https://www.webezy.io/docs/go/bidi-stream\nfunc (c *{0}) {1}(messages []*{2}.{3}) []*{7}.{8} {4}\n\tlog.Printf("Calling {1} %v", message)\n\n\tctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)\n\n\tdefer cancel()\n\n\tstream, err := c.{5}.{1}(ctx)\n\n\tif err != nil {4}\n\t\tlog.Fatalf("Client call {1} failed: %v", err)\n\t{6}\n\n\tvar listResponses []*{7}.{8}\n\n\twaitc := make(chan struct{4}{6})\n\n\tgo func() {4}\n\t\tfor {4}\n\t\t\t{8}, err := stream.Recv()\n\t\t\tif err == io.EOF {4}\n\t\t\t\tclose(waitc)\n\t\t\t\tbreak\n\t\t\t{6}\n\t\t\tif err != nil {4}\n\t\t\t\tlog.Fatalf("Client call {1} stream message failed: %v", err)\n\t\t\t{6}\n\t\t\tlistResponses = append(listResponses, {8})\n\t\t{6}\n\t{6}()\n\tfor _, message := range messages {4}\n\t\tif err := stream.Send(message); err != nil {4}\n\t\t\tlog.Fatalf("Client.{1} stream.Send(%v) failed: %v", message, err)\n\t\t{6}\n\t{6}\n\tstream.CloseSend()\n\t<-waitc\n\treturn listResponses\n{6}'.format(self._project_package,rpc_name,rpc_msg_in_pkg,rpc_msg_input_type,_OPEN_BRCK,s.lower(),_CLOSING_BRCK,rpc_msg_out_pkg,rpc_msg_output_type,r.get('description'),s))
+
 
         return '\n\n'.join(list_of_rpcs)
 
