@@ -131,7 +131,7 @@ def main(args=None):
     print(theme.logo_ascii_art_color)
 
     if config.configs.first_run:
-        analytic = inquirer.prompt([inquirer.Confirm('analytic',default=True,message='We want to gather some basic usage and bug report while you are using webezyio CLI')],theme=WebezyTheme())
+        analytic = inquirer.prompt([inquirer.Confirm('analytic',default=True,message='We want to gather some basic usage and bug report while you are using webezyio CLI')],theme=theme.WebezyTheme())
         p = Path(__file__).parents[1]
         hash_token=platform()+':'+datetime.today().isoformat()
 
