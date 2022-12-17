@@ -28,43 +28,51 @@ import inquirer
 from inquirer import errors as inquirer_errors
 
 from webezyio.cli.theme import WebezyTheme
-
+from webezyio.commons.pretty import bcolors
 user_prompt_type = Literal["Confirm","List","Text","Checkbox"]
-
+user_message_color = Literal["warning","danger"]
 
 class QList:
     
-    def __init__(self, name:str, message:str, choices,validate=None) -> None:
+    def __init__(self, name:str, message:str, choices,validate=None,ignore=None,color:user_message_color=None) -> None:
         self.name = name
         self.message = message
         self.choices = choices
         self.validate = validate if validate is not None else True
+        self.ignore = ignore if ignore is not None else False
+        self.color = color
 
     def add_choice(self,choice:Tuple[str,str]):
         self.choices.append(choice)
 
 class QConfirm:
-    
-    def __init__(self, name:str, message:str, default:bool, validate=None) -> None:
+
+    def __init__(self, name:str, message:str, default:bool, validate=None,ignore=None,color:user_message_color=None) -> None:
         self.name = name
         self.message = message
         self.default = default
         self.validate = validate if validate is not None else True
+        self.ignore = ignore if ignore is not None else False
+        self.color = color
 
 class QText:
 
-    def __init__(self, name:str, message:str, validate=None) -> None:
+    def __init__(self, name:str, message:str, validate=None,ignore=None,color:user_message_color=None) -> None:
         self.name = name
         self.message = message
         self.validate = validate if validate is not None else True
+        self.ignore = ignore if ignore is not None else False
+        self.color = color
 
 class QCheckbox:
 
-    def __init__(self, name:str, message:str, choices, validate=None) -> None:
+    def __init__(self, name:str, message:str, choices, validate=None,ignore=None,color:user_message_color=None) -> None:
         self.name = name
         self.message = message
         self.choices = choices
         self.validate = validate if validate is not None else True
+        self.ignore = ignore if ignore is not None else False
+        self.color = color
 
     def add_choice(self,choice:Tuple[str,str]):
         self.choices.append(choice)
@@ -88,11 +96,17 @@ def ask_user_question(questions):
     questions_temp = []
     for q in questions:
         dict_obj = vars(q)
+        message = dict_obj.get('message')
+        if dict_obj.get('color') is not None:
+            if dict_obj.get('color') == 'warning':
+                message = bcolors.WARNING + message + bcolors.ENDC
+            elif dict_obj.get('color') == 'danger':
+                message = bcolors.FAIL + message + bcolors.ENDC
         if q.__class__.__name__ == 'QList':
             questions_temp.append(
                 inquirer.List(
                     dict_obj.get('name'),
-                    message=dict_obj.get('message'),
+                    message=message,
                     choices=dict_obj.get('choices'),
                     ignore=dict_obj.get('ignore'),
                     validate=dict_obj.get('validate')
@@ -102,7 +116,7 @@ def ask_user_question(questions):
             questions_temp.append(
                 inquirer.Checkbox(
                     dict_obj.get('name'),
-                    message=dict_obj.get('message'),
+                    message=message + ' (Use arrow keys <-/->)',
                     choices=dict_obj.get('choices'),
                     ignore=dict_obj.get('ignore'),
                     validate=dict_obj.get('validate')
@@ -112,7 +126,7 @@ def ask_user_question(questions):
             questions_temp.append(
                 inquirer.Text(
                     dict_obj.get('name'),
-                    message=dict_obj.get('message'),
+                    message=message,
                     ignore=dict_obj.get('ignore'),
                     validate=dict_obj.get('validate')
                 )
