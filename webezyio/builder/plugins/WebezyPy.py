@@ -387,7 +387,7 @@ def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_
 
 bash_init_script = '#!/bin/bash\n\n\
 declare -a services=("protos")\n\
-echo "[WEBEZYIO] init.sh starting protoc compiler"\n\
+echo "[WEBEZYIO] init-py.sh starting protoc compiler"\n\
 DESTDIR="./protos"\n\
 for SERVICE in "${services[@]}"; do\n\
     python3 -m grpc_tools.protoc --proto_path=$SERVICE/ --python_out=$DESTDIR --grpc_python_out=$DESTDIR $SERVICE/*.proto\n\

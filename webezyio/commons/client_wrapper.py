@@ -38,11 +38,11 @@ class WebezyioClient:
     def __getattr__(self, attr):
         return partial(self._wrapped_call, self.stub, attr)
 
-    # args[0]: stub, args[1]: function to call, args[3]: Request
+    # args[0]: stub, args[1]: function to call, args[2]: Request
     # kwargs: keyword arguments
     def _wrapped_call(self, *args, **kwargs):
         try:
-            return getattr(args[0], args[1])(
+            return getattr(args[0], args[1]).with_call(
                 args[2], **kwargs, timeout=self.timeout
             )
         except grpc.RpcError as e:

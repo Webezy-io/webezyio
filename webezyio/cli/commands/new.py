@@ -47,7 +47,7 @@ def validate_domain(answers, current):
 
 wz_new_q = [
     QList(name="server", message="Choose server language", choices=[
-                  ('Python', protos.python), ('Typescript', protos.typescript)], default=protos.python),
+                  ('Python', protos.python), ('Typescript', protos.typescript), ('Go', protos.go)], default=protos.python),
     QCheckbox(name="clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
                       ('Python', protos.python), ('Typescript', protos.typescript), ('Go',protos.go), ('Webpack-js',protos.webpack)], default=[protos.python],validate=validate_client),
     QText(name="domain", message="Enter domain name", default='domain',validate=validate_domain),

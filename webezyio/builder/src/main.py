@@ -5,10 +5,10 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient,WebezyWebpack
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyGoServer, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient,WebezyWebpack
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.pretty import print_error, print_warning
-_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsClient,WebezyTsServer,WebezyTsClient,WebezyGoClient,WebezyWebpack,
+_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsServer,WebezyTsClient,WebezyGoServer,WebezyGoClient,WebezyWebpack,
                         WebezyReadme]  # Many More To Come
 log = logging.getLogger('webezyio.cli.main')
 
@@ -106,6 +106,8 @@ class WebezyBuilder:
 
         if server_lang == 'typescript':
             self._pm.register(WebezyTsServer)
+        if server_lang == 'go':
+            self._pm.register(WebezyGoServer)
         
         for p in _WELL_KNOWN_PLUGINS:
             plug_name = self._pm.get_name(p)
@@ -230,12 +232,12 @@ class WebezyBuilder:
         results = list(itertools.chain(*results))
         return results
 
-    def PackageProject(self):
-        """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
-        results = self._pm.hook.pre_build(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
-        results = list(itertools.chain(*results))
-        return results
+    # def PackageProject(self):
+    #     """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
+    #     results = self._pm.hook.pre_build(
+    #         wz_json=self._webezy_json, wz_context=self._webezy_context)
+    #     results = list(itertools.chain(*results))
+    #     return results
 
     def BuildAll(self):
         prebuild = self.PreBuild()
@@ -249,9 +251,9 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
-        package = self.PackageProject()
+        # package = self.PackageProject()
         results = [prebuild, init, context, protos, services,
-                   server, compile, readme, protoclass, clients, postbuild, package]
+                   server, compile, readme, protoclass, clients, postbuild]
         return results
 
     def BuildOnlyProtos(self):
@@ -270,7 +272,7 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
-        package = self.PackageProject()
+        # package = self.PackageProject()
         results = [services, server, compile, readme, protoclass, clients, postbuild, package]
         return results
 

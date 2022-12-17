@@ -46,6 +46,8 @@ _WELL_KNOWN_PY_IMPORTS = [
 
 _WELL_KNOWN_TS_IMPORTS = ["import { \n\thandleUnaryCall,\n\thandleClientStreamingCall,\n\thandleServerStreamingCall,\n\thandleBidiStreamingCall,\n\tsendUnaryData,\n\tServerDuplexStream,\n\tServerReadableStream,\n\tServerUnaryCall,\n\tServerWritableStream,\n\tstatus,\n\tUntypedHandleCall,\n\tMetadata\n } from '@grpc/grpc-js';","import { ServiceError } from './utils/error';","import { ApiType } from './utils/interfaces';"]
 
+_WELL_KNOWN_GO_IMPORTS = ['"context"','"io"','"google.golang.org/grpc/metadata"']
+
 _FIELD_TYPES = Literal["TYPE_INT32", "TYPE_INT64", "TYPE_STRING", "TYPE_BOOL",
                        "TYPE_MESSAGE", "TYPE_ENUM", "TYPE_DOUBLE", "TYPE_FLOAT", "TYPE_BYTE"]
 _FIELD_LABELS = Literal["LABEL_OPTIONAL", "LABEL_REPEATED"]
@@ -1256,6 +1258,137 @@ class WZClientGo:
 
         return '\n\n'.join(list_of_rpcs)
 
+class WZServiceGo():
+    """A helper class to write 'Go' language services for Webezy.io project services"""
+    
+    def __init__(self, project_package, name, imports=[], service=None, package=None, messages=[], enums=[], context: WZContext = None,wz_json: WZJson= None):
+        self._name = name
+        self._imports = imports
+        self._service = service
+        self._project_package = project_package
+        self._context = context
+        self._wz_json = wz_json
+
+    def write_imports(self):
+        if self._imports is not None:
+            list_d = list(map(lambda i: i, _WELL_KNOWN_GO_IMPORTS))
+            go_package_name = self._wz_json.project.get('goPackage')
+            # list_d.append('codes "google.golang.org/grpc/codes"')
+            # list_d.append('status "google.golang.org/grpc/status"')
+            list_d.append(f'{self._name}Servicer "{go_package_name}/services/protos/{self._name}"')
+            list_d.append(f'"{go_package_name}/services/utils"')
+
+            for d in self._imports:
+                name = d.split('.')[1]
+                d_name = '{0}'.format(name)
+                list_d.append(f'{d_name} "{go_package_name}/services/protos/{d_name}"')
+
+            list_d = '\n\t'.join(list_d)
+            return f'{list_d}'
+        else:
+            return ''
+
+    def write_struct(self):
+        temp_name = self._name[0].capitalize() + self._name[1:]
+        return 'type {0} struct {1}\n\t{3}Servicer.Unimplemented{0}Server\n{2}'.format(temp_name,_OPEN_BRCK,_CLOSING_BRCK,self._name)
+
+    def write_methods(self):
+        temp_name = self._name[0].capitalize() + self._name[1:]
+        list_of_rpcs = []
+        for rpc in self._service.get('methods'):
+            rpc_temp_name = rpc.get('name')[0].capitalize() + rpc.get('name')[1:]
+            rpc_output_type = rpc.get('serverStreaming') if rpc.get('serverStreaming') is not None else False
+            rpc_input_type = rpc.get('clientStreaming') if rpc.get('clientStreaming') is not None else False
+            rpc_input_name = rpc.get('inputType').split('.')[3]
+            rpc_input_package_name = rpc.get('inputType').split('.')[1]
+            rpc_output_name = rpc.get('outputType').split('.')[3]
+            rpc_output_package_name = rpc.get('outputType').split('.')[1]
+            temp_go_rpc_input_name = rpc_input_name[0].capitalize() + rpc_input_name[1:]
+            temp_go_rpc_output_name = rpc_output_name[0].capitalize() + rpc_output_name[1:]
+            rpc_description = rpc.get('description')
+            
+            # Unary
+            if rpc_output_type == False and rpc_input_type == False:
+                list_of_rpcs.append('\n'.join([
+                    f'\n\n// [webezy.io] - {self._name}.{rpc_temp_name} - {rpc_description}',
+                    f'func ({self._name}Servicer *{temp_name}) {rpc_temp_name}(ctx context.Context, {rpc_input_name} *{rpc_input_package_name}.{temp_go_rpc_input_name}) (response *{rpc_output_package_name}.{temp_go_rpc_output_name}, err error) {_OPEN_BRCK}',
+                    f'\tprintLog("{rpc_temp_name}",ctx, {rpc_input_name})',
+                    f'\treturn &{rpc_output_package_name}.{temp_go_rpc_output_name}{_OPEN_BRCK}{_CLOSING_BRCK}, nil',
+                    f'{_CLOSING_BRCK}'
+                    ]))
+            # Client stream
+            elif rpc_input_type == True and rpc_output_type == False:
+                list_of_rpcs.append('\n'.join([
+                    f'\n\n// [webezy.io] - {self._name}.{rpc_temp_name} - {rpc_description}',
+                    f'func ({self._name}Servicer *{temp_name}) {rpc_temp_name}(stream {self._name}Servicer.{temp_name}_{rpc_temp_name}Server) (err error) {_OPEN_BRCK}',
+                    f'\tprintLog("{rpc_temp_name}",stream.Context(), nil)',
+                    f'\tfor {_OPEN_BRCK}',
+                    f'\t\tclientStreamRequest, err := stream.Recv()',
+                    f'\t\tif err == io.EOF {_OPEN_BRCK}',
+                    f'\t\t\tutils.ErrorLogger.Printf("[{rpc_temp_name}] Client stream closed.")',
+                    f'\t\t\tbreak',
+                    f'\t\t{_CLOSING_BRCK}',
+                    f'\t\tif err != nil {_OPEN_BRCK}',
+                    f'\t\t\tutils.ErrorLogger.Printf("[{rpc_temp_name}] Client stream Request error: \'%v\'.", err)',
+                    f'\t\t\treturn stream.SendAndClose(&{rpc_output_package_name}.{temp_go_rpc_output_name}{_OPEN_BRCK}{_CLOSING_BRCK})',
+                    f'\t\t{_CLOSING_BRCK}',
+                    f'\t\t// Do something with incoming object',
+                    f'\t\tutils.InfoLogger.Printf("[{rpc_temp_name}] Request received: \'%v\'.", clientStreamRequest)',
+                    f'\t{_CLOSING_BRCK}',
+                    f'\treturn stream.SendAndClose(&{rpc_output_package_name}.{temp_go_rpc_output_name}{_OPEN_BRCK}{_CLOSING_BRCK})',
+                    f'{_CLOSING_BRCK}',
+                ]))
+            # Server stream
+            elif rpc_input_type == False and rpc_output_type == True:
+                list_of_rpcs.append('\n'.join([
+                    f'\n\n// [webezy.io] - {self._name}.{rpc_temp_name} - {rpc_description}',
+                    f'func ({self._name}Servicer *{temp_name}) {rpc_temp_name}({rpc_input_name} *{rpc_input_package_name}.{temp_go_rpc_input_name}, stream {self._name}Servicer.{temp_name}_{rpc_temp_name}Server) (err error) {_OPEN_BRCK}',
+                    f'\tprintLog("{rpc_temp_name}",stream.Context(), nil)',
+                    f'\t// Do loop for responses',
+                    f'\treturn nil',
+                    f'{_CLOSING_BRCK}',
+                ]))
+            # BidiStream
+            elif rpc_input_type and rpc_output_type:
+
+                list_of_rpcs.append('\n'.join([
+                    f'\n\n// [webezy.io] - {self._name}.{rpc_temp_name} - {rpc_description}',
+                    f'func ({self._name}Servicer *{temp_name}) {rpc_temp_name}(stream {self._name}Servicer.{temp_name}_{rpc_temp_name}Server) (err error) {_OPEN_BRCK}',
+                    f'\tprintLog("{rpc_temp_name}",stream.Context(), nil)',
+                    f'\tfor {_OPEN_BRCK}',
+                    f'\t\tbidirectionalStreamRequest, err := stream.Recv()',
+                    f'\t\tif err == io.EOF {_OPEN_BRCK}',
+                    f'\t\t\tutils.ErrorLogger.Printf("[{rpc_temp_name}] Client stream closed.")',
+                    f'\t\t\tbreak',
+                    f'\t\t{_CLOSING_BRCK}',
+                    f'\t\tif err != nil {_OPEN_BRCK}',
+                    f'\t\t\tutils.ErrorLogger.Printf("[{rpc_temp_name}] Client stream Request error: \'%v\'.", err)',
+                    f'\t\t\treturn stream.Send(&{rpc_output_package_name}.{temp_go_rpc_output_name}{_OPEN_BRCK}{_CLOSING_BRCK})',
+                    f'\t\t{_CLOSING_BRCK}',
+                    f'\t\t// Do something with incoming object',
+                    f'\t\tutils.InfoLogger.Printf("[{rpc_temp_name}] Request received: \'%v\'.", bidirectionalStreamRequest)',
+                    f'\t\tstream.Send(&{rpc_output_package_name}.{temp_go_rpc_output_name}{_OPEN_BRCK}{_CLOSING_BRCK})',
+                    f'\t{_CLOSING_BRCK}',
+                    '\treturn nil',
+                    f'{_CLOSING_BRCK}'
+                ]))
+  
+        return '\n'.join(list_of_rpcs)
+
+
+    def write_log_func(self):
+        return f'func printLog(name string, ctx context.Context, message interface{_OPEN_BRCK}{_CLOSING_BRCK}) {_OPEN_BRCK}\n\
+\tcontextMetadata, _ := metadata.FromIncomingContext(ctx)\n\
+\tutils.InfoLogger.Printf("[%s] Got RPC request: %v", name, message)\n\
+\tutils.DebugLogger.Printf("[%s] Metadata: %v", name, contextMetadata)\n\
+{_CLOSING_BRCK}'
+
+    def to_str(self):
+        return self.__str__()
+
+    def __str__(self):
+        temp_svc_name = self._name[0].capitalize() + self._name[1:]
+        return f'package {temp_svc_name}\n\nimport (\n\t{self.write_imports()}\n)\n\n{self.write_struct()}\n{self.write_methods()}\n\n{self.write_log_func()}'
 
 
 def parse_code_file(file_content, seperator='@rpc'):

@@ -626,10 +626,10 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
             prompter.QList(name="type", message="Choose message type", choices=[('Unary', (False, False)), (
                 'Client stream', (True, False)), ('Server stream', (False, True)), ('Bidi stream', (True, True))]),
         ]
-        if has_service == False:
-            wz_g_r_q.append(inquirer.List(
-                "service", message="Choose a service to attach the rpc", choices=temp_s))
 
+        if has_service == False:
+            wz_g_r_q.append(prompter.QList(
+                "service", message="Choose a service to attach the rpc", choices=temp_s))
         questions = wz_g_r_q
 
     elif namespace == 'm':

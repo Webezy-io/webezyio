@@ -130,6 +130,9 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
         temp_langugae = python
     elif server_langauge == 'typescript':
         temp_langugae = typescript
+    elif server_langauge == 'go':
+        temp_langugae = go
+    # Add more language support here...
     else:
         raise errors.WebezyValidationError('Server Language Error','Must pass a valid server language for your new project')
     server = WebezyServer(language=WebezyLanguage.Name(temp_langugae))

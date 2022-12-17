@@ -151,7 +151,7 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
     if debug:
         st = time.time()    
     try:
-        response = getattr(stub, rpc)(msg)
+        response , call = getattr(stub,rpc)(msg)
         _pretty.print_info('Waiting for server response... [{0}]'.format(output_message_description['fullName']))
         if debug:
             # get the end time
@@ -164,6 +164,7 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
             else:
                 _pretty.print_note('Execution time: {:.2f} sec.'.format(elapsed_time))
             _pretty.print_note('Response size: {}'.format(sys.getsizeof(response)))
+            _pretty.print_note(call.trailing_metadata(),True,'Metadata')
         try:
             for i in response:
                 _pretty.print_info(i,True)

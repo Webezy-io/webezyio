@@ -2,7 +2,7 @@
 
 [![Downloads](https://pepy.tech/badge/webezyio)](https://pepy.tech/project/webezyio)
 
-[![Python 3.6](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![Python 3.7](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
 [webezyio](./docs/source/webezyio_concepts.md) is free and open-source project that aims to be a complete framework for developing micro-services projects.
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
@@ -17,9 +17,9 @@ The current supported languages are:
 |:-----------------------------------------:|:----------:|:----------:|:------------:|
 |     [Python](./docs/source/python.md)     |    **V**   |    **V**   |    Stable    |
 | [Typescript](./docs/source/typescript.md) |    **V**   |    **V**   |    Stable    |
-|         [Go](./docs/source/go.md)         |    **X**   |    **V**   | Experimental |
+|         [Go](./docs/source/go.md)         |    **V**   |    **V**   | Experimental |
 | [Webpack-js](./docs/source/webpack-js.md) |     --     |    **V**   | Experimental |
-|                   C#.NET                  |    **X**   |    **V**   |    Planned   |
+|                   C#.NET                  |    **X**   |    **X**   |    Planned   |
 
 Get full explanation and many more details on usage at [```webezy.io```](https://www.webezy.io).
 

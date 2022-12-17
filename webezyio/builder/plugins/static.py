@@ -148,6 +148,7 @@ yarn.lock\n\n\
 .webezy\n'
 _OPEN_BRCK='{'
 _CLOSING_BRCK = '}'
+
 def bash_init_script_go(project_package, services, packages):
     services_protoc = []
     packages_protoc = []
@@ -443,4 +444,30 @@ protos_ts_config_client_only = '{\n\
     "exclude": [\n\
         "node_modules"\n\
     ]\n\
+}'
+
+bash_run_server_script_go = '#!/bin/bash\n\n\
+if [[ $1 == "debug" ]]\n\
+then\n\
+\techo "Debug mode: $1"\n\
+\tGRPC_VERBOSITY=DEBUG GRPC_TRACE=all ngo run ./server/server.go\n\
+else\n\
+go run ./server/server.go\n\
+fi'
+
+utils_go = 'package utils\n\n\
+import (\n\
+	"log"\n\
+)\n\n\
+var (\n\
+	WarningLogger *log.Logger\n\
+	DebugLogger   *log.Logger\n\
+	InfoLogger    *log.Logger\n\
+	ErrorLogger   *log.Logger\n\
+)\n\n\
+func init() {\n\
+	InfoLogger = log.New(log.Writer(), "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)\n\
+	DebugLogger = log.New(log.Writer(), "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)\n\
+	WarningLogger = log.New(log.Writer(), "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)\n\
+	ErrorLogger = log.New(log.Writer(), "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)\n\
 }'
