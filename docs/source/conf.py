@@ -12,7 +12,7 @@ import sys
 project = 'webezyio'
 copyright = 'Webezy.io 2022, Amit Shmulevitch'
 author = 'Amit Shmulevitch'
-release = '0.1.2'
+release = '0.1.3'
 
 sys.path.append('/Users/amitshmulevitch/Projects/wz/webezyio')
 # -- General configuration ---------------------------------------------------

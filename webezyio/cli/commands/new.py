@@ -22,6 +22,7 @@
 import logging
 import subprocess
 from typing import List, Literal
+from webezyio.cli.prompter import QCheckbox,QConfirm,QList,QText,ask_user_question
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import file_system,protos
 from webezyio.commons.helpers import WZEnumValue, WZField,_BUILTINS_TEMPLATES
@@ -45,11 +46,11 @@ def validate_domain(answers, current):
     return True
 
 wz_new_q = [
-    inquirer.List("server", message="Choose server language", choices=[
-                  ('Python', protos.python), ('Typescript', protos.typescript)], default=protos.python),
-    inquirer.Checkbox("clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
-                      ('Python', protos.python), ('Typescript', protos.typescript), ('Go',protos.go)], default=[protos.python],validate=validate_client),
-    inquirer.Text("domain", message="Enter domain name", default='domain',validate=validate_domain),
+    QList(name="server", message="Choose server language", choices=[
+                  ('Python', protos.python), ('Typescript', protos.typescript), ('Go', protos.go)], default=protos.python),
+    QCheckbox(name="clients", message="Choose clients languages (Use arrows keys to enable disable a language)", choices=[
+                      ('Python', protos.python), ('Typescript', protos.typescript), ('Go',protos.go), ('Webpack-js',protos.webpack)], default=[protos.python],validate=validate_client),
+    QText(name="domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
 def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None,server_language:str=None,clients=[],domain:str=None,template:_TEMPLATES='@webezyio/Blank'):
@@ -57,7 +58,7 @@ def create_new_project(project_name:str,path:str=None,host:str=None,port:int=Non
     domain_name = 'domain'
 
     if server_language is None and clients == None and domain is None:
-        results = inquirer.prompt(wz_new_q, theme=WebezyTheme())
+        results = ask_user_question(questions=wz_new_q)
     
         if results is None:
             print_warning("Must answer project creation questions")

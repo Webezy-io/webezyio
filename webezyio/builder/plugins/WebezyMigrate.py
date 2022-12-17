@@ -28,6 +28,7 @@ from typing import Dict, List, Literal
 import inquirer
 from webezyio.architect import WebezyArchitect
 import webezyio.builder as builder
+from webezyio.cli import prompter
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import helpers, file_system, resources, errors,protos as webezy_protos
 from webezyio.commons.pretty import print_error, print_info, print_note, print_success, print_warning
@@ -158,8 +159,8 @@ def parse_protos_to_resource(protos_dir, project_name, server_language, clients:
                 for msg in pkg_messages:
                     message = helpers.WZMessage(pkg_messages[msg].name,fields=[],domain=proto_module.package.split('.')[0])
                     for ext in pkg_messages[msg].extensions:
-
-                        extension_type = inquirer.prompt([inquirer.List('extension_type','Choose which type \'{}\' extending?'.format(message.name),choices=['FieldOptions','FileOptions','MessageOptions','ServiceOptions'])],theme=WebezyTheme())
+                        extensions_list_choice = prompter.QList(name='extension_type',message='Choose which type \'{}\' extending?'.format(message.name),choices=[('FieldOptions','FieldOptions'),('FileOptions','FileOptions'),('MessageOptions','MessageOptions'),('ServiceOptions','ServiceOptions')])
+                        extension_type = prompter.ask_user_question(questions=[extensions_list_choice])
                         if extension_type is None:
                             
                             # Currently only supports FieldOptions as auto-detect

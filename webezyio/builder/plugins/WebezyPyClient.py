@@ -186,13 +186,13 @@ def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZCo
 
 bash_init_script = '#!/bin/bash\n\n\
 declare -a services=("protos")\n\
-echo "[WEBEZYIO] proto-py.sh starting protoc compiler"\n\
+echo "[WEBEZYIO] init-py.sh starting protoc compiler"\n\
 DESTDIR="./protos"\n\
 for SERVICE in "${services[@]}"; do\n\
     python3 -m grpc_tools.protoc --proto_path=$SERVICE/ --python_out=$DESTDIR --grpc_python_out=$DESTDIR $SERVICE/*.proto\n\
 done\n\
 statuscode=$?\n\
-echo "Exit code for protoc -> "$statuscode\n\
+echo "Exit code for python protoc -> "$statuscode\n\
 exit 0'
 
 def parse_proto_type_to_py(type, label, messageType=None, enumType=None,current_pkg=None,key_type=None,value_type=None):

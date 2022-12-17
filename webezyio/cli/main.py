@@ -35,8 +35,7 @@ from webezyio import __version__, config
 from webezyio.builder.plugins import WebezyMigrate
 from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
-from webezyio.cli import theme
-from webezyio.cli.theme import WebezyTheme
+from webezyio.cli import theme,prompter
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf, protos
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
 from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template, config as config_command
@@ -114,25 +113,23 @@ field_label = [
 # ]
 
 wz_g_p_q = [
-    inquirer.Text("package", message="Enter package name",
-                  validate=validation),
+    prompter.QText(name="package",message="Enter package name",validate=validation)
 ]
-
 wz_g_s_q = [
-    inquirer.Text("service", message="Enter service name",
-                  validate=validation),
+    prompter.QText(name="service",message="Enter service name",validate=validation)
 ]
-
 wz_g_e_q = [
-    inquirer.Text("enum", message="Enter enum name", validate=validation),
+    prompter.QText(name="enum",message="Enter enum name",validate=validation)
 ]
 
 
 def main(args=None):
+    # Print webezy 'Logo'
     print(theme.logo_ascii_art_color)
-
+    # If first run of CLI ask for analytic usage
     if config.configs.first_run:
-        analytic = inquirer.prompt([inquirer.Confirm('analytic',default=True,message='We want to gather some basic usage and bug report while you are using webezyio CLI')],theme=WebezyTheme())
+        confirm_analytics = prompter.QConfirm(name='analytic',message='We want to gather some basic usage and bug report while you are using webezyio CLI',color='warning',default=True)
+        analytic = prompter.ask_user_question(questions=[confirm_analytics])
         p = Path(__file__).parents[1]
         hash_token=platform()+':'+datetime.today().isoformat()
 
@@ -149,7 +146,8 @@ def main(args=None):
         config_file = config_file.replace('first_run=True','first_run=False')
         file_system.wFile(file_system.join_path(p,'config.py'),content=config_file,overwrite=True)
 
-    """Main CLI processing, with argpars package.
+    """
+    Main CLI processing, with argpars package.
     """
     # Main cli parser
     parser = argparse.ArgumentParser(prog='webezy',
@@ -367,9 +365,8 @@ def main(args=None):
                 
                 print_info(
                     f"Generating new resource '{namespace[0]}'{resource_name}")
-
-                results = inquirer.prompt(
-                    namespace[1] if args.name is None else namespace[1][1:], theme=WebezyTheme())
+                results = prompter.ask_user_question(
+                    questions=namespace[1] if args.name is None else namespace[1][1:])
 
                 if results is None:
                     print_error('Must answer all questions')
@@ -444,7 +441,8 @@ def main(args=None):
                 """Purge command process"""
 
                 temp_path = webezy_json_path.replace('webezy.json','.webezy/context.json')
-                confirm =inquirer.prompt([inquirer.Confirm('confirm',False,message='You are about to purge the webezy context are you sure?')],theme=WebezyTheme())
+                confirm_purge = prompter.QConfirm(name='confirm',message='You are about to purge the webezy context are you sure?',default=False)
+                confirm = prompter.ask_user_question(questions=[confirm_purge])
                 if confirm.get('confirm'):
                     file_system.removeFile(temp_path)
                     print_success("Purged webezy context !")
@@ -624,15 +622,14 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
                 print_error(f"Service -> {parent} not exists under {wz_json.project.get('name')}")
                 exit(1)
         wz_g_r_q = [
-            inquirer.Text("rpc", message="Enter rpc name",
-                          validate=validation),    
-            inquirer.List("type", message="Choose message type", choices=[('Unary', (False, False)), (
+            prompter.QText(name="rpc",message="Enter rpc name",validate=validation),
+            prompter.QList(name="type", message="Choose message type", choices=[('Unary', (False, False)), (
                 'Client stream', (True, False)), ('Server stream', (False, True)), ('Bidi stream', (True, True))]),
         ]
-        if has_service == False:
-            wz_g_r_q.append(inquirer.List(
-                "service", message="Choose a service to attach the rpc", choices=temp_s))
 
+        if has_service == False:
+            wz_g_r_q.append(prompter.QList(
+                "service", message="Choose a service to attach the rpc", choices=temp_s))
         questions = wz_g_r_q
 
     elif namespace == 'm':
@@ -658,13 +655,13 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
                 exit(1)
 
         wz_g_m_q = [
-            inquirer.Text("message", message="Enter message name",
+            prompter.QText(name="message", message="Enter message name",
                           validate=validation),
         ]
 
         if has_package == False:
-            wz_g_m_q.append(inquirer.List(
-            "package", message="Choose a package to attach the message", choices=temp_p))
+            wz_g_m_q.append(prompter.QList(
+            name="package", message="Choose a package to attach the message", choices=temp_p))
 
         questions = wz_g_m_q
 
@@ -690,7 +687,8 @@ def parse_namespace_resource(name, wz_json: helpers.WZJson,parent:str=None):
                 print_error(f"{parent} Is not under current project")
                 exit(1)
         else:
-            wz_g_e_q.append(inquirer.List('package','Choose a package',choices=temp_p))
+            wz_g_e_q.append(
+                prompter.QList(name='package',message='Choose a package',choices=temp_p))
 
         questions = wz_g_e_q
 

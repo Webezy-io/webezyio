@@ -20,6 +20,14 @@ webezyio.cli.main module
    :undoc-members:
    :show-inheritance:
 
+webezyio.cli.prompter module
+----------------------------
+
+.. automodule:: webezyio.cli.prompter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 webezyio.cli.theme module
 -------------------------
 

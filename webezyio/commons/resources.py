@@ -33,8 +33,7 @@ from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
     FieldDescriptor, ServiceDescriptor, EnumDescriptor
 from grpc_tools import command
-import inquirer
-from webezyio.cli.theme import WebezyTheme
+from webezyio.cli import prompter
 from webezyio.commons import errors
 from webezyio.commons.pretty import print_error, print_info, print_note, print_warning
 from webezyio.commons.protos.WebezyPackage_pb2 import UNKNOWN_WEBEZYEXTENSION, WebezyExtension, WebezyField, WebezyOneOfField
@@ -52,7 +51,7 @@ from webezyio.commons.protos import WebezyJson, \
     WebezyEnum, \
     WebezyFieldType, \
     WebezyFieldLabel, \
-    python, typescript, go, \
+    python, typescript, go, webpack, javascript, csharp, java, \
     WebezyLanguage, \
     UNKNOWN_WEBEZYEXTENSION, \
     google_dot_protobuf_dot_struct__pb2
@@ -81,6 +80,7 @@ class ResourceKinds(Enum):
     service_client_cpp = 'Webezy.service/client/cpp'
     service_srvr_java = 'Webezy.service/server/java'
     service_client_java = 'Webezy.service/client/java'
+    service_client_webpack = 'Webezy.service/client/webpack'
     file_proto = 'Webezy.file/proto'
     file_js = 'Webezy.file/javascript'
     file_ts = 'Webezy.file/typescript'
@@ -89,6 +89,7 @@ class ResourceKinds(Enum):
     file_go = 'Webezy.file/go'
     file_cpp = 'Webezy.file/cpp'
     file_java = 'Webezy.file/java'
+    file_webpack = 'Webezy.file/webpack'
     method = 'Webezy.descriptor/method'
     field = 'Webezy.descriptor/field'
     oneof_field = 'Webezy.descriptor/oneof_field'
@@ -129,6 +130,9 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
         temp_langugae = python
     elif server_langauge == 'typescript':
         temp_langugae = typescript
+    elif server_langauge == 'go':
+        temp_langugae = go
+    # Add more language support here...
     else:
         raise errors.WebezyValidationError('Server Language Error','Must pass a valid server language for your new project')
     server = WebezyServer(language=WebezyLanguage.Name(temp_langugae))
@@ -137,7 +141,7 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
     if package_name is None:
         package_name = name.replace('-', '').replace('_', '').lower()
 
-    # Parse clients
+    # Parse clients languages
     go_package = None
     temp_clients = []
     if len(clients) > 0:
@@ -149,11 +153,15 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
             elif c['language'] == 'go':
                 temp_c_lang = go
                 if json:
-                    go_package = inquirer.prompt([inquirer.Text('go_package','Enter a prefix to support Go package','github.com')],theme=WebezyTheme())
+                    go_package_input = prompter.QText(name='go_package',message='Enter a prefix to support Go package',default='github.com')
+                    go_package = prompter.ask_user_question(questions=[go_package_input])
                 if go_package is not None:
                     go_package = '{}/{}'.format(go_package['go_package'],package_name)
                 else:
                     go_package = 'github.com/{}'.format(package_name)
+            elif c['language'] == 'webpack':
+                temp_c_lang = webpack
+            # TODO Add more client supported languages
             else:
                 raise errors.WebezyValidationError('Client Language Error','Client {} is not supported'.format(c['language']))
             client = WebezyClient(out_dir=get_uri_client(
@@ -429,6 +437,8 @@ def get_uri_client(path, language):
         uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_ts)
     elif language == 'go':
         uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_go)
+    elif language == 'webpack':
+        uri = construct_uri(path, ResourceTypes.client, ResourceKinds.file_webpack)
     else:
         raise errors.WebezyValidationError('Client Not Supported','Client of type {} is not supported yet !'.format(language))
     return uri

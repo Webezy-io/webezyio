@@ -21,7 +21,6 @@
 
 import os
 import subprocess
-from tkinter import E, N
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme
 from webezyio.commons import file_system

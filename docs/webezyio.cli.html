@@ -139,6 +139,125 @@
 <dd></dd></dl>
 
 </section>
+<section id="module-webezyio.cli.prompter">
+<span id="webezyio-cli-prompter-module"></span><h2>webezyio.cli.prompter module<a class="headerlink" href="#module-webezyio.cli.prompter" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.QCheckbox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.cli.prompter.</span></span><span class="sig-name descname"><span class="pre">QCheckbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'warning'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'danger'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.QCheckbox" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A checkbox set of question to be passed to the questions array for prompter function <a class="reference internal" href="#webezyio.cli.prompter.ask_user_question" title="webezyio.cli.prompter.ask_user_question"><code class="xref py py-func docutils literal notranslate"><span class="pre">ask_user_question()</span></code></a>
+see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/examples.html#checkbox-py">https://python-inquirer.readthedocs.io/en/latest/examples.html#checkbox-py</a></p>
+<blockquote>
+<div><p>name: The answer name see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#name">https://python-inquirer.readthedocs.io/en/latest/usage.html#name</a></p>
+<dl class="simple">
+<dt>message: The user prompt message</dt><dd><p>see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#message">https://python-inquirer.readthedocs.io/en/latest/usage.html#message</a></p>
+</dd>
+</dl>
+<p>choices: The tuple array for choices to be prompted where the first element of the tuple is the displayed value and the 2nd element is the value itself</p>
+<dl class="simple">
+<dt>ignore: Optional callback function that gets <cite>answers</cite> where answers contains the dict of previous</dt><dd><p>answers again and returns a boolean value if to ignore urrent question see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore">https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore</a></p>
+</dd>
+</dl>
+<p>validate: Optional attribute that allows the program to check if the answer is valid or not see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#validate">https://python-inquirer.readthedocs.io/en/latest/usage.html#validate</a></p>
+<p>color: The message color if needed extra customizations, can be passed with “danger” | “warning” - red color or yellow</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.QCheckbox.add_choice">
+<span class="sig-name descname"><span class="pre">add_choice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.QCheckbox.add_choice" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.QConfirm">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.cli.prompter.</span></span><span class="sig-name descname"><span class="pre">QConfirm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'warning'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'danger'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.QConfirm" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A checkbox set of question to be passed to the questions array for prompter function <a class="reference internal" href="#webezyio.cli.prompter.ask_user_question" title="webezyio.cli.prompter.ask_user_question"><code class="xref py py-func docutils literal notranslate"><span class="pre">ask_user_question()</span></code></a>
+see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/examples.html#confirm-py">https://python-inquirer.readthedocs.io/en/latest/examples.html#confirm-py</a></p>
+<blockquote>
+<div><p>name: The answer name see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#name">https://python-inquirer.readthedocs.io/en/latest/usage.html#name</a></p>
+<dl class="simple">
+<dt>message: The user prompt message</dt><dd><p>see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#message">https://python-inquirer.readthedocs.io/en/latest/usage.html#message</a></p>
+</dd>
+<dt>default: The default value to be used as confirm</dt><dd><p>seef: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#default">https://python-inquirer.readthedocs.io/en/latest/usage.html#default</a></p>
+</dd>
+<dt>ignore: Optional callback function that gets <cite>answers</cite> where answers contains the dict of previous</dt><dd><p>answers again and returns a boolean value if to ignore urrent question see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore">https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore</a></p>
+</dd>
+</dl>
+<p>validate: Optional attribute that allows the program to check if the answer is valid or not see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#validate">https://python-inquirer.readthedocs.io/en/latest/usage.html#validate</a></p>
+<p>color: The message color if needed extra customizations, can be passed with “danger” | “warning” - red color or yellow</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.QList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.cli.prompter.</span></span><span class="sig-name descname"><span class="pre">QList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'warning'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'danger'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.QList" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A list set of question to be passed to the questions array for prompter function <a class="reference internal" href="#webezyio.cli.prompter.ask_user_question" title="webezyio.cli.prompter.ask_user_question"><code class="xref py py-func docutils literal notranslate"><span class="pre">ask_user_question()</span></code></a>
+see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/examples.html#list-py">https://python-inquirer.readthedocs.io/en/latest/examples.html#list-py</a></p>
+<blockquote>
+<div><p>name: The answer name see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#name">https://python-inquirer.readthedocs.io/en/latest/usage.html#name</a></p>
+<dl class="simple">
+<dt>message: The user prompt message</dt><dd><p>see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#message">https://python-inquirer.readthedocs.io/en/latest/usage.html#message</a></p>
+</dd>
+</dl>
+<p>choices: The tuple array for choices to be prompted where the first element of the tuple is the displayed value and the 2nd element is the value itself</p>
+<dl class="simple">
+<dt>ignore: Optional callback function that gets <cite>answers</cite> where answers contains the dict of previous</dt><dd><p>answers again and returns a boolean value if to ignore urrent question see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore">https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore</a></p>
+</dd>
+</dl>
+<p>validate: Optional attribute that allows the program to check if the answer is valid or not see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#validate">https://python-inquirer.readthedocs.io/en/latest/usage.html#validate</a></p>
+<p>color: The message color if needed extra customizations, can be passed with “danger” | “warning” - red color or yellow</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.QList.add_choice">
+<span class="sig-name descname"><span class="pre">add_choice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choice</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.QList.add_choice" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.QText">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.cli.prompter.</span></span><span class="sig-name descname"><span class="pre">QText</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'warning'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'danger'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.QText" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A checkbox set of question to be passed to the questions array for prompter function <a class="reference internal" href="#webezyio.cli.prompter.ask_user_question" title="webezyio.cli.prompter.ask_user_question"><code class="xref py py-func docutils literal notranslate"><span class="pre">ask_user_question()</span></code></a>
+see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/examples.html#text-py">https://python-inquirer.readthedocs.io/en/latest/examples.html#text-py</a></p>
+<blockquote>
+<div><p>name: The answer name see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#name">https://python-inquirer.readthedocs.io/en/latest/usage.html#name</a></p>
+<dl class="simple">
+<dt>message: The user prompt message</dt><dd><p>see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#message">https://python-inquirer.readthedocs.io/en/latest/usage.html#message</a></p>
+</dd>
+<dt>ignore: Optional callback function that gets <cite>answers</cite> where answers contains the dict of previous</dt><dd><p>answers again and returns a boolean value if to ignore urrent question see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore">https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore</a></p>
+</dd>
+</dl>
+<p>validate: Optional attribute that allows the program to check if the answer is valid or not see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#validate">https://python-inquirer.readthedocs.io/en/latest/usage.html#validate</a></p>
+<p>color: The message color if needed extra customizations, can be passed with “danger” | “warning” - red color or yellow</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.cli.prompter.ask_user_question">
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.prompter.</span></span><span class="sig-name descname"><span class="pre">ask_user_question</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">questions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.prompter.ask_user_question" title="Permalink to this definition"></a></dt>
+<dd><p>A function to prompt user input questions</p>
+<blockquote>
+<div><p>question_type: The prompt type see <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#question-types">https://python-inquirer.readthedocs.io/en/latest/usage.html#question-types</a>
+questions:  One of <a class="reference internal" href="#webezyio.cli.prompter.QCheckbox" title="webezyio.cli.prompter.QCheckbox"><code class="xref py py-func docutils literal notranslate"><span class="pre">QCheckbox()</span></code></a> | <a class="reference internal" href="#webezyio.cli.prompter.QText" title="webezyio.cli.prompter.QText"><code class="xref py py-func docutils literal notranslate"><span class="pre">QText()</span></code></a> | <a class="reference internal" href="#webezyio.cli.prompter.QConfirm" title="webezyio.cli.prompter.QConfirm"><code class="xref py py-func docutils literal notranslate"><span class="pre">QConfirm()</span></code></a> | <a class="reference internal" href="#webezyio.cli.prompter.QList" title="webezyio.cli.prompter.QList"><code class="xref py py-func docutils literal notranslate"><span class="pre">QList()</span></code></a></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>name</cite> - The answer name see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#name">https://python-inquirer.readthedocs.io/en/latest/usage.html#name</a></p></li>
+<li><p><cite>message</cite> - The user prompt message see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#message">https://python-inquirer.readthedocs.io/en/latest/usage.html#message</a></p></li>
+<li><dl class="simple">
+<dt><cite>ignore</cite> - Optional callback function that gets <cite>answers</cite> where answers contains the dict of previous</dt><dd><p>answers again and returns a boolean value if to ignore urrent question see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore">https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore</a></p>
+</dd>
+</dl>
+</li>
+<li><p><cite>validate</cite> - Optional attribute that allows the program to check if the answer is valid or not see: <a class="reference external" href="https://python-inquirer.readthedocs.io/en/latest/usage.html#validate">https://python-inquirer.readthedocs.io/en/latest/usage.html#validate</a></p></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+</section>
 <section id="module-webezyio.cli.theme">
 <span id="webezyio-cli-theme-module"></span><h2>webezyio.cli.theme module<a class="headerlink" href="#module-webezyio.cli.theme" title="Permalink to this heading"></a></h2>
 <dl class="py class">

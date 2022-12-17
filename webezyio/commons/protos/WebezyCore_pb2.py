@@ -18,7 +18,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10WebezyCore.proto\x12\x14webezy.WebezyCore.v1\x1a\x1cgoogle/protobuf/struct.proto\"-\n\nOkResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontext\x18\x02 \x01(\t\"F\n\x0cWebezyServer\x12\x36\n\x08language\x18\x01 \x01(\x0e\x32$.webezy.WebezyCore.v1.WebezyLanguage\"\x92\x01\n\x0cWebezyClient\x12\x36\n\x08language\x18\x01 \x01(\x0e\x32$.webezy.WebezyCore.v1.WebezyLanguage\x12\x0f\n\x07out_dir\x18\x02 \x01(\t\x12.\n\x03npm\x18\x03 \x01(\x0b\x32\x1f.webezy.WebezyCore.v1.WebezyNpmH\x00\x42\t\n\x07package\"\x97\x02\n\rWebezyProject\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x14\n\x0cpackage_name\x18\x03 \x01(\t\x12\x0f\n\x07version\x18\x04 \x01(\t\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\x12+\n\nproperties\x18\x07 \x01(\x0b\x32\x17.google.protobuf.Struct\x12\x32\n\x06server\x18\x08 \x01(\x0b\x32\".webezy.WebezyCore.v1.WebezyServer\x12\x33\n\x07\x63lients\x18\t \x03(\x0b\x32\".webezy.WebezyCore.v1.WebezyClient\x12\x12\n\ngo_package\x18\n \x01(\t\"9\n\tWebezyNpm\x12\r\n\x05scope\x18\x01 \x01(\t\x12\x0e\n\x06public\x18\x02 \x01(\x08\x12\r\n\x05token\x18\x03 \x01(\t*P\n\x0eWebezyLanguage\x12\x1a\n\x16UNKNOWN_WEBEZYLANGUAGE\x10\x00\x12\n\n\x06python\x10\x01\x12\x0e\n\ntypescript\x10\x02\x12\x06\n\x02go\x10\x03\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10WebezyCore.proto\x12\x14webezy.WebezyCore.v1\x1a\x1cgoogle/protobuf/struct.proto\"-\n\nOkResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07\x63ontext\x18\x02 \x01(\t\"F\n\x0cWebezyServer\x12\x36\n\x08language\x18\x01 \x01(\x0e\x32$.webezy.WebezyCore.v1.WebezyLanguage\"9\n\tWebezyNpm\x12\r\n\x05scope\x18\x01 \x01(\t\x12\x0e\n\x06public\x18\x02 \x01(\x08\x12\r\n\x05token\x18\x03 \x01(\t\"\x92\x01\n\x0cWebezyClient\x12\x36\n\x08language\x18\x01 \x01(\x0e\x32$.webezy.WebezyCore.v1.WebezyLanguage\x12\x0f\n\x07out_dir\x18\x02 \x01(\t\x12.\n\x03npm\x18\x03 \x01(\x0b\x32\x1f.webezy.WebezyCore.v1.WebezyNpmH\x00\x42\t\n\x07package\"\x97\x02\n\rWebezyProject\x12\x0b\n\x03uri\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x14\n\x0cpackage_name\x18\x03 \x01(\t\x12\x0f\n\x07version\x18\x04 \x01(\t\x12\x0c\n\x04type\x18\x05 \x01(\t\x12\x0c\n\x04kind\x18\x06 \x01(\t\x12+\n\nproperties\x18\x07 \x01(\x0b\x32\x17.google.protobuf.Struct\x12\x32\n\x06server\x18\x08 \x01(\x0b\x32\".webezy.WebezyCore.v1.WebezyServer\x12\x33\n\x07\x63lients\x18\t \x03(\x0b\x32\".webezy.WebezyCore.v1.WebezyClient\x12\x12\n\ngo_package\x18\n \x01(\t*\x83\x01\n\x0eWebezyLanguage\x12\x1a\n\x16UNKNOWN_WEBEZYLANGUAGE\x10\x00\x12\n\n\x06python\x10\x01\x12\x0e\n\ntypescript\x10\x02\x12\x06\n\x02go\x10\x03\x12\x0b\n\x07webpack\x10\x04\x12\x0e\n\njavascript\x10\x05\x12\n\n\x06\x63sharp\x10\x06\x12\x08\n\x04java\x10\x07\x62\x06proto3')
 
 _WEBEZYLANGUAGE = DESCRIPTOR.enum_types_by_name['WebezyLanguage']
 WebezyLanguage = enum_type_wrapper.EnumTypeWrapper(_WEBEZYLANGUAGE)
@@ -26,13 +26,17 @@ UNKNOWN_WEBEZYLANGUAGE = 0
 python = 1
 typescript = 2
 go = 3
+webpack = 4
+javascript = 5
+csharp = 6
+java = 7
 
 
 _OKRESPONSE = DESCRIPTOR.message_types_by_name['OkResponse']
 _WEBEZYSERVER = DESCRIPTOR.message_types_by_name['WebezyServer']
+_WEBEZYNPM = DESCRIPTOR.message_types_by_name['WebezyNpm']
 _WEBEZYCLIENT = DESCRIPTOR.message_types_by_name['WebezyClient']
 _WEBEZYPROJECT = DESCRIPTOR.message_types_by_name['WebezyProject']
-_WEBEZYNPM = DESCRIPTOR.message_types_by_name['WebezyNpm']
 
 @overload
 class OkResponse(_message.Message):
@@ -195,21 +199,19 @@ WebezyProject = _reflection.GeneratedProtocolMessageType('WebezyProject', (_mess
   })
 _sym_db.RegisterMessage(WebezyProject)
 
-
-
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _WEBEZYLANGUAGE._serialized_start=681
-  _WEBEZYLANGUAGE._serialized_end=761
+  _WEBEZYLANGUAGE._serialized_start=682
+  _WEBEZYLANGUAGE._serialized_end=813
   _OKRESPONSE._serialized_start=72
   _OKRESPONSE._serialized_end=117
   _WEBEZYSERVER._serialized_start=119
   _WEBEZYSERVER._serialized_end=189
-  _WEBEZYCLIENT._serialized_start=192
-  _WEBEZYCLIENT._serialized_end=338
-  _WEBEZYPROJECT._serialized_start=341
-  _WEBEZYPROJECT._serialized_end=620
-  _WEBEZYNPM._serialized_start=622
-  _WEBEZYNPM._serialized_end=679
+  _WEBEZYNPM._serialized_start=191
+  _WEBEZYNPM._serialized_end=248
+  _WEBEZYCLIENT._serialized_start=251
+  _WEBEZYCLIENT._serialized_end=397
+  _WEBEZYPROJECT._serialized_start=400
+  _WEBEZYPROJECT._serialized_end=679
 # @@protoc_insertion_point(module_scope)

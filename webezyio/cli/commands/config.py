@@ -23,5 +23,12 @@ from webezyio.commons.config import parse_project_config
 from webezyio.commons.pretty import print_info
 
 def display_configs(path:str,dictionary=False):
-
+    """Displaying all webezy.io configurations - Global | Project | WebezyJson
+    
+    Parameters:
+    -----------
+    
+        path: The path for webezy.json file
+        dictionary: True / False for printing the results as dict value. If specified False it will print the values as `proto`
+    """
     print_info(parse_project_config(path,proto=True if dictionary == False else False),True,'Webezy Configs')

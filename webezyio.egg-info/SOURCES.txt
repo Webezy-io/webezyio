@@ -34,6 +34,7 @@ webezyio/builder/__init__.py
 webezyio/builder/plugins/WebezyBase.py
 webezyio/builder/plugins/WebezyDocker.py
 webezyio/builder/plugins/WebezyGoClient.py
+webezyio/builder/plugins/WebezyGoServer.py
 webezyio/builder/plugins/WebezyMigrate.py
 webezyio/builder/plugins/WebezyMonitor.py
 webezyio/builder/plugins/WebezyProto.py
@@ -44,6 +45,7 @@ webezyio/builder/plugins/WebezyReadme.py
 webezyio/builder/plugins/WebezyTsClient.py
 webezyio/builder/plugins/WebezyTsServer.py
 webezyio/builder/plugins/WebezyUnitPy.py
+webezyio/builder/plugins/WebezyWebpack.py
 webezyio/builder/plugins/__init__.py
 webezyio/builder/plugins/static.py
 webezyio/builder/src/__init__.py
@@ -53,6 +55,7 @@ webezyio/builder/src/main.py
 webezyio/cli/__init__.py
 webezyio/cli/__main__.py
 webezyio/cli/main.py
+webezyio/cli/prompter.py
 webezyio/cli/theme.py
 webezyio/cli/commands/__init__.py
 webezyio/cli/commands/build.py
@@ -76,6 +79,8 @@ webezyio/commons/helpers.py
 webezyio/commons/parser.py
 webezyio/commons/pretty.py
 webezyio/commons/resources.py
+webezyio/commons/protos/Analytics_pb2.py
+webezyio/commons/protos/Analytics_pb2_grpc.py
 webezyio/commons/protos/WebezyAnalytics_pb2.py
 webezyio/commons/protos/WebezyConfig_pb2.py
 webezyio/commons/protos/WebezyCore_pb2.py
@@ -86,6 +91,7 @@ webezyio/commons/protos/WebezyProxy_pb2.py
 webezyio/commons/protos/WebezyService_pb2.py
 webezyio/commons/protos/WebezyTemplate_pb2.py
 webezyio/commons/protos/__init__.py
+webezyio/commons/protos/client.py
 webezyio/commons/protos/old/webezy_pb2.py
 webezyio/commons/protos/old/webezy_pb2_grpc.py
 webezyio/commons/templates/webezyio/HelloWorldPy.template.py
@@ -94,13 +100,6 @@ webezyio/commons/templates/webezyio/PubSubTs.template.py
 webezyio/commons/templates/webezyio/SamplePy.template.py
 webezyio/commons/templates/webezyio/SampleTs.template.py
 webezyio/commons/templates/webezyio/io.template.py
-webezyio/core/Analytics_pb2.py
-webezyio/core/Analytics_pb2_grpc.py
-webezyio/core/WebezyAnalytics_pb2.py
-webezyio/core/WebezyAnalytics_pb2_grpc.py
-webezyio/core/WebezyCore_pb2.py
-webezyio/core/WebezyCore_pb2_grpc.py
-webezyio/core/__init__.py
 webezyio/tests/unit-test.py
 webezyio/tests/blank/test.py
 webezyio/tests/commons/test.py
