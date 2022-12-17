@@ -33,8 +33,7 @@ from google.protobuf.descriptor_pb2 import DescriptorProto, FieldDescriptorProto
 from google.protobuf.descriptor import FileDescriptor, Descriptor, MethodDescriptor,\
     FieldDescriptor, ServiceDescriptor, EnumDescriptor
 from grpc_tools import command
-import inquirer
-from webezyio.cli.theme import WebezyTheme
+from webezyio.cli import prompter
 from webezyio.commons import errors
 from webezyio.commons.pretty import print_error, print_info, print_note, print_warning
 from webezyio.commons.protos.WebezyPackage_pb2 import UNKNOWN_WEBEZYEXTENSION, WebezyExtension, WebezyField, WebezyOneOfField
@@ -151,7 +150,8 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
             elif c['language'] == 'go':
                 temp_c_lang = go
                 if json:
-                    go_package = inquirer.prompt([inquirer.Text('go_package','Enter a prefix to support Go package','github.com')],theme=WebezyTheme())
+                    go_package_input = prompter.QText(name='go_package',message='Enter a prefix to support Go package',default='github.com')
+                    go_package = prompter.ask_user_question(questions=[go_package_input])
                 if go_package is not None:
                     go_package = '{}/{}'.format(go_package['go_package'],package_name)
                 else:

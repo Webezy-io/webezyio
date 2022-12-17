@@ -19,8 +19,8 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import inquirer
 from webezyio.builder.src.main import WebezyBuilder
+from webezyio.cli import prompter
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import client_wrapper 
 from webezyio import _helpers,_fs,_pretty
@@ -84,9 +84,8 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
     # TODO allow support iterator for client stream
     msg = message_proto()
     # Ask for seed data
-    seed_data = inquirer.prompt([
-        inquirer.Confirm('seed',message='Do you want to send seed data?',default=True)
-    ],theme=WebezyTheme())
+    confirm_seed_data = prompter.QConfirm(name='seed',message='Do you want to send seed data?',default=True)
+    seed_data = prompter.ask_user_question(questions=[confirm_seed_data])
     # Seed data input
     if seed_data is not None:
         
@@ -122,20 +121,24 @@ def CallRPC(service_module_path:str,service_rpc_name:str,wz_json:_helpers.WZJson
                     question = []
                     if f['fieldType'] == 'TYPE_STRING':
                         fields[f.get('name')] = None
-                        question.append(inquirer.Text(f.get('name'),'Enter a value for "{0}" key (String)'.format(f.get('name')),"Test"))
+                        string_value = prompter.QText(name=f.get('name'),message='Enter a value for "{0}" key (String)'.format(f.get('name')),default='Test String')
+                        question.append(string_value)
                     elif f['fieldType'] =='TYPE_BOOL':
                         fields[f.get('name')] = None
-                        question.append(inquirer.Confirm(f.get('name'),'Choose value for "{0}" key (Boolean)'.format(f.get('name')),"Test"))
+                        bool_value = prompter.QConfirm(name=f.get('name'),message='Choose value for "{0}" key (Boolean)'.format(f.get('name')),default=True)
+                        question.append(bool_value)
                     elif f['fieldType'] == 'TYPE_INT32' or f['fieldType'] =='TYPE_INT64':
                         fields[f.get('name')] = None
-                        question.append(inquirer.Text(f.get('name'),'Choose value for "{0}" key (Integer)'.format(f.get('name')),"Test"))
+                        number_value = prompter.QText(name=f.get('name'),message='Choose value for "{0}" key (Integer)'.format(f.get('name')),default='1')
+                        question.append(number_value)
                     elif f['fieldType'] == 'TYPE_DOUBLE' or f['fieldType'] =='TYPE_FLOAT':
                         fields[f.get('name')] = None
-                        question.append(inquirer.Text(f.get('name'),'Choose value for "{0}" key (Integer)'.format(f.get('name')),"Test"))
+                        number_value = prompter.QText(name=f.get('name'),message='Choose value for "{0}" key (Float)'.format(f.get('name')),default='1.0')
+                        question.append(number_value)
                     if len(question) == 0:
                         pass
                     else:
-                        fields[f.get('name')] = inquirer.prompt(question,theme=WebezyTheme()).get(f.get('name'))
+                        fields[f.get('name')] = prompter.ask_user_question(questions=question).get(f.get('name')) 
                 else:
                     _pretty.print_warning('Skipping {0}->{1}:{2}'.format(f['name'],f['fieldType'],f['messageType']))
                     

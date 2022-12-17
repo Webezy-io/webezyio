@@ -11,7 +11,7 @@ def test_cli():
 
 def test_prompter():
     list = QList('test_list','Some test user input from list',[('Display 1','value1'),('Display 2','value2')])
-    text = QText('test_text','Some test user input from text')
+    text = QText('test_text','Some test user input from text',default='test')
     confirm = QConfirm('test_confirm','Some test user input from confirm',default=True)
     checkbox = QCheckbox('test_checkbox','Some test user input from checkbox',choices=[('Display 1','value1'),('Display 2','value2')],color='danger')
     list_ignore = QList('test_list_ignore','Some test user input from list that should be ignored',choices=[('Display 1','value1'),('Display 2','value2')],ignore=lambda x: x["test_confirm"])

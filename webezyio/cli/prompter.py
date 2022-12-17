@@ -21,7 +21,7 @@
 
 # A prompting module for all webezy.io cli prompting tasks
 
-from typing import Any, List, Literal, Tuple
+from typing import Literal, Tuple
 from collections.abc import Callable
 
 import inquirer
@@ -53,13 +53,14 @@ class QList:
 
         color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
     """
-    def __init__(self, name:str, message:str, choices,validate=None,ignore=None,color:user_message_color=None) -> None:
+    def __init__(self, name:str, message:str, choices,validate=None,ignore=None,default=None,color:user_message_color=None) -> None:
        
         self.name = name
         self.message = message
         self.choices = choices
         self.validate = validate if validate is not None else True
         self.ignore = ignore if ignore is not None else False
+        self.default = default
         self.color = color
 
     def add_choice(self,choice:Tuple[str,str]):
@@ -117,12 +118,13 @@ class QText:
         color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
     """
 
-    def __init__(self, name:str, message:str, validate=None,ignore=None,color:user_message_color=None) -> None:
+    def __init__(self, name:str, message:str, validate=None,ignore=None,default=None,color:user_message_color=None) -> None:
       
         self.name = name
         self.message = message
         self.validate = validate if validate is not None else True
         self.ignore = ignore if ignore is not None else False
+        self.default = default
         self.color = color
 
 class QCheckbox:
@@ -147,13 +149,14 @@ class QCheckbox:
         color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
     """
     
-    def __init__(self, name:str, message:str, choices:Tuple[str,str], validate=None,ignore=None,color:user_message_color=None) -> None:
+    def __init__(self, name:str, message:str, choices:Tuple[str,str],default=[], validate=None,ignore=None,color:user_message_color=None) -> None:
        
         self.name = name
         self.message = message
         self.choices = choices
         self.validate = validate if validate is not None else True
         self.ignore = ignore if ignore is not None else False
+        self.default = default
         self.color = color
 
     def add_choice(self,choice:Tuple[str,str]):
@@ -191,7 +194,8 @@ def ask_user_question(questions):
                     message=message,
                     choices=dict_obj.get('choices'),
                     ignore=dict_obj.get('ignore'),
-                    validate=dict_obj.get('validate')
+                    validate=dict_obj.get('validate'),
+                    default=dict_obj.get('default')
                 )
             )
         elif q.__class__.__name__ == 'QCheckbox':
@@ -201,7 +205,8 @@ def ask_user_question(questions):
                     message=message + ' (Use arrow keys <-/->)',
                     choices=dict_obj.get('choices'),
                     ignore=dict_obj.get('ignore'),
-                    validate=dict_obj.get('validate')
+                    validate=dict_obj.get('validate'),
+                    default=dict_obj.get('default')
                 )
             )
         elif q.__class__.__name__ == 'QText':
@@ -210,14 +215,15 @@ def ask_user_question(questions):
                     dict_obj.get('name'),
                     message=message,
                     ignore=dict_obj.get('ignore'),
-                    validate=dict_obj.get('validate')
+                    validate=dict_obj.get('validate'),
+                    default=dict_obj.get('default')
                 )
             )
         elif q.__class__.__name__ == 'QConfirm':
             questions_temp.append(
                 inquirer.Confirm(
                     dict_obj.get('name'),
-                    message=dict_obj.get('message'),
+                    message=message,
                     default=dict_obj.get('default'),
                     ignore=dict_obj.get('ignore'),
                     validate=dict_obj.get('validate')
