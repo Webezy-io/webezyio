@@ -33,8 +33,28 @@ user_prompt_type = Literal["Confirm","List","Text","Checkbox"]
 user_message_color = Literal["warning","danger"]
 
 class QList:
+    """
+    A list set of question to be passed to the questions array for prompter function :func:`~webezyio.cli.prompter.ask_user_question`
+    see: https://python-inquirer.readthedocs.io/en/latest/examples.html#list-py
     
+    Parameters:
+    -----------
+        name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
+        
+        message: The user prompt message 
+            see: https://python-inquirer.readthedocs.io/en/latest/usage.html#message
+        
+        choices: The tuple array for choices to be prompted where the first element of the tuple is the displayed value and the 2nd element is the value itself
+
+        ignore: Optional callback function that gets `answers` where answers contains the dict of previous
+            answers again and returns a boolean value if to ignore urrent question see: https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore
+        
+        validate: Optional attribute that allows the program to check if the answer is valid or not see: https://python-inquirer.readthedocs.io/en/latest/usage.html#validate
+
+        color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
+    """
     def __init__(self, name:str, message:str, choices,validate=None,ignore=None,color:user_message_color=None) -> None:
+       
         self.name = name
         self.message = message
         self.choices = choices
@@ -46,8 +66,30 @@ class QList:
         self.choices.append(choice)
 
 class QConfirm:
+    """
+    A confirm set of question to be passed to the questions array for prompter function :func:`~webezyio.cli.prompter.ask_user_question`
+    see: https://python-inquirer.readthedocs.io/en/latest/examples.html#confirm-py
+
+    Parameters:
+    -----------
+        name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
+        
+        message: The user prompt message 
+            see: https://python-inquirer.readthedocs.io/en/latest/usage.html#message
+        
+        default: The default value to be used as confirm 
+            seef: https://python-inquirer.readthedocs.io/en/latest/usage.html#default
+
+        ignore: Optional callback function that gets `answers` where answers contains the dict of previous
+            answers again and returns a boolean value if to ignore urrent question see: https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore
+        
+        validate: Optional attribute that allows the program to check if the answer is valid or not see: https://python-inquirer.readthedocs.io/en/latest/usage.html#validate
+
+        color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
+    """
 
     def __init__(self, name:str, message:str, default:bool, validate=None,ignore=None,color:user_message_color=None) -> None:
+
         self.name = name
         self.message = message
         self.default = default
@@ -56,8 +98,27 @@ class QConfirm:
         self.color = color
 
 class QText:
+    """
+    A text set of question to be passed to the questions array for prompter function :func:`~webezyio.cli.prompter.ask_user_question`
+    see: https://python-inquirer.readthedocs.io/en/latest/examples.html#text-py
+
+    Parameters:
+    -----------
+        name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
+        
+        message: The user prompt message 
+            see: https://python-inquirer.readthedocs.io/en/latest/usage.html#message
+        
+        ignore: Optional callback function that gets `answers` where answers contains the dict of previous
+            answers again and returns a boolean value if to ignore urrent question see: https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore
+        
+        validate: Optional attribute that allows the program to check if the answer is valid or not see: https://python-inquirer.readthedocs.io/en/latest/usage.html#validate
+
+        color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
+    """
 
     def __init__(self, name:str, message:str, validate=None,ignore=None,color:user_message_color=None) -> None:
+      
         self.name = name
         self.message = message
         self.validate = validate if validate is not None else True
@@ -65,8 +126,29 @@ class QText:
         self.color = color
 
 class QCheckbox:
+    """
+    A checkbox set of question to be passed to the questions array for prompter function :func:`~webezyio.cli.prompter.ask_user_question`
+    see: https://python-inquirer.readthedocs.io/en/latest/examples.html#checkbox-py
 
-    def __init__(self, name:str, message:str, choices, validate=None,ignore=None,color:user_message_color=None) -> None:
+    Parameters:
+    -----------
+        name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
+        
+        message: The user prompt message 
+            see: https://python-inquirer.readthedocs.io/en/latest/usage.html#message
+        
+        choices: The tuple array for choices to be prompted where the first element of the tuple is the displayed value and the 2nd element is the value itself
+
+        ignore: Optional callback function that gets `answers` where answers contains the dict of previous
+            answers again and returns a boolean value if to ignore urrent question see: https://python-inquirer.readthedocs.io/en/latest/usage.html#ignore
+        
+        validate: Optional attribute that allows the program to check if the answer is valid or not see: https://python-inquirer.readthedocs.io/en/latest/usage.html#validate
+
+        color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
+    """
+    
+    def __init__(self, name:str, message:str, choices:Tuple[str,str], validate=None,ignore=None,color:user_message_color=None) -> None:
+       
         self.name = name
         self.message = message
         self.choices = choices
@@ -85,7 +167,7 @@ def ask_user_question(questions):
     Parameters:
     -----------
         question_type: The prompt type see https://python-inquirer.readthedocs.io/en/latest/usage.html#question-types
-        questions: List of questions tuples that consist of : 
+        questions:  One of :func:`~webezyio.cli.prompter.QCheckbox` | :func:`~webezyio.cli.prompter.QText` | :func:`~webezyio.cli.prompter.QConfirm` | :func:`~webezyio.cli.prompter.QList` 
             * `name` - The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
             * `message` - The user prompt message see: https://python-inquirer.readthedocs.io/en/latest/usage.html#message
             * `ignore` - Optional callback function that gets `answers` where answers contains the dict of previous
