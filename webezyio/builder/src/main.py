@@ -1,3 +1,4 @@
+import importlib
 import itertools
 import logging
 import os
@@ -7,9 +8,12 @@ import pluggy
 from webezyio.builder.src import hookspecs, lru
 from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyGoServer, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient,WebezyWebpack
 from webezyio.commons import file_system, helpers, resources, errors
-from webezyio.commons.pretty import print_error, print_warning
+from webezyio.commons.pretty import print_error, print_info, print_warning
+
+# ADD MORE WELL KNOWN PLUGINS HERE
 _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsServer,WebezyTsClient,WebezyGoServer,WebezyGoClient,WebezyWebpack,
                         WebezyReadme]  # Many More To Come
+
 log = logging.getLogger('webezyio.cli.main')
 
 
@@ -18,11 +22,16 @@ class WebezyBuilder:
     Defined on :module:`webezyio.builder.src.hookspecs`
     """
 
-    def __init__(self, path, hooks=None, project_name=None, server_language=None, clients=None):
+    def __init__(self, path, hooks=None, project_name=None, server_language=None, clients=None, configs:resources.WebezyConfig=None):
         self._pm = pluggy.PluginManager("builder")
         self._webezy_context = None
         self._pm.add_hookspecs(hookspecs)
         self._pm.load_setuptools_entrypoints("builder")
+
+        self._plugins = pluggy.PluginManager("plugins")
+        self._plugins.add_hookspecs(hookspecs)
+        self._plugins.load_setuptools_entrypoints("plugins")
+
         self._webezy_json = self._parse_webezy_json(path)
         # self._cache = lru.LruCache[resources.WzResourceWrapper](100)
         self.hooks = hooks
@@ -31,16 +40,20 @@ class WebezyBuilder:
         self._project_name = project_name
         self._server_language = server_language
         self._clients = clients
+        self._configs = configs
 
         if hooks:
             self._register_hooks()
         else:
             self._auto_register_hooks()
 
+        if hasattr(self._configs,'plugins'):
+            if len(self._configs.plugins) > 0:
+                self.import_custom_plugins(self._configs.plugins)
+
         self._parse_webezy_context(path)
         self._parse_protos(path)
         self._validate_json_proto()
-
     def _validate_json_proto(self):
         pass
 
@@ -58,8 +71,12 @@ class WebezyBuilder:
 
     def _register_hooks(self) -> None:
         for hook in self.hooks:
-            self._pm.register(hook)
-            log.info(f'Registerd plugin -> {self._pm.get_name(hook)}')
+            if hook in _WELL_KNOWN_PLUGINS:
+                self._pm.register(hook)
+                print_info(f'Registerd well known plugin -> {self._pm.get_name(hook)}')
+            else:
+                self._plugins.register(hook)
+                print_info(f'Registerd custom plugin -> {self._plugins.get_name(hook)}')
 
     def _auto_register_hooks(self):
         server_lang = self._webezy_json.get_server_language()
@@ -231,7 +248,13 @@ class WebezyBuilder:
             protos_dir=path, project_name=project_name, server_language=server_language, clients=clients,domain=domain)
         results = list(itertools.chain(*results))
         return results
-
+    
+    def BuildMongo(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.write_models` hook"""
+        results = self._plugins.hook.write_models(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        results = list(itertools.chain(*results))
+        return results
     # def PackageProject(self):
     #     """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
     #     results = self._pm.hook.pre_build(
@@ -251,9 +274,11 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
+        custom_plugins = self.BuildCustomPlugins()
+
         # package = self.PackageProject()
         results = [prebuild, init, context, protos, services,
-                   server, compile, readme, protoclass, clients, postbuild]
+                   server, compile, readme, protoclass, clients, postbuild, custom_plugins]
         return results
 
     def BuildOnlyProtos(self):
@@ -261,7 +286,9 @@ class WebezyBuilder:
         init = self.InitProjectStructure()
         context = self.RebuildContext()
         protos = self.BuildProtos()
-        results = [prebuild, init, context, protos]
+        custom_plugins = self.BuildCustomPlugins()
+
+        results = [prebuild, init, context, protos, custom_plugins]
         return results
 
     def BuildOnlyCode(self):
@@ -272,10 +299,25 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
+        custom_plugins = self.BuildCustomPlugins()
         # package = self.PackageProject()
-        results = [services, server, compile, readme, protoclass, clients, postbuild, package]
+        results = [services, server, compile, readme, protoclass, clients, postbuild, custom_plugins]
         return results
+
+    def BuildCustomPlugins(self):
+        self.BuildMongo()
+        # TODO add more plugins here
 
     @property
     def WZJson(self):
         return self._webezy_json
+
+    def import_custom_plugins(self,plugins):
+        for p in plugins:
+            try:
+                sys.path.append(file_system.get_current_location())
+                mod = importlib.import_module(p)
+                self._plugins.register(mod)
+                print_info(f'Registerd custom plugin -> {mod.__name__}')
+            except Exception as e:
+                print_error(e)

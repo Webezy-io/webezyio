@@ -74,7 +74,7 @@ def parse_project_config(root_path:str,proto=False):
     if proto:
         webezy_config = WebezyConfig()
         global_config = parse_global_config_proto()
-        print_note(f'{global_config.host = }\n{global_config.port = }\n{global_config.docs = }\n{global_config.template = }\n{global_config.monitor = }\n{global_config.proxy = }\n{global_config.webezyio_templates = }\n{global_config.first_run = }\n{global_config.token = }\n{global_config.analytics = }\n')
+        # print_note(f'{global_config.host = }\n{global_config.port = }\n{global_config.docs = }\n{global_config.template = }\n{global_config.monitor = }\n{global_config.proxy = }\n{global_config.webezyio_templates = }\n{global_config.first_run = }\n{global_config.token = }\n{global_config.analytics = }\n')
         webezy_config.MergeFrom(global_config)
         
         config_file = parse_config_file_proto(root_path)
@@ -82,8 +82,10 @@ def parse_project_config(root_path:str,proto=False):
         # print_note(type(config_file))
         if config_file is not None:
             webezy_config.MergeFrom(config_file)
-
-        print_note(f'{webezy_config.host = }\n{webezy_config.port = }\n{webezy_config.docs = }\n{webezy_config.template = }\n{webezy_config.monitor = }\n{webezy_config.proxy = }\n{webezy_config.webezyio_templates = }\n{webezy_config.first_run = }\n{webezy_config.token = }\n{webezy_config.analytics = }\n')
+        webezy_json_configs = parse_webezy_json_configs_proto(root_path)
+        if webezy_json_configs is not None:
+            webezy_config.MergeFrom(webezy_json_configs)
+        # print_note(f'{webezy_config.host = }\n{webezy_config.port = }\n{webezy_config.docs = }\n{webezy_config.template = }\n{webezy_config.monitor = }\n{webezy_config.proxy = }\n{webezy_config.webezyio_templates = }\n{webezy_config.first_run = }\n{webezy_config.token = }\n{webezy_config.analytics = }\n')
 
     else:
         global_config = parse_global_config_dict()
@@ -119,6 +121,17 @@ def parse_webezy_json_configs(root_path):
         WEBEZY_JSON = _fs.rFile(webezy_json_path, json=True)
         WEBEZY_JSON = _helpers.WZJson(webezy_json=WEBEZY_JSON)
     return WEBEZY_JSON._config if WEBEZY_JSON is not None else None
+
+def parse_webezy_json_configs_proto(root_path):
+    WEBEZY_JSON = None
+    if _fs.check_if_file_exists(root_path):
+
+        WEBEZY_JSON = _fs.rFile(root_path, json=True)
+        WEBEZY_JSON = _helpers.WZJson(webezy_json=WEBEZY_JSON)
+        if WEBEZY_JSON._config:
+            return ParseDict(WEBEZY_JSON._config,WebezyConfig())
+        else:
+            return None
 
 def parse_config_file_proto(root_path) -> WebezyConfig:
     custom_config_path = _fs.join_path(root_path,'config.py')
@@ -161,7 +174,8 @@ def parse_config_file_dict(root_path):
                 deployment = temp_configs.deployment,
                 monitor = MessageToDict(temp_configs.monitor),
                 proxy =  MessageToDict(temp_configs.proxy),
-                host = temp_configs.host
+                host = temp_configs.host,
+                plugins = temp_configs.plugins
             )
         else:
             print_warning('You must configure the parameters under \'configs = WebezyConfig.Config()\' variable')

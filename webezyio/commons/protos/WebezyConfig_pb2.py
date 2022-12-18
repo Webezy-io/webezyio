@@ -21,7 +21,7 @@ from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 from . import WebezyTemplate_pb2 as WebezyTemplate__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12WebezyConfig.proto\x12\x16webezy.WebezyConfig.v1\x1a\x16WebezyPrometheus.proto\x1a\x11WebezyProxy.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x14WebezyTemplate.proto\"Q\n\rWebezyMonitor\x12@\n\nprometheus\x18\x01 \x01(\x0b\x32,.webezy.WebezyPrometheus.v1.PrometheusConfig\"\xfc\x03\n\x0cWebezyConfig\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12:\n\ndeployment\x18\x03 \x01(\x0e\x32&.webezy.WebezyConfig.v1.DeploymentType\x12\x31\n\x05proxy\x18\x04 \x01(\x0b\x32\".webezy.WebezyProxy.v1.ProxyConfig\x12%\n\x04\x64ocs\x18\x05 \x01(\x0b\x32\x17.google.protobuf.Struct\x12:\n\x08template\x18\x06 \x01(\x0b\x32(.webezy.WebezyTemplate.v1.TemplateConfig\x12\x36\n\x07monitor\x18\x07 \x01(\x0b\x32%.webezy.WebezyConfig.v1.WebezyMonitor\x12\x11\n\tanalytics\x18\x08 \x01(\x08\x12\r\n\x05token\x18\t \x01(\t\x12\x11\n\tfirst_run\x18\n \x01(\x08\x12\x1a\n\x12webezyio_templates\x18\x0b \x03(\t\x12\x44\n\x08\x66\x65\x61tures\x18\x0c \x03(\x0b\x32\x32.webezy.WebezyConfig.v1.WebezyConfig.FeaturesEntry\x1a/\n\rFeaturesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x08:\x02\x38\x01*C\n\x0e\x44\x65ploymentType\x12\x1a\n\x16UNKNOWN_DEPLOYMENTTYPE\x10\x00\x12\t\n\x05LOCAL\x10\x01\x12\n\n\x06\x44OCKER\x10\x02\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12WebezyConfig.proto\x12\x16webezy.WebezyConfig.v1\x1a\x16WebezyPrometheus.proto\x1a\x11WebezyProxy.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x14WebezyTemplate.proto\"Q\n\rWebezyMonitor\x12@\n\nprometheus\x18\x01 \x01(\x0b\x32,.webezy.WebezyPrometheus.v1.PrometheusConfig\"\x8d\x04\n\x0cWebezyConfig\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12:\n\ndeployment\x18\x03 \x01(\x0e\x32&.webezy.WebezyConfig.v1.DeploymentType\x12\x31\n\x05proxy\x18\x04 \x01(\x0b\x32\".webezy.WebezyProxy.v1.ProxyConfig\x12%\n\x04\x64ocs\x18\x05 \x01(\x0b\x32\x17.google.protobuf.Struct\x12:\n\x08template\x18\x06 \x01(\x0b\x32(.webezy.WebezyTemplate.v1.TemplateConfig\x12\x36\n\x07monitor\x18\x07 \x01(\x0b\x32%.webezy.WebezyConfig.v1.WebezyMonitor\x12\x11\n\tanalytics\x18\x08 \x01(\x08\x12\r\n\x05token\x18\t \x01(\t\x12\x11\n\tfirst_run\x18\n \x01(\x08\x12\x1a\n\x12webezyio_templates\x18\x0b \x03(\t\x12\x44\n\x08\x66\x65\x61tures\x18\x0c \x03(\x0b\x32\x32.webezy.WebezyConfig.v1.WebezyConfig.FeaturesEntry\x12\x0f\n\x07plugins\x18\r \x03(\t\x1a/\n\rFeaturesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x08:\x02\x38\x01*C\n\x0e\x44\x65ploymentType\x12\x1a\n\x16UNKNOWN_DEPLOYMENTTYPE\x10\x00\x12\t\n\x05LOCAL\x10\x01\x12\n\n\x06\x44OCKER\x10\x02\x62\x06proto3')
 
 _DEPLOYMENTTYPE = DESCRIPTOR.enum_types_by_name['DeploymentType']
 DeploymentType = enum_type_wrapper.EnumTypeWrapper(_DEPLOYMENTTYPE)
@@ -76,8 +76,9 @@ class WebezyConfig(_message.Message):
 	first_run = bool # type: bool
 	webezyio_templates = List[str] # type: List[str]
 	features = Dict[str,bool] # type: Dict[str,bool]
+	plugins = List[str] # type: List[str]
 
-	def __init__(self, host=str, port=int, deployment=enum_type_wrapper.EnumTypeWrapper, proxy=WebezyProxy__pb2.ProxyConfig, docs=google_dot_protobuf_dot_struct__pb2.Struct, template=WebezyTemplate__pb2.TemplateConfig, monitor=WebezyMonitor, analytics=bool, token=str, first_run=bool, webezyio_templates=List[str], features=Dict[str,bool]):
+	def __init__(self, host=str, port=int, deployment=enum_type_wrapper.EnumTypeWrapper, proxy=WebezyProxy__pb2.ProxyConfig, docs=google_dot_protobuf_dot_struct__pb2.Struct, template=WebezyTemplate__pb2.TemplateConfig, monitor=WebezyMonitor, analytics=bool, token=str, first_run=bool, webezyio_templates=List[str], features=Dict[str,bool], plugins=List[str]):
 		"""
 		Attributes:
 		----------
@@ -105,6 +106,8 @@ class WebezyConfig(_message.Message):
 			
 		features : Dict[str,bool]
 			
+		plugins : List[str]
+			
 		"""
 		pass
 WebezyConfig = _reflection.GeneratedProtocolMessageType('WebezyConfig', (_message.Message,), {
@@ -127,12 +130,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _WEBEZYCONFIG_FEATURESENTRY._options = None
   _WEBEZYCONFIG_FEATURESENTRY._serialized_options = b'8\001'
-  _DEPLOYMENTTYPE._serialized_start=735
-  _DEPLOYMENTTYPE._serialized_end=802
+  _DEPLOYMENTTYPE._serialized_start=752
+  _DEPLOYMENTTYPE._serialized_end=819
   _WEBEZYMONITOR._serialized_start=141
   _WEBEZYMONITOR._serialized_end=222
   _WEBEZYCONFIG._serialized_start=225
-  _WEBEZYCONFIG._serialized_end=733
-  _WEBEZYCONFIG_FEATURESENTRY._serialized_start=686
-  _WEBEZYCONFIG_FEATURESENTRY._serialized_end=733
+  _WEBEZYCONFIG._serialized_end=750
+  _WEBEZYCONFIG_FEATURESENTRY._serialized_start=703
+  _WEBEZYCONFIG_FEATURESENTRY._serialized_end=750
 # @@protoc_insertion_point(module_scope)
