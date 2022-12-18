@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>webezyio.commons package &mdash; webezyio 0.1.2 documentation</title>
+  <title>webezyio.commons package &mdash; webezyio 0.1.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -157,6 +157,11 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.commons.config.parse_webezy_json_configs">
 <span class="sig-prename descclassname"><span class="pre">webezyio.commons.config.</span></span><span class="sig-name descname"><span class="pre">parse_webezy_json_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.config.parse_webezy_json_configs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.commons.config.parse_webezy_json_configs_proto">
+<span class="sig-prename descclassname"><span class="pre">webezyio.commons.config.</span></span><span class="sig-name descname"><span class="pre">parse_webezy_json_configs_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.config.parse_webezy_json_configs_proto" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -716,6 +721,38 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="webezyio.commons.helpers.WZService.to_tuple">
 <span class="sig-name descname"><span class="pre">to_tuple</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZService.to_tuple" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZServiceGo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">webezyio.commons.helpers.</span></span><span class="sig-name descname"><span class="pre">WZServiceGo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_package</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imports</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enums</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZServiceGo" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A helper class to write ‘Go’ language services for Webezy.io project services</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZServiceGo.to_str">
+<span class="sig-name descname"><span class="pre">to_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZServiceGo.to_str" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZServiceGo.write_imports">
+<span class="sig-name descname"><span class="pre">write_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZServiceGo.write_imports" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZServiceGo.write_log_func">
+<span class="sig-name descname"><span class="pre">write_log_func</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZServiceGo.write_log_func" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZServiceGo.write_methods">
+<span class="sig-name descname"><span class="pre">write_methods</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZServiceGo.write_methods" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZServiceGo.write_struct">
+<span class="sig-name descname"><span class="pre">write_struct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZServiceGo.write_struct" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
