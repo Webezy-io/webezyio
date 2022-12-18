@@ -19,20 +19,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from webezyio.builder.src.main import WebezyBuilder
-from webezyio.commons.config import parse_project_config
+import logging
+import webezyio.builder as builder
+from webezyio.commons import helpers,file_system,pretty
 
-def build_all(path:str):
-    prj_configs = parse_project_config(path,proto=True)
-    wzBuilder = WebezyBuilder(path=path,configs=prj_configs)
-    wzBuilder.BuildAll()
-
-def build_code(path:str):
-    prj_configs = parse_project_config(path,proto=True)
-    wzBuilder = WebezyBuilder(path=path,configs=prj_configs)
-    wzBuilder.BuildOnlyCode()
-
-def build_protos(path:str):
-    prj_configs = parse_project_config(path,proto=True)
-    wzBuilder = WebezyBuilder(path=path,configs=prj_configs)
-    wzBuilder.BuildOnlyProtos()
+@builder.plugins_hookimpl
+def write_models(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    pretty.print_error("Mongo plugin")

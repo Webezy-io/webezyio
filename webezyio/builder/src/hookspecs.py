@@ -2,6 +2,7 @@ import pluggy
 
 from webezyio.commons.helpers import WZContext, WZJson
 
+"""Core builder plugins hookspec"""
 hookspec = pluggy.HookspecMarker("builder")
 
 @hookspec
@@ -64,3 +65,11 @@ def parse_protos_to_resource(protos_dir,project_name,server_language,clients,dom
 @hookspec
 def package_project(wz_json:WZJson, wz_context: WZContext):
     """Provide a packaging project methods / files / scripts"""
+
+
+"""Custom plugins hook specs"""
+plugin_hookspecs = pluggy.HookspecMarker("plugins")
+
+@plugin_hookspecs
+def write_models(wz_json:WZJson, wz_context:WZContext):
+    """Write mongo models impl."""

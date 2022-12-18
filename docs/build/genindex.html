@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; webezyio 0.1.2 documentation</title>
+  <title>Index &mdash; webezyio 0.1.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -195,11 +195,15 @@
 </li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildAll">BuildAll() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildClients">BuildClients() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildCustomPlugins">BuildCustomPlugins() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
       <li><a href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder">Builder (class in webezyio.architect.recievers)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildMongo">BuildMongo() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildOnlyCode">BuildOnlyCode() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
@@ -643,6 +647,8 @@
         <li><a href="webezyio.architect.interfaces.html#webezyio.architect.interfaces.IHook">(class in webezyio.architect.interfaces)</a>
 </li>
       </ul></li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.import_custom_plugins">import_custom_plugins() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.package.import_package">import_package() (in module webezyio.cli.commands.package)</a>
 </li>
       <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.init_context">init_context() (in module webezyio.builder.plugins.WebezyPy)</a>
@@ -976,8 +982,6 @@
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.package_project">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
-      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PackageProject">PackageProject() (webezyio.builder.src.main.WebezyBuilder method)</a>
-</li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZJson.packages">packages (webezyio.commons.helpers.WZJson property)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.parse_code_file">parse_code_file() (in module webezyio.commons.helpers)</a>
@@ -1035,6 +1039,8 @@
       <li><a href="webezyio.commons.html#webezyio.commons.resources.parse_service">parse_service() (in module webezyio.commons.resources)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.config.parse_webezy_json_configs">parse_webezy_json_configs() (in module webezyio.commons.config)</a>
+</li>
+      <li><a href="webezyio.commons.html#webezyio.commons.config.parse_webezy_json_configs_proto">parse_webezy_json_configs_proto() (in module webezyio.commons.config)</a>
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.template.parse_wz_json">parse_wz_json() (in module webezyio.cli.commands.template)</a>
 </li>
@@ -1319,6 +1325,8 @@
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZProto.to_str">to_str() (webezyio.commons.helpers.WZProto method)</a>
 
       <ul>
+        <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo.to_str">(webezyio.commons.helpers.WZServiceGo method)</a>
+</li>
         <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServicePy.to_str">(webezyio.commons.helpers.WZServicePy method)</a>
 </li>
         <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceTs.to_str">(webezyio.commons.helpers.WZServiceTs method)</a>
@@ -1722,8 +1730,6 @@
         <li><a href="webezyio.commons.html#module-webezyio.commons.client_wrapper">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     webezyio.commons.config
 
@@ -1738,6 +1744,8 @@
         <li><a href="webezyio.commons.html#module-webezyio.commons.errors">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     webezyio.commons.file_system
 
@@ -1900,14 +1908,24 @@
 </li>
         <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZProto.write_imports">(webezyio.commons.helpers.WZProto method)</a>
 </li>
+        <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo.write_imports">(webezyio.commons.helpers.WZServiceGo method)</a>
+</li>
         <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServicePy.write_imports">(webezyio.commons.helpers.WZServicePy method)</a>
 </li>
         <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceTs.write_imports">(webezyio.commons.helpers.WZServiceTs method)</a>
 </li>
       </ul></li>
+      <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo.write_log_func">write_log_func() (webezyio.commons.helpers.WZServiceGo method)</a>
+</li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZProto.write_messages">write_messages() (webezyio.commons.helpers.WZProto method)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZClientGo.write_methods">write_methods() (webezyio.commons.helpers.WZClientGo method)</a>
+
+      <ul>
+        <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo.write_methods">(webezyio.commons.helpers.WZServiceGo method)</a>
+</li>
+      </ul></li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.write_models">write_models() (in module webezyio.builder.src.hookspecs)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZClientGo.write_new">write_new() (webezyio.commons.helpers.WZClientGo method)</a>
 </li>
@@ -1950,7 +1968,11 @@
 </li>
       </ul></li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZClientGo.write_struct">write_struct() (webezyio.commons.helpers.WZClientGo method)</a>
+
+      <ul>
+        <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo.write_struct">(webezyio.commons.helpers.WZServiceGo method)</a>
 </li>
+      </ul></li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.WriteReadme">WriteReadme() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZClientGo">WZClientGo (class in webezyio.commons.helpers)</a>
@@ -1988,6 +2010,8 @@
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZRPC">WZRPC (class in webezyio.commons.helpers)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZService">WZService (class in webezyio.commons.helpers)</a>
+</li>
+      <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo">WZServiceGo (class in webezyio.commons.helpers)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServicePy">WZServicePy (class in webezyio.commons.helpers)</a>
 </li>

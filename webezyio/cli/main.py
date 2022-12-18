@@ -32,8 +32,6 @@ import inquirer
 from inquirer import errors
 import re
 from webezyio import __version__, config
-from webezyio.builder.plugins import WebezyMigrate
-from webezyio.builder.src.main import WebezyBuilder
 from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme,prompter
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf, protos
