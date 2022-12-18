@@ -36,6 +36,7 @@ webezyio/builder/plugins/WebezyDocker.py
 webezyio/builder/plugins/WebezyGoClient.py
 webezyio/builder/plugins/WebezyGoServer.py
 webezyio/builder/plugins/WebezyMigrate.py
+webezyio/builder/plugins/WebezyMongo.py
 webezyio/builder/plugins/WebezyMonitor.py
 webezyio/builder/plugins/WebezyProto.py
 webezyio/builder/plugins/WebezyProxy.py
