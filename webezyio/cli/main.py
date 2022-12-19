@@ -357,6 +357,14 @@ def main(args=None):
             if hasattr(args, 'resource'):
                 """Generate command process"""
 
+                # Small validations:
+                # Project name
+                if WEBEZY_JSON.project.get('name') is None:
+                    print_warning("Project name value is not specified !")
+                # Project domain 
+                if WEBEZY_JSON.domain is None:
+                    print_warning("Project domain value is not specified !")
+
                 namespace = parse_namespace_resource(
                     args.resource, WEBEZY_JSON, args.parent)
                 resource_name = f' [{args.name}]' if args.name is not None else ''
@@ -371,7 +379,7 @@ def main(args=None):
                     exit(1)
 
                 ARCHITECT = WebezyArchitect(
-                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project.get('name'))
                 if namespace[0] == 'package':
                     generate.package(results,WEBEZY_JSON,ARCHITECT,args.expand,args.verbose)
                 
@@ -457,7 +465,7 @@ def main(args=None):
                 resource = parse_name_to_resource(args.name,WEBEZY_JSON)
                 type = resource.get('type')
                 ARCHITECT = WebezyArchitect(
-                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project.get('name'))
                 if type == 'packages':
                     edit.edit_package(resource,args.action,WEBEZY_JSON,ARCHITECT)
                 elif type == 'service':
@@ -484,7 +492,7 @@ def main(args=None):
             elif hasattr(args, 'path'):
                 """Template command process"""
                 ARCHITECT = WebezyArchitect(
-                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project['name'])
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project.get('name'))
                 template_commands(args,WEBEZY_JSON,ARCHITECT)
             
             elif hasattr(args, 'service') and hasattr(args, 'rpc'):
@@ -705,16 +713,18 @@ def template_commands(args,wz_json:helpers.WZJson=None,architect=None):
                     template.load_template(args.path)
                 else:
                     if 'webezy.json' in args.path:
-                        prj_configs = prj_conf.parse_project_config(wz_json.path)
+                        prj_configs = prj_conf.parse_project_config(wz_json.path,proto=True)
                         WEBEZY_JSON = file_system.rFile(args.path, json=True)
                         WEBEZY_JSON = helpers.WZJson(webezy_json=WEBEZY_JSON)
                         filename = WEBEZY_JSON.project.get('packageName') if args.template_name is None else args.template_name
                         save_file_location = args.path.replace('webezy.json','{0}.template.py'.format(filename)) if args.out_path is None else file_system.join_path(args.out_path,'{0}.template.py'.format(filename))
-                        if prj_configs.get('template') is not None:
-                            filename = filename if prj_configs.get('template').get('name') is None else prj_configs.get('template').get('name')
-                            save_file_location = save_file_location if prj_configs.get('template').get('outPath') is None else file_system.join_path(WEBEZY_JSON.path.replace('webezy.json',''),prj_configs.get('template').get('outPath'),'{0}.template.py'.format(filename))
+                        if prj_configs.template is not None:
+                            filename = filename if prj_configs.template.name is None else filename
+                            save_file_location = save_file_location if prj_configs.template.out_path is None else file_system.join_path(WEBEZY_JSON.path.replace('webezy.json',''),prj_configs.template.out_path,'{0}.template.py'.format(filename))
+
                         parent_path = file_system.join_path(file_system.get_current_location(),os.path.dirname(save_file_location))
-                        include_code = args.code if prj_configs.get('template') is None else prj_configs.get('template').get('includeCode') if  prj_configs.get('template').get('includeCode') is not None else False
+                        include_code = args.code if prj_configs.template is None else prj_configs.template.include_code if  prj_configs.template.include_code is not None else False
+
                         if file_system.check_if_dir_exists(parent_path):
                             file_system.wFile(save_file_location,template.create_webezy_template_py(WEBEZY_JSON,include_code,prj_configs),overwrite=True)
                             print_success("Generated project template for '{0}'\n\t-> {1}".format(WEBEZY_JSON.project.get('name'),save_file_location))

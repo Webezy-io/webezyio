@@ -255,6 +255,14 @@ class WebezyBuilder:
             wz_json=self._webezy_json, wz_context=self._webezy_context)
         results = list(itertools.chain(*results))
         return results
+
+    def InitPackages(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.init_packages` hook"""
+        results = self._plugins.hook.init_packages(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        results = list(itertools.chain(*results))
+        return results
+
     # def PackageProject(self):
     #     """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
     #     results = self._pm.hook.pre_build(
@@ -263,6 +271,7 @@ class WebezyBuilder:
     #     return results
 
     def BuildAll(self):
+        custom_plugins = self.BuildCustomPlugins()
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
         context = self.RebuildContext()
@@ -274,7 +283,6 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
-        custom_plugins = self.BuildCustomPlugins()
 
         # package = self.PackageProject()
         results = [prebuild, init, context, protos, services,
@@ -282,16 +290,17 @@ class WebezyBuilder:
         return results
 
     def BuildOnlyProtos(self):
+        custom_plugins = self.BuildCustomPlugins()
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
         context = self.RebuildContext()
         protos = self.BuildProtos()
-        custom_plugins = self.BuildCustomPlugins()
 
         results = [prebuild, init, context, protos, custom_plugins]
         return results
 
     def BuildOnlyCode(self):
+        custom_plugins = self.BuildCustomPlugins()
         services = self.BuildServices()
         server = self.BuildServer()
         compile = self.CompileProtos()
@@ -299,15 +308,15 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
-        custom_plugins = self.BuildCustomPlugins()
         # package = self.PackageProject()
         results = [services, server, compile, readme, protoclass, clients, postbuild, custom_plugins]
         return results
 
     def BuildCustomPlugins(self):
-        self.BuildMongo()
+        init_packages = self.InitPackages()
+        mongo = self.BuildMongo()
         # TODO add more plugins here
-
+        return [init_packages, mongo]
     @property
     def WZJson(self):
         return self._webezy_json

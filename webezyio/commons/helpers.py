@@ -325,7 +325,7 @@ class WZMessage():
         for f in self._fields:
             f_array.append(f.to_dict())
 
-        return self._name, f_array, self._description, self._extension_type, self._domain
+        return self._name, f_array, self._description, self._extension_type, self._extensions,  self._domain
 
     @property
     def name(self):
@@ -1506,11 +1506,19 @@ def parse_extension_to_proto(
     label_ext = extension_field.get(
         'label').split('_')[-1].lower()
     # Handle FileOptions extensions
-    if extension_type == 'FileOptions' or  extension_type == 'MessageOptions':
+    if extension_type == 'FileOptions':
         if label_ext == 'repeated':
             pass
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field)
+            if extension_value is not None:
+                extension_value = f'option ({ext_key}) = {extension_value};'
+    
+    elif extension_type == 'MessageOptions':
+        if label_ext == 'repeated':
+            pass
+        else:
+            extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
             if extension_value is not None:
                 extension_value = f'option ({ext_key}) = {extension_value};'
     

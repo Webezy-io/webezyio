@@ -315,11 +315,10 @@ def generate_message(path, domain, package, name, fields=[], option=UNKNOWN_WEBE
     if extensions is not None:
         temp_ext = {}
         for ext in extensions:
-            if '.'.join(ext.split('.')[:3]) not in package.dependencies:
+            if '.'.join(ext.split('.')[:3]) not in package.dependencies and '.'.join(ext.split('.')[:3]) != package.package:
                 depend_name = '.'.join(ext.split('.')[:3])
                 print_warning("Adding depndency {}".format(depend_name))
                 package.dependencies.append(depend_name)
-
             if wz_json is not None:
                 pkg_path = 'protos/{}/{}.proto'.format(ext.split('.')[2],ext.split('.')[1])
                 ext_package = wz_json.get('packages').get(pkg_path)
@@ -331,7 +330,6 @@ def generate_message(path, domain, package, name, fields=[], option=UNKNOWN_WEBE
             else:
                 print_error("Cannot parse extension value without context to webezy.json file !")
                 exit(1)
-
     msg = WebezyMessage(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,extensions=temp_ext,
                        kind=ResourceKinds.message.value, extension_type=WebezyExtension.Name(option) if isinstance(option,int) else option, description=description)
     return msg if json == False else MessageToDict(msg)
@@ -617,19 +615,52 @@ def parse_proto_extension(field_opt_type,field_opt_label,description,value,field
         field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
     else:
         if 'BOOL' in field_opt_type:
+            if hasattr(value,'bool_value'):
+                value = value.string_value
             field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(bool_value=value)
         elif 'STRING' in field_opt_type:
+            if hasattr(value,'string_value'):
+                value = value.string_value
             field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(string_value=getattr(value,'string_value') if hasattr(value,'string_value') != False else value)
-        elif 'INT' in field_opt_type:
+        elif 'INT' in field_opt_type or 'FLOAT' in field_opt_type  or 'DOUBLE' in field_opt_type:
+            if hasattr(value,'number_value'):
+                value = value.number_value
             field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(number_value=value)
         elif 'MESSAGE' in field_opt_type:
+
                 struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
-                ext_package_path = 'protos/{}/{}.proto'.format(description.get('fullName').split('.')[2],description.get('fullName').split('.')[1])
-                message_type = next((m for m in wz_json.get('packages').get(ext_package_path).get('messages') if m.get('fullName') == '.'.join(description.get('fullName').split('.')[:-1])),None)
+                ext_package_path = 'protos/{}/{}.proto'.format(description.get('messageType').split('.')[2],description.get('messageType').split('.')[1])
+
+                message_type = next((m for m in wz_json.get('packages').get(ext_package_path).get('messages') if m.get('fullName') == description.get('messageType')),None)
+                temp_dict = {}
+                
                 for field_ext_temp in message_type.get('fields'):
+
                     if field_ext_temp.get('fieldType') == 'TYPE_MESSAGE' or field_ext_temp.get('fieldType') == 'TYPE_MAP' or field_ext_temp.get('fieldType') == 'TYPE_ENUM':
                         raise errors.WebezyValidationError('Extension values parse error','There are too many nested levels for {}'.format(field_ext_temp.full_name))
-                    struct_temp.update({field_ext_temp.get('name'):getattr(value,field_ext_temp.get('name'))})
+                    try:
+                        if isinstance(value,dict):
+                            temp_value = value.get(field_ext_temp.get('name'))
+                        else:
+                            temp_value = getattr(value,field_ext_temp.get('name'))
+                        temp_dict[field_ext_temp.get('name')] = temp_value
+                        # struct_temp.update({:temp_value})
+                    except AttributeError:
+                        if hasattr(value,'struct_value'):
+                            f = field_ext_temp.get('name')
+                            if 'BOOL' in field_ext_temp.get('fieldType'):
+                                temp_dict[field_ext_temp.get('name')]= value.struct_value.fields[f].bool_value
+                            elif 'INT' in field_ext_temp.get('fieldType') or 'FLOAT' in field_ext_temp.get('fieldType') or 'DOUBLE' in field_ext_temp.get('fieldType'):
+                                temp_dict[field_ext_temp.get('name')] = value.struct_value.fields[f].number_value
+                            elif 'STRING' in field_ext_temp.get('fieldType'):
+                                temp_dict[field_ext_temp.get('name')] = value.struct_value.fields[f].string_value
+                                # struct_temp.update({field_ext_temp.get('name'):value.struct_value.fields[f].string_value})
+                            
+                            # TODO handle enum type for nested object field
+                    except Exception as e:
+                        print_info(e)
+
+                struct_temp.update(temp_dict)
                 field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(struct_value=struct_temp)
         elif 'ENUM' in field_opt_type:
             ext_package_path = 'protos/{}/{}.proto'.format(description.get('fullName').split('.')[2],description.get('fullName').split('.')[1])

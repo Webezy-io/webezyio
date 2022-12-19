@@ -71,5 +71,9 @@ def package_project(wz_json:WZJson, wz_context: WZContext):
 plugin_hookspecs = pluggy.HookspecMarker("plugins")
 
 @plugin_hookspecs
+def init_packages(wz_json:WZJson, wz_context:WZContext):
+    """implement the initialization of webezy.io packages into webezy.json file"""
+
+@plugin_hookspecs
 def write_models(wz_json:WZJson, wz_context:WZContext):
     """Write mongo models impl."""
