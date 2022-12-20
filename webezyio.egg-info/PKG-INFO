@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: webezyio
-Version: 0.1.4
+Version: 0.1.5
 Summary: Webezy.io CLI for generating gRPC micro-services
 Author-email: Amit Shmulevitch <amitsh1995@gmail.com>
 License: Copyright (c) 2022 Webezy.io.
@@ -28,6 +28,7 @@ Project-URL: homepage, https://www.webezy.io/
 Project-URL: documentation, https://www.webezy.io/docs/cli
 Keywords: grpc,micro-services,cli,framework
 Classifier: License :: OSI Approved :: MIT License
+Classifier: Development Status :: 5 - Stable
 Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 3
 Requires-Python: >=3.7
