@@ -28,7 +28,6 @@ Project-URL: homepage, https://www.webezy.io/
 Project-URL: documentation, https://www.webezy.io/docs/cli
 Keywords: grpc,micro-services,cli,framework
 Classifier: License :: OSI Approved :: MIT License
-Classifier: Development Status :: 5 - Stable
 Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 3
 Requires-Python: >=3.7
