@@ -3,7 +3,7 @@ import pluggy
 from webezyio.commons.helpers import WZContext, WZJson
 
 """Core builder plugins hookspec"""
-hookspec = pluggy.HookspecMarker("builder")
+hookspec = pluggy.HookspecMarker("webezyio")
 
 @hookspec
 def get_webezy_json(wz_json_path):
