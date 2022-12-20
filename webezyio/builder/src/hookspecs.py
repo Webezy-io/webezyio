@@ -3,7 +3,7 @@ import pluggy
 from webezyio.commons.helpers import WZContext, WZJson
 
 """Core builder plugins hookspec"""
-hookspec = pluggy.HookspecMarker("builder")
+hookspec = pluggy.HookspecMarker("webezyio")
 
 @hookspec
 def get_webezy_json(wz_json_path):
@@ -69,6 +69,10 @@ def package_project(wz_json:WZJson, wz_context: WZContext):
 
 """Custom plugins hook specs"""
 plugin_hookspecs = pluggy.HookspecMarker("plugins")
+
+@plugin_hookspecs
+def init_packages(wz_json:WZJson, wz_context:WZContext):
+    """implement the initialization of webezy.io packages into webezy.json file"""
 
 @plugin_hookspecs
 def write_models(wz_json:WZJson, wz_context:WZContext):

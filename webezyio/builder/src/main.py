@@ -16,17 +16,44 @@ _WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsServer,Webez
 
 log = logging.getLogger('webezyio.cli.main')
 
-
 class WebezyBuilder:
-    """Webezy builder class, it is a wrapper for the implemented plugins and is used to invoking the hooks
+    """
+    Webezy builder class, it is a wrapper for the implemented plugins and is used to invoking the hooks
     Defined on :module:`webezyio.builder.src.hookspecs`
     """
 
     def __init__(self, path, hooks=None, project_name=None, server_language=None, clients=None, configs:resources.WebezyConfig=None):
-        self._pm = pluggy.PluginManager("builder")
+        self._configs = configs
+        self._pm = pluggy.PluginManager("webezyio")
         self._webezy_context = None
         self._pm.add_hookspecs(hookspecs)
-        self._pm.load_setuptools_entrypoints("builder")
+        
+        loaded_plugins = self._pm.load_setuptools_entrypoints("webezyio")
+        # print_info(importlib_metadata.distributions())
+        print_info("Loaded installed plugins: {}".format(loaded_plugins))
+        if hasattr(self._configs,'plugins'):
+            # If plugins array specified under `WebezyConfig.plugins` and not empty -
+            # The plugins specified under project configurations will be cross-validated against the `load_setuptools_entrypoints()` values
+            # Which should result with the installed packages that includes entry_points { 'webezyio' : [...] }
+            if len(self._configs.plugins) > 0:
+                plugins_omit_prefix = list(map(lambda x: x.split('-')[1] ,self._configs.plugins))
+                self.import_custom_plugins(self._configs.plugins)
+                for name, mod in self._pm.list_name_plugin():
+                    if name not in plugins_omit_prefix:
+                        self._pm.set_blocked(name)
+            # If `WebezyConfig.plugins` is empty array - 
+            # We block the installed package to not "automaticlly" import installed packahges to avoid unattended behaviour
+            else:
+                print_warning("All installed webezyio-XXX plugins will be blocked, since `WebezyConfig.plugins` array is empty")
+                for name, mod in self._pm.list_name_plugin():
+                    self._pm.set_blocked(name)
+
+
+        for name, mod in self._pm.list_name_plugin():
+            if mod is None:
+                print_warning("Found \"webezyio-{}\" plugin that is not passed to `WebezyConfig.plugins` array".format(name))
+            else:
+                print_info(mod.__name__,True,'Loaded Plugin -> {}'.format(name))
 
         self._plugins = pluggy.PluginManager("plugins")
         self._plugins.add_hookspecs(hookspecs)
@@ -40,16 +67,13 @@ class WebezyBuilder:
         self._project_name = project_name
         self._server_language = server_language
         self._clients = clients
-        self._configs = configs
 
         if hooks:
             self._register_hooks()
         else:
             self._auto_register_hooks()
 
-        if hasattr(self._configs,'plugins'):
-            if len(self._configs.plugins) > 0:
-                self.import_custom_plugins(self._configs.plugins)
+       
 
         self._parse_webezy_context(path)
         self._parse_protos(path)
@@ -255,6 +279,14 @@ class WebezyBuilder:
             wz_json=self._webezy_json, wz_context=self._webezy_context)
         results = list(itertools.chain(*results))
         return results
+
+    def InitPackages(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.init_packages` hook"""
+        results = self._plugins.hook.init_packages(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        results = list(itertools.chain(*results))
+        return results
+
     # def PackageProject(self):
     #     """Executing the :func:`webezyio.builder.src.hookspecs.package_project` hook"""
     #     results = self._pm.hook.pre_build(
@@ -263,6 +295,7 @@ class WebezyBuilder:
     #     return results
 
     def BuildAll(self):
+        custom_plugins = self.BuildCustomPlugins()
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
         context = self.RebuildContext()
@@ -274,7 +307,6 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
-        custom_plugins = self.BuildCustomPlugins()
 
         # package = self.PackageProject()
         results = [prebuild, init, context, protos, services,
@@ -282,16 +314,17 @@ class WebezyBuilder:
         return results
 
     def BuildOnlyProtos(self):
+        custom_plugins = self.BuildCustomPlugins()
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
         context = self.RebuildContext()
         protos = self.BuildProtos()
-        custom_plugins = self.BuildCustomPlugins()
 
         results = [prebuild, init, context, protos, custom_plugins]
         return results
 
     def BuildOnlyCode(self):
+        custom_plugins = self.BuildCustomPlugins()
         services = self.BuildServices()
         server = self.BuildServer()
         compile = self.CompileProtos()
@@ -299,15 +332,15 @@ class WebezyBuilder:
         protoclass = self.OverrideGeneratedClasses()
         clients = self.BuildClients()
         postbuild = self.PostBuild()
-        custom_plugins = self.BuildCustomPlugins()
         # package = self.PackageProject()
         results = [services, server, compile, readme, protoclass, clients, postbuild, custom_plugins]
         return results
 
     def BuildCustomPlugins(self):
-        self.BuildMongo()
+        init_packages = self.InitPackages()
+        mongo = self.BuildMongo()
         # TODO add more plugins here
-
+        return [init_packages, mongo]
     @property
     def WZJson(self):
         return self._webezy_json
@@ -320,4 +353,5 @@ class WebezyBuilder:
                 self._plugins.register(mod)
                 print_info(f'Registerd custom plugin -> {mod.__name__}')
             except Exception as e:
-                print_error(e)
+                pass
+                # print_error(e,True,'Local module import error')

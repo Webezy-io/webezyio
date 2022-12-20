@@ -28,35 +28,38 @@ from webezyio.commons.helpers import WZJson,MessageToDict
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
 import zlib
 
+from webezyio.commons.protos.WebezyConfig_pb2 import WebezyConfig
+
 _OPEN_BRCK = '{'
 _CLOSING_BRCK = '}'
 
 def parse_wz_json():
     pass
 
-def create_webezy_template_py(wz_json:WZJson,include_code:bool,prj_configs):
-    opt_template = prj_configs.get('template')
+def create_webezy_template_py(wz_json:WZJson,include_code:bool,prj_configs:WebezyConfig):
+    
+    opt_template = prj_configs.template
     opts = None
-    if opt_template is None:
-        print_warning("Couldnt find webezy.config.template object at webezy.json file")
+    if opt_template is None or opt_template.name =='':
+        print_warning("Couldnt find any 'WebezyTemplate.TemplateConfig' object at: webezy.json | config.py files")
     else:
-        opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
-    host = prj_configs.get('host')
-    port = prj_configs.get('port')
-    project_pkg_name = wz_json.project['packageName'] if prj_configs.get('template') is None else  prj_configs.get('template').get('name')
-    project_name = wz_json.project['name'] if prj_configs.get('template') is None else  prj_configs.get('template').get('name')
+        # opts = ',\n\t- '.join(str((k,opt_template[k])) for k in opt_template)
+        opts = prj_configs.template
+    host = prj_configs.host
+    port = prj_configs.port
+    project_pkg_name = wz_json.project['packageName'] if prj_configs.template is None else  prj_configs.template.name
+    project_name = wz_json.project['name'] if prj_configs.template is None else  prj_configs.template.name
     clients = wz_json.project.get('clients')
-    description = prj_configs.get('template').get('description') if prj_configs.get('template') is not None else ''
+    description = prj_configs.template.description if prj_configs.template is not None else ''
     messages = []
     enums = []
     includes = None
     excludes = None
     root_path = wz_json.path.split('webezy.json')[0]
-    author = prj_configs.get('template').get('author') if  prj_configs.get('template') is not None else 'Unknown'
-
+    author = prj_configs.template.author if  prj_configs.template is not None else 'Unknown'
     if include_code:
-        includes = [] if prj_configs.get('template') is None or prj_configs.get('template').get('include') is None else prj_configs.get('template').get('include')
-        excludes = [] if prj_configs.get('template') is None or prj_configs.get('template').get('exclude') is None else prj_configs.get('template').get('exclude')
+        includes = [] if prj_configs.template is None or prj_configs.template.include is None else prj_configs.template.include
+        excludes = [] if prj_configs.template is None or prj_configs.template.exclude is None else prj_configs.template.exclude
     for pkg in wz_json.packages:
         p = wz_json.packages[pkg]
         for m in p.get('messages'):
@@ -113,7 +116,7 @@ args = parser.parse_args()
 _PATH = file_system.join_path(os.getcwd(), 'webezy.json') 
 _DOMAIN = args.domain
 _PROJECT_NAME = args.project_name
-_SERVER_LANGUAGE = Language.Name(Language.{server_language})
+_SERVER_LANGUAGE = WebezyLanguage.Name(WebezyLanguage.{server_language})
 _HOST = '{host}'
 _PORT = {port}
 
@@ -132,7 +135,7 @@ def create_clients(clients):
     temp_clients = []
     langauges = []
     for c in clients:
-        temp_clients.append({'language':c['language'],'out_dir':'file_system.join_path(_PATH, \'clients\', Language.Name(Language.{0}))'.format(c['language'])})
+        temp_clients.append({'language':c['language'],'out_dir':'file_system.join_path(_PATH, \'clients\', WebezyLanguage.Name(WebezyLanguage.{0}))'.format(c['language'])})
         langauges.append(c['language'])
     return """
 # Init all the client to be used with your services
@@ -291,8 +294,8 @@ def add_msgs(packages):
     for p in packages:
         pkg = packages[p]
         code += '\nfor m in _pkg_{0}_messages:\n\
-\tmsg_name, msg_fields, msg_desc, msg_opt, msg_domain = m\n\
-\ttemp_msg = _architect.AddMessage(_pkg_{0}, msg_name, msg_fields, msg_desc, msg_opt, msg_domain)\n\
+\tmsg_name, msg_fields, msg_desc, msg_opt, msg_ext, msg_domain = m\n\
+\ttemp_msg = _architect.AddMessage(package=_pkg_{0}, name=msg_name, fields=msg_fields, description=msg_desc, options=msg_opt, extensions=msg_ext, domain=msg_domain)\n\
 \tmsgs_map[temp_msg.full_name] = temp_msg'.format(pkg.get('package').replace('.','_'))
     return """
 msgs_map = {1}{2}
@@ -307,7 +310,7 @@ def add_enums(packages):
         pkg = packages[p]
         code += '\nfor e in _pkg_{0}_enums:\n\
 \tenum_name, enum_values, enum_desc, enum_domain = e\n\
-\t_architect.AddEnum(_pkg_{0}, enum_name, enum_values, enum_desc, enum_domain)'.format(pkg.get('package').replace('.','_'))
+\t_architect.AddEnum(package=_pkg_{0}, name=enum_name, enum_values=enum_values, description=enum_desc, domain=enum_domain)'.format(pkg.get('package').replace('.','_'))
     return """
 # Add packages enums
 {0}

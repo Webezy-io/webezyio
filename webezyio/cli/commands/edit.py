@@ -573,10 +573,11 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
     for d in package.dependencies:
 
         if 'google.protobuf' in d:
-            # webezy_json.get_package()
-            ext_msg_pkg = '.'.join(d.split('.')[:-1])
-            avail_msgs.append(
-                (d.split('.')[-1], '{0}.{1}'.format(ext_msg_pkg, d.split('.')[-1])))
+            # Override to omit the Descriptor package
+            if 'Descriptor' not in d:
+                ext_msg_pkg = '.'.join(d.split('.')[:-1])
+                avail_msgs.append(
+                    ('{} [Google]'.format(d.split('.')[-1]), '{0}.{1}'.format(ext_msg_pkg, d.split('.')[-1])))
         else:
             d_package = wz_json.get_package(
                 d.split('.')[1],False)
@@ -594,6 +595,9 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                         for f in m.fields:
                             avail_field_ext.append((f.name,f.full_name))
     extend = None
+    if resource.get('extensionType') is not None:
+        extend=protos.WebezyExtension.Value(resource.get('extensionType'))
+
     if expand:
         extend = inquirer.prompt([inquirer.Confirm('extend',message='Do you want to extend a message?')],theme=WebezyTheme())
         if extend.get('extend'):
@@ -747,8 +751,8 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
             else:
                 if nextfield['continue'] == False:
                     add_field = False
-    architect.EditMessage(package, resource.get('name'),
-                            msg_fields, description, extend,extensions=resource.get('extensions'))
+    architect.EditMessage(package=package, name=resource.get('name'),
+                            fields=msg_fields, description=description, options=extend,extensions=resource.get('extensions'))
     architect.Save()
 
 def add_fields_oneof(add_field:bool,avail_msgs,avail_enums,pre_fields,msg_full_name):

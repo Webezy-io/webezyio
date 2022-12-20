@@ -78,11 +78,14 @@ def parse_project_config(root_path:str,proto=False):
         webezy_config.MergeFrom(global_config)
         
         config_file = parse_config_file_proto(root_path)
+
         # print_note(f'{config_file.host = }\n{config_file.port = }\n{config_file.docs = }\n{config_file.template = }\n{config_file.monitor = }\n{config_file.proxy = }\n{config_file.webezyio_templates = }\n{config_file.first_run = }\n{config_file.token = }\n{config_file.analytics = }\n')
         # print_note(type(config_file))
         if config_file is not None:
             webezy_config.MergeFrom(config_file)
         webezy_json_configs = parse_webezy_json_configs_proto(root_path)
+        print_note(f'{webezy_json_configs.host = }\n{webezy_json_configs.port = }\n{webezy_json_configs.docs = }\n{webezy_json_configs.template = }\n{webezy_json_configs.monitor = }\n{webezy_json_configs.proxy = }\n{webezy_json_configs.webezyio_templates = }\n{webezy_json_configs.first_run = }\n{webezy_json_configs.token = }\n{webezy_json_configs.analytics = }\n')
+
         if webezy_json_configs is not None:
             webezy_config.MergeFrom(webezy_json_configs)
         # print_note(f'{webezy_config.host = }\n{webezy_config.port = }\n{webezy_config.docs = }\n{webezy_config.template = }\n{webezy_config.monitor = }\n{webezy_config.proxy = }\n{webezy_config.webezyio_templates = }\n{webezy_config.first_run = }\n{webezy_config.token = }\n{webezy_config.analytics = }\n')
@@ -125,6 +128,9 @@ def parse_webezy_json_configs(root_path):
 def parse_webezy_json_configs_proto(root_path):
     WEBEZY_JSON = None
     if _fs.check_if_file_exists(root_path):
+        if 'webezy.json' not in root_path:
+            root_path = root_path +'/webezy.json'
+        print_error(root_path)
 
         WEBEZY_JSON = _fs.rFile(root_path, json=True)
         WEBEZY_JSON = _helpers.WZJson(webezy_json=WEBEZY_JSON)
@@ -137,7 +143,6 @@ def parse_config_file_proto(root_path) -> WebezyConfig:
     custom_config_path = _fs.join_path(root_path,'config.py')
     wz_prj_conf = None
     if _fs.check_if_file_exists(custom_config_path):
-        
         if _fs.get_current_location() not in sys.path:
             sys.path.append(_fs.get_current_location())
         

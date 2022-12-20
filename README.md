@@ -51,7 +51,7 @@ __Useful Resources__:
 - __Generated Code__ Auto-Generated code classes for Services implemantations and client stubs
     * [Python](./docs/source/python.md)
     * [Typescript](./docs/source/typescript.md)
-    * [Go](./docs/source/go.md) (Only Client For Now)
+    * [Go](./docs/source/go.md)
 - __Plugins__ Highly pluggable API allow us to create and publish "Extensions" without breaking the code:
     * Readme generator
     * Languages Builder - (Python, Typescript & Go)
