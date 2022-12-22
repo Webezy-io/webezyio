@@ -136,7 +136,6 @@ def extend_package(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:W
                 else:
                     value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
                     # raise errors.WebezyValidationError('Handle Extension Editing Failed','Error occured during handling of extensions {}'.format(temp_field_ext.get('fullName')))
-
                 resource['extensions'][temp_field_ext.get('fullName')] = value
 
                 ARCHITECT.EditPackage(resource.get('name'),resource.get('dependencies'),resource.get('messages'),resource.get('enums'),resource.get('description'),resource.get('extensions'))
@@ -172,7 +171,7 @@ def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Lite
     for pkg in pkg_dependencies:
         if 'google.protobuf.' not in pkg:
             temp_pkg = wz_json.get_package(pkg.split('.')[1])
-            for ext in _get_extensions(pkg_messages,ext_type):
+            for ext in _get_extensions(temp_pkg.get('messages'),ext_type):
                 avail_extensions.append(ext)
     for ext in _get_extensions(pkg_messages,ext_type):
         avail_extensions.append(ext)
@@ -303,8 +302,7 @@ def handle_ext_field(ext_field,wz_json:helpers.WZJson,old_ext=None):
             print_error("Must enter a valid float !")
             exit(1)
     elif ext_field.get('fieldType') == 'TYPE_BOOL':
-        value = inquirer.prompt([inquirer.Confirm('bool_value','Enter boolean value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
-        
+        value = inquirer.prompt([inquirer.Confirm('bool_value',message='Enter a bool value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
         if value.get('bool_value') is not None:
             return google_dot_protobuf_dot_struct__pb2.Value(bool_value=value.get('bool_value'))
         else:

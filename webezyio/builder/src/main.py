@@ -36,9 +36,10 @@ class WebezyBuilder:
             # The plugins specified under project configurations will be cross-validated against the `load_setuptools_entrypoints()` values
             # Which should result with the installed packages that includes entry_points { 'webezyio' : [...] }
             if len(self._configs.plugins) > 0:
-                plugins_omit_prefix = list(map(lambda x: x.split('-')[1] ,self._configs.plugins))
+                plugins_omit_prefix = list(map(lambda x: '_'.join(x.split('webezyio-')[1].split('-')) ,self._configs.plugins))
                 self.import_custom_plugins(self._configs.plugins)
                 for name, mod in self._pm.list_name_plugin():
+                    print_info(name,True,plugins_omit_prefix)
                     if name not in plugins_omit_prefix:
                         self._pm.set_blocked(name)
             # If `WebezyConfig.plugins` is empty array - 

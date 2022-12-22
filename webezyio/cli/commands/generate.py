@@ -203,7 +203,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
             extend = WebezyExtension.Value(extend['extend'])
         else:
             extend = None
-            add_extension = inquirer.prompt([inquirer.List('add_message_extension','Do you want to add message level extension?')],theme=WebezyTheme())
+            # add_extension = inquirer.prompt([inquirer.List('add_message_extension','Do you want to add message level extension?')],theme=WebezyTheme())
         
         description = inquirer.prompt([inquirer.Text(
             'description', 'Enter message description', '')], theme=WebezyTheme())

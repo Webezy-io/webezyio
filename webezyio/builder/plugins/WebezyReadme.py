@@ -36,8 +36,12 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def write_readme(wz_json: helpers.WZJson):
+    file_path = 'README.md' 
+    if wz_json._config.get('docs') is not None:
+        alt_path = wz_json._config.get('docs').get('file')
+        file_path = file_path if alt_path is None else alt_path
     file_system.wFile(file_system.join_path(
-        wz_json.path, 'README.md'), get_readme(wz_json), overwrite=True)
+        wz_json.path, file_path), get_readme(wz_json), overwrite=True)
 
 _OPEN_BRCK = '{'
 _CLOSING_BRCK = '}'

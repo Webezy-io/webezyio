@@ -12,10 +12,10 @@ configs=WebezyConfig(
     host="localhost",
     port=50051,
     # Analytic gathering approval
-    analytics=True,
+    analytics=False,
     # First run flag
-    first_run=True,
-    token="",
+    first_run=False,
+    token="macOS-12.6-arm64-arm-64bit:2022-12-22T09:04:45.725155",
     # Supported builtins templates
     webezyio_templates = [
         "@webezyio/Blank",

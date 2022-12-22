@@ -529,7 +529,7 @@ class WZJson():
             depend = self._packages[f'protos/v1/{name}.proto'].get('dependencies')
             msgs = self._packages[f'protos/v1/{name}.proto'].get('messages')
             enums = self._packages[f'protos/v1/{name}.proto'].get('enums')
-            return generate_package(self.path,self.domain,name,depend if depend is not None else [],msgs if msgs is not None else [],enums if enums is not None else [])
+            return generate_package(self.path,self.domain,name,depend if depend is not None else [],msgs if msgs is not None else [],enums if enums is not None else [],wz_json=self)
 
 
     def get_enum(self, full_name):
@@ -572,9 +572,32 @@ class WZJson():
         temp_msg = self.get_message(message_full_name)
 
         if temp_msg is not None:
-            list_fields = next((f for f in temp_msg.get('fields') if f.get('extensions') is not None),None)
+            list_fields = [f for f in temp_msg.get('fields') if f.get('extensions') is not None]
             
         return list_fields
+
+    def get_extended_messages(self,package:str,extension:str=None):
+        """This function should be used when trying to iterate a specific package message options
+        
+        Args
+        ----
+            package - valid name for the package we want to get fields that are extended
+            extension - Optional full name that filter the message extension accordingly must be the extension message full name
+
+        Returns
+        -------
+            A list of messages under passed package that holds an extension value
+        """
+        list_msgs = None
+        temp_pkg = self.get_package(package)
+
+        if temp_pkg is not None:
+            if temp_pkg.get('messages') is not None:
+                list_msgs = [
+                    m for m in temp_pkg.get('messages') if m.get('extensions') is not None 
+                    and (extension in m.get('extensions') if extension is not None else True)]
+            
+        return list_msgs
 
     @property
     def domain(self):
@@ -760,8 +783,8 @@ class WZProto():
                             temp_field_extension_test = parse_extension_to_proto('FieldOptions',ext_msg,ext,f.get('extensions')[ext],self._wz_json)
                             fOptions.append(temp_field_extension_test)
 
-                        fOptions = ','.join(fOptions)
-                    fOptions = f' [{fOptions}]' if len(fOptions) > 0 else ''
+                        fOptions = ',\n\t\t'.join(fOptions)
+                    fOptions = f' [\n\t\t{fOptions}\n\t]' if len(fOptions) > 1 else f'[{fOptions}]' if len(fOptions) == 1 else ''
                     fDesc = f.get('description')
                     fFullName = f.get('fullName')
                     if ext_type == 'FieldOptions' or ext_type == 'FileOptions' or ext_type == 'MessageOptions' or ext_type == 'ServiceOptions' or ext_type == 'MethodOptions':
