@@ -114,8 +114,8 @@ class WebezyArchitect():
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': { service_name : MessageToDict(service) } })
 
     def AddPackage(self,name,dependencies=[],messages=[],description=None,domain=None,extensions=None):
-        dict = generate_package(self._path,self._domain if domain is None else domain,name,dependencies=dependencies,messages=messages,description=description,extensions=extensions,json=True)
-        package = generate_package(self._path,self._domain if domain is None else domain,name,dependencies=dependencies,messages=messages,description=description,extensions=extensions)
+        dict = generate_package(self._path,self._domain if domain is None else domain,name,dependencies=dependencies,messages=messages,description=description,extensions=extensions,json=True,wz_json=self._webezy.webezyJson)
+        package = generate_package(self._path,self._domain if domain is None else domain,name,dependencies=dependencies,messages=messages,description=description,extensions=extensions,wz_json=self._webezy.webezyJson)
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'packages': { f'protos/v1/{name}.proto' : dict } })
         return package
 
@@ -141,7 +141,7 @@ class WebezyArchitect():
         return service
 
     def EditPackage(self,name,dependencies=[],messages=[],enums=[],description=None,extensions=None):
-        package = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description,enums=enums,extensions=extensions)
+        package = generate_package(self._path,self._domain,name,dependencies=dependencies,messages=messages,description=description,enums=enums,extensions=extensions,wz_json=self._webezy.webezyJson)
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(package))
         return package
 

@@ -204,24 +204,40 @@ def generate_service(path, domain, name, service_language, dependencies, descrip
     return service if json == False else MessageToDict(service)
 
 
-def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],description=None,extensions=None, json=False):
+def generate_package(path, domain, name, dependencies=[],messages=[],enums=[],description=None,extensions=None, json=False,wz_json=None):
     path = path.split('/webezy.json')[0]
     temp_msgs = []
     temp_enums = []
-    temp_exts = {}
     for m in messages:
         temp_msgs.append(ParseDict(m,WebezyMessage()))
     if enums is not None:
         for e in enums:
             temp_enums.append(ParseDict(e,WebezyEnum()))
-    # for ext in extensions:
-    #     ext_msg = 
-    #     parse_proto_extension()
-    #     temp_exts[ext] = google_dot_protobuf_dot_struct__pb2.Value()
-    #     print_note(extensions[ext],True,ext)
+ 
     full_name = get_package_full_name(domain, name)
+    temp_ext = None
+    if extensions is not None:
+        temp_ext = {}
+        for ext in extensions:
+            if '.'.join(ext.split('.')[:3]) not in dependencies and '.'.join(ext.split('.')[:3]) != full_name:
+                depend_name = '.'.join(ext.split('.')[:3])
+                print_warning("Adding depndency {}".format(depend_name))
+                dependencies.append(depend_name)
+            if wz_json is not None:
+                pkg_path = 'protos/{}/{}.proto'.format(ext.split('.')[2],ext.split('.')[1])
+                if  wz_json.get('packages'):
+                    ext_package = wz_json.get('packages').get(pkg_path)
+                    ext_msg = next((m for m in ext_package.get('messages') if m.get('fullName') == '.'.join(ext.split('.')[:-1])),None)
+                    if ext_msg is not None:
+                        ext_field = next((f_ext for f_ext in ext_msg.get('fields') if f_ext.get('fullName') == ext),None)
+                        if ext_field is not None:
+                            temp_ext = parse_proto_extension(ext_field.get('fieldType'),ext_field.get('label'),ext_field,extensions[ext],temp_ext,wz_json=wz_json)
+            else:
+                print_error("Cannot parse extension value without context to webezy.json file !")
+                exit(1)
+
     package = WebezyPackage(uri=get_uri_package(
-        path, full_name),type= ResourceTypes.package.value, name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description,extensions=extensions)
+        path, full_name),type= ResourceTypes.package.value, name=name, package=full_name, version='0.0.1', dependencies=dependencies, messages=temp_msgs,enums=temp_enums,description=description,extensions=temp_ext)
 
     return package if json == False else MessageToDict(package)
 
@@ -281,12 +297,13 @@ def generate_message(path, domain, package, name, fields=[], option=UNKNOWN_WEBE
 
                     if wz_json is not None:
                         pkg_path = 'protos/{}/{}.proto'.format(ext.split('.')[2],ext.split('.')[1])
-                        ext_package = wz_json.get('packages').get(pkg_path)
-                        ext_msg = next((m for m in ext_package.get('messages') if m.get('fullName') == '.'.join(ext.split('.')[:-1])),None)
-                        if ext_msg is not None:
-                            ext_field = next((f_ext for f_ext in ext_msg.get('fields') if f_ext.get('fullName') == ext),None)
-                            if ext_field is not None:
-                                temp_ext = parse_proto_extension(ext_field.get('fieldType'),ext_field.get('label'),ext_field,f.get('extensions')[ext],temp_ext,wz_json=wz_json)
+                        if  wz_json.get('packages'):
+                            ext_package = wz_json.get('packages').get(pkg_path)
+                            ext_msg = next((m for m in ext_package.get('messages') if m.get('fullName') == '.'.join(ext.split('.')[:-1])),None)
+                            if ext_msg is not None:
+                                ext_field = next((f_ext for f_ext in ext_msg.get('fields') if f_ext.get('fullName') == ext),None)
+                                if ext_field is not None:
+                                    temp_ext = parse_proto_extension(ext_field.get('fieldType'),ext_field.get('label'),ext_field,f.get('extensions')[ext],temp_ext,wz_json=wz_json)
                     else:
                         print_error("Cannot parse extension value without context to webezy.json file !")
                         exit(1)
@@ -321,12 +338,13 @@ def generate_message(path, domain, package, name, fields=[], option=UNKNOWN_WEBE
                 package.dependencies.append(depend_name)
             if wz_json is not None:
                 pkg_path = 'protos/{}/{}.proto'.format(ext.split('.')[2],ext.split('.')[1])
-                ext_package = wz_json.get('packages').get(pkg_path)
-                ext_msg = next((m for m in ext_package.get('messages') if m.get('fullName') == '.'.join(ext.split('.')[:-1])),None)
-                if ext_msg is not None:
-                    ext_field = next((f_ext for f_ext in ext_msg.get('fields') if f_ext.get('fullName') == ext),None)
-                    if ext_field is not None:
-                        temp_ext = parse_proto_extension(ext_field.get('fieldType'),ext_field.get('label'),ext_field,extensions[ext],temp_ext,wz_json=wz_json)
+                if  wz_json.get('packages'):
+                    ext_package = wz_json.get('packages').get(pkg_path)
+                    ext_msg = next((m for m in ext_package.get('messages') if m.get('fullName') == '.'.join(ext.split('.')[:-1])),None)
+                    if ext_msg is not None:
+                        ext_field = next((f_ext for f_ext in ext_msg.get('fields') if f_ext.get('fullName') == ext),None)
+                        if ext_field is not None:
+                            temp_ext = parse_proto_extension(ext_field.get('fieldType'),ext_field.get('label'),ext_field,extensions[ext],temp_ext,wz_json=wz_json)
             else:
                 print_error("Cannot parse extension value without context to webezy.json file !")
                 exit(1)
@@ -616,7 +634,7 @@ def parse_proto_extension(field_opt_type,field_opt_label,description,value,field
     else:
         if 'BOOL' in field_opt_type:
             if hasattr(value,'bool_value'):
-                value = value.string_value
+                value = value.bool_value
             field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(bool_value=value)
         elif 'STRING' in field_opt_type:
             if hasattr(value,'string_value'):

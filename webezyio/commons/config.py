@@ -51,6 +51,7 @@ class WebezyProjectConfig:
         self.deployment = kwargs.get('deployment')
         self.monitor = kwargs.get('monitor')
         self.proxy = kwargs.get('proxy')
+        self.docs = kwargs.get('docs')
 
     def config(self):
         temp_dict = {}
@@ -68,6 +69,9 @@ class WebezyProjectConfig:
             temp_dict['monitor'] = self.monitor
         if self.proxy:
             temp_dict['proxy'] = self.proxy
+        if self.docs:
+            temp_dict['docs'] = self.docs
+
         return temp_dict
 
 def parse_project_config(root_path:str,proto=False):
@@ -180,7 +184,9 @@ def parse_config_file_dict(root_path):
                 monitor = MessageToDict(temp_configs.monitor),
                 proxy =  MessageToDict(temp_configs.proxy),
                 host = temp_configs.host,
-                plugins = temp_configs.plugins
+                plugins = temp_configs.plugins,
+                docs = temp_configs.docs
+
             )
         else:
             print_warning('You must configure the parameters under \'configs = WebezyConfig.Config()\' variable')

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>webezyio.builder.src package &mdash; webezyio 0.1.3 documentation</title>
+  <title>webezyio.builder.src package &mdash; webezyio 0.1.6 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -94,6 +94,12 @@
 <dt class="sig sig-object py" id="webezyio.builder.src.hookspecs.init_context">
 <span class="sig-prename descclassname"><span class="pre">webezyio.builder.src.hookspecs.</span></span><span class="sig-name descname"><span class="pre">init_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.hookspecs.init_context" title="Permalink to this definition"></a></dt>
 <dd><p>Init context object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.builder.src.hookspecs.init_packages">
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.src.hookspecs.</span></span><span class="sig-name descname"><span class="pre">init_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.hookspecs.init_packages" title="Permalink to this definition"></a></dt>
+<dd><p>implement the initialization of webezy.io packages into webezy.json file</p>
 </dd></dl>
 
 <dl class="py function">
@@ -266,6 +272,12 @@ Defined on <a href="#id1"><span class="problematic" id="id2">:module:`webezyio.b
 <dt class="sig sig-object py" id="webezyio.builder.src.main.WebezyBuilder.CompileProtos">
 <span class="sig-name descname"><span class="pre">CompileProtos</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.main.WebezyBuilder.CompileProtos" title="Permalink to this definition"></a></dt>
 <dd><p>Executing the <a class="reference internal" href="#webezyio.builder.src.hookspecs.compile_protos" title="webezyio.builder.src.hookspecs.compile_protos"><code class="xref py py-func docutils literal notranslate"><span class="pre">webezyio.builder.src.hookspecs.compile_protos()</span></code></a> hook</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.builder.src.main.WebezyBuilder.InitPackages">
+<span class="sig-name descname"><span class="pre">InitPackages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.src.main.WebezyBuilder.InitPackages" title="Permalink to this definition"></a></dt>
+<dd><p>Executing the <a class="reference internal" href="#webezyio.builder.src.hookspecs.init_packages" title="webezyio.builder.src.hookspecs.init_packages"><code class="xref py py-func docutils literal notranslate"><span class="pre">webezyio.builder.src.hookspecs.init_packages()</span></code></a> hook</p>
 </dd></dl>
 
 <dl class="py method">
