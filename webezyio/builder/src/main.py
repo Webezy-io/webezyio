@@ -39,9 +39,11 @@ class WebezyBuilder:
                 plugins_omit_prefix = list(map(lambda x: '_'.join(x.split('webezyio-')[1].split('-')) ,self._configs.plugins))
                 self.import_custom_plugins(self._configs.plugins)
                 for name, mod in self._pm.list_name_plugin():
-                    print_info(name,True,plugins_omit_prefix)
                     if name not in plugins_omit_prefix:
                         self._pm.set_blocked(name)
+                    else:
+                        print_info('Registering plugin -> {}'.format(name))
+
             # If `WebezyConfig.plugins` is empty array - 
             # We block the installed package to not "automaticlly" import installed packahges to avoid unattended behaviour
             else:

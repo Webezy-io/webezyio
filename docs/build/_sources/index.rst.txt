@@ -80,6 +80,7 @@ Init a Builder
 
    commands
    webezyio_concepts
+   go
    typescript
    templating
    builder_api

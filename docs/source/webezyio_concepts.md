@@ -52,8 +52,9 @@ my-project/
 │  │  ├─ SamplePackage_pb2.py
 │  │  ├─ SamplePackage_pb2_grpc.py
 │  ├─ SampleService.py
-├─ .gitignore
+├─ webezy.json # All project resource descriptions
 ├─ README.md
+├─ .gitignore
 ```
 
 The main compoenent is the `webezy.json` file which conssisting of all project resources and metadata.

@@ -42,9 +42,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#write-custom-plugin">Write Custom Plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
@@ -82,6 +84,26 @@
 <p>The <code class="docutils literal notranslate"><span class="pre">Builder</span></code> Class has been created in plug and play concept for easier and more granluar modules which can be dropped or added without affectively changing how Webezy.io CLI works.</p>
 <p>This feature allows you as the developer to further enrich you project creating process with custom files, modules or even changing the projec structure itself to your demands and needs.</p>
 <p><span class="xref myst">See plugins directory for examples</span></p>
+</section>
+<section id="write-custom-plugin">
+<h1>Write Custom Plugin<a class="headerlink" href="#write-custom-plugin" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugins are written using <a class="reference external" href="https://pluggy.readthedocs.io/en/stable/#"><code class="docutils literal notranslate"><span class="pre">Pluggy</span></code></a> framework.</p>
+<p>You can write as a <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> developer a custom plugin that will be hooked to <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> project, the plugin should interact with <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file with well-defined utils and helpers.
+The main modules you will interact with when writing a <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugin are:</p>
+<ul class="simple">
+<li><p>:func:<code class="docutils literal notranslate"><span class="pre">~webezyio.builder</span></code></p></li>
+</ul>
+<p>All plugins should be written in <code class="docutils literal notranslate"><span class="pre">Python</span></code> and should have the following structure at-least:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Root dir of your project must prefixed with `webezyio-`</span>
+webezyio-my-plugin/
+├─ webezyio_my_plugin.py
+├─ README.md
+├─ setup.py
+</pre></div>
+</div>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
 </section>
 
 

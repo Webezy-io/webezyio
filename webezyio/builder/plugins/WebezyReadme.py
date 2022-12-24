@@ -99,7 +99,7 @@ def get_readme(wz_json: helpers.WZJson):
                 fields.append(f'* __{field_name}__ [{f_type}]\n{f_desc}\n')
             fields = '\n'.join(fields)
             msg_desc = '' if msg.get('description') is None else '{0}\n'.format(msg.get('description')) 
-            msgs.append(f'\n### __{msg_name}__\n{msg_desc}\n{fields}')
+            msgs.append(f'\n<details id="#{msg_name}">\n<summary><b>{msg_name}</b></summary>\n\n### __{msg_name}__\n: {msg_desc}\n{fields}</details>')
         msgs = '\n\n'.join(msgs)
         pkgs.append(f'## `{package_name}`\n\n{msgs}')
     
@@ -139,5 +139,5 @@ def get_readme(wz_json: helpers.WZJson):
                 pretty.print_error("Extra docs file is not found ! [{0}]({1})".format(k,extra_links[k]))
     temp_links = '\n### Further Reading\n{0}'.format(temp_links) if extra_links is not None else ''
 
-    readme_file = f'# {project_name}\n\nThis project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !\n\nThis project is using gRPC as main code generator and utilize HTTP2 + protobuf protocols for communication.\n\n# Index\nUsage:\n{clients_usage_i}\n\nResources:\n{index}\n\n# Services\n\n{svcs}\n\n# Packages\n\n{pkgs}\n\n# Usage\nThis project supports clients communication in the following languages:\n{clients_usage}\n{temp_links}\n* * *\n__This project and README file has been created thanks to [webezy.io](https://www.webezy.io)__'
+    readme_file = f'# {project_name}\n\nThis project has been generated thanks to [```Webezy.io```](https://www.webezy.io) !\n\nThis project is using gRPC as main code generator and utilize HTTP2 + protobuf protocols for communication.\n\n# Index\nUsage:\n{clients_usage_i}\n\nResources:\n{index}\n\n# Services\n\n{svcs}\n\n# Packages\n\n{pkgs}\n\n\n# Usage\n\nThis project supports clients communication in the following languages:\n\n{clients_usage}\n{temp_links}\n* * *\n__This project and README file has been created thanks to [webezy.io](https://www.webezy.io)__'
     return readme_file
