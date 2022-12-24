@@ -23,7 +23,7 @@ import logging
 import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources, pretty
-from webezyio.builder.plugins.static import gitignore_go,package_json,bash_init_script_go
+from webezyio.builder.plugins.static import gitignore_go,package_json,bash_init_script_go,webezyio_go_utils_channel
 
 
 @builder.hookimpl
@@ -48,6 +48,8 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
         # Clients
         file_system.join_path(wz_json.path, 'clients', 'go'),
         file_system.join_path(wz_json.path, 'clients', 'go','protos'),
+        file_system.join_path(wz_json.path, 'clients', 'go','utils'),
+
         # Protos
         file_system.join_path(wz_json.path, 'services', 'protos')]
 
@@ -68,8 +70,8 @@ def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContex
             if file_system.check_if_dir_exists(file_system.join_path(wz_json.path, 'services', 'protos', wz_json.packages[p].get('name'))) == False:
                 file_system.mkdir(file_system.join_path(wz_json.path, 'services', 'protos', wz_json.packages[p].get('name')))
 
-    # file_system.wFile(file_system.join_path(
-        # wz_json.path, 'bin', 'init-go.sh'), bash_init_script_go(wz_json.project.get('packageName'),services_protoc,packages_protoc))
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'clients','go','utils', 'channel.go'), webezyio_go_utils_channel)
     # file_system.wFile(file_system.join_path(
         # wz_json.path, 'bin', 'proto.js'), protos_compile_script_ts)
 

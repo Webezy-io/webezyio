@@ -471,3 +471,120 @@ func init() {\n\
 	WarningLogger = log.New(log.Writer(), "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)\n\
 	ErrorLogger = log.New(log.Writer(), "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)\n\
 }'
+
+webezyio_go_utils_channel = 'package webezyioChannel\n\n\
+import (\n\
+	"context"\n\
+	"crypto/tls"\n\
+	"crypto/x509"\n\
+	"fmt"\n\
+	"log"\n\n\
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"\n\
+	"google.golang.org/grpc"\n\
+	"google.golang.org/grpc/credentials"\n\
+	"google.golang.org/grpc/credentials/insecure"\n\
+	"google.golang.org/grpc/keepalive"\n\
+)\n\n\
+// GrpcClientConnBuilder is a builder to create GRPC connection to the GRPC Server\n\
+type GrpcClientConnBuilder interface {\n\
+	WithContext(ctx context.Context)\n\
+	WithOptions(opts ...grpc.DialOption)\n\
+	WithInsecure()\n\
+	WithUnaryInterceptors(interceptors []grpc.UnaryClientInterceptor)\n\
+	WithStreamInterceptors(interceptors []grpc.StreamClientInterceptor)\n\
+	WithKeepAliveParams(params keepalive.ClientParameters)\n\
+	GetConn(addr string) (*grpc.ClientConn, error)\n\
+}\n\n\
+// GRPC client builder\n\
+type GrpcConnBuilder struct {\n\
+	options              []grpc.DialOption\n\
+	enabledReflection    bool\n\
+	shutdownHook         func()\n\
+	enabledHealthCheck   bool\n\
+	ctx                  context.Context\n\
+	transportCredentials credentials.TransportCredentials\n\
+	err                  error\n\
+}\n\n\
+// WithContext set the context to be used in the dial\n\
+func (b *GrpcConnBuilder) WithContext(ctx context.Context) {\n\
+	b.ctx = ctx\n\
+}\n\n\
+// WithOptions set dial options\n\
+func (b *GrpcConnBuilder) WithOptions(opts ...grpc.DialOption) {\n\
+	b.options = append(b.options, opts...)\n\
+}\n\n\
+// WithInsecure set the connection as insecure\n\
+func (b *GrpcConnBuilder) WithInsecure() {\n\
+	b.options = append(b.options, grpc.WithTransportCredentials(insecure.NewCredentials()))\n\
+}\n\n\
+// WithBlock the dialing blocks until the  underlying connection is up.\n\
+// Without this, Dial returns immediately and connecting the server happens in background.\n\
+func (b *GrpcConnBuilder) WithBlock() {\n\
+	b.options = append(b.options, grpc.WithBlock())\n\
+}\n\n\
+// WithKeepAliveParams set the keep alive params\n\
+// ClientParameters is used to set keepalive parameters on the client-side.\n\
+// These configure how the client will actively probe to notice when a\n\
+// connection is broken and send pings so intermediaries will be aware of the\n\
+// liveness of the connection. Make sure these parameters are set in\n\
+// coordination with the keepalive policy on the server, as incompatible\n\
+// settings can result in closing of connection.\n\
+func (b *GrpcConnBuilder) WithKeepAliveParams(params keepalive.ClientParameters) {\n\
+	keepAlive := grpc.WithKeepaliveParams(params)\n\
+	b.options = append(b.options, keepAlive)\n\
+}\n\
+// WithUnaryInterceptors set a list of interceptors to the Grpc client for unary connection\n\
+// By default, gRPC doesn\'t allow one to have more than one interceptor either on the client nor on the server side.\n\
+// By using `grpc_middleware` we are able to provides convenient method to add a list of interceptors\n\
+func (b *GrpcConnBuilder) WithUnaryInterceptors(interceptors []grpc.UnaryClientInterceptor) {\n\
+	b.options = append(b.options, grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(interceptors...)))\n\
+}\n\n\
+// WithUnaryInterceptors set a list of interceptors to the Grpc client for stream connection\n\
+// By default, gRPC doesn\'t allow one to have more than one interceptor either on the client nor on the server side.\n\
+// By using `grpc_middleware` we are able to provides convenient method to add a list of interceptors\n\
+func (b *GrpcConnBuilder) WithStreamInterceptors(interceptors []grpc.StreamClientInterceptor) {\n\
+	b.options = append(b.options, grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(interceptors...)))\n\
+}\n\n\
+// ClientTransportCredentials builds transport credentials for a gRPC client using the given properties.\n\
+func (b *GrpcConnBuilder) WithClientTransportCredentials(insecureSkipVerify bool, certPool *x509.CertPool) {\n\
+	var tlsConf tls.Config\n\n\
+	if insecureSkipVerify {\n\
+		tlsConf.InsecureSkipVerify = true\n\
+		b.transportCredentials = credentials.NewTLS(&tlsConf)\n\
+		return\n\
+	}\n\n\
+	tlsConf.RootCAs = certPool\n\
+	b.transportCredentials = credentials.NewTLS(&tlsConf)\n\
+}\n\n\
+// GetConn returns the client connection to the server\n\
+func (b *GrpcConnBuilder) GetConn(addr string) (*grpc.ClientConn, error) {\n\
+	if addr == "" {\n\
+		return nil, fmt.Errorf("target connection parameter missing. address = %s", addr)\n\
+	}\n\
+	log.Printf("Target to connect = %s", addr)\n\
+	cc, err := grpc.DialContext(b.getContext(), addr, b.options...)\n\n\
+	if err != nil {\n\
+		return nil, fmt.Errorf("unable to connect to client. address = %s. error = %+v", addr, err)\n\
+	}\n\
+	return cc, nil\n\
+}\n\n\
+// GetTlsConn returns client connection to the server\n\
+func (b *GrpcConnBuilder) GetTlsConn(addr string) (*grpc.ClientConn, error) {\n\
+	b.options = append(b.options, grpc.WithTransportCredentials(b.transportCredentials))\n\
+	cc, err := grpc.DialContext(\n\
+		b.getContext(),\n\
+		addr,\n\
+		b.options...,\n\
+	)\n\
+	if err != nil {\n\
+		return nil, fmt.Errorf("failed to get tls conn. Unable to connect to client. address = %s: %w", addr, err)\n\
+	}\n\
+	return cc, nil\n\
+}\n\n\
+func (b *GrpcConnBuilder) getContext() context.Context {\n\
+	ctx := b.ctx\n\
+	if ctx == nil {\n\
+		ctx = context.Background()\n\
+	}\n\
+	return ctx\n\
+}'
