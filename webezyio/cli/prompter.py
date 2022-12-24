@@ -39,6 +39,7 @@ class QList:
     
     Parameters:
     -----------
+    
         name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
         
         message: The user prompt message 
@@ -73,6 +74,7 @@ class QConfirm:
 
     Parameters:
     -----------
+
         name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
         
         message: The user prompt message 
@@ -105,6 +107,7 @@ class QText:
 
     Parameters:
     -----------
+
         name: The answer name see: https://python-inquirer.readthedocs.io/en/latest/usage.html#name
         
         message: The user prompt message 

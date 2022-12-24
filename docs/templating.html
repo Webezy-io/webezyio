@@ -42,15 +42,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Service templating</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#create-a-template-from-service">Create a template from service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#load-a-template-for-blank-service">Load a template for blank service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configure-template-options">Configure template options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#known-limitations">Known limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#read-more">Read more</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
@@ -137,21 +140,18 @@ wz new &lt;SomeProject&gt; --template @webezyio/SampleTs
 </pre></div>
 </div>
 <p>Or alternatively <strong><code class="docutils literal notranslate"><span class="pre">config.py</span></code></strong></p>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="n">template</span><span class="o">=</span><span class="p">{</span>
-  <span class="s2">&quot;outPath&quot;</span><span class="p">:</span> <span class="s2">&quot;template&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SamplePy&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A basic sample project for webezyio.</span><span class="se">\</span>
-<span class="s2">    It is included with examples for all RPC&#39;s types</span><span class="se">\</span>
-<span class="s2">    and using Enums + Nested Messages, including &#39;Well Known&#39;</span><span class="se">\</span>
-<span class="s2">    messages from google&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="s2">&quot;typescript.ts&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;python.py&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;services&quot;</span>
-  <span class="p">],</span>
-  <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Amit Shmulevitch&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;includeCode&quot;</span><span class="p">:</span> <span class="kc">True</span>
-<span class="p">}</span>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">webezyio.commons.protos</span> <span class="kn">import</span> <span class="n">WebezyConfig</span><span class="p">,</span><span class="n">WebezyMonitor</span>
+
+<span class="n">configs</span><span class="o">=</span><span class="n">WebezyConfig</span><span class="p">(</span>
+    <span class="n">template</span><span class="o">=</span><span class="n">TemplateConfig</span><span class="p">(</span>
+      <span class="n">outPath</span><span class="o">=</span><span class="s2">&quot;template&quot;</span><span class="p">,</span>
+      <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SampleGo&quot;</span><span class="p">,</span>
+      <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Some description&quot;</span><span class="p">,</span>
+      <span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;services/samlpeService/sampleService.go&quot;</span><span class="p">],</span>
+      <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Amit Shmulevitch&quot;</span><span class="p">,</span>
+      <span class="n">includeCode</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>With those specifications described above we can now call the <code class="docutils literal notranslate"><span class="pre">template</span></code> command without any further arguments.</p>
@@ -164,6 +164,13 @@ wz new &lt;SomeProject&gt; --template @webezyio/SampleTs
 <blockquote>
 <div><p><strong>Warning</strong> DO NOT set sensitive information on template code files that are included on template, such as keys and secrets as it will be copied to the template script.</p>
 </div></blockquote>
+</section>
+<section id="known-limitations">
+<h2>Known limitations<a class="headerlink" href="#known-limitations" title="Permalink to this heading"></a></h2>
+<p>There are few known issues / limitations with templating your project</p>
+<ul class="simple">
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">One</span> <span class="pre">Of</span> <span class="pre">Fields</span></code> isn’t supported in templating API, this means when you package your template with existing message that holds <code class="docutils literal notranslate"><span class="pre">TYPE_ONEOF</span></code> field, it will fail in the <code class="docutils literal notranslate"><span class="pre">--load</span></code> process / when the script is executed.</p></li>
+</ul>
 </section>
 <section id="read-more">
 <h2>Read more<a class="headerlink" href="#read-more" title="Permalink to this heading"></a></h2>

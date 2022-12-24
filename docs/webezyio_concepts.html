@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Developing Webezy.io Projects With Typescript" href="typescript.html" />
+    <link rel="next" title="Webezy.io project using Go" href="go.html" />
     <link rel="prev" title="Webezy CLI Commands" href="commands.html" /> 
 </head>
 
@@ -47,6 +47,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#project-structure">Project Structure</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="go.html">Webezy.io project using Go</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
@@ -132,8 +133,9 @@ my-project/
 │  │  ├─ SamplePackage_pb2.py
 │  │  ├─ SamplePackage_pb2_grpc.py
 │  ├─ SampleService.py
-├─ .gitignore
+├─ webezy.json <span class="c1"># All project resource descriptions</span>
 ├─ README.md
+├─ .gitignore
 </pre></div>
 </div>
 <p>The main compoenent is the <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file which conssisting of all project resources and metadata.</p>
@@ -165,7 +167,7 @@ my-project/
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="commands.html" class="btn btn-neutral float-left" title="Webezy CLI Commands" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="typescript.html" class="btn btn-neutral float-right" title="Developing Webezy.io Projects With Typescript" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="go.html" class="btn btn-neutral float-right" title="Webezy.io project using Go" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

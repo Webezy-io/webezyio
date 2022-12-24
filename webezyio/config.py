@@ -1,4 +1,4 @@
-from webezyio.commons.protos import WebezyConfig,WebezyMonitor
+from webezyio.commons.protos import WebezyConfig
 """
                  _                           _        
  __      __ ___ | |__    ___  ____ _   _    (_)  ___  

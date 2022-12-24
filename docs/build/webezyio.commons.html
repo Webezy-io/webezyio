@@ -40,6 +40,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="go.html">Webezy.io project using Go</a></li>
 <li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
@@ -578,6 +579,20 @@
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>A list of messages under passed package that holds an extension value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="webezyio.commons.helpers.WZJson.get_extended_packages">
+<span class="sig-name descname"><span class="pre">get_extended_packages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.commons.helpers.WZJson.get_extended_packages" title="Permalink to this definition"></a></dt>
+<dd><p>This function should be used when trying to iterate a specific package message options</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>extension - Optional full name that filter the message extension accordingly must be the extension message full</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>A list of packages under the whole project that holds an extension value</p>
 </dd>
 </dl>
 </dd></dl>

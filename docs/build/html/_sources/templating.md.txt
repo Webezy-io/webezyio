@@ -68,21 +68,18 @@ __`webezy.json`__
 Or alternatively __`config.py`__
 
 ```py
-template={
-  "outPath": "template",
-  "name": "SamplePy",
-  "description": "A basic sample project for webezyio.\
-    It is included with examples for all RPC's types\
-    and using Enums + Nested Messages, including 'Well Known'\
-    messages from google",
-  "include": [
-    "typescript.ts",
-    "python.py",
-    "services"
-  ],
-  "author": "Amit Shmulevitch",
-  "includeCode": True
-}
+from webezyio.commons.protos import WebezyConfig,WebezyMonitor
+
+configs=WebezyConfig(
+    template=TemplateConfig(
+      outPath="template",
+      name="SampleGo",
+      description="Some description",
+      include=["services/samlpeService/sampleService.go"],
+      author="Amit Shmulevitch",
+      includeCode=True
+    )
+)
 ```
 
 
@@ -93,6 +90,14 @@ wz template webezy.json
 > __Note__ the "includeCode" key it can be passed as `-c` / `--code` argument to `wz template` command, it is passed to the exporter of template and includes all files listed under project while searching for `"include"` list of files and folders then cross checking the `"exclude"` list against them - Each file listed in the "includes" array will be compressed and attached to the template script.
 
 > __Warning__ DO NOT set sensitive information on template code files that are included on template, such as keys and secrets as it will be copied to the template script.
+
+
+## Known limitations
+
+There are few known issues / limitations with templating your project
+
+- Using `One Of Fields` isn't supported in templating API, this means when you package your template with existing message that holds `TYPE_ONEOF` field, it will fail in the `--load` process / when the script is executed.
+
 
 ## Read more
 See more info on [templating and project configurations](./custom_configurations.md#template-configurations)

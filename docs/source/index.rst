@@ -58,15 +58,6 @@ Continue developing your project packages and services:
 
     wz generate --package
 
-====
-API
-====
-
-Init a Architect
-----------------
-
-Init a Builder
---------------
 
 .. _gRPC: https://grpc.io/
 .. _protobuf: https://developers.google.com/protocol-buffers/docs/pythontutorial
@@ -80,10 +71,12 @@ Init a Builder
 
    commands
    webezyio_concepts
+   go
    typescript
    templating
    builder_api
    custom_configurations
+   JsonSchema
    vscode_webezyio
    contirbuting
 

@@ -41,10 +41,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JsonSchema.html">Webezy.io Json Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
 </ul>
@@ -116,15 +121,6 @@ If you want to start your project in other location run it with the <cite>–pat
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wz generate --package
 </pre></div>
 </div>
-</section>
-</section>
-<section id="api">
-<h3>API<a class="headerlink" href="#api" title="Permalink to this heading"></a></h3>
-<section id="init-a-architect">
-<h4>Init a Architect<a class="headerlink" href="#init-a-architect" title="Permalink to this heading"></a></h4>
-</section>
-<section id="init-a-builder">
-<h4>Init a Builder<a class="headerlink" href="#init-a-builder" title="Permalink to this heading"></a></h4>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -148,6 +144,24 @@ If you want to start your project in other location run it with the <cite>–pat
 <li class="toctree-l2"><a class="reference internal" href="webezyio_concepts.html#project-structure">Project Structure</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="go.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="go.html#project-structure">Project Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="go.html#service">Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="go.html#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="go.html#client">Client</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="go.html#id1">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="go.html#useful-resources">Useful resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="go.html#known-issues">Known issues</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="go.html#fix">Fix:</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="typescript.html#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typescript.html#service-side">Service Side</a></li>
@@ -158,15 +172,20 @@ If you want to start your project in other location run it with the <cite>–pat
 <li class="toctree-l2"><a class="reference internal" href="templating.html#create-a-template-from-service">Create a template from service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="templating.html#load-a-template-for-blank-service">Load a template for blank service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="templating.html#configure-template-options">Configure template options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templating.html#known-limitations">Known limitations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="templating.html#read-more">Read more</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="custom_configurations.html#global-configurations">Global Configurations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="custom_configurations.html#template-configurations">Template configurations</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="JsonSchema.html">Webezy.io Json Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="contirbuting.html#pull-request-process">Pull Request Process</a></li>

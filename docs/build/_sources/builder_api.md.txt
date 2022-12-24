@@ -1,4 +1,4 @@
-## Builder plugins
+# Builder plugins
 
 Webezy.io allows developer to create thier own modules that inherit from `webezyio.builder` class, this small modules can be activate on specific hooks and mainly in use with building the proto files, code files and project structure as general.
 
@@ -11,3 +11,26 @@ The `Builder` Class has been created in plug and play concept for easier and mor
 This feature allows you as the developer to further enrich you project creating process with custom files, modules or even changing the projec structure itself to your demands and needs.
 
 [See plugins directory for examples](../webezyio//builder/plugins/)
+
+
+# Write Custom Plugin
+
+`webezyio` plugins are written using [`Pluggy`](https://pluggy.readthedocs.io/en/stable/#) framework.
+
+You can write as a `Webezy.io` developer a custom plugin that will be hooked to `webezyio` project, the plugin should interact with `webezy.json` file with well-defined utils and helpers.
+The main modules you will interact with when writing a `webezyio` plugin are:
+- :func:`~webezyio.builder`
+
+All plugins should be written in `Python` and should have the following structure at-least:
+```sh
+# Root dir of your project must prefixed with `webezyio-`
+webezyio-my-plugin/
+├─ webezyio_my_plugin.py
+├─ README.md
+├─ setup.py
+```
+
+
+```py
+
+```
