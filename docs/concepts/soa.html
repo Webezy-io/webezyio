@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Oriented Architecture &mdash; webezyio 0.1.7 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Languages" href="../languages/index.html" />
+    <link rel="prev" title="Understanding Webezy.io" href="webezyio_concepts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands.html">Webezy CLI Commands</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Concepts</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Service Oriented Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-webezy-io-serving-soa">How Webezy.io Serving SOA</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Concepts</a></li>
+      <li class="breadcrumb-item active">Service Oriented Architecture</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/concepts/soa.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="service-oriented-architecture">
+<h1>Service Oriented Architecture<a class="headerlink" href="#service-oriented-architecture" title="Permalink to this heading"></a></h1>
+<p>Service-oriented architecture (SOA) is a software design pattern that organizes a system as a collection of interconnected services. SOA is designed to allow different services to communicate with each other through a well-defined interface.</p>
+<p>The main idea behind SOA is to build a system by connecting independent services, rather than building a monolithic application. This allows each service to focus on a specific task, and to be developed and maintained independently of the other services in the system.</p>
+<p>SOA systems are typically built using a distributed architecture, where different services are deployed on separate servers or machines. This allows for flexibility and scalability, as services can be added or removed without affecting the entire system.</p>
+<p>SOA has many benefits, including:</p>
+<ul class="simple">
+<li><p>Modularity: Services can be developed and maintained independently of each other, which makes it easier to update and improve the system.</p></li>
+<li><p>Reusability: Services can be reused in multiple applications, which can reduce development time and cost.</p></li>
+<li><p>Interoperability: Services can communicate with each other using a well-defined interface, which allows for integration with other systems and technologies.</p></li>
+<li><p>Scalability: Services can be added or removed without affecting the entire system, which makes it easier to scale the system up or down as needed.</p></li>
+</ul>
+<p>Overall, SOA is a powerful software design pattern that can help organizations build flexible and scalable systems that are easy to maintain and improve over time.</p>
+<section id="how-webezy-io-serving-soa">
+<h2>How Webezy.io Serving SOA<a class="headerlink" href="#how-webezy-io-serving-soa" title="Permalink to this heading"></a></h2>
+<p>Webezy.io is utulizing <code class="docutils literal notranslate"><span class="pre">gRPC</span></code> which is framework for <code class="docutils literal notranslate"><span class="pre">RPC</span></code> - the very concept of Remote Procedure Call is to implement a distributed system
+with abstract layer of communication, so when you call a native function on some place it will call a process execution on other remote computers.</p>
+<p><code class="docutils literal notranslate"><span class="pre">gRPC</span></code> doing that transperent communication with <code class="docutils literal notranslate"><span class="pre">HTTP2</span></code> and <code class="docutils literal notranslate"><span class="pre">Protobuf</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">HTTP2</span></code> doing all the communication layer and <code class="docutils literal notranslate"><span class="pre">Protobuf</span></code> handling the serilization / deserialization from one code module to the other - in other words for example it’s a data manipulation layer to marshel and unmarshel object from <code class="docutils literal notranslate"><span class="pre">Python</span></code> call to the remote server in <code class="docutils literal notranslate"><span class="pre">Typescript</span></code> and vice versa.</p>
+<p><code class="docutils literal notranslate"><span class="pre">gRPC</span></code> let you define your “Services” and thier respectively “Methods” (RPC’s) in a generic way with <code class="docutils literal notranslate"><span class="pre">Protobuf</span></code> (IDL) which later compiles to native modules in the required language which makes the communication handling and the object modules.</p>
+<p>Each RPC should know which Object it will get and which it will respond with, this “Objects” can be refrenced as “JSON” in a <code class="docutils literal notranslate"><span class="pre">HTTP1</span> <span class="pre">Over</span> <span class="pre">JSON</span></code> system as the JSON themselvs, but we will call them in thier right name simple as “Messages” - they are not JSON ! they are <code class="docutils literal notranslate"><span class="pre">Protobuf</span></code> Objects which is much more effiecient from JSON - About 30% avg. less memory.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> wrapping the <code class="docutils literal notranslate"><span class="pre">gRPC</span></code> functionality with a simple to use CLI that handling the project creation process (Project Structuring, Auto-generated Code, Correct Workflows Enforcments and more).</p>
+<p>It follows the well-defined concepts of <code class="docutils literal notranslate"><span class="pre">gRPC</span></code> and Service Oriented Architecture in a way of each project has a well-defined “Resources” that can be described in short with the two main resources:</p>
+<ul class="simple">
+<li><p>Packages - A centralized module for all domain-specific “Messages” (Objects)</p></li>
+<li><p>Services - A service which holds 1 or more RPC, a service most import atleast 1 package to use it’s “Messages” as I/O on the RPC’s it implements</p></li>
+</ul>
+<blockquote>
+<div><p><strong>Note</strong> To create a resource with <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> CLI just write</p>
+</div></blockquote>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>webezy generate package <span class="c1"># Generate new package</span>
+webezy generate service <span class="c1"># Generate new service</span>
+</pre></div>
+</div>
+<p>When you define those resources <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> build the resources into <code class="docutils literal notranslate"><span class="pre">Protobuf</span></code> Files and compile them into the native implementations by the project configurations.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="webezyio_concepts.html" class="btn btn-neutral float-left" title="Understanding Webezy.io" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../languages/index.html" class="btn btn-neutral float-right" title="Languages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -40,6 +40,7 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
         pretty.print_info('Run the following command :\n\t-> $ go mod init {}'.format(_format_go_package_name(wz_json.project.get('goPackage'))))
         # subprocess.run(['go mod init',_format_go_package_name(wz_json.project.get('goPackage'))])
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
+    return (__name__,'OK')
 
 
 @builder.hookimpl

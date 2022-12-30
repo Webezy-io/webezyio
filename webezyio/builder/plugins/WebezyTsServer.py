@@ -24,6 +24,7 @@ import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources,pretty, protos
 from webezyio.builder.plugins.static import gitignore_ts,utils_errors_ts,utils_interfaces,package_json,bash_init_script_ts,bash_run_server_script_ts,protos_compile_script_ts,main_ts_config,clients_ts_configs,protos_ts_config
+import inspect
 
 
 @builder.hookimpl
@@ -35,6 +36,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
+    return (__name__,'OK')
 
 
 @builder.hookimpl
@@ -136,36 +138,39 @@ def init_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     if wz_json.services is not None:
         for svc in wz_json.services:
             methods = []
-            for rpc in wz_json.services[svc].get('methods'):
-                rpc_name = rpc.get('name')
-                rpc_type_out = rpc.get('serverStreaming')
-                rpc_out_name = rpc.get('inputType').split('.')[-1]
-                rpc_out_pkg = rpc.get('outputType').split('.')[1]
-                rpc_output = rpc.get('outputType')
-                msg = wz_json.get_message(rpc_output)
-                fields = []
-                for f in msg.get('fields'):
-                    F_VALUE = 'null'
-                    if f.get('fieldType') == 'TYPE_STRING':
-                        F_VALUE = '"SomeString"'
-                    elif f.get('fieldType') == 'TYPE_BOOL':
-                        F_VALUE = 'false'
-                    elif f.get('fieldType') == 'TYPE_INT32' or f.get('fieldType') ==  'TYPE_INT64':
-                        F_VALUE = '1'
-                    elif f.get('fieldType') == 'TYPE_FLOAT' or f.get('fieldType') == 'TYPE_DOUBLE':
-                        F_VALUE = '1.0'
+            if wz_json.services[svc].get('methods') is not None and len(wz_json.services[svc].get('methods')) > 0 :
+                for rpc in wz_json.services[svc].get('methods'):
+                    rpc_name = rpc.get('name')
+                    rpc_type_out = rpc.get('serverStreaming')
+                    rpc_out_name = rpc.get('inputType').split('.')[-1]
+                    rpc_out_pkg = rpc.get('outputType').split('.')[1]
+                    rpc_output = rpc.get('outputType')
+                    msg = wz_json.get_message(rpc_output)
+                    fields = []
+                    for f in msg.get('fields'):
+                        F_VALUE = 'null'
+                        if f.get('fieldType') == 'TYPE_STRING':
+                            F_VALUE = '"SomeString"'
+                        elif f.get('fieldType') == 'TYPE_BOOL':
+                            F_VALUE = 'false'
+                        elif f.get('fieldType') == 'TYPE_INT32' or f.get('fieldType') ==  'TYPE_INT64':
+                            F_VALUE = '1'
+                        elif f.get('fieldType') == 'TYPE_FLOAT' or f.get('fieldType') == 'TYPE_DOUBLE':
+                            F_VALUE = '1.0'
 
-                    fields.append('{0}: {1}'.format(f.get('name'), F_VALUE))
-                fields = ','.join(fields)
-                if rpc_type_out:
-                    out_prototype = f'\t\tcall.destroy(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
-                else:
-                    out_prototype = f'\t\t// let response:{rpc_out_pkg}.{rpc_out_name} = {_OPEN_BRCK} {fields} {_CLOSING_BRCK};\n\t\t// callback(null,response);\n\t\tcallback(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
-                code = f'{out_prototype}\n'
-                methods.append(protos.WebezyMethodContext(
-                    name=rpc_name, code=code, type='rpc'))
-            files.append(protos.WebezyFileContext(
-                file=f'./services/{svc}.ts', methods=methods))
+                        fields.append('{0}: {1}'.format(f.get('name'), F_VALUE))
+                    fields = ','.join(fields)
+                    if rpc_type_out:
+                        out_prototype = f'\t\tcall.destroy(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
+                    else:
+                        out_prototype = f'\t\t// let response:{rpc_out_pkg}.{rpc_out_name} = {_OPEN_BRCK} {fields} {_CLOSING_BRCK};\n\t\t// callback(null,response);\n\t\tcallback(new ServiceError(status.UNIMPLEMENTED,"Method is not yet implemented"))'
+                    code = f'{out_prototype}\n'
+                    methods.append(protos.WebezyMethodContext(
+                        name=rpc_name, code=code, type='rpc'))
+                files.append(protos.WebezyFileContext(
+                    file=f'./services/{svc}.ts', methods=methods))
+            else:
+                pretty.print_warning("No available RPC's for -> {}".format(svc))
     context = resources.proto_to_dict(protos.WebezyContext(files=files))
     logging.debug("Writing new context")
     file_system.mkdir(file_system.join_path(path, '.webezy'))
@@ -260,32 +265,126 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
         wz_json.path, '.webezy', 'context.json'), wz_context.dump(), True, True)
 
 @builder.hookimpl
-def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext,pre_data):
+    
     imports = ['import { Server, ServerCredentials } from \'@grpc/grpc-js\';']
+    services_init_impl = []
     services_bindings = []
-    svcs = []
+    overwrite = False
+    server_options = [
+        ('grpc.max_receive_message_length',-1),
+        ('grpc.max_send_message_length',-1)
+    ]
+    before_init = ''
+    injects_service = {}
+    startup_promises =[]
+    after_startup = ''
+    """Parse pre data"""
+    if pre_data:
+        _hook_name = inspect.stack()[0][3]
+        for mini_hooks in pre_data:
+            for hook in mini_hooks:
+                if __name__ == hook.split(':')[0]:
+
+                    if hook.split(':')[2] is not None and _hook_name == hook.split(':')[1].replace('()',''):
+
+                        # Pre consume imports
+                        if 'append_imports' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for imp in mini_hooks[hook]:
+                                    imports.append(imp)
+                        
+                        # Pre consume services bindings
+                        elif 'append_services_bindings' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None and len(mini_hooks[hook]) > 1:
+                                for imp in mini_hooks[hook]:
+                                    imports.append(imp)
+                        
+                        # Force rewriting of server each build
+                        elif 'overwrite' in hook.split(':')[2]:
+                            if mini_hooks[hook] == True:
+                                overwrite = True
+
+                        elif 'append_server_options' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for k,v in mini_hooks[hook]:
+                                    old_value = next((i for i in server_options if i[0] == k),(None,None))[1]
+                                    if k not in list(map(lambda x: x[0], server_options)):
+                                        server_options.append((k,v))
+                                    elif v != old_value:
+                                        server_options.remove((k,old_value))
+                                        server_options.append((k,v))
+
+                        # Add code before server init
+                        elif 'add_before_init' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                before_init = mini_hooks[hook]
+                        
+                        # Inject the service classes with additional objects
+                        elif 'inject_service' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for svc in mini_hooks[hook]:
+                                    injects_service[svc] = mini_hooks[hook][svc]
+                        
+                        # Inject the service classes with additional objects
+                        elif 'wrap_service' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for svc in mini_hooks[hook]:
+                                    injects_service[svc] = mini_hooks[hook][svc]
+                        
+                        # Inject the service classes with additional objects
+                        elif 'append_startup_promise' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for promise in mini_hooks[hook]:
+                                    startup_promises.append(promise)
+
+                        # Append code block after startup
+                        elif 'append_after_startup' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                after_startup = mini_hooks[hook]
+
+
+                    else:
+                        pretty.print_warning(f'[{__name__}] `{hook}` missing command')
+
+                    
+    
     for svc in wz_json.services:
-        svcs.append(svc)
         imports.append(f'import {_OPEN_BRCK} {svc}, {svc}Service {_CLOSING_BRCK} from \'./services/{svc}\';')
+        injects = []
+        if svc in injects_service:
+            injects.append(injects_service[svc])
+        
+        injects = ', '.join(injects)
+        services_init_impl.append(f'const {svc}Impl = new {svc}({injects})')
+
         services_bindings.append(
-            f'server.addService({svc}Service, new {svc}());')
+            f'server.addService({svc}Service, {svc}Impl);')
     services_bindings = '\n\t'.join(services_bindings)
+    services_init_impl = '\n\t'.join(services_init_impl)
     imports = '\n'.join(imports)
+    startup_promises = ',\n\t'.join(startup_promises)
+    server_options = '\n\t'.join(list(map(lambda opt: '"{}": {},'.format(opt[0],opt[1]),server_options)))
     server_code = f'// Webezy.io Generated Server Code\n\
 {imports}\n\n\
 let _PORT:number = 50051;\n\
 let _HOST:string = \'0.0.0.0\';\n\
 let _ADDR = `${_OPEN_BRCK}_HOST{_CLOSING_BRCK}:${_OPEN_BRCK}_PORT{_CLOSING_BRCK}`\n\
+{before_init}\n\
 const server = new Server({_OPEN_BRCK}\n\
-	"grpc.max_receive_message_length": -1,\n\
-	"grpc.max_send_message_length": -1,\n\
+\t{server_options}\n\
 {_CLOSING_BRCK});\n\n\
-{services_bindings}\n\n\
-server.bindAsync(_ADDR, ServerCredentials.createInsecure(), (err: Error | null, bindPort: number) => {_OPEN_BRCK}\n\tif (err) {_OPEN_BRCK}\n\t\tthrow err;\n\t{_CLOSING_BRCK}\n\n\tconsole.log(`[webezy] Starting gRPC:server:${_OPEN_BRCK}bindPort{_CLOSING_BRCK}`,`at -> ${_OPEN_BRCK}new Date().toLocaleString(){_CLOSING_BRCK})`);\n\tserver.start();\n{_CLOSING_BRCK});'
+async function startServer() {_OPEN_BRCK}\n\
+\tconst promises: Promise<number>[] = [\n\
+\t{startup_promises}\n\
+\t];\n\
+\tconst results = await Promise.all(promises);\n\
+\tconsole.log(results);\n\n\
+\t{after_startup}\n\n\
+\t{services_init_impl}\n\
+\t{services_bindings}\n\n\
+\tserver.bindAsync(_ADDR, ServerCredentials.createInsecure(), (err: Error | null, bindPort: number) => {_OPEN_BRCK}\n\tif (err) {_OPEN_BRCK}\n\t\tthrow err;\n\t{_CLOSING_BRCK}\n\n\tconsole.log(`[webezy] Starting gRPC:server:${_OPEN_BRCK}bindPort{_CLOSING_BRCK}`,`at -> ${_OPEN_BRCK}new Date().toLocaleString(){_CLOSING_BRCK})`);\n\tserver.start();\n\t{_CLOSING_BRCK});\n{_CLOSING_BRCK}\n\nstartServer().then(res => console.log("Service Start Up...")).catch(err => console.log(err));'
    
-    if file_system.check_if_file_exists(file_system.join_path(
-            wz_json.path, 'server.ts')) == False:
-        file_system.wFile(file_system.join_path(
-            wz_json.path, 'server.ts'), server_code, overwrite=True)
-    else:
-        pretty.print_warning("Make sure you make desired changes on server.ts file !")
+    file_system.wFile(file_system.join_path(
+        wz_json.path, 'server.ts'), server_code,overwrite=overwrite)
+    pretty.print_warning("Make sure you make desired changes on server.ts file !")

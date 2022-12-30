@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Writing Custom Plugins &mdash; webezyio 0.1.7 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Service templating" href="../templating.html" />
+    <link rel="prev" title="WebezyTsServer" href="core/WebezyTsServer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core/index.html">Core Plugins</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Writing Custom Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-plugins-should-do">What Plugins Should do</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#extending-webezy-io-functionality">Extending <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Functionality</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hooks">Hooks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Plugins</a></li>
+      <li class="breadcrumb-item active">Writing Custom Plugins</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/plugins/custom_plugins.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="writing-custom-plugins">
+<h1>Writing Custom Plugins<a class="headerlink" href="#writing-custom-plugins" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Allow developers to build and use custom plugins in thier <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> projects.</p>
+<p>Thos plugins can add functionality to your project or even inject the <code class="docutils literal notranslate"><span class="pre">Core</span> <span class="pre">Plugins</span></code> with additional supported parameters.</p>
+<p><code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugins are written using <a class="reference external" href="https://pluggy.readthedocs.io/en/stable/#"><code class="docutils literal notranslate"><span class="pre">Pluggy</span></code></a> framework.</p>
+<p>You can write as a <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> developer a custom plugin that will be hooked to <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> project, the plugin should interact with <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file with well-defined utils and helpers.
+The main modules you will interact with when writing a <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugin are:</p>
+<ul class="simple">
+<li><p><span class="xref myst">Builder</span> - Use the <code class="docutils literal notranslate"><span class="pre">webezyio.builder.hookimpl</span></code> as the decorator for your hook implemeantations</p></li>
+<li><p><span class="xref myst">WZJson</span> - A wrapper class to easy interactions with webezy.json</p></li>
+</ul>
+</section>
+<section id="what-plugins-shouldn-t-do">
+<h1>What Plugins Shouldn’t do<a class="headerlink" href="#what-plugins-shouldn-t-do" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugins <strong>MUST</strong> not modify existing resource on project it should only parse the project resources and metadata from <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> by <code class="docutils literal notranslate"><span class="pre">webezyio.commons.helpers.WZJson</span></code> interface and add functionality for the project like additional modules and code files to be auto-generated.</p>
+</section>
+<section id="what-plugins-should-do">
+<h1>What Plugins Should do<a class="headerlink" href="#what-plugins-should-do" title="Permalink to this heading"></a></h1>
+<p>The main power of <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugins is at the project extensions and configurations, you can extend the <code class="docutils literal notranslate"><span class="pre">protobuf</span></code> own functionality with <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">Custom</span> <span class="pre">Options</span></code></span> later after adding the extensions to you resources you can apply additional functionality that reuqires some dynamic user input from the extensions.</p>
+<p>All plugins should be written in <code class="docutils literal notranslate"><span class="pre">Python</span></code> and should have the following structure at-least:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Root dir of your project must prefixed with `webezyio-`</span>
+webezyio-my-plugin/
+├─ webezyio_my_plugin.py
+├─ README.md
+├─ setup.py
+</pre></div>
+</div>
+<p>The setup script for the plugin must include <code class="docutils literal notranslate"><span class="pre">entry_points</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> this how <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> core module install and register a plugins that installed on the same <code class="docutils literal notranslate"><span class="pre">venv</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">setup.py</span></code></p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;webezyio-my-plugin&quot;</span><span class="p">,</span>
+    <span class="n">install_requires</span><span class="o">=</span><span class="s2">&quot;webezyio&quot;</span><span class="p">,</span>
+    <span class="n">entry_points</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;webezyio&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my_plugin = webezyio_my_plugin&quot;</span><span class="p">]},</span>
+    <span class="n">py_modules</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;webezyio_my_plugin&quot;</span><span class="p">],</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;0.0.1&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Write the hooks implmeantations, see <span class="xref myst">Hookspecs</span> for all the available hooks that will be executed at <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command</p>
+<p><code class="docutils literal notranslate"><span class="pre">webezyio_my_plugin.py</span></code></p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">webezyio.builder</span> <span class="kn">import</span> <span class="n">hookimpl</span>
+<span class="kn">from</span> <span class="nn">webezyio.commons.helpers</span> <span class="kn">import</span> <span class="n">WZContext</span><span class="p">,</span> <span class="n">WZJson</span>
+
+<span class="nd">@hookimpl</span>
+<span class="k">def</span> <span class="nf">pre_build</span><span class="p">(</span><span class="n">wz_json</span><span class="p">:</span> <span class="n">WZJson</span><span class="p">,</span> <span class="n">wz_context</span><span class="p">:</span> <span class="n">WZContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Here the caller expects us to return a list.&quot;&quot;&quot;</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Starting webezyio build process </span><span class="si">%s</span><span class="s2"> plugin&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+
+<span class="nd">@hookimpl</span>
+<span class="k">def</span> <span class="nf">post_build</span><span class="p">(</span><span class="n">wz_json</span><span class="p">:</span> <span class="n">WZJson</span><span class="p">,</span> <span class="n">wz_context</span><span class="p">:</span> <span class="n">WZContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Here the caller passes a mutable object, so we mess with it directly.&quot;&quot;&quot;</span>
+    <span class="n">print_success</span><span class="p">(</span><span class="s2">&quot;Finished webezyio build process </span><span class="si">%s</span><span class="s2"> plugin&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Install the plugin with <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install -e .
+</pre></div>
+</div>
+<p>Now add the plugin name to your own <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file under <code class="docutils literal notranslate"><span class="pre">config</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">plugins</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;plugins&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;webezyio-my-plugin&quot;</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>After succesfull packaging and installation of your new plugin <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> should recognize it by the <code class="docutils literal notranslate"><span class="pre">entry_points</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> at <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command execution and will execute all the registered hooks that the plugin implement.</p>
+<p>On <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command you should see the following log for your plugin registering -</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>*<span class="o">]</span> Loaded installed plugins: <span class="m">1</span>
+<span class="o">[</span>*<span class="o">]</span> Registering plugin -&gt; my_plugin
+<span class="o">[</span>*<span class="o">]</span> Loaded Plugin -&gt; my_plugin
+---------------------------------------------
+<span class="s1">&#39;webezyio_my_plugin&#39;</span>
+---------------------------------------------
+</pre></div>
+</div>
+<section id="extending-webezy-io-functionality">
+<h2>Extending <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Functionality<a class="headerlink" href="#extending-webezy-io-functionality" title="Permalink to this heading"></a></h2>
+<p>By writing custom plugins developer can inject data by implementing <code class="docutils literal notranslate"><span class="pre">pre_build_xxx</span></code> hook and enrich a <code class="docutils literal notranslate"><span class="pre">Core</span> <span class="pre">Plugin</span></code> like <code class="docutils literal notranslate"><span class="pre">WebezyTsServer</span></code> with additional parameters which will have different results once the project is built.</p>
+<p>A plugin can implement one of the <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">pre_build_xxx</span></code></span> hooks and return a set of predefined /dynamic data based on <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file this data should be in a well-formatted structure that the targeted plugin will know how to execute.</p>
+<p>For e.x if we wish to add functionality to <code class="docutils literal notranslate"><span class="pre">WebezyTsServer</span></code> plugin which implements <code class="docutils literal notranslate"><span class="pre">write_server</span></code> hook as well as others - we can write a small impl. code in our custom plugin to inject some additional data when the <code class="docutils literal notranslate"><span class="pre">WebezyTsServer</span></code> will excute <code class="docutils literal notranslate"><span class="pre">write_server</span></code> hook.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@hookimpl</span>
+<span class="k">def</span> <span class="nf">pre_build_server</span><span class="p">(</span><span class="n">wz_json</span><span class="p">:</span> <span class="n">WZJson</span><span class="p">,</span> <span class="n">wz_context</span><span class="p">:</span> <span class="n">WZContext</span><span class="p">):</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Running pre build server&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;webezyio.builder.plugins.WebezyTsServer:write_server():overwrite&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+        <span class="s1">&#39;webezyio.builder.plugins.WebezyTsServer:write_server():append_imports&#39;</span><span class="p">:[</span><span class="s2">&quot;// Importing custom class from webezyio-mongo-ts plugin&quot;</span><span class="p">,</span><span class="s2">&quot;import { WebezyioMongo } from &#39;./services/utils/mongo/models&#39;;&quot;</span><span class="p">],</span>
+        <span class="s1">&#39;webezyio.builder.plugins.WebezyTsServer:write_server():add_before_init&#39;</span><span class="p">:</span><span class="s1">&#39;const db = new WebezyioMongo()&#39;</span><span class="p">,</span>
+        <span class="c1"># &#39;webezyio.builder.plugins.WebezyTsServer:append_server_options&#39;:[(&quot;grpc.max_send_message_length&quot;, 256)],</span>
+        <span class="s1">&#39;webezyio.builder.plugins.WebezyTsServer:write_server():inject_service&#39;</span><span class="p">:{</span><span class="s1">&#39;mongoApi&#39;</span><span class="p">:</span><span class="s1">&#39;db&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;webezyio.builder.plugins.WebezyTsServer:write_server():append_startup_promise&#39;</span><span class="p">:[</span><span class="s1">&#39;db.ready.then()&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong> The paths are important to be a valid full path to <code class="docutils literal notranslate"><span class="pre">Target</span> <span class="pre">Plugin</span></code> : <code class="docutils literal notranslate"><span class="pre">Target</span> <span class="pre">Hook</span></code> : <code class="docutils literal notranslate"><span class="pre">Target</span> <span class="pre">parameter</span></code> -  so <code class="docutils literal notranslate"><span class="pre">'webezyio.builder.plugins.WebezyTsServer:write_server():overwrite</span></code> will target the <code class="docutils literal notranslate"><span class="pre">WebeztTsServer</span></code> plugin and will inject the data when <code class="docutils literal notranslate"><span class="pre">write_server()</span></code> hook impl. excutes on <code class="docutils literal notranslate"><span class="pre">WebezyTsServer</span></code> - and the hook impl. knows how to handle <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> parameter - For more info see <span class="xref myst">WebezyTsServer Plugin Docs</span></p>
+</div></blockquote>
+<section id="hooks">
+<h3>Hooks<a class="headerlink" href="#hooks" title="Permalink to this heading"></a></h3>
+<p>Each build process <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> initiate a <code class="docutils literal notranslate"><span class="pre">Builder</span></code> instance which excuting and managing all registered <code class="docutils literal notranslate"><span class="pre">Hooks</span></code> from the different custom <code class="docutils literal notranslate"><span class="pre">webezyio-xxx</span></code> plugins and core plugins <code class="docutils literal notranslate"><span class="pre">WebezyXxx</span></code></p>
+<p>Some hook have <code class="docutils literal notranslate"><span class="pre">pre_build_xxx</span></code> data injection when excuted, this allow us to write plugins in ageneric way and attach at runtime dynamic context within “Custom Plugin” that implements <code class="docutils literal notranslate"><span class="pre">pre_build_xxx</span></code> hook.</p>
+<p>For a list of <a class="reference internal" href="../webezyio.builder.html"><span class="doc std std-doc">supported hooks</span></a></p>
+<p>For a list of <a class="reference internal" href="../webezyio.builder.plugins.html"><span class="doc std std-doc">Core Plugins</span></a></p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="core/WebezyTsServer.html" class="btn btn-neutral float-left" title="WebezyTsServer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../templating.html" class="btn btn-neutral float-right" title="Service templating" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

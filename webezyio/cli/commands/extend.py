@@ -49,6 +49,29 @@ def extend_resource(resource,extension,wz_json:helpers.WZJson):
         elif resource.get('kind') == resources.ResourceKinds.message.value:
             results = handle_extension_by_type(resource,extension,wz_json,'message')
             extend_message(results,resource,extension,wz_json,ARCHITECT)    
+    elif resource.get('type') == 'services':
+        results = handle_extension_by_type(resource,extension,wz_json,'service')
+        extend_service(results,resource,extension,wz_json,ARCHITECT)
+
+def extend_service(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:WebezyArchitect):
+    """"""
+    if results is not None:
+        list_of_ext_fields = []
+        for ext_field in results.get('fields'):
+            list_of_ext_fields.append((ext_field.get('name'),ext_field.get('fullName')))
+
+        field_extension_result = inquirer.prompt([inquirer.List('extension_field','Chose which field you want to add / edit?',list_of_ext_fields)],theme=WebezyTheme())
+        if resource.get('extensions') is None:
+            resource['extensions'] = {}
+        if field_extension_result is not None:
+            temp_field_ext = next((f for f in results.get('fields') if f.get('fullName') == field_extension_result['extension_field']),None)
+            if temp_field_ext.get('fieldType') == 'TYPE_MESSAGE':
+                value = handle_ext_field_message(temp_field_ext.get('messageType'),wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
+            else:
+                value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
+        resource['extensions'][temp_field_ext.get('fullName')] = value
+        ARCHITECT.EditService(resource.get('name'),resource.get('dependencies'),resource.get('description'),resource.get('methods'),extensions=resource.get('extensions'))
+        ARCHITECT.Save()
 
 def extend_message(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:WebezyArchitect):
     """
@@ -83,6 +106,7 @@ def extend_message(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:W
                 value = handle_ext_field_message(temp_field_ext.get('messageType'),wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
             else:
                 value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
+
         temp_pkg_desc = wz_json.get_package(resource.get('fullName').split(".")[1],False)
         resource['extensions'][temp_field_ext.get('fullName')] = value
 
@@ -148,6 +172,7 @@ def _get_extensions(messages, type):
 def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Literal['package','service','message','field','method']):
     """Package extensions"""
     ext_type = None
+    pkg_messages = None
 
     if type == 'package':
         pkg_dependencies = resource.get('dependencies')
@@ -166,6 +191,13 @@ def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Lite
         pkg_messages = temp_pkg.get('messages') 
         ext_type = 'MessageOptions'
 
+    elif type == 'service':
+        pkg_dependencies = resource.get('dependencies')
+        ext_type = 'ServiceOptions'
+
+    else:
+        print_error("Extending {} resource is not supported yet".format(type))
+        exit(1)
     # Iterating available packages and extendable messages
     avail_extensions = []
     for pkg in pkg_dependencies:
@@ -173,8 +205,9 @@ def handle_extension_by_type(resource,extension,wz_json:helpers.WZJson,type:Lite
             temp_pkg = wz_json.get_package(pkg.split('.')[1])
             for ext in _get_extensions(temp_pkg.get('messages'),ext_type):
                 avail_extensions.append(ext)
-    for ext in _get_extensions(pkg_messages,ext_type):
-        avail_extensions.append(ext)
+    if pkg_messages:
+        for ext in _get_extensions(pkg_messages,ext_type):
+            avail_extensions.append(ext)
     if len(avail_extensions) == 0:
         print_error("Make sure your package / service has been imported with the package wrapper for extensions !",True,"No available messages to extend")
     # Insert into prompt
@@ -237,12 +270,11 @@ def handle_ext_field_message(message_full_name,wz_json:helpers.WZJson,old_ext=No
                         if value is not None:
                             value = int(value['int_value'])
                     elif 'TYPE_BOOL' in f.get('fieldType'):
-                        value = inquirer.prompt([inquirer.Confirm('bool_value','Enter boolean value for {}'.format(f.get('fullName')))],theme=WebezyTheme())  
+                        value = inquirer.prompt([inquirer.Confirm('bool_value',message='Enter boolean value for {}'.format(f.get('fullName')))],theme=WebezyTheme())  
                         if value is not None:
                             value = value['bool_value']
                     else:
                         raise errors.WebezyValidationError('Extension field type not valid','Unsupported {} field type for extensions'.format(f.get('fieldType')))
-                    
                     temp_struct = google_dot_protobuf_dot_struct__pb2.Struct()
                     temp_dict = {}
                     if old_ext is not None:
@@ -265,8 +297,6 @@ def handle_ext_field_message(message_full_name,wz_json:helpers.WZJson,old_ext=No
                     exit(1)
                 else:
                     raise errors.WebezyValidationError('Unsupported label type','Unsupporting label {} for extensions'.format(temp_extended_field.get('label'))) 
-            else:
-                print_warning("Not supporting editing extensions from CLI yet")
 
 
 def handle_ext_field(ext_field,wz_json:helpers.WZJson,old_ext=None):
@@ -279,7 +309,6 @@ def handle_ext_field(ext_field,wz_json:helpers.WZJson,old_ext=None):
     if ext_field.get('fieldType') == 'TYPE_STRING':
         
         value = inquirer.prompt([inquirer.Text('string_value','Enter string value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
-        
         if value.get('string_value') is not None:
             return google_dot_protobuf_dot_struct__pb2.Value(string_value=value.get('string_value'))
         else:
@@ -308,5 +337,41 @@ def handle_ext_field(ext_field,wz_json:helpers.WZJson,old_ext=None):
         else:
             print_error("Must enter a valid boolean !")
             exit(1)
+    
+    elif ext_field.get('fieldType') == 'TYPE_ENUM':
+        enum = wz_json.get_enum(ext_field.get('enumType'))
+        ev_list = []
+        for value in enum.get('values'):
+            ev_list.append((value.get('name'),value.get('name')))
+        
+        if ext_field.get('label') == 'LABEL_REPEATED':
+            add_enum_values = True
+            list_values = google_dot_protobuf_dot_struct__pb2.ListValue()
+            
+            while add_enum_values == True:
+                
+                value = inquirer.prompt([inquirer.List('enum_value',message='Enter a enum value for {}'.format(ext_field.get('fullName')),choices=ev_list)],theme=WebezyTheme())  
+                
+                if value.get('enum_value') is not None:
+
+                    list_values.append(value.get('enum_value'))
+                    continue_add = inquirer.prompt([inquirer.Confirm('continue',message='Continue add more fields?')],theme=WebezyTheme())  
+
+                    if continue_add.get('continue') is None or continue_add.get('continue') == False:
+                        add_enum_values = False
+
+                else:
+                    add_enum_values = False
+
+            return google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
+
+
+        else:
+            value = inquirer.prompt([inquirer.List('enum_value',message='Enter a enum value for {}'.format(ext_field.get('fullName')),choices=ev_list)],theme=WebezyTheme())  
+            if value.get('enum_value') is not None:
+                return google_dot_protobuf_dot_struct__pb2.Value(string_value=value.get('enum_value'))
+            else:
+                print_error("Must enter a valid boolean !")
+                exit(1)
     # extended_message_field = inquirer.prompt([inquirer.List('extension_message_field','Enter an extension value for',avail_extension_message_fields)],theme=WebezyTheme())
     # return google_dot_protobuf_dot_struct__pb2.Value()

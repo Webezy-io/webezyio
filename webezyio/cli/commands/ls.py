@@ -22,7 +22,60 @@
 import logging
 from prettytable import PrettyTable
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
-from webezyio.commons.helpers import WZJson
+from webezyio.commons.helpers import Graph, WZJson
+from webezyio.commons.protos import WebezyExtension,FieldOptions,MessageOptions,ServiceOptions,FileOptions
+
+
+def list_dependencies(resource,webezy_json:WZJson):
+    resources = []
+
+    if resource is None or resource in ['service','package']:
+        for p in webezy_json.packages:
+            pkg = webezy_json.packages[p]
+            resources.append(pkg)
+        for s in webezy_json.services:
+            svc = webezy_json.services[s]
+            resources.append(svc)
+
+        resourcesSorted = Graph(resources,True).topologicalSort()
+    elif resource == 'message':
+        for p in webezy_json.packages:
+            pkg = webezy_json.packages[p]
+            for m in pkg.get('messages'):
+                resources.append(m)
+        resourcesSorted = dict(Graph(resources).graph)
+        del resourcesSorted[None]
+
+    print_info('Listing Dependencies {}'.format(resource if resource is not None else 'All'),True)
+    
+    for dep in resourcesSorted:
+
+        if len(dep.split('.')) == 1:
+            if resource is None or resource == 'service':
+                print()
+                print_success('|| Service: {}'.format(dep))
+
+                if webezy_json.services[dep].get('dependencies'):
+                    for d in webezy_json.services[dep].get('dependencies'):
+                        print('    ||\t     |\n    ||\t      -- {}'.format(d))
+        elif resource is None or resource == 'package':
+            print()
+            print_note('| Package: {}'.format(dep))
+            pkg_name = 'protos/{}/{}.proto'.format(dep.split('.')[-1],dep.split('.')[1])
+            if webezy_json.packages[pkg_name].get('dependencies'):
+                for d in webezy_json.packages[pkg_name].get('dependencies'):
+                    print('    ||\t     |\n    ||\t      -- {}'.format(d))
+        
+        elif resource == 'message':
+            msg = resourcesSorted[dep]
+            print()
+            print_note('|| Message: {}'.format(dep))
+            for m in msg:
+                if m is not None:
+                    print('    ||\t     |\n    |\t      - * {}'.format(m))
+
+            print()
+
 
 def list_by_name(full_name,webezy_json:WZJson):
     """Will print in pretty table the resource description and child descriptions from full name of the resource 
@@ -35,7 +88,7 @@ def list_by_name(full_name,webezy_json:WZJson):
     elif args_split > 1 and args_split <=2:
         try:
             header = ['Service','RPC\'s','Dependencies']
-            svc = webezy_json.get_service(full_name.split('.')[1])
+            svc = webezy_json.get_service(full_name.split('.')[1],wz_json=webezy_json._webezy_json)
             tab = PrettyTable(header)
             add_service_desc(tab,svc)
             # tab.add_row([svc['name'],len(svc.get('methods') if svc.get('methods') is not None else []),svc.get('dependencies')])
@@ -106,44 +159,57 @@ def list_by_resource(type,webezy_json:WZJson):
     """
     # Services list
     if type == 'service':
-        header = ['Service','RPC\'s','Dependencies']
+        header = ['Service','RPC\'s','Dependencies','Extensions']
         tab = PrettyTable(header)
         header = ['RPC','Type','Input','Output']
         tab_rpcs = PrettyTable(header)
         if webezy_json.services is not None:
             for svc in webezy_json.services:
                 service=webezy_json.services[svc]
+                ext = []
+                if service.get('extensions') is not None:
+                    ext = list(map(lambda k: k,service.get('extensions')))
+                ext = ext if len(ext) >0 else '-'
                 if service.get('methods') is not None:
                     for rpc in service.get('methods'):
                         add_rpc_desc(tab_rpcs,rpc)
-                add_service_desc(tab,service)
+                add_service_desc(tab,service,ext)
             print_info(tab,True,'Listing services resources')
         else:
             print_warning("No services under {}".format(webezy_json.project.get('packageName')))
     
     # Packages list
     elif type == 'package':
-        header = ['Package','Messages','Enums','Dependencies']
+        header = ['Package','Messages','Enums','Dependencies','Extensions']
         tab = PrettyTable(header)
         if webezy_json.packages is not None:
 
             for pkg in webezy_json.packages:
                 pkg = webezy_json.packages[pkg]
-                tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies') ])
+                ext = []
+                if pkg.get('extensions') is not None:
+                    ext = list(map(lambda k: k,pkg.get('extensions')))
+                ext = ext if len(ext) >0 else '-'
+                tab.add_row([pkg['name'],len(pkg.get('messages') if pkg.get('messages') is not None else []),len(pkg.get('enums') if pkg.get('enums') is not None else []),pkg.get('dependencies'),ext ])
             print_info(tab,True,'Listing packages resources')
         else:
             print_warning("No packages under {}".format(webezy_json.project.get('packageName')))
 
     # Messages List
     elif type == 'message':
-        header = ['Message','Fields','Package']
+        header = ['Message','Fields','Package','Extensions','Extending']
         tab = PrettyTable(header)
         if webezy_json.packages is not None:
             for pkg in webezy_json.packages:
                 package = webezy_json.packages[pkg]
                 if package.get('messages'):
                     for m in package['messages']:
-                        tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []), package.get('package') ])
+                        ext = []
+                        if m.get('extensions') is not None:
+                            ext = list(map(lambda k: k,m.get('extensions')))
+                        ext_type = m.get('extensionType') if m.get('extensionType') is not None else '-'
+                        ext = ext if len(ext) >0 else '-'
+                        tab.add_row([m['name'],len(m.get('fields') if m.get('fields') is not None else []), package.get('package'), ext,ext_type ])
             print_info(tab,True,'Listing packages resources')
         else:
             print_warning("No packages under {}".format(webezy_json.project.get('packageName')))
@@ -161,6 +227,21 @@ def list_by_resource(type,webezy_json:WZJson):
         else:
             print_warning("No services under {}".format(webezy_json.project.get('packageName')))
     
+    # Extensions List
+    elif type == 'extension':
+        header = ['Name','Package','Extending']
+        tab_exts = PrettyTable(header)
+        
+        options = webezy_json.get_extensions()
+        # Extensions fields options
+        if len(options) > 0:
+            for opt in options:
+                add_ext_desc(tab_exts,opt)
+            print_info(tab_exts,True,'Listing Extensions')
+        else:
+            print_warning("No services under {}".format(webezy_json.project.get('packageName')))
+    
+
     # Not supported listing ALL resources
     else:
         if type is not None:
@@ -171,7 +252,7 @@ def list_all(webezy_json:WZJson):
     """Will print all webezy.io project resource that are declared on webezy.json file"""
 
     # Services list
-    header = ['Service','RPC\'s','Dependencies']
+    header = ['Service','RPC\'s','Dependencies','Extensions']
     tab = PrettyTable(header)
     
     if webezy_json.services:
@@ -181,35 +262,49 @@ def list_all(webezy_json:WZJson):
         
         for svc in webezy_json.services:
             service=webezy_json.services[svc]
-            add_service_desc(tab,service)
+            ext = []
+            if service.get('extensions') is not None:
+                ext = list(map(lambda k: k,service.get('extensions')))
+            ext = ext if len(ext) >0 else '-'
+            add_service_desc(tab,service,ext)
             if service.get('methods') is not None:
                 for rpc in service.get('methods'):
-                    add_rpc_desc(tab_rpcs,rpc)
+                    add_rpc_desc(tab_rpcs,rpc,)
     
         print_info(tab,True,'Listing services resources')
         print_info(tab_rpcs,True,'Listing RPC\'s')
     
     # Packages list
-    header = ['Package','Messages','Enums','Dependencies']
+    header = ['Package','Messages','Enums','Dependencies','Extensions']
     tab = PrettyTable(header)
     if webezy_json.packages is not None:
         for pkg in webezy_json.packages:
             pkg = webezy_json.packages[pkg]
-            add_package_desc(tab,pkg)
+            ext = []
+            if pkg.get('extensions') is not None:
+                ext = list(map(lambda k: k,pkg.get('extensions')))
+            ext = ext if len(ext) >0 else '-'
+            add_package_desc(tab,pkg,ext)
     else:
         print_warning("No packages on project")
 
     print_info(tab,True,'Listing packages resources')
 
     # Messages List
-    header = ['Message','Fields','Package']
+    header = ['Message','Fields','Package','Extensions','Extending']
     tab = PrettyTable(header)
 
     if webezy_json.packages is not None:
         for pkg in webezy_json.packages:
             package = webezy_json.packages[pkg]
-            for m in package['messages']:
-                add_message_desc(tab,m,package)
+            if package.get('messages'):
+                for m in package['messages']:
+                    ext = []
+                    if m.get('extensions') is not None:
+                        ext = list(map(lambda k: k,m.get('extensions')))
+                    ext_type = m.get('extensionType') if m.get('extensionType') is not None else '-'
+                    ext = ext if len(ext) >0 else '-'
+                    add_message_desc(tab,m,package,ext,ext_type)
     else:
         print_warning("No packages on project")
     
@@ -230,14 +325,14 @@ def list_all(webezy_json:WZJson):
     print_info(tab,True,'Listing packages enums')
 
 
-def add_service_desc(tab,svc_description):
-    tab.add_row([svc_description.get('name'),len(svc_description.get('methods') if svc_description.get('methods') is not None else []),svc_description.get('dependencies')])
+def add_service_desc(tab,svc_description,extensions=None):
+    tab.add_row([svc_description.get('name'),len(svc_description.get('methods') if svc_description.get('methods') is not None else []),svc_description.get('dependencies'),extensions])
 
-def add_package_desc(tab,package_desc):
-    tab.add_row([package_desc.get('name'),len(package_desc.get('messages') if package_desc.get('messages') is not None else []),len(package_desc.get('enums') if package_desc.get('enums') is not None else []),package_desc.get('dependencies') ])
+def add_package_desc(tab,package_desc,ext):
+    tab.add_row([package_desc.get('name'),len(package_desc.get('messages') if package_desc.get('messages') is not None else []),len(package_desc.get('enums') if package_desc.get('enums') is not None else []),package_desc.get('dependencies'),ext ])
 
-def add_message_desc(tab,msg_desc,package_desc):
-    tab.add_row([msg_desc.get('name'),len(msg_desc.get('fields') if msg_desc.get('fields') is not None else []),package_desc.get('package')])
+def add_message_desc(tab,msg_desc,package_desc, ext,ext_type ):
+    tab.add_row([msg_desc.get('name'),len(msg_desc.get('fields') if msg_desc.get('fields') is not None else []),package_desc.get('package'), ext,ext_type ])
 
 def add_enum_desc(tab,enum_desc,package_desc):
     tab.add_row([enum_desc.get('name'),len(enum_desc.get('values') if enum_desc.get('values') is not None else []),package_desc.get('package')])
@@ -248,3 +343,6 @@ def add_rpc_desc(tab,rpc_desc):
     rpc_type = 'Unary' if (rpc_type_client == False or rpc_type_client is None ) and (rpc_type_server == False or rpc_type_server is None) else 'Client stream' if rpc_type_client == True and (rpc_type_server == False or rpc_type_server is None) else 'Server Stream' if rpc_type_server == True and (rpc_type_client == False or rpc_type_client is None ) else 'Bidi' if rpc_type_client == True and rpc_type_server == True else ''
     tab.add_row([rpc_desc.get('name'),rpc_type,rpc_desc.get('inputType'),rpc_desc.get('outputType')])
 
+def add_ext_desc(tab,ext_desc):
+    ext_package = '.'.join(ext_desc.get('fullName').split('.')[:-1])
+    tab.add_row([ext_desc.get('name'),ext_package,ext_desc.get('extensionType')])

@@ -35,17 +35,28 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/index.html">Commands</a></li>
+</ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="JsonSchema.html">Webezy.io Json Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
@@ -116,6 +127,8 @@
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.template.add_enums">add_enums() (in module webezyio.cli.commands.template)</a>
 </li>
+      <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.ls.add_ext_desc">add_ext_desc() (in module webezyio.cli.commands.ls)</a>
+</li>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.add_field_to_message">add_field_to_message() (in module webezyio.commons.resources)</a>
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.edit.add_fields">add_fields() (in module webezyio.cli.commands.edit)</a>
@@ -140,10 +153,10 @@
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.ls.add_rpc_desc">add_rpc_desc() (in module webezyio.cli.commands.ls)</a>
 </li>
-      <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.template.add_rpcs">add_rpcs() (in module webezyio.cli.commands.template)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.template.add_rpcs">add_rpcs() (in module webezyio.cli.commands.template)</a>
+</li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.ls.add_service_desc">add_service_desc() (in module webezyio.cli.commands.ls)</a>
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.template.add_services">add_services() (in module webezyio.cli.commands.template)</a>
@@ -200,15 +213,13 @@
 </li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildAll">BuildAll() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
-      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildClients">BuildClients() (webezyio.builder.src.main.WebezyBuilder method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildClients">BuildClients() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildCustomPlugins">BuildCustomPlugins() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder">Builder (class in webezyio.architect.recievers)</a>
-</li>
-      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildMongo">BuildMongo() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.BuildOnlyCode">BuildOnlyCode() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
@@ -255,8 +266,6 @@
       <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyGoClient.compile_protos">compile_protos() (in module webezyio.builder.plugins.WebezyGoClient)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.compile_protos">(in module webezyio.builder.plugins.WebezyPy)</a>
-</li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.compile_protos">(in module webezyio.builder.plugins.WebezyPyClient)</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsClient.compile_protos">(in module webezyio.builder.plugins.WebezyTsClient)</a>
@@ -270,10 +279,10 @@
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.config.WebezyProjectConfig.config">config() (webezyio.commons.config.WebezyProjectConfig method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.construct_full_name">construct_full_name() (in module webezyio.commons.resources)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.construct_uri">construct_uri() (in module webezyio.commons.resources)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.file_system.copyFile">copyFile() (in module webezyio.commons.file_system)</a>
@@ -436,6 +445,8 @@
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.extend.extend_resource">extend_resource() (in module webezyio.cli.commands.extend)</a>
 </li>
+      <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.extend.extend_service">extend_service() (in module webezyio.cli.commands.extend)</a>
+</li>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.ResourceKinds.ezy_1">ezy_1 (webezyio.commons.resources.ResourceKinds attribute)</a>
 </li>
   </ul></td>
@@ -546,6 +557,10 @@
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZJson.get_extended_packages">get_extended_packages() (webezyio.commons.helpers.WZJson method)</a>
 </li>
+      <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZJson.get_extended_services">get_extended_services() (webezyio.commons.helpers.WZJson method)</a>
+</li>
+      <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZJson.get_extensions">get_extensions() (webezyio.commons.helpers.WZJson method)</a>
+</li>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.get_field_full_name">get_field_full_name() (in module webezyio.commons.resources)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.config.get_file_config">get_file_config() (in module webezyio.commons.config)</a>
@@ -554,10 +569,10 @@
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZJson.get_message">get_message() (webezyio.commons.helpers.WZJson method)</a>
 </li>
-      <li><a href="webezyio.commons.html#webezyio.commons.resources.get_message_full_name">get_message_full_name() (in module webezyio.commons.resources)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="webezyio.commons.html#webezyio.commons.resources.get_message_full_name">get_message_full_name() (in module webezyio.commons.resources)</a>
+</li>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.get_method_full_name">get_method_full_name() (in module webezyio.commons.resources)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.get_oneof_field_full_name">get_oneof_field_full_name() (in module webezyio.commons.resources)</a>
@@ -626,10 +641,10 @@
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.pretty.bcolors.HEADER">HEADER (webezyio.commons.pretty.bcolors attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.commons.html#webezyio.commons.resources.ResourceKinds.health">health (webezyio.commons.resources.ResourceKinds attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.architect.html#webezyio.architect.invoker.CoreInvoker.history">history (webezyio.architect.invoker.CoreInvoker property)</a>
 
       <ul>
@@ -641,6 +656,8 @@
       <li><a href="webezyio.builder.html#webezyio.builder.hookimpl">hookimpl (in module webezyio.builder)</a>
 </li>
       <li><a href="webezyio.architect.html#webezyio.architect.invoker.Webezy.hooks">hooks (webezyio.architect.invoker.Webezy property)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.hookspec">hookspec (in module webezyio.builder.src.hookspecs)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -660,11 +677,9 @@
 </li>
       <li><a href="webezyio.cli.commands.html#webezyio.cli.commands.package.import_package">import_package() (in module webezyio.cli.commands.package)</a>
 </li>
-      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.init_context">init_context() (in module webezyio.builder.plugins.WebezyPy)</a>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.init_context">init_context() (in module webezyio.builder.plugins.WebezyTsServer)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.init_context">(in module webezyio.builder.plugins.WebezyTsServer)</a>
-</li>
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.init_context">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
@@ -680,8 +695,6 @@
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyMonitor.init_project_structure">(in module webezyio.builder.plugins.WebezyMonitor)</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyProxy.init_project_structure">(in module webezyio.builder.plugins.WebezyProxy)</a>
-</li>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.init_project_structure">(in module webezyio.builder.plugins.WebezyPy)</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.init_project_structure">(in module webezyio.builder.plugins.WebezyPyClient)</a>
 </li>
@@ -830,8 +843,6 @@
 </li>
         <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyProxy">webezyio.builder.plugins.WebezyProxy</a>
 </li>
-        <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyPy">webezyio.builder.plugins.WebezyPy</a>
-</li>
         <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyPyClient">webezyio.builder.plugins.WebezyPyClient</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyReadme">webezyio.builder.plugins.WebezyReadme</a>
@@ -839,8 +850,6 @@
         <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyTsClient">webezyio.builder.plugins.WebezyTsClient</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyTsServer">webezyio.builder.plugins.WebezyTsServer</a>
-</li>
-        <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyUnitPy">webezyio.builder.plugins.WebezyUnitPy</a>
 </li>
         <li><a href="webezyio.builder.src.html#module-webezyio.builder.src">webezyio.builder.src</a>
 </li>
@@ -965,15 +974,13 @@
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.pretty.bcolors.OKGREEN">OKGREEN (webezyio.commons.pretty.bcolors attribute)</a>
 </li>
-      <li><a href="webezyio.commons.html#webezyio.commons.resources.ResourceKinds.oneof_field">oneof_field (webezyio.commons.resources.ResourceKinds attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.override_generated_classes">override_generated_classes() (in module webezyio.builder.plugins.WebezyPy)</a>
+      <li><a href="webezyio.commons.html#webezyio.commons.resources.ResourceKinds.oneof_field">oneof_field (webezyio.commons.resources.ResourceKinds attribute)</a>
+</li>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.override_generated_classes">override_generated_classes() (in module webezyio.builder.plugins.WebezyPyClient)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.override_generated_classes">(in module webezyio.builder.plugins.WebezyPyClient)</a>
-</li>
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.override_generated_classes">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
@@ -1035,12 +1042,8 @@
         <li><a href="webezyio.commons.html#webezyio.commons.resources.parse_proto_extension">(in module webezyio.commons.resources)</a>
 </li>
       </ul></li>
-      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.parse_proto_type_to_py">parse_proto_type_to_py() (in module webezyio.builder.plugins.WebezyPy)</a>
-
-      <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.parse_proto_type_to_py">(in module webezyio.builder.plugins.WebezyPyClient)</a>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.parse_proto_type_to_py">parse_proto_type_to_py() (in module webezyio.builder.plugins.WebezyPyClient)</a>
 </li>
-      </ul></li>
       <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.parse_proto_type_to_ts">parse_proto_type_to_ts() (in module webezyio.builder.plugins.WebezyTsServer)</a>
 </li>
       <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyMigrate.parse_protos_to_resource">parse_protos_to_resource() (in module webezyio.builder.plugins.WebezyMigrate)</a>
@@ -1076,8 +1079,6 @@
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyProxy.post_build">(in module webezyio.builder.plugins.WebezyProxy)</a>
 </li>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.post_build">(in module webezyio.builder.plugins.WebezyPy)</a>
-</li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.post_build">(in module webezyio.builder.plugins.WebezyPyClient)</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyReadme.post_build">(in module webezyio.builder.plugins.WebezyReadme)</a>
@@ -1091,7 +1092,27 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyBase.post_build_clients">post_build_clients() (in module webezyio.builder.plugins.WebezyBase)</a>
+
+      <ul>
+        <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.post_build_clients">(in module webezyio.builder.src.hookspecs)</a>
+</li>
+      </ul></li>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyBase.post_build_server">post_build_server() (in module webezyio.builder.plugins.WebezyBase)</a>
+
+      <ul>
+        <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.post_build_server">(in module webezyio.builder.src.hookspecs)</a>
+</li>
+      </ul></li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.post_build_services">post_build_services() (in module webezyio.builder.src.hookspecs)</a>
+</li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PostBuild">PostBuild() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PostBuildClients">PostBuildClients() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PostBuildServer">PostBuildServer() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PostBuildServices">PostBuildServices() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyBase.pre_build">pre_build() (in module webezyio.builder.plugins.WebezyBase)</a>
 
@@ -1108,8 +1129,6 @@
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyProxy.pre_build">(in module webezyio.builder.plugins.WebezyProxy)</a>
 </li>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.pre_build">(in module webezyio.builder.plugins.WebezyPy)</a>
-</li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.pre_build">(in module webezyio.builder.plugins.WebezyPyClient)</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyReadme.pre_build">(in module webezyio.builder.plugins.WebezyReadme)</a>
@@ -1121,7 +1140,27 @@
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.pre_build">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyBase.pre_build_clients">pre_build_clients() (in module webezyio.builder.plugins.WebezyBase)</a>
+
+      <ul>
+        <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.pre_build_clients">(in module webezyio.builder.src.hookspecs)</a>
+</li>
+      </ul></li>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyBase.pre_build_server">pre_build_server() (in module webezyio.builder.plugins.WebezyBase)</a>
+
+      <ul>
+        <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.pre_build_server">(in module webezyio.builder.src.hookspecs)</a>
+</li>
+      </ul></li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.pre_build_services">pre_build_services() (in module webezyio.builder.src.hookspecs)</a>
+</li>
       <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PreBuild">PreBuild() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PreBuildClients">PreBuildClients() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PreBuildServer">PreBuildServer() (webezyio.builder.src.main.WebezyBuilder method)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.PreBuildServices">PreBuildServices() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.pretty.print_error">print_error() (in module webezyio.commons.pretty)</a>
 </li>
@@ -1134,6 +1173,10 @@
       <li><a href="webezyio.commons.html#webezyio.commons.pretty.print_version">print_version() (in module webezyio.commons.pretty)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.pretty.print_warning">print_warning() (in module webezyio.commons.pretty)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.process_plugin">process_plugin() (in module webezyio.builder.src.hookspecs)</a>
+</li>
+      <li><a href="webezyio.builder.src.html#webezyio.builder.src.main.WebezyBuilder.ProcessPlugin">ProcessPlugin() (webezyio.builder.src.main.WebezyBuilder method)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZJson.project">project (webezyio.commons.helpers.WZJson property)</a>
 
@@ -1171,11 +1214,9 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.rebuild_context">rebuild_context() (in module webezyio.builder.plugins.WebezyPy)</a>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.rebuild_context">rebuild_context() (in module webezyio.builder.plugins.WebezyTsServer)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.rebuild_context">(in module webezyio.builder.plugins.WebezyTsServer)</a>
-</li>
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.rebuild_context">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
@@ -1201,10 +1242,10 @@
 </li>
       <li><a href="webezyio.architect.recievers.html#webezyio.architect.recievers.Builder.remove_resource">remove_resource() (webezyio.architect.recievers.Builder method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.architect.html#webezyio.architect.WebezyArchitect.RemoveEnum">RemoveEnum() (webezyio.architect.WebezyArchitect method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="webezyio.architect.html#webezyio.architect.WebezyArchitect.RemoveEnumValue">RemoveEnumValue() (webezyio.architect.WebezyArchitect method)</a>
 </li>
       <li><a href="webezyio.architect.html#webezyio.architect.WebezyArchitect.RemoveField">RemoveField() (webezyio.architect.WebezyArchitect method)</a>
@@ -1541,13 +1582,6 @@
 </li>
       </ul></li>
       <li>
-    webezyio.builder.plugins.WebezyPy
-
-      <ul>
-        <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyPy">module</a>
-</li>
-      </ul></li>
-      <li>
     webezyio.builder.plugins.WebezyPyClient
 
       <ul>
@@ -1573,13 +1607,6 @@
 
       <ul>
         <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyTsServer">module</a>
-</li>
-      </ul></li>
-      <li>
-    webezyio.builder.plugins.WebezyUnitPy
-
-      <ul>
-        <li><a href="webezyio.builder.plugins.html#module-webezyio.builder.plugins.WebezyUnitPy">module</a>
 </li>
       </ul></li>
       <li>
@@ -1901,8 +1928,6 @@
       <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyGoClient.write_clients">write_clients() (in module webezyio.builder.plugins.WebezyGoClient)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.write_clients">(in module webezyio.builder.plugins.WebezyPy)</a>
-</li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPyClient.write_clients">(in module webezyio.builder.plugins.WebezyPyClient)</a>
 </li>
         <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsClient.write_clients">(in module webezyio.builder.plugins.WebezyTsClient)</a>
@@ -1938,8 +1963,6 @@
         <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZServiceGo.write_methods">(webezyio.commons.helpers.WZServiceGo method)</a>
 </li>
       </ul></li>
-      <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.write_models">write_models() (in module webezyio.builder.src.hookspecs)</a>
-</li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZClientGo.write_new">write_new() (webezyio.commons.helpers.WZClientGo method)</a>
 </li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZProto.write_package">write_package() (webezyio.commons.helpers.WZProto method)</a>
@@ -1956,21 +1979,17 @@
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.write_readme">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
-      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.write_server">write_server() (in module webezyio.builder.plugins.WebezyPy)</a>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.write_server">write_server() (in module webezyio.builder.plugins.WebezyTsServer)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.write_server">(in module webezyio.builder.plugins.WebezyTsServer)</a>
-</li>
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.write_server">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>
       <li><a href="webezyio.commons.html#webezyio.commons.helpers.WZProto.write_service">write_service() (webezyio.commons.helpers.WZProto method)</a>
 </li>
-      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyPy.write_services">write_services() (in module webezyio.builder.plugins.WebezyPy)</a>
+      <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.write_services">write_services() (in module webezyio.builder.plugins.WebezyTsServer)</a>
 
       <ul>
-        <li><a href="webezyio.builder.plugins.html#webezyio.builder.plugins.WebezyTsServer.write_services">(in module webezyio.builder.plugins.WebezyTsServer)</a>
-</li>
         <li><a href="webezyio.builder.src.html#webezyio.builder.src.hookspecs.write_services">(in module webezyio.builder.src.hookspecs)</a>
 </li>
       </ul></li>

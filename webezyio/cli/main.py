@@ -219,7 +219,8 @@ def main(args=None):
     parser_list.add_argument(
         '--full-name',metavar='fullName',required=False, help='Display a resource report for specific resoource by passing in a full name, for e.x domain.test.GetTest will return "GetTest" (RPC) which under "test" (service)')
     parser_list.add_argument('-t', '--type', choices=['service', 'package', 'message',
-                             'rpc', 'enum'], help='List a webezyio resource from specific resource type')
+                             'rpc', 'enum','extension'], help='List a webezyio resource from specific resource type')
+    parser_list.add_argument('-d', '--dependencies',action='store_true', help='List the dependencies graph for your project')
     
     """Package command"""
     
@@ -507,9 +508,12 @@ def main(args=None):
                 else:
                     config_command.display_configs(WEBEZY_JSON.path,dictionary=args.dict)
             else:
+                # List command execution
                 if hasattr(args, 'full_name'):
                     if args.full_name is None:
-                        if hasattr(args, 'type'):
+                        if args.dependencies == True:
+                            ls.list_dependencies(args.type,WEBEZY_JSON)
+                        elif hasattr(args, 'type'):
                             ls.list_by_resource(args.type,WEBEZY_JSON)
                     else:
                         ls.list_by_name(args.full_name,WEBEZY_JSON)

@@ -234,7 +234,7 @@ package_json ='{\n\
     "scripts": {\n\
         "test": "echo \\"Error: no test specified\\" && exit 1",\n\
         "lint": "eslint --ext .ts .",\n\
-        "build": "node bin/proto && rimraf clients/typescript/protos && rimraf server && tsc -b",\n\
+        "build": "node bin/proto && rimraf clients/typescript/protos && rimraf clients/typescript/index.* && rimraf server && tsc -b",\n\
         "build:webpack": "bash bin/webpack.sh",\n\
         "start": "node clients/typescript/server",\n\
         "client": "node clients/typescript/client",\n\

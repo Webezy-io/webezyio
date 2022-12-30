@@ -181,20 +181,40 @@ def generate_project(path, name, server_langauge='python', clients=[], package_n
     return project if json == False else MessageToDict(project)
 
  
-def generate_service(path, domain, name, service_language, dependencies, description=None,methods=[],extensions=None, json=False):
+def generate_service(path, domain, name, service_language, dependencies, description=None,methods=[],extensions=None, json=False,wz_json=None):
     path = path.split('/webezy.json')[0]
     # Init service
     temp_methods = []
+
     if methods:
         for m in methods:
             temp_methods.append(ParseDict(m,WebezyMethod()))
+    temp_ext = {}
+    if extensions is not None:
+        for ext in extensions:
+            if '.'.join(ext.split('.')[:3]) not in dependencies and '.'.join(ext.split('.')[:3]) != full_name:
+                depend_name = '.'.join(ext.split('.')[:3])
+                print_warning("Adding depndency {}".format(depend_name))
+                dependencies.append(depend_name)
+            if wz_json is not None:
+                pkg_path = 'protos/{}/{}.proto'.format(ext.split('.')[2],ext.split('.')[1])
+                if  wz_json.get('packages'):
+                    ext_package = wz_json.get('packages').get(pkg_path)
+                    ext_msg = next((m for m in ext_package.get('messages') if m.get('fullName') == '.'.join(ext.split('.')[:-1])),None)
+                    if ext_msg is not None:
+                        ext_field = next((f_ext for f_ext in ext_msg.get('fields') if f_ext.get('fullName') == ext),None)
+                        if ext_field is not None:
+                            temp_ext = parse_proto_extension(ext_field.get('fieldType'),ext_field.get('label'),ext_field,extensions[ext],temp_ext,wz_json=wz_json)
+            else:
+                print_error("Cannot parse extension value without context to webezy.json file !")
+                exit(1)
     service = WebezyService(uri=get_uri_service(path, name, service_language.lower()),
                                   name=name, full_name=get_service_full_name(domain, name), dependencies=dependencies,
                                   methods=temp_methods,
                                   description=description,
                                   type= ResourceTypes.service.value,
                                   version='0.0.1',
-                                  extensions=extensions)
+                                  extensions=temp_ext)
     # Init methods
     # service.methods = dependencies
 
@@ -331,6 +351,7 @@ def generate_message(path, domain, package, name, fields=[], option=UNKNOWN_WEBE
     temp_ext = None
     if extensions is not None:
         temp_ext = {}
+
         for ext in extensions:
             if '.'.join(ext.split('.')[:3]) not in package.dependencies and '.'.join(ext.split('.')[:3]) != package.package:
                 depend_name = '.'.join(ext.split('.')[:3])
@@ -348,6 +369,7 @@ def generate_message(path, domain, package, name, fields=[], option=UNKNOWN_WEBE
             else:
                 print_error("Cannot parse extension value without context to webezy.json file !")
                 exit(1)
+    
     msg = WebezyMessage(uri=msg_uri, name=name, full_name=msg_fName, fields=temp_fields, type=ResourceTypes.descriptor.value,extensions=temp_ext,
                        kind=ResourceKinds.message.value, extension_type=WebezyExtension.Name(option) if isinstance(option,int) else option, description=description)
     return msg if json == False else MessageToDict(msg)

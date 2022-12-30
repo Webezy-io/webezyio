@@ -58,7 +58,7 @@ def import_package(source,target,path,webezy_json:WZJson):
 
     else:
         dep = []
-        old_svc = webezy_json.get_service(target)
+        old_svc = webezy_json.get_service(target,wz_json=webezy_json._webezy_json)
         if old_svc is None:
             print_error(f"Service '{target}' not exists")
             exit(1)
@@ -114,7 +114,7 @@ def remove_import(source,target,path,webezy_json:WZJson):
 
     else:
         dep = []
-        old_svc = webezy_json.get_service(target)
+        old_svc = webezy_json.get_service(target,wz_json=webezy_json._webezy_json)
         if old_svc is None:
             print_error(f"Service '{target}' not exists")
             exit(1)

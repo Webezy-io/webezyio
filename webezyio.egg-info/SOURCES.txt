@@ -36,16 +36,14 @@ webezyio/builder/plugins/WebezyDocker.py
 webezyio/builder/plugins/WebezyGoClient.py
 webezyio/builder/plugins/WebezyGoServer.py
 webezyio/builder/plugins/WebezyMigrate.py
-webezyio/builder/plugins/WebezyMongo.py
 webezyio/builder/plugins/WebezyMonitor.py
 webezyio/builder/plugins/WebezyProto.py
 webezyio/builder/plugins/WebezyProxy.py
-webezyio/builder/plugins/WebezyPy.py
 webezyio/builder/plugins/WebezyPyClient.py
+webezyio/builder/plugins/WebezyPyServer.py
 webezyio/builder/plugins/WebezyReadme.py
 webezyio/builder/plugins/WebezyTsClient.py
 webezyio/builder/plugins/WebezyTsServer.py
-webezyio/builder/plugins/WebezyUnitPy.py
 webezyio/builder/plugins/WebezyWebpack.py
 webezyio/builder/plugins/__init__.py
 webezyio/builder/plugins/static.py

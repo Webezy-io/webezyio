@@ -6,12 +6,12 @@ import sys
 import pluggy
 
 from webezyio.builder.src import hookspecs, lru
-from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyGoServer, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPy, WebezyPyClient, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient,WebezyWebpack
+from webezyio.builder.plugins import WebezyBase, WebezyDocker, WebezyGoServer, WebezyMonitor, WebezyProto, WebezyProxy, WebezyPyClient, WebezyPyServer, WebezyReadme, WebezyTsClient, WebezyTsServer,WebezyGoClient,WebezyWebpack
 from webezyio.commons import file_system, helpers, resources, errors
 from webezyio.commons.pretty import print_error, print_info, print_warning
 
 # ADD MORE WELL KNOWN PLUGINS HERE
-_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPy,WebezyPyClient,WebezyTsServer,WebezyTsClient,WebezyGoServer,WebezyGoClient,WebezyWebpack,
+_WELL_KNOWN_PLUGINS = [WebezyProto, WebezyPyServer,WebezyPyClient,WebezyTsServer,WebezyTsClient,WebezyGoServer,WebezyGoClient,WebezyWebpack,
                         WebezyReadme]  # Many More To Come
 
 log = logging.getLogger('webezyio.cli.main')
@@ -30,7 +30,7 @@ class WebezyBuilder:
         
         loaded_plugins = self._pm.load_setuptools_entrypoints("webezyio")
         # print_info(importlib_metadata.distributions())
-        print_info("Loaded installed plugins: {}".format(loaded_plugins))
+        print_info("Found installed plugins: {}".format(loaded_plugins))
         if hasattr(self._configs,'plugins'):
             # If plugins array specified under `WebezyConfig.plugins` and not empty -
             # The plugins specified under project configurations will be cross-validated against the `load_setuptools_entrypoints()` values
@@ -47,9 +47,10 @@ class WebezyBuilder:
             # If `WebezyConfig.plugins` is empty array - 
             # We block the installed package to not "automaticlly" import installed packahges to avoid unattended behaviour
             else:
-                print_warning("All installed webezyio-XXX plugins will be blocked, since `WebezyConfig.plugins` array is empty")
-                for name, mod in self._pm.list_name_plugin():
-                    self._pm.set_blocked(name)
+                if loaded_plugins > 0:
+                    print_warning("All installed webezyio-XXX plugins will be blocked, since `WebezyConfig.plugins` array is empty")
+                    for name, mod in self._pm.list_name_plugin():
+                        self._pm.set_blocked(name)
 
 
         for name, mod in self._pm.list_name_plugin():
@@ -135,7 +136,7 @@ class WebezyBuilder:
 
         # Code generators plugins
         if server_lang == 'python':
-            self._pm.register(WebezyPy)
+            self._pm.register(WebezyPyServer)
         elif client_py != False:
             self._pm.register(WebezyPyClient)
            
@@ -190,77 +191,77 @@ class WebezyBuilder:
     def InitProjectStructure(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.init_project_structure` hook"""
         results = self._pm.hook.init_project_structure(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
-    def BuildServices(self):
+    def BuildServices(self,pre_build_services_data):
         """Executing the :func:`webezyio.builder.src.hookspecs.write_services` hook"""
         results = self._pm.hook.write_services(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=pre_build_services_data)
         results = list(itertools.chain(*results))
         return results
 
     def BuildProtos(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.write_protos` hook"""
         results = self._pm.hook.write_protos(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
     def CompileProtos(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.compile_protos` hook"""
         results = self._pm.hook.compile_protos(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
-    def BuildClients(self):
+    def BuildClients(self,pre_build_clients_data):
         """Executing the :func:`webezyio.builder.src.hookspecs.write_clients` hook"""
         results = self._pm.hook.write_clients(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=pre_build_clients_data)
         results = list(itertools.chain(*results))
         return results
 
-    def BuildServer(self):
+    def BuildServer(self,pre_build_data):
         """Executing the :func:`webezyio.builder.src.hookspecs.write_server` hook"""
         results = self._pm.hook.write_server(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=pre_build_data)
         results = list(itertools.chain(*results))
         return results
 
     def WriteReadme(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.write_readme` hook"""
         results = self._pm.hook.write_readme(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
     def RebuildContext(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.rebuild_context` hook"""
         results = self._pm.hook.rebuild_context(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
     def OverrideGeneratedClasses(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.override_generated_classes` hook"""
         results = self._pm.hook.override_generated_classes(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
     def PreBuild(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.pre_build` hook"""
         results = self._pm.hook.pre_build(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
     def PostBuild(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.post_build` hook"""
         results = self._pm.hook.post_build(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
@@ -276,17 +277,18 @@ class WebezyBuilder:
         results = list(itertools.chain(*results))
         return results
     
-    def BuildMongo(self):
-        """Executing the :func:`webezyio.builder.src.hookspecs.write_models` hook"""
-        results = self._plugins.hook.write_models(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+    def ProcessPlugin(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.process_plugin` hook"""
+        # print_info(self._plugins.get_hookcallers(),True)
+        results = self._pm.hook.process_plugin(
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
     def InitPackages(self):
         """Executing the :func:`webezyio.builder.src.hookspecs.init_packages` hook"""
         results = self._plugins.hook.init_packages(
-            wz_json=self._webezy_json, wz_context=self._webezy_context)
+            wz_json=self._webezy_json, wz_context=self._webezy_context,pre_data=None)
         results = list(itertools.chain(*results))
         return results
 
@@ -297,23 +299,76 @@ class WebezyBuilder:
     #     results = list(itertools.chain(*results))
     #     return results
 
+    def PreBuildServer(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.pre_build_server` hook"""
+        results = self._pm.hook.pre_build_server(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        return results
+
+    def PostBuildServer(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.post_build_server` hook"""
+        results = self._pm.hook.post_build_server(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        return results
+
+    def PostBuildServices(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.pre_build_services` hook"""
+        results = self._pm.hook.pre_build_services(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        return results
+
+    def PreBuildServices(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.post_build_services` hook"""
+        results = self._pm.hook.post_build_services(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        return results
+
+    def PreBuildClients(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.pre_build_clients` hook"""
+        results = self._pm.hook.pre_build_clients(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        return results
+
+    def PostBuildClients(self):
+        """Executing the :func:`webezyio.builder.src.hookspecs.post_build_clients` hook"""
+        results = self._pm.hook.post_build_clients(
+            wz_json=self._webezy_json, wz_context=self._webezy_context)
+        return results
+
     def BuildAll(self):
         custom_plugins = self.BuildCustomPlugins()
+
         prebuild = self.PreBuild()
         init = self.InitProjectStructure()
         context = self.RebuildContext()
+
+        """Protos hooks"""
         protos = self.BuildProtos()
-        services = self.BuildServices()
-        server = self.BuildServer()
+
+        """Services hooks"""
+        pre_services = self.PreBuildServices()
+        services = self.BuildServices(pre_services)
+        post_services = self.PostBuildServices()
+
+        """Server hooks"""
+        pre_server = self.PreBuildServer()
+        server = self.BuildServer(pre_server)
+        post_server = self.PostBuildServer()
+
         compile = self.CompileProtos()
         readme = self.WriteReadme()
         protoclass = self.OverrideGeneratedClasses()
-        clients = self.BuildClients()
+
+        """Clients hooks"""
+        pre_clients = self.PreBuildClients()
+        clients = self.BuildClients(pre_clients)
+        post_clients = self.PostBuildClients()
+
         postbuild = self.PostBuild()
 
         # package = self.PackageProject()
-        results = [prebuild, init, context, protos, services,
-                   server, compile, readme, protoclass, clients, postbuild, custom_plugins]
+        results = [prebuild, init, context, protos, (pre_services,services,post_services),
+                   (pre_server,server,post_server), compile, readme, protoclass, (pre_clients,clients,post_clients), postbuild, custom_plugins]
         return results
 
     def BuildOnlyProtos(self):
@@ -328,22 +383,37 @@ class WebezyBuilder:
 
     def BuildOnlyCode(self):
         custom_plugins = self.BuildCustomPlugins()
-        services = self.BuildServices()
-        server = self.BuildServer()
+        
+        """Services hooks"""
+        pre_services = self.PreBuildServices()
+        services = self.BuildServices(pre_services)
+        post_services = self.PostBuildServices()
+
+        """Server hooks"""
+        pre_server = self.PreBuildServer()
+        server = self.BuildServer(pre_server)
+        post_server = self.PostBuildServer()
+
         compile = self.CompileProtos()
         readme = self.WriteReadme()
         protoclass = self.OverrideGeneratedClasses()
-        clients = self.BuildClients()
+
+        """Clients hooks"""
+        pre_clients = self.PreBuildClients()
+        clients = self.BuildClients(pre_clients)
+        post_clients = self.PostBuildClients()
+
         postbuild = self.PostBuild()
         # package = self.PackageProject()
-        results = [services, server, compile, readme, protoclass, clients, postbuild, custom_plugins]
+        results = [(pre_services,services,post_services), (pre_server,server,post_server), compile, readme, protoclass, (pre_clients,clients,post_clients), postbuild, custom_plugins]
         return results
 
     def BuildCustomPlugins(self):
         init_packages = self.InitPackages()
-        mongo = self.BuildMongo()
-        # TODO add more plugins here
-        return [init_packages, mongo]
+        process = self.ProcessPlugin()
+        # TODO add more plugins hooks here
+        return [init_packages, process]
+
     @property
     def WZJson(self):
         return self._webezy_json

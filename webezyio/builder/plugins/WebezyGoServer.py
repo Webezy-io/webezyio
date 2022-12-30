@@ -35,7 +35,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
-
+    return (__name__,'OK')
 
 @builder.hookimpl
 def init_project_structure(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
@@ -129,7 +129,8 @@ _CLOSING_BRCK = '}'
 
 
 @builder.hookimpl
-def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+def write_server(wz_json: helpers.WZJson, wz_context: helpers.WZContext,pre_data):
+    pretty.print_error(pre_data,True,'pre_data')
     go_package_name = wz_json.project.get('goPackage')
     imports = ['"log"','"fmt"','"flag"','"net"','"google.golang.org/grpc"']
     services_bindings = []

@@ -18,7 +18,7 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+from collections import defaultdict
 import logging
 import os
 import re
@@ -408,14 +408,16 @@ class WZContext():
         self._files = self._webezy_context.get('files')
 
     def get_rpc(self, service, name):
-        svc = next((svc for svc in self._files if svc['file'].split(
-            '/')[-1].split('.')[0] == service), None)
-        if svc is not None:
-            for rpc in svc['methods']:
-                if rpc['name'] == name:
-                    return rpc
-        else:
-            return svc
+        svc = None
+        if self._files is not None and len(self._files) > 0:
+            svc = next((svc for svc in self._files if svc['file'].split(
+                '/')[-1].split('.')[0] == service), None)
+            if svc is not None:
+                for rpc in svc['methods']:
+                    if rpc['name'] == name:
+                        return rpc
+            else:
+                return svc
 
     def new_rpc(self,service,context, suffix='py'):
         file = next((file for file in self._files if file.get('file') == f'./services/{service}.{suffix}'),None)
@@ -434,16 +436,17 @@ class WZContext():
         rpc['type'] = 'rpc'
 
     def get_functions(self, service):
-        svc = next((svc for svc in self._files if svc['file'].split(
-            '/')[-1].split('.')[0] == service), None)
-        funcs = []
-        if svc is not None:
-            for func in svc['methods']:
-                if func['type'] != 'rpc':
-                    funcs.append(func)
-            return funcs
-        else:
-            return svc
+        if self._files is not None:
+            svc = next((svc for svc in self._files if svc['file'].split(
+                '/')[-1].split('.')[0] == service), None)
+            funcs = []
+            if svc is not None:
+                for func in svc['methods']:
+                    if func['type'] != 'rpc':
+                        funcs.append(func)
+                return funcs
+            else:
+                return svc
 
     def set_method_code(self, service, name, code):
         file = next((f for f in self._files if service in f['file']), None)
@@ -510,7 +513,7 @@ class WZJson():
         self._packages = self._webezy_json.get('packages')
         self._path = self._webezy_json.get('project').get('uri')
 
-    def get_service(self, name, json=True):
+    def get_service(self, name, json=True,wz_json=None):
         if json:
             try:
                 return self._services[name]
@@ -519,7 +522,8 @@ class WZJson():
         else:
             depend = self._services[name].get('dependencies')
             methods = self._services[name].get('methods')
-            return generate_service(self.path,self.domain,name,self.get_server_language(),depend if depend is not None else [],self._services[name].get('description'),methods if methods is not None else [])
+            extensions = self._services[name].get('extensions')
+            return generate_service(self.path,self.domain,name,self.get_server_language(),depend if depend is not None else [],self._services[name].get('description'),methods if methods is not None else [],extensions=extensions,wz_json=wz_json)
 
 
     def get_package(self, name,json=True):
@@ -560,6 +564,24 @@ class WZJson():
     def get_server_language(self):
         return self.project.get('server').get('language').lower()
 
+    
+    def get_extensions(self,extensions_type:Literal["FieldOptions","MessageOptions","ServiceOptions","FileOptions","MethodOptions"]=None):
+        extensions = []
+        if self.packages is not None:
+            for p in self.packages:
+                pkg = self.packages[p]
+                msgs = pkg.get('messages')
+                if msgs is not None:
+                    for m in msgs:
+                        ext_type = m.get('extensionType')
+                        if ext_type is not None:
+                            if extensions_type is not None and extensions_type == ext_type:
+                                extensions.append(m)
+                            else:
+                                extensions.append(m)
+        return extensions
+
+    
     def get_extended_fields(self,message_full_name:str):
         """This function should be used when trying to iterate a specific message fields options
         
@@ -601,6 +623,31 @@ class WZJson():
                     and (extension in m.get('extensions') if extension is not None else True)]
             
         return list_msgs
+
+    def get_extended_services(self,extension:str=None):
+        """This function should be used when trying to iterate a specific service options
+        
+        Args
+        ----
+            extension - Optional full name that filter the message extension accordingly must be the extension message full name
+
+        Returns
+        -------
+            A list of services under the whole project that holds an extension value
+        """
+        list_pkgs = []
+
+        for svc in self.services:
+            temp_pkg = self.services[svc]
+
+            if temp_pkg.get('extensions') is not None:
+                if extension is not None:
+                    if extension in temp_pkg.get('extensions'):
+                        list_pkgs.append(temp_pkg)
+                else:
+                    list_pkgs.append(temp_pkg)
+            
+        return list_pkgs
 
     def get_extended_packages(self,extension:str=None):
         """This function should be used when trying to iterate a specific package message options
@@ -680,7 +727,13 @@ class WZProto():
                     temp_imports.append(f'import "{imp.lower()}";')
                 else:
                     imp = imp.split('.')[1]
-                    temp_imports.append(f'import "{imp}.proto";')
+                    try:
+                        self._wz_json.get_package(imp) 
+                        temp_imports.append(f'import "{imp}.proto";')
+                    except WebezyValidationError as e:
+                        
+                        pretty.print_warning(e)
+                        pretty.print_success('Importing {} Service into {} Service'.format(self._wz_json.get_service(imp).get('name'),self._name))
 
             options = next((m for m in self._messages if m.get(
                 'extensionType') is not None), None)
@@ -715,7 +768,9 @@ class WZProto():
             if self._service.get('extensions') is not None:
                 for ext in self._service.get('extensions'):
                     ext_msg = self._wz_json.get_message('.'.join(ext.split('.')[:4]))
+                    
                     temp_svc_ext = parse_extension_to_proto('ServiceOptions',ext_msg,ext,self._service.get('extensions')[ext],self._wz_json)
+                    
                     rpcs.append(temp_svc_ext)
 
             for m in self._service.get('methods'):
@@ -888,20 +943,25 @@ class WZProto():
 class WZClientPy():
     """A helper class to write 'Python' language clients for Webezy.io project services"""
 
-    def __init__(self, project_package, services=None, packages=None, context: WZContext = None, config = None):
+    def __init__(self, project_package, services=None, packages=None, context: WZContext = None, config = None, pre_data = None):
 
         self._services = services
         self._project_package = project_package
         self._context = context
         self._packages = packages
         self._config = config
+        self._pre_data = pre_data
 
     def __str__(self):
 
         return f'{self.write_imports()}\n{self.write_client_wrapper()}\n\n\t{self.write_services_classes()}'
 
     def write_client_wrapper(self):
-        return f'\n# For available channel options in python visit https://github.com/grpc/grpc/blob/v1.46.x/include/grpc/impl/codegen/grpc_types.h\n_CHANNEL_OPTIONS = (("grpc.keepalive_permit_without_calls",1),\n\t("grpc.keepalive_time_ms",120000),\n\t("grpc.http2.min_time_between_pings_ms",120000),\n\t("grpc.keepalive_timeout_ms",20000),\n\t("grpc.http2.max_pings_without_data",0),)\n\nclass {self._project_package}:\n\n\t{self.init_wrapper()}'
+        if self._pre_data is not None:
+            client_options = self._pre_data.get('client_options')
+            client_options = '\n\t'.join(list(map(lambda opt: '("{}", {}),'.format(opt[0],opt[1]),client_options)))
+        
+        return f'\n# For available channel options in python visit https://github.com/grpc/grpc/blob/v1.46.x/include/grpc/impl/codegen/grpc_types.h\n_CHANNEL_OPTIONS = ({client_options})\n\nclass {self._project_package}:\n\n\t{self.init_wrapper()}'
 
     def init_stubs(self):
         stubs = []
@@ -922,13 +982,20 @@ class WZClientPy():
         return init_func
 
     def write_imports(self):
-        imports = ['from typing import Tuple,Iterator', 'import grpc',
+        imports = ['from typing import Tuple, Iterator, Any', 'import grpc',
                    'import sys', 'from functools import partial']
         for svc in self._services:
             imports.append(f'from . import {svc}_pb2_grpc as {svc}Service')
         for pkg in self._packages:
             pkg = pkg.split('/')[-1].split('.')[0]
             imports.append(f'from . import {pkg}_pb2 as {pkg}')
+
+        # Pre data parsing
+        if self._pre_data is not None:
+            if self._pre_data.get('imports') is not None:
+                for imp in self._pre_data.get('imports'):
+                    if imp not in imports:
+                        imports.append(imp)
 
         return '\n'.join(imports)
 
@@ -954,7 +1021,7 @@ class WZClientPy():
                     out_close_type = ']' if rpc.get('serverStreaming') is not None and rpc.get(
                         'serverStreaming') == True else ''
                     rpcs.append(
-                        f'def {rpc_name}_WithCall(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]] = ()) -> Tuple[{out_open_type}{rpc_out_type}{out_close_type}, grpc.Call]:\n\t\t"""webezyio - {description} Returns: RPC output and a call object"""\n\n\t\treturn self.{svc}Stub.{rpc_name}.with_call(request,metadata=metadata)')
+                        f'def {rpc_name}_WithCall(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]] = ()) -> Tuple[{out_open_type}{rpc_out_type}{out_close_type}, Any]:\n\t\t"""webezyio - {description} Returns: RPC output and a call object"""\n\n\t\treturn self.{svc}Stub.{rpc_name}.with_call(request,metadata=metadata)')
                     rpcs.append(
                         f'def {rpc_name}(self, request: {in_open_type}{rpc_in_type}{in_close_type}, metadata: Tuple[Tuple[str,str]] = ()) -> {out_open_type}{rpc_out_type}{out_close_type}:\n\t\t"""webezyio - {description}"""\n\n\t\treturn self.{svc}Stub.{rpc_name}(request,metadata=metadata)')
 
@@ -1115,12 +1182,13 @@ class WZServiceTs():
 class WZClientTs():
     """A helper class to write 'Typescript' language clients for Webezy.io project services"""
 
-    def __init__(self, project_package, services=None, packages=None, context: WZContext = None, config = None):
+    def __init__(self, project_package, services=None, packages=None, context: WZContext = None, config = None,pre_data=None):
         self._services = services
         self._project_package = project_package
         self._context = context
         self._packages = packages
         self._config = config
+        self._pre_data = pre_data
 
     def __str__(self):
         return f'{self.write_imports()}\n{self.write_client_wrapper()}\n\n\t{self.write_services_classes()}\n{_CLOSING_BRCK}\n{self.write_client_exports()}'
@@ -1134,16 +1202,50 @@ class WZClientTs():
         pkgs_list = ',\n\t'.join(pkgs_list)
         for key in self._services:
             clients_list.append(key+'Client')
+        
+        # Pre data parsing
+        if self._pre_data is not None:
+            if self._pre_data.get('exports') is not None:
+                for exp in self._pre_data.get('exports'):
+                    if exp not in clients_list:
+                        clients_list.append(exp)
+
         clients_list = ',\n\t'.join(clients_list)
         return f'export {_OPEN_BRCK}\n\t{pkgs_list},\n\t{clients_list}\n{_CLOSING_BRCK}' 
 
     def write_client_wrapper(self):
-        return f'const _DEFAULT_OPTION = {_OPEN_BRCK}\n\t"grpc.keepalive_time_ms": 120000,\n\t"grpc.http2.min_time_between_pings_ms": 120000,\n\t"grpc.keepalive_timeout_ms": 20000,\n\t"grpc.http2.max_pings_without_data": 0,\n\t"grpc.keepalive_permit_without_calls": 1,\n{_CLOSING_BRCK}\n\nexport class {self._project_package} {_OPEN_BRCK}\n\n\t{self.init_wrapper()}'
+        client_options = self._pre_data.get('client_options')
+        client_options = '\n\t'.join(list(map(lambda opt: '"{}": {},'.format(opt[0],opt[1]),client_options)))
+        
+        # Parsing pre data
+        before_init = ''
+        interceptors = []
+
+        if self._pre_data:
+            if self._pre_data.get('before_init') is not None:
+                before_init = self._pre_data.get('before_init')
+            if self._pre_data.get('interceptors') is not None:
+                interceptors = self._pre_data.get('interceptors')
+
+        interceptors = ', '.join(interceptors)
+        return f'\n{before_init}\nconst interceptorsProviders: Interceptor[] = [{interceptors}]\nconst _DEFAULT_OPTION = {_OPEN_BRCK}\n\t{client_options}\n{_CLOSING_BRCK}\n\nexport class {self._project_package} {_OPEN_BRCK}\n\n\t{self.init_wrapper()}'
 
     def init_stubs(self):
         stubs = []
+        temp_stubs = {}
+        if self._pre_data is not None:
+            if self._pre_data.get('stubs') is not None:
+                temp_stubs = self._pre_data.get('stubs')
+
         for svc in self._services:
-            stubs.append(f'this.{svc}_client = new {svc}Client(`${_OPEN_BRCK}this.host{_CLOSING_BRCK}:${_OPEN_BRCK}this.port{_CLOSING_BRCK}`, credentials.createInsecure(),_DEFAULT_OPTION);')
+            if svc in temp_stubs:
+                stub = temp_stubs[svc]
+                stub_target = stub.get('target') if stub.get('target') is not None else '${_OPEN_BRCK}this.host{_CLOSING_BRCK}:${_OPEN_BRCK}this.port{_CLOSING_BRCK}'
+                stub_creds = stub.get('creds') if stub.get('creds') is not None else 'credentials.createInsecure()'
+                stub_opts =  stub.get('opts') if stub.get('opts') is not None else '_DEFAULT_OPTION'
+                stubs.append(f'this.{svc}_client = new {svc}Client(`{stub_target}`, {stub_creds}, {stub_opts});')
+            else:
+                stubs.append(f'this.{svc}_client = new {svc}Client(`${_OPEN_BRCK}this.host{_CLOSING_BRCK}:${_OPEN_BRCK}this.port{_CLOSING_BRCK}`, credentials.createInsecure(),_DEFAULT_OPTION);')
 
         return '\n\t\t'.join(stubs)
 
@@ -1166,13 +1268,20 @@ class WZClientTs():
         return init_func
 
     def write_imports(self):
-        imports = ['import { credentials, Metadata, ServiceError as _service_error, ClientUnaryCall, ClientDuplexStream, ClientReadableStream, ClientWritableStream } from \'@grpc/grpc-js\';',
+        imports = ['import { credentials, Metadata, ServiceError as _service_error, ClientUnaryCall, ClientDuplexStream, ClientReadableStream, ClientWritableStream, InterceptingCall, Interceptor } from \'@grpc/grpc-js\';',
                    'import { promisify } from \'util\';','import { Observable } from \'rxjs\';']
         for svc in self._services:
             imports.append(f'import {_OPEN_BRCK} {svc}Client {_CLOSING_BRCK} from \'./protos/{svc}\'')
         for pkg in self._packages:
             pkg = pkg.split('/')[-1].split('.')[0]
             imports.append(f'import * as {pkg} from \'./protos/{pkg}\'')
+        
+        # Pre data parsing
+        if self._pre_data is not None:
+            if self._pre_data.get('imports') is not None:
+                for imp in self._pre_data.get('imports'):
+                    if imp not in imports:
+                        imports.append(imp)
 
         return '\n'.join(imports)
 
@@ -1197,15 +1306,18 @@ class WZClientTs():
                     return_type_overload = 'ClientUnaryCall' if rpc_output_type == False and rpc_input_type == False else f'ClientDuplexStream<{rpc_in_type}, {rpc_out_type}>' if rpc_output_type == True and rpc_input_type == True else f'ClientReadableStream<{rpc_out_type}>' if rpc_output_type == True and rpc_input_type == False else f'ClientWritableStream<{rpc_in_type}>' if rpc_output_type == False and rpc_input_type == True else 'any'
                     return_type = f'Promise<{rpc_out_type}>' if rpc_output_type == False else f'Observable<{rpc_out_type}>'
                     temp_rpc_name = rpc_name[0].lower() + rpc_name[1:]
-                    rpc_impl = f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\treturn promisify<{rpc_in_type}, Metadata, {rpc_out_type}>(this.{svc}_client.{temp_rpc_name}.bind(this.{svc}_client))(request, metadata);\n\t\t{_CLOSING_BRCK} else {_OPEN_BRCK}\n\t\t return this.{svc}_client.{temp_rpc_name}(request, metadata, callback);\n\t\t{_CLOSING_BRCK}' if rpc_output_type == False and rpc_input_type == False else f'return this.{svc}_client.{temp_rpc_name}(metadata);' if rpc_output_type == True and rpc_input_type == True  else f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\tcallback = (_error:_service_error | null , _response:{rpc_out_type}) => {_OPEN_BRCK}if (_error) throw _error; return _response{_CLOSING_BRCK}\n\t\t{_CLOSING_BRCK}\n\t\treturn this.{svc}_client.{temp_rpc_name}(metadata, callback);' if rpc_output_type == False and rpc_input_type == True else f'return new Observable(subscriber => {_OPEN_BRCK}\n\t\tconst stream = this.{svc}_client.{temp_rpc_name}(request, metadata);\n\t\t\tstream.on(\'data\', (res: {rpc_out_type}) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(res)\n\t\t\t{_CLOSING_BRCK}).on(\'end\', () => {_OPEN_BRCK}\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK}).on(\'error\', (err: any) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.error(err)\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK});\n\t\t{_CLOSING_BRCK})'
+                    rpc_impl = f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\treturn promisify<{rpc_in_type}, Metadata, {rpc_out_type}>(this.{svc}_client.{temp_rpc_name}.bind(this.{svc}_client))({rpc_in_type}.fromJSON(request), metadata);\n\t\t{_CLOSING_BRCK} else {_OPEN_BRCK}\n\t\t return this.{svc}_client.{temp_rpc_name}({rpc_in_type}.fromJSON(request), metadata, callback);\n\t\t{_CLOSING_BRCK}' if rpc_output_type == False and rpc_input_type == False else f'return this.{svc}_client.{temp_rpc_name}(metadata);' if rpc_output_type == True and rpc_input_type == True  else f'if (callback === undefined) {_OPEN_BRCK}\n\t\t\tcallback = (_error:_service_error | null , _response:{rpc_out_type}) => {_OPEN_BRCK}if (_error) throw _error; return _response{_CLOSING_BRCK}\n\t\t{_CLOSING_BRCK}\n\t\treturn this.{svc}_client.{temp_rpc_name}(metadata, callback);' if rpc_output_type == False and rpc_input_type == True else f'return new Observable(subscriber => {_OPEN_BRCK}\n\t\tconst stream = this.{svc}_client.{temp_rpc_name}({rpc_in_type}.fromJSON(request), metadata);\n\t\t\tstream.on(\'data\', (res: {rpc_out_type}) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.next(res)\n\t\t\t{_CLOSING_BRCK}).on(\'end\', () => {_OPEN_BRCK}\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK}).on(\'error\', (err: any) => {_OPEN_BRCK}\n\t\t\t\tsubscriber.error(err)\n\t\t\t\tsubscriber.complete()\n\t\t\t{_CLOSING_BRCK});\n\t\t{_CLOSING_BRCK})'
+                    # Client streaming
                     if rpc_output_type == False and rpc_input_type == True:
                         description = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param metadata Metadata\n\t*/'
                         rpcs.append(
                             f'\n\t{description}\n\tpublic {rpc_name}(metadata?: Metadata): {return_type};\n\tpublic {rpc_name}(metadata: Metadata, callback: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload};\n\tpublic {rpc_name}(metadata: Metadata = this.metadata, callback?: (error: _service_error | null, response: {rpc_out_type}) => void): {return_type_overload} | {return_type} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
+                    # Bidi stream
                     elif rpc_output_type == True and rpc_input_type == True:
                         description = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param request {rpc_in_type}\n\t* @param metadata Metadata\n\t*/'
                         rpcs.append(
                             f'\n\t{description}\n\tpublic {rpc_name}(metadata: Metadata = this.metadata): {return_type_overload} {_OPEN_BRCK}\n\t\t{rpc_impl}\n\t{_CLOSING_BRCK}')
+                    # Unary
                     else:
                         description_0 = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param request {rpc_in_type}\n\t* @param metadata Metadata\n\t* @returns {return_type}\n\t*/'
                         description_1 = f'/**\n\t* @method {svc}.{rpc_name}\n\t* @description {rpc_description}\n\t* @kind {rpc_type}\n\t* @param request {rpc_in_type}\n\t* @param metadata Metadata\n\t* @param callback A callback function to be excuted once the server responds with {rpc_out_type}\n\t* @returns {return_type_overload}\n\t*/'
@@ -1590,7 +1702,8 @@ def parse_extension_to_proto(
     # Handle FileOptions extensions
     if extension_type == 'FileOptions':
         if label_ext == 'repeated':
-            pass
+            pretty.print_error("Not supporting repeated FileOptions")
+            extension_value = ''
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field)
             if extension_value is not None:
@@ -1598,7 +1711,8 @@ def parse_extension_to_proto(
     
     elif extension_type == 'MessageOptions':
         if label_ext == 'repeated':
-            pass
+            pretty.print_error("Not supporting repeated MessageOptions")
+            extension_value = ''
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
             if extension_value is not None:
@@ -1606,21 +1720,29 @@ def parse_extension_to_proto(
     
     elif extension_type == 'FieldOptions':
         if label_ext == 'repeated':
-            pass
+            pretty.print_error("Not supporting repeated FieldOptions")
+            extension_value = ''
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
             if extension_value is not None:
                 extension_value = f'({ext_key}) = {extension_value}'
     elif extension_type == 'ServiceOptions':
         if label_ext == 'repeated':
-            pass
+            temp_value = []
+            for v in ext_value:
+                extension_value = parse_extension_value(type_ext,v,wz_json,extension_field,2)
+                if extension_value is not None:
+                    temp_value.append(f'option ({ext_key}) = {extension_value};')
+
+            extension_value = '\n\t'.join(temp_value)
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
             if extension_value is not None:
                 extension_value = f'option ({ext_key}) = {extension_value};'
     elif extension_type == 'MethodOptions':
         if label_ext == 'repeated':
-            pass
+            pretty.print_error("Not supporting repeated MethodOptions")
+            extension_value = ''
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field,2)
             if extension_value is not None:
@@ -1676,3 +1798,74 @@ def parse_extension_value(type,value,wz_json:WZJson,field=None,num_tabs=1):
                 value = None
 
     return value
+
+
+_WellKnowns = ['google.protobuf.Timestamp','google.protobuf.Value','google.protobuf.Any','google.protobuf.Struct']
+
+# Python class for topological sorting of a DAG
+# Class to represent a graph
+class Graph:
+    def __init__(self,nodes,dependencies:bool=False):
+        self.graph = defaultdict(list) #dictionary containing adjacency List
+        self.graph[None] = []
+
+        if dependencies:
+            for p in nodes:
+                resource_name = p.get('package') if p.get('package') is not None else p.get('name')
+                
+                if p.get('dependencies') is not None and len(p.get('dependencies')) > 0 and True not in list(map(lambda x: x not in p.get('dependencies'),_WellKnowns)):
+                    for d in p.get('dependencies'):
+                        self.addEdge(resource_name,d)
+                else:
+                    self.addEdge(resource_name,None)
+        else:   
+            for m in nodes:
+                list_of_msgs = []
+                pkgName = '.'.join(m.get('fullName').split('.')[:3])
+                for f in m.get('fields'):
+                    if f.get('messageType') is not None and  f.get('messageType') not in _WellKnowns and pkgName in f.get('messageType'):
+                        list_of_msgs.append(f.get('messageType'))
+                    
+                if len(list_of_msgs) > 0:
+                    for msg in list_of_msgs:
+                        self.addEdge(m.get('fullName'),msg)
+                else:
+                    self.addEdge(m.get('fullName'),None)
+
+    # function to add an edge to graph
+    def addEdge(self,u,v):
+        self.graph[u].append(v)
+ 
+    # A recursive function used by topologicalSort
+    def topologicalSortUtil(self,v,visited,stack):
+ 
+        # Mark the current node as visited.
+        visited[v] = True
+ 
+        # Recur for all the vertices adjacent to this vertex
+        for i in self.graph[v]:
+            if visited[i] == False:
+                self.topologicalSortUtil(i,visited,stack)
+
+        # Push current vertex to stack which stores result
+        stack.insert(0,v)
+ 
+    # The function to do Topological Sort. It uses recursive
+    # topologicalSortUtil()
+    def topologicalSort(self):
+        visited = {}
+        # Mark all the vertices as not visited
+        for k in self.graph.keys():
+            visited[k] = False
+        stack =[]
+ 
+        # Call the recursive helper function to store Topological
+        # Sort starting from all vertices one by one
+        for i in list(self.graph.keys()):
+            if visited[i] == False:
+                self.topologicalSortUtil(i,visited,stack)
+ 
+        # Print contents of stack
+        stack.remove(None)
+        return stack
+ 

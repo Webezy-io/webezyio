@@ -22,6 +22,7 @@
 import logging
 from pprint import pprint
 import webezyio
+from webezyio.cli.prompter import QCheckbox,QConfirm,QList,QText,ask_user_question
 from webezyio.architect import WebezyArchitect
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons.helpers import WZJson, WZField, WZEnumValue
@@ -75,13 +76,13 @@ def package(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
             list_depend.append(webezy_json.packages[p]['package'])
     temp_d_list = []
     if expand:
-        description = inquirer.prompt([inquirer.Text(
-            'description', 'Enter package description', '')], theme=WebezyTheme())
-        description = description.get('description')
-        dependencies = inquirer.prompt([
-            inquirer.Checkbox(
-                'dependencies', 'Choose package dependencies', choices=list_depend)
-        ], theme=WebezyTheme())
+        description = ask_user_question(questions=[QText(name='description',message='Enter package description')])
+        description = description.get('description') if description.get('description') is not None else ''
+        
+        dependencies = ask_user_question(questions=[
+                QCheckbox(name="dependencies", message="Choose package dependencies (Use arrows keys to enable disable a language)", choices=list_depend)
+            ])
+
         temp_d_list = dependencies['dependencies']
 
     if verbose:
@@ -106,11 +107,10 @@ def service(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                     print_error(
                         f"Cannot create service {svc}, package by the same name is already exists !")
                     exit(1)
-                list_depend.append(webezy_json.packages[p]['package'])
-            depend = inquirer.prompt([
-                inquirer.Checkbox(
-                    'dependencies', 'Choose service dependencies', choices=list_depend),
-            ], theme=WebezyTheme())
+                list_depend.append((webezy_json.packages[p]['package'],webezy_json.packages[p]['package']))
+            depend = ask_user_question(questions=[
+                QCheckbox(name="dependencies", message="Choose service dependencies (Use arrows keys to enable disable a language)", choices=list_depend)
+            ])
             if depend is not None:
                 list_depend = depend['dependencies']
 
@@ -194,12 +194,12 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
                             avail_msg_ext.append((f'MessageOptions | {f.name}', f.full_name))
     extend = None
     if expand:
-        extend = inquirer.prompt([inquirer.Confirm(
-            'extend', message='Do you want to extend a message?')], theme=WebezyTheme())
+        extend = ask_user_question(questions=[QConfirm(name='extend',message='Do you want to extend a message?')])
         
         if extend.get('extend'):
-            extend = inquirer.prompt([inquirer.List('extend', 'Choose message extension', choices=[WebezyExtension.Name(
-                WebezyExtension.FieldOptions), WebezyExtension.Name(WebezyExtension.MessageOptions), WebezyExtension.Name(WebezyExtension.FileOptions),WebezyExtension.Name(WebezyExtension.ServiceOptions),WebezyExtension.Name(WebezyExtension.MethodOptions)])], theme=WebezyTheme())
+            avail_options = [WebezyExtension.Name(
+                WebezyExtension.FieldOptions), WebezyExtension.Name(WebezyExtension.MessageOptions), WebezyExtension.Name(WebezyExtension.FileOptions),WebezyExtension.Name(WebezyExtension.ServiceOptions),WebezyExtension.Name(WebezyExtension.MethodOptions)]
+            extend = ask_user_question(questions=[QList(name='extend',message='Choose message extension',choices=avail_options)])
             extend = WebezyExtension.Value(extend['extend'])
         else:
             extend = None
@@ -464,6 +464,7 @@ def rpc(results, webezy_json: WZJson, architect: WebezyArchitect, expand=None, p
         svc_name = svc.split('.')[1]
         print_error(
             f'Dependencies not listed under "{svc}"\n\tTry attache first a packge to service\n\tRun: \'wz package <some.package.v1> {svc_name}\'')
+        print_warning("Try and list all available packages with `$ wz ls --type package`")
         exit(1)
 
     avail = []
@@ -493,7 +494,7 @@ def rpc(results, webezy_json: WZJson, architect: WebezyArchitect, expand=None, p
     if inputs_outputs is None:
         print_error('IN/OUT Types are required for RPC')
         exit(1)
-    architect.AddRPC(webezy_json.get_service(svc.split('.')[1], False), rpc, [
+    architect.AddRPC(webezy_json.get_service(svc.split('.')[1], False,wz_json=webezy_json._webezy_json), rpc, [
         (results['type'][0], inputs_outputs['input_type']), (results['type'][1], inputs_outputs['output_type'])], description)
     architect.Save()
     print_success(f'Success !\n\tCreated new RPC "{rpc}"')

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developing Webezy.io Projects With Typescript &mdash; webezyio 0.1.7 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands.html">Webezy CLI Commands</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html">Builder plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/languages/typescript.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developing-webezy-io-projects-with-typescript">
+<h1>Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code><a class="headerlink" href="#developing-webezy-io-projects-with-typescript" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>In this article we are going over the basic concepts of developing <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> project with <code class="docutils literal notranslate"><span class="pre">Typescript</span></code> language.</p>
+</section>
+<section id="service-side">
+<h2>Service Side<a class="headerlink" href="#service-side" title="Permalink to this heading"></a></h2>
+<p>Each <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> project is assigned with one or more <code class="docutils literal notranslate"><span class="pre">services</span></code>.
+If your “Server Language” is configured to <code class="docutils literal notranslate"><span class="pre">Typescript</span></code> - Then you should write implementation class for each <code class="docutils literal notranslate"><span class="pre">service</span></code>.
+Those Implementations will hold our core business logic for each <code class="docutils literal notranslate"><span class="pre">service</span></code> and each <code class="docutils literal notranslate"><span class="pre">RPC</span></code> of that respective <code class="docutils literal notranslate"><span class="pre">service</span></code>.</p>
+<p><strong>For ex’:</strong>
+We got a project called “Helloworld” and the project is holding “HelloService” (<code class="docutils literal notranslate"><span class="pre">service</span></code>) which have a “GetHello” (<code class="docutils literal notranslate"><span class="pre">RPC</span></code>) method.
+We first need to go to our root directory of our project and open the <code class="docutils literal notranslate"><span class="pre">./services/HelloService.ts</span></code> file which should be created at the first time you <code class="docutils literal notranslate"><span class="pre">build</span></code> the project with <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command.</p>
+<p>When our service implemantation class has been opened we can now edit the code for our “Server Side”, the class will be attached to our <code class="docutils literal notranslate"><span class="pre">server</span></code> object at start-up.</p>
+<blockquote>
+<div><p><strong>Note</strong> See <code class="docutils literal notranslate"><span class="pre">./server.ts</span></code> file to check how your services classes are beeing attached to the serving server.</p>
+</div></blockquote>
+</section>
+<section id="client-side">
+<h2>Client Side<a class="headerlink" href="#client-side" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -88,7 +88,7 @@ def parse_project_config(root_path:str,proto=False):
         if config_file is not None:
             webezy_config.MergeFrom(config_file)
         webezy_json_configs = parse_webezy_json_configs_proto(root_path)
-        print_note(f'{webezy_json_configs.host = }\n{webezy_json_configs.port = }\n{webezy_json_configs.docs = }\n{webezy_json_configs.template = }\n{webezy_json_configs.monitor = }\n{webezy_json_configs.proxy = }\n{webezy_json_configs.webezyio_templates = }\n{webezy_json_configs.first_run = }\n{webezy_json_configs.token = }\n{webezy_json_configs.analytics = }\n')
+        # print_note(f'{webezy_json_configs.host = }\n{webezy_json_configs.port = }\n{webezy_json_configs.docs = }\n{webezy_json_configs.template = }\n{webezy_json_configs.monitor = }\n{webezy_json_configs.proxy = }\n{webezy_json_configs.webezyio_templates = }\n{webezy_json_configs.first_run = }\n{webezy_json_configs.token = }\n{webezy_json_configs.analytics = }\n')
 
         if webezy_json_configs is not None:
             webezy_config.MergeFrom(webezy_json_configs)

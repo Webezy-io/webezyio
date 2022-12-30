@@ -21,7 +21,8 @@
 
 import logging
 from webezyio.commons import resources
-from webezyio.commons.pretty import print_error, print_info
+from webezyio.commons.helpers import Graph
+from webezyio.commons.pretty import print_error, print_info, print_warning
 
 from webezyio.commons.resources import get_blank_webezy_json
 from webezyio.commons.file_system import mkdir, rFile, wFile, get_current_location, join_path, check_if_file_exists
@@ -77,6 +78,7 @@ class Builder:
         resource = resource[0]
         type = resource.get('type')
         kind = resource.get('kind')
+
         if type is not None:
             if type == 'descriptors':
                 if kind == resources.ResourceKinds.message.value:
@@ -84,16 +86,28 @@ class Builder:
                     pkgname = 'protos/{0}/{1}.proto'.format(fullname.split('.')[2],fullname.split('.')[1])
                     package = webezyJson.get('packages').get(pkgname)
                     if package is not None:
+
                         index = 0
                         for m in package['messages']:
-                            if args[0] is not None:
+
+                            if args[0] is not None and args[0].get('old_name') is not None:
+
                                 if m.get('name') == args[0].get('old_name'):
                                     webezyJson['packages'][pkgname]['messages'][index] = resource
                                     break
+
                             if m.get('fullName') == resource.get('fullName'):
+                                
                                 webezyJson['packages'][pkgname]['messages'][index] = resource
-                                # removed_message = webezyJson['packages'][pkgname]['messages'][index]
-                                # webezyJson['packages'][pkgname]['messages'].remove(removed_message)
+                                try:
+                                    sort_topological = Graph(webezyJson['packages'][pkgname]['messages']).topologicalSort()
+                                    temp_messages = []
+                                    for m in sort_topological[::-1]:
+                                        temp_messages.append(next((tmpM for tmpM in webezyJson['packages'][pkgname]['messages'] if tmpM.get('fullName') == m),None))
+                                    webezyJson['packages'][pkgname]['messages'] = temp_messages
+                                except KeyError as e:
+                                    print_warning("Error while sorting the dependencies graph of package messages\n\t- If this error appeared right after making rename of message then ignore it...\n\t- Else please issue a bug report !")
+                                
                                 # webezyJson['packages'][pkgname]['messages'].insert(len(webezyJson['packages'][pkgname]['messages']), removed_message)
                                 break
                             index += 1

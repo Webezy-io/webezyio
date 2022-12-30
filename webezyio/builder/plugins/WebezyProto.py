@@ -31,6 +31,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
         print_info("Starting webezyio build process %s plugin" % (__name__))
     else:
         file_system.mkdir(file_system.join_path(wz_json.path, 'protos'))
+    return (__name__,'OK')
 
 
 @builder.hookimpl
@@ -55,6 +56,7 @@ def write_protos(wz_json: helpers.WZJson):
 
         svc_def = helpers.WZProto(svc, wz_json.services[svc].get(
             'dependencies'), wz_json.services[svc], description=wz_json.services[svc].get('description'),extensions=wz_json.services[svc].get('extensions'),wz_json=wz_json)
+        
         logging.debug(f"Writing proto file for service: {svc}")
         file_system.wFile(file_system.join_path(
             wz_json.path, 'protos', f'{svc}.proto'), svc_def.__str__(), True)

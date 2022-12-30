@@ -39,6 +39,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     logging.debug("Finished webezyio build process %s plugin" % (__name__))
+    return (__name__,'OK')
 
 
 @builder.hookimpl
