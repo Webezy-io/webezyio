@@ -91,6 +91,8 @@ import (
 func main() {
 	//Init the client
 	c := client.Default()
+	// Alternatively more advanced custom client
+	// c := client.New("localhost", 50051, []grpc.DialOption{}, []grpc.CallOption{}, metadata,MD, nil)
 
 	// Construct a message
 	msg := somePackage.SomeMessage{}

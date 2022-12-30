@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>webezyio.builder.plugins package &mdash; webezyio 0.1.6 documentation</title>
+  <title>webezyio.builder.plugins package &mdash; webezyio 0.1.8 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -36,15 +36,30 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/index.html">Commands</a></li>
+</ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="go.html">Webezy.io project using Go</a></li>
-<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JsonSchema.html">Webezy.io Json Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
 </ul>
@@ -91,8 +106,28 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyBase.post_build_clients">
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyBase.</span></span><span class="sig-name descname"><span class="pre">post_build_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyBase.post_build_clients" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyBase.post_build_server">
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyBase.</span></span><span class="sig-name descname"><span class="pre">post_build_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyBase.post_build_server" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyBase.pre_build">
 <span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyBase.</span></span><span class="sig-name descname"><span class="pre">pre_build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyBase.pre_build" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyBase.pre_build_clients">
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyBase.</span></span><span class="sig-name descname"><span class="pre">pre_build_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyBase.pre_build_clients" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyBase.pre_build_server">
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyBase.</span></span><span class="sig-name descname"><span class="pre">pre_build_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyBase.pre_build_server" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -234,63 +269,8 @@
 <dd></dd></dl>
 
 </section>
-<section id="module-webezyio.builder.plugins.WebezyPy">
-<span id="webezyio-builder-plugins-webezypy-module"></span><h2>webezyio.builder.plugins.WebezyPy module<a class="headerlink" href="#module-webezyio.builder.plugins.WebezyPy" title="Permalink to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.compile_protos">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">compile_protos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.compile_protos" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.init_context">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">init_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.init_context" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.init_project_structure">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">init_project_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.init_project_structure" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.override_generated_classes">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">override_generated_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.override_generated_classes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.parse_proto_type_to_py">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">parse_proto_type_to_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messageType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enumType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_pkg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.parse_proto_type_to_py" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.post_build">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">post_build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.post_build" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.pre_build">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">pre_build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.pre_build" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.rebuild_context">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">rebuild_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.rebuild_context" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.write_clients">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">write_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.write_clients" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.write_server">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">write_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.write_server" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPy.write_services">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPy.</span></span><span class="sig-name descname"><span class="pre">write_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPy.write_services" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="webezyio-builder-plugins-webezypy-module">
+<h2>webezyio.builder.plugins.WebezyPy module<a class="headerlink" href="#webezyio-builder-plugins-webezypy-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-webezyio.builder.plugins.WebezyPyClient">
 <span id="webezyio-builder-plugins-webezypyclient-module"></span><h2>webezyio.builder.plugins.WebezyPyClient module<a class="headerlink" href="#module-webezyio.builder.plugins.WebezyPyClient" title="Permalink to this heading"></a></h2>
@@ -326,7 +306,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyPyClient.write_clients">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPyClient.</span></span><span class="sig-name descname"><span class="pre">write_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPyClient.write_clients" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyPyClient.</span></span><span class="sig-name descname"><span class="pre">write_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyPyClient.write_clients" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -377,7 +357,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyTsClient.write_clients">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyTsClient.</span></span><span class="sig-name descname"><span class="pre">write_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyTsClient.write_clients" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyTsClient.</span></span><span class="sig-name descname"><span class="pre">write_clients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyTsClient.write_clients" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -420,7 +400,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.builder.plugins.WebezyTsServer.write_server">
-<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyTsServer.</span></span><span class="sig-name descname"><span class="pre">write_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyTsServer.write_server" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.builder.plugins.WebezyTsServer.</span></span><span class="sig-name descname"><span class="pre">write_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wz_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wz_context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZContext" title="webezyio.commons.helpers.WZContext"><span class="pre">WZContext</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.builder.plugins.WebezyTsServer.write_server" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -429,8 +409,8 @@
 <dd></dd></dl>
 
 </section>
-<section id="module-webezyio.builder.plugins.WebezyUnitPy">
-<span id="webezyio-builder-plugins-webezyunitpy-module"></span><h2>webezyio.builder.plugins.WebezyUnitPy module<a class="headerlink" href="#module-webezyio.builder.plugins.WebezyUnitPy" title="Permalink to this heading"></a></h2>
+<section id="webezyio-builder-plugins-webezyunitpy-module">
+<h2>webezyio.builder.plugins.WebezyUnitPy module<a class="headerlink" href="#webezyio-builder-plugins-webezyunitpy-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-webezyio.builder.plugins.static">
 <span id="webezyio-builder-plugins-static-module"></span><h2>webezyio.builder.plugins.static module<a class="headerlink" href="#module-webezyio.builder.plugins.static" title="Permalink to this heading"></a></h2>

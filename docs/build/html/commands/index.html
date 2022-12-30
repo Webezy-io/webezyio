@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commands &mdash; webezyio 0.1.8 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Webezy CLI Commands" href="commands.html" />
+    <link rel="prev" title="Webezy.io API Documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Commands</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/commands/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="commands">
+<h1>Commands<a class="headerlink" href="#commands" title="Permalink to this heading"></a></h1>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>positional arguments:
+<span class="o">{</span>new,n,generate,g,ls,package,edit,template,build,call,extend,run,migrate,configs<span class="o">}</span>
+                        Main modules to interact with Webezy CLI.
+    new                 Create new project
+    n                   A shortend <span class="k">for</span> new commands
+    generate            Generate resources commands
+    g                   A shortend <span class="k">for</span> generate commands
+    ls                  List resources commands
+    package             Attach a package into other services / package
+    edit                Edit any webezy.io resource
+    template            Create a template from your webezy.json / proto files directory / webezy.template.py
+    build               Build project resources
+    call                Call a RPC
+    extend              Extend any webezy.io resource
+    run                 Run server on current active project
+    migrate             Migrate existing gRPC project to Webezy.io project
+    configs             Display Webezy.io Configurations
+
+options:
+-h, --help            show this <span class="nb">help</span> message and <span class="nb">exit</span>
+-v, --version         Display webezyio current installed version
+-e, --expand          Expand optional fields <span class="k">for</span> each resource
+--loglevel <span class="o">{</span>DEBUG,DEBUG,WARNING,ERROR,CRITICAL<span class="o">}</span>
+                        Log level
+--verbose             Control on verbose logging
+-u, --undo            Undo last webezy.json modification
+-r, --redo            Redo webezy.json modification, <span class="k">if</span> undo has been made.
+--purge               Purge .webezy/contxt.json file
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-new">wz new</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-generate">wz generate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-ls">wz ls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-package">wz package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-edit">wz edit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-build">wz build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-template">wz template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-call">wz call</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-run">wz run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-migrate">wz migrate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-extend">wz extend</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Webezy.io API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="commands.html" class="btn btn-neutral float-right" title="Webezy CLI Commands" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+# WebezyGoServer
+
+`WebezyGoServer` is a core plugin for building `Go` server from `webezyio` resources configured on `webezy.json` file.
+
+## Overview
+
+`WebezyGoServer` will be registered on `Builder` plugin-manager once it detects that the project hold a server resource of type `Go`:
+
+Start a `webezyio` project and pass in the `Go` config:
+
+```sh
+$ wz new <some-project>
+
+[?] Choose server language: Python
+   Python
+   Typescript
+ ❯ Go
+```
+
+It will assign the following resource on your `webezy.json` file:
+
+```json
+{
+    "project": {
+        "server": {
+            "language" : "Go"
+        }
+    }
+}
+```
+
+
+## Generated Files
+
+On `wz build` process `WebezyGoServer` plugin will build the following files:
+
+| File 	| Description 	| Overwrite 	|
+|---	|---	|---	|
+| `server.ts` 	| The entry point for the project server <br>which registers the server configurations and all the server "Services" - <br>as 1 server can serve multiple "Micro-services" 	| **X** 	|
+| `services/<service>.ts` 	| For each "Service" resource on `webezy.json`<br>file it will build a `Typescript` file with the auto-generated code class<br>that implements the service RPC's 	| **X** 	|
+| `services/protos/<Service/Package>.ts` 	| The auto-generated compiled `Protobuf` modules 	| **V** 	|
+| `services/protos/tsconfig.ts` 	| `Typescript` configuration for compilation process 	| **X** 	|
+| `services/utils/error.ts` 	| Util class for handling `ServiceError` 	| **X** 	|
+| `bin/init-ts.sh` 	| Initialization `bash` script for compiling protos 	| **X** 	|
+
+
+## Hooks
+
+| Hook 	| Description 	|
+|---	|---	|
+| `pre_build` 	| **-** 	|
+| `post_build` 	| **-** 	|
+| `init_project_structure` 	|  	|
+| `write_services` 	| Writing services auto-generated code at `services/<service>.ts` for each "Service" resource<br>described on `webezy.json` file 	|
+| `compile_protos` 	| Running `bin/init-ts.sh` sub-process for compiling protos to `Typescript` modules 	|
+| `init_context` 	| `Deprecated` 	|
+| `rebuild_context` 	| `Deprecated` 	|
+| `write_server` 	| Writing `server.ts` file, can be injected with additional parameters incoming from<br>`pre_build_server` hook implementations - See more info on `Mini Hooks` below 	|
+
+
+## Mini Hooks
+
+
+Mini hooks can be used on `WebezyGoServer` to inject the core plugin with additional parameters combined from different `Custom Plugins` that implementing:
+
+- `pre_build_server`:
+Hook implemantation for injecting data into `write_server` hook execution.
+
+To write a custom plugin that uses `WebezyGoServer` see more information on [Writing Custom Plugin](../custom_plugins.md)
+
+Main hook: `webezyio.builder.plugins.WebezyGoServer`
+
+| Mini Hook 	| Description 	| Parameters 	|
+|---	|---	|---	|
+| `write_server():overwrite` 	| To overwrite `server.ts` generation every build 	| **Boolean**<br>Default: `false` 	|
+| `write_server():append_imports` 	| Add more imports to `server.ts` module 	| **List[String]**<br>Default: [] 	|
+| `write_server():add_before_init` 	| Add code block before server startup 	| **String**<br>Default: "" 	|
+| `write_server():inject_service` 	| Inject a dependency to service class implementation.<br>Should pass a `dict` value that the service name is the `key`<br>and the `value` is the injected object into `someService(SomeDependency)` 	| **Dict[String, String]**<br>Default: {} 	|
+| `write_server():append_startup_promise` 	| Add additional promise function before server startup 	| **List[String]**<br>Default: [] 	|
+| `write_server():append_server_options` 	| Append additional server channel options 	| **List[Tuple[String, Any]]**<br>Default: [] 	|

@@ -3,11 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to webezyio's documentation!
+Webezy.io API Documentation
 ====================================
 
 Overview
 ********
+
 webezyio is free and open-source project that aims to be a complete framework for developing micro-services projects.
 The underlying communication protocol is `HTTP2`_ and for serialization and deserialization is `protobuf`_.
 It utulize those communication protocol, message serialization / deserialization and code generator with `gRPC`_ opensource project by google. 
@@ -34,9 +35,11 @@ Usage
 ******
 Write webezy.io projects with Package API or with CLI.
 
-====
-CLI
-====
+.. toctree::
+   :maxdepth: 3
+
+   commands/index
+
 
 Start a new project
 -------------------
@@ -59,6 +62,53 @@ Continue developing your project packages and services:
     wz generate --package
 
 
+Tutorials
+=======
+
+.. toctree::
+   :maxdepth: 2
+
+   toturials/index
+
+
+Concepts
+=======
+
+.. toctree::
+   :maxdepth: 2
+
+   concepts/index
+   production/index
+
+
+Languages
+=======
+
+.. toctree::
+   :maxdepth: 2
+
+   languages/index
+
+Protobuf
+=======
+
+.. toctree::
+   :maxdepth: 2
+
+   protobuf/index
+
+
+Plugins
+=======
+
+.. toctree::
+   :maxdepth: 3
+
+   plugins/index
+
+
+
+
 .. _gRPC: https://grpc.io/
 .. _protobuf: https://developers.google.com/protocol-buffers/docs/pythontutorial
 .. _HTTP2: https://en.wikipedia.org/wiki/HTTP/2
@@ -69,17 +119,11 @@ Continue developing your project packages and services:
    :maxdepth: 4
    :caption: Contents:
 
-   commands
-   webezyio_concepts
-   go
-   typescript
    templating
-   builder_api
    custom_configurations
    JsonSchema
    vscode_webezyio
    contirbuting
-
 
 
 Indices and tables

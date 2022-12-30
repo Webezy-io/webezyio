@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Understanding Webezy.io &mdash; webezyio 0.1.8 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Service Oriented Architecture" href="soa.html" />
+    <link rel="prev" title="Concepts" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../toturials/index.html">Tutorials</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Concepts</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Understanding Webezy.io</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sub-modules">Sub-modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#project-structure">Project Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="soa.html">Service Oriented Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Concepts</a></li>
+      <li class="breadcrumb-item active">Understanding Webezy.io</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/concepts/webezyio_concepts.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="understanding-webezy-io">
+<h1>Understanding Webezy.io<a class="headerlink" href="#understanding-webezy-io" title="Permalink to this heading"></a></h1>
+<p>While it is not nesscesary step to get you started we do recommend to invest few minutes to read an overview of how <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Built and utulizing gRPC, this high level overview will make you approach some scenarios more easly.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>Webezy.io is a <strong>free</strong> open-source framework for gRPC.</p>
+<p>We provide a <strong>complete</strong> sets of tools that will help developers creating distributed-systems using the latest <strong>“Battle Tested”</strong> tech available.</p>
+<p>The magic of Webezy.io is that we are utulizing another open-source project called
+<strong><a class="reference external" href="https://grpc.io/"><code class="docutils literal notranslate"><span class="pre">gRPC</span></code></a></strong> - This google based project has been developed to make use of
+<code class="docutils literal notranslate"><span class="pre">HTTP2</span></code> (the newer web protocol) and <code class="docutils literal notranslate"><span class="pre">Protobufers</span></code> togther to overcome some of the most <strong>challenging</strong> topics
+<strong>web and backend developers</strong> encountring <strong>daily</strong>, such as:</p>
+<ul class="simple">
+<li><p>Desrialization / Serialization</p></li>
+<li><p>Streaming (WS)</p></li>
+<li><p>Multi Language Services</p></li>
+<li><p>Schema Evolution Compatibility</p></li>
+<li><p>HTTP Headers Overhead
+And many more!</p></li>
+</ul>
+</section>
+<section id="sub-modules">
+<h2>Sub-modules<a class="headerlink" href="#sub-modules" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>builder - A command-pattern module for easy interacting with webezy.json</p></li>
+<li><p>cli - A CLI interface module for webezy</p></li>
+<li><p>coder - A pluggable API for all code generating methods</p></li>
+<li><p>commons - Common modules and methods, such as retrieving and modifying protos</p></li>
+</ul>
+</section>
+<section id="project-structure">
+<h2>Project Structure<a class="headerlink" href="#project-structure" title="Permalink to this heading"></a></h2>
+<p>Every webezy.io project should look like the following schema:</p>
+<blockquote>
+<div><p><strong>Note</strong> For simplicity we use for this example 1 service (<code class="docutils literal notranslate"><span class="pre">SampleService</span></code>) and 1 package (<code class="docutils literal notranslate"><span class="pre">SamplePackage</span></code>)</p>
+</div></blockquote>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Root dir of your project</span>
+my-project/
+├─ bin/ <span class="c1"># Some executable scripts</span>
+├─ clients/ <span class="c1"># All clients code in multiple languages if specified</span>
+│  ├─ python/
+│     ├─ client.py
+├─ server/ <span class="c1"># Server file</span>
+│  ├─ server.py
+├─ protos/ <span class="c1"># Proto defintions files</span>
+│  ├─ SampleService.proto
+│  ├─ Samplepackage.proto
+├─ service/ <span class="c1"># Service file and protos compiled files</span>
+│  ├─ protos/
+│  │  ├─ SampleService_pb2.py
+│  │  ├─ SampleService_pb2_grpc.py
+│  │  ├─ SamplePackage_pb2.py
+│  │  ├─ SamplePackage_pb2_grpc.py
+│  ├─ SampleService.py
+├─ webezy.json <span class="c1"># All project resource descriptions</span>
+├─ README.md
+├─ .gitignore
+</pre></div>
+</div>
+<p>The main compoenent is the <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file which conssisting of all project resources and metadata.</p>
+<p>This “Snapshot” of current project state is confined into well structerd json format based on its proto message definition at <code class="docutils literal notranslate"><span class="pre">webezyio.commons.protos.webezy_pb2.py</span></code>.</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="kd">message</span><span class="w"> </span><span class="nc">WebezyJson</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="na">domain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Project</span><span class="w"> </span><span class="na">project</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="n">map</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="n">ServiceDescriptor</span><span class="p">&gt;</span><span class="w"> </span><span class="na">services</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">    </span><span class="n">map</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="n">PackageDescriptor</span><span class="p">&gt;</span><span class="w"> </span><span class="na">packages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">    </span><span class="n">WebezyConfig</span><span class="w"> </span><span class="na">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Note</strong> See how we utulized protobuffers as main serialization and desrialization in our CLI and core modules</p>
+</div></blockquote>
+<p>This Json document mainly connsist of 4 components:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">project</span></code> - All project specific metadata this data is only to be consumed by internal Webezy.io CLI and modules.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config</span></code> - Open metadata for various tasks as one of them is to give plugins and other external modules to have context point.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">packages</span></code> - gRPC driven component for all packages which are centralized place for <code class="docutils literal notranslate"><span class="pre">Enums</span></code> and <code class="docutils literal notranslate"><span class="pre">Messages</span></code> under so called “Package” compoenent to be consumed by a “Service”.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">services</span></code> - gRPC driven component for all Services which holds details on RPC’s, and Service dependencies which are “Packages” that hold “Messages” that relate to RPC’s input and output types.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Concepts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="soa.html" class="btn btn-neutral float-right" title="Service Oriented Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

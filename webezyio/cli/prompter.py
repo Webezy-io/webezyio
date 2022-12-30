@@ -91,7 +91,7 @@ class QConfirm:
         color: The message color if needed extra customizations, can be passed with "danger" | "warning" - red color or yellow
     """
 
-    def __init__(self, name:str, message:str, default:bool, validate=None,ignore=None,color:user_message_color=None) -> None:
+    def __init__(self, name:str, message:str, default:bool=False, validate=None,ignore=None,color:user_message_color=None) -> None:
 
         self.name = name
         self.message = message

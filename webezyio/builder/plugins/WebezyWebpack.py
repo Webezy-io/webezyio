@@ -42,6 +42,7 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     subprocess.run(['npm', 'install'])
     # subprocess.run(['go mod init',_format_go_package_name(wz_json.project.get('goPackage'))])
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
+    return (__name__,'OK')
 
 
 @builder.hookimpl

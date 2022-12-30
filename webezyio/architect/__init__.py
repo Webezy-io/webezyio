@@ -23,7 +23,7 @@ from enum import Enum
 import logging
 from webezyio.commons.errors import WebezyProtoError
 from webezyio.commons.file_system import join_path
-from webezyio.commons.pretty import print_info, print_note
+from webezyio.commons.pretty import print_error, print_info, print_note
 
 from webezyio.commons.protos import WebezyLanguage, python, go, typescript,WebezyProject
 from google.protobuf.json_format import MessageToDict
@@ -90,8 +90,8 @@ class WebezyArchitect():
         pass
 
     def AddService(self,name,dependencies,description,methods,extensions=None):
-        dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,extensions=extensions,json=True,methods=methods) 
-        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,extensions=extensions,methods=methods)
+        dict = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,extensions=extensions,json=True,methods=methods,wz_json=self._webezy.webezyJson) 
+        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,extensions=extensions,methods=methods,wz_json=self._webezy.webezyJson)
         services = self._webezy.webezyJson.get('services') if self._webezy.webezyJson.get('services') is not None else {} 
         services[name] = dict
         self._webezy.execute(CommandMap._ADD_RESOURCE,{'services': services })
@@ -136,7 +136,7 @@ class WebezyArchitect():
         return enum
 
     def EditService(self,name,dependencies,description,methods,extensions=None):
-        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,methods=methods,extensions=extensions)
+        service = generate_service(self._path,self._domain,name,self._webezy.webezyJson.get('project')['server']['language'],dependencies=dependencies,description=description,methods=methods,extensions=extensions,wz_json=self._webezy.webezyJson)
         self._webezy.execute(CommandMap._EDIT_RESOURCE,MessageToDict(service))
         return service
 

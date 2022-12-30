@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What is protobuf? &mdash; webezyio 0.1.8 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Well Known Types" href="well_known.html" />
+    <link rel="prev" title="Extensions in Webezy.io" href="extensions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../languages/index.html">Languages</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Protocol Buffer</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="extensions.html">Extensions in Webezy.io</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">What is <code class="docutils literal notranslate"><span class="pre">protobuf</span></code>?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#syntax">Syntax</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#python"><code class="docutils literal notranslate"><span class="pre">Python</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#typescript"><code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#go"><code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="well_known.html">Well Known Types</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Protocol Buffer</a></li>
+      <li class="breadcrumb-item active">What is <code class="docutils literal notranslate"><span class="pre">protobuf</span></code>?</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/protobuf/overview.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="what-is-protobuf">
+<h1>What is <code class="docutils literal notranslate"><span class="pre">protobuf</span></code>?<a class="headerlink" href="#what-is-protobuf" title="Permalink to this heading"></a></h1>
+<p>Protocol buffers, also known as <code class="docutils literal notranslate"><span class="pre">protobuf</span></code>, are a data serialization format developed by Google. They are a compact and efficient way to encode structured data for communication between systems, or for storing data in a compact and efficient manner.</p>
+<p>Protocol buffers consist of a language- and platform-neutral schema to define the structure of the data, and code generated based on the schema to easily read and write the data in a variety of programming languages. This allows systems written in different languages to exchange data efficiently, without the need for manual parsing and serialization of data.</p>
+<p>Protocol buffers are used in a variety of applications, including for communication between microservices, for storing data in databases, and for serializing data for storage or transmission over a network. They are designed to be fast, flexible, and simple to use, making them a popular choice for many developers.</p>
+<section id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Protocol</span> <span class="pre">Buffer</span></code> is language-neutral, platform-neutral, extensible mechanism for serializing structured data, when we define our messages that both the services and clients of our project will know of, we define it in <code class="docutils literal notranslate"><span class="pre">.proto</span></code> files as in the following e.x:</p>
+<p><code class="docutils literal notranslate"><span class="pre">y.proto</span></code></p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="k">syntax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;proto3&quot;</span><span class="p">;</span>
+
+<span class="kn">package</span><span class="w"> </span><span class="nn">x</span><span class="o">.</span><span class="n">y.z</span><span class="p">;</span>
+
+<span class="kd">message</span><span class="w"> </span><span class="nc">Test</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">string</span><span class="w"> </span><span class="na">hello</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Thie small definition will be compiled to the following languages as:</p>
+<section id="python">
+<h3><code class="docutils literal notranslate"><span class="pre">Python</span></code><a class="headerlink" href="#python" title="Permalink to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">y_pb2</span> <span class="k">as</span> <span class="nn">y</span>
+
+<span class="n">test</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">Test</span><span class="p">(</span><span class="n">hello</span><span class="o">=</span><span class="s2">&quot;World !&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">test</span><span class="p">))</span>
+
+<span class="c1"># Output: &lt;class &#39;y_pb2.Test&#39;&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="typescript">
+<h3><code class="docutils literal notranslate"><span class="pre">Typescript</span></code><a class="headerlink" href="#typescript" title="Permalink to this heading"></a></h3>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Test</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;y&#39;</span><span class="p">;</span><span class="w"></span>
+
+<span class="kd">let</span><span class="w"> </span><span class="nx">test</span><span class="o">:</span><span class="w"> </span><span class="kt">Test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">hello</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;World !&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="go">
+<h3><code class="docutils literal notranslate"><span class="pre">Go</span></code><a class="headerlink" href="#go" title="Permalink to this heading"></a></h3>
+<div class="highlight-go notranslate"><div class="highlight"><pre><span></span><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w"></span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="s">&quot;y&quot;</span><span class="w"></span>
+<span class="p">)</span><span class="w"></span>
+
+<span class="kd">var</span><span class="w"> </span><span class="nx">test</span><span class="w"> </span><span class="o">&amp;</span><span class="nx">y</span><span class="p">.</span><span class="nx">Test</span><span class="w"></span>
+<span class="nx">test</span><span class="p">{</span><span class="nx">Hello</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;World !&quot;</span><span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="extensions.html" class="btn btn-neutral float-left" title="Extensions in Webezy.io" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="well_known.html" class="btn btn-neutral float-right" title="Well Known Types" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 from pprint import pprint
 from webezyio import WebezyArchitect, _helpers, _resources
-from webezyio import WebezyBuilder, WebezyPy, WebezyTs, WebezyProto, WebezyBase
-from webezyio.commons.protos.webezy_pb2 import Language
+from webezyio import WebezyBuilder, WebezyPyServer, WebezyTsServer, WebezyProto, WebezyBase
+from webezyio.commons.protos import WebezyLanguage
 
 """
 Webezy Builder - Programaticlly build Webezy.io projects
@@ -68,7 +68,7 @@ _PATH = "/Users/amitshmulevitch/Projects/wz/webezyio/webezyio/tests/blank/webezy
 # The project name
 _PROJECT_NAME = "TEST-PROJECT"
 # The project server langugae (only 1 server per project - all services impl. should be in same langugae)
-_SERVER_LANGUAGE = Language.python
+_SERVER_LANGUAGE = WebezyLanguage.python
 # The project server host and port
 _HOST = 'localhost'
 _PORT = 50051
@@ -177,7 +177,7 @@ def main():
     ARCHITECT = WebezyArchitect(
         path=_PATH, domain=_DOMAIN, project_name=_PROJECT_NAME)
     # Init Project
-    ARCHITECT.AddProject(server_language=Language.Name(_SERVER_LANGUAGE), clients=[])
+    ARCHITECT.AddProject(server_language=WebezyLanguage.Name(_SERVER_LANGUAGE), clients=[])
 
     # Configs
     ARCHITECT.SetConfig({'host': _HOST, 'port': _PORT})

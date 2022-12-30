@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Builder plugins &mdash; webezyio 0.1.6 documentation</title>
+  <title>Builder plugins &mdash; webezyio 0.1.7 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -47,7 +47,10 @@
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Builder plugins</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#write-custom-plugin">Write Custom Plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#what-plugins-should-do">What Plugins Should do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="JsonSchema.html">Webezy.io Json Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contirbuting.html">Contributing</a></li>
 </ul>
@@ -79,11 +82,16 @@
   <section id="builder-plugins">
 <h1>Builder plugins<a class="headerlink" href="#builder-plugins" title="Permalink to this heading"></a></h1>
 <p>Webezy.io allows developer to create thier own modules that inherit from <code class="docutils literal notranslate"><span class="pre">webezyio.builder</span></code> class, this small modules can be activate on specific hooks and mainly in use with building the proto files, code files and project structure as general.</p>
-<p>As you may have noted webezyio has it’s <code class="docutils literal notranslate"><span class="pre">Architect</span></code> class an <code class="docutils literal notranslate"><span class="pre">Builder</span></code> class which responsible as thier names applies - <strong>Design and bring some feel to the project (<code class="docutils literal notranslate"><span class="pre">Architect</span></code>) \ To construct in reality from the highlevel reprepresentationresntation of resource, to actual working code (<code class="docutils literal notranslate"><span class="pre">Builder</span></code>)</strong></p>
+<p>As you may have noted webezyio has it’s <code class="docutils literal notranslate"><span class="pre">Architect</span></code> class an <code class="docutils literal notranslate"><span class="pre">Builder</span></code> class which responsible as thier names applies -</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="webezyio.architect.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">Architect</span></code></span></a> <strong>High-Level Design of project</strong></p></li>
+<li><p><a class="reference internal" href="webezyio.builder.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">Builder</span></code></span></a> <strong>The “real” processor of resources <code class="docutils literal notranslate"><span class="pre">Architect</span></code> defined to actual working code</strong></p></li>
+</ul>
 <p>While currently <code class="docutils literal notranslate"><span class="pre">Architect</span></code> plugins are not supported (But we do plan to open this module as well).</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Builder</span></code> Class has been created in plug and play concept for easier and more granluar modules which can be dropped or added without affectively changing how Webezy.io CLI works.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Builder</span></code> Class has been created in “Plug &amp; Play” concept for easier dev workflows and more granluar modules which can be dropped or added without making breeaking changes.</p>
+<p>Additionaly custom plugins can be incorporated in <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> projects with well defined <code class="docutils literal notranslate"><span class="pre">hooks</span></code> that the builder register and execute on <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command.</p>
 <p>This feature allows you as the developer to further enrich you project creating process with custom files, modules or even changing the projec structure itself to your demands and needs.</p>
-<p><span class="xref myst">See plugins directory for examples</span></p>
+<p>See plugins directory for examples - <code class="docutils literal notranslate"><span class="pre">webezyio/builder/src/plugins</span></code></p>
 </section>
 <section id="write-custom-plugin">
 <h1>Write Custom Plugin<a class="headerlink" href="#write-custom-plugin" title="Permalink to this heading"></a></h1>
@@ -91,8 +99,17 @@
 <p>You can write as a <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> developer a custom plugin that will be hooked to <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> project, the plugin should interact with <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file with well-defined utils and helpers.
 The main modules you will interact with when writing a <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugin are:</p>
 <ul class="simple">
-<li><p>:func:<code class="docutils literal notranslate"><span class="pre">~webezyio.builder</span></code></p></li>
+<li><p><a class="reference internal" href="webezyio.builder.html"><span class="doc std std-doc">Builder</span></a> - Use the <code class="docutils literal notranslate"><span class="pre">webezyio.builder.hookimpl</span></code> as the decorator for your hook implemeantations</p></li>
+<li><p><a class="reference internal" href="webezyio.commons.html"><span class="doc std std-doc">WZJson</span></a> - A wrapper class to easy interactions with webezy.json</p></li>
 </ul>
+</section>
+<section id="what-plugins-shouldn-t-do">
+<h1>What Plugins Shouldn’t do<a class="headerlink" href="#what-plugins-shouldn-t-do" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugins <strong>MUST</strong> not modify existing resource on project it should only parse the project resources and metadata from <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> by <code class="docutils literal notranslate"><span class="pre">webezyio.commons.helpers.WZJson</span></code> interface and add functionality for the project like additional modules and code files to be auto-generated.</p>
+</section>
+<section id="what-plugins-should-do">
+<h1>What Plugins Should do<a class="headerlink" href="#what-plugins-should-do" title="Permalink to this heading"></a></h1>
+<p>The main power of <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> plugins is at the project extensions and configurations, you can extend the <code class="docutils literal notranslate"><span class="pre">protobuf</span></code> own functionality with <a class="reference internal" href="extensions.html"><span class="doc std std-doc"><code class="docutils literal notranslate"><span class="pre">Custom</span> <span class="pre">Options</span></code></span></a> later after adding the extensions to you resources you can apply additional functionality that reuqires some dynamic user input from the extensions.</p>
 <p>All plugins should be written in <code class="docutils literal notranslate"><span class="pre">Python</span></code> and should have the following structure at-least:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Root dir of your project must prefixed with `webezyio-`</span>
 webezyio-my-plugin/
@@ -101,7 +118,56 @@ webezyio-my-plugin/
 ├─ setup.py
 </pre></div>
 </div>
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span>
+<p>The setup script for the plugin must include <code class="docutils literal notranslate"><span class="pre">entry_points</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> this how <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> core module install and register a plugins that installed on the same <code class="docutils literal notranslate"><span class="pre">venv</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">setup.py</span></code></p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;webezyio-my-plugin&quot;</span><span class="p">,</span>
+    <span class="n">install_requires</span><span class="o">=</span><span class="s2">&quot;webezyio&quot;</span><span class="p">,</span>
+    <span class="n">entry_points</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;webezyio&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;my_plugin = webezyio_my_plugin&quot;</span><span class="p">]},</span>
+    <span class="n">py_modules</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;webezyio_my_plugin&quot;</span><span class="p">],</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;0.0.1&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Write the hooks implmeantations, see <a class="reference internal" href="webezyio.builder.src.html"><span class="doc std std-doc">Hookspecs</span></a> for all the available hooks that will be executed at <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command</p>
+<p><code class="docutils literal notranslate"><span class="pre">webezyio_my_plugin.py</span></code></p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">webezyio.builder</span> <span class="kn">import</span> <span class="n">hookimpl</span>
+<span class="kn">from</span> <span class="nn">webezyio.commons.helpers</span> <span class="kn">import</span> <span class="n">WZContext</span><span class="p">,</span> <span class="n">WZJson</span>
+
+<span class="nd">@hookimpl</span>
+<span class="k">def</span> <span class="nf">pre_build</span><span class="p">(</span><span class="n">wz_json</span><span class="p">:</span> <span class="n">WZJson</span><span class="p">,</span> <span class="n">wz_context</span><span class="p">:</span> <span class="n">WZContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Here the caller expects us to return a list.&quot;&quot;&quot;</span>
+    <span class="n">print_info</span><span class="p">(</span><span class="s2">&quot;Starting webezyio build process </span><span class="si">%s</span><span class="s2"> plugin&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+
+<span class="nd">@hookimpl</span>
+<span class="k">def</span> <span class="nf">post_build</span><span class="p">(</span><span class="n">wz_json</span><span class="p">:</span> <span class="n">WZJson</span><span class="p">,</span> <span class="n">wz_context</span><span class="p">:</span> <span class="n">WZContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Here the caller passes a mutable object, so we mess with it directly.&quot;&quot;&quot;</span>
+    <span class="n">print_success</span><span class="p">(</span><span class="s2">&quot;Finished webezyio build process </span><span class="si">%s</span><span class="s2"> plugin&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Install the plugin with <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install -e .
+</pre></div>
+</div>
+<p>Now add the plugin name to your own <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file under <code class="docutils literal notranslate"><span class="pre">config</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">plugins</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;plugins&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;webezyio-my-plugin&quot;</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>After succesfull packaging and installation of your new plugin <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> should recognize it by the <code class="docutils literal notranslate"><span class="pre">entry_points</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> at <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command execution and will execute all the registered hooks that the plugin implement.</p>
+<p>On <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> command you should see the following log for your plugin registering -</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>*<span class="o">]</span> Loaded installed plugins: <span class="m">1</span>
+<span class="o">[</span>*<span class="o">]</span> Registering plugin -&gt; my_plugin
+<span class="o">[</span>*<span class="o">]</span> Loaded Plugin -&gt; my_plugin
+---------------------------------------------
+<span class="s1">&#39;webezyio_my_plugin&#39;</span>
+---------------------------------------------
 </pre></div>
 </div>
 </section>

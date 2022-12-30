@@ -24,7 +24,7 @@ import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources, pretty
 from webezyio.builder.plugins.static import gitignore_ts,package_json,bash_init_script_ts,protos_compile_script_ts,main_ts_config_client_only,protos_ts_config_client_only
-
+import inspect
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
@@ -44,9 +44,15 @@ def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
             file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
             file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
     
+    if file_system.check_if_dir_exists(file_system.join_path(wz_json.path,'clients', 'typescript','utils')) == False:
+        file_system.mkdir(file_system.join_path(wz_json.path,'clients', 'typescript','utils'))
+
+    file_system.cpDir(file_system.join_path(wz_json.path,'server','services','utils'),file_system.join_path(wz_json.path,'clients','typescript','utils'))
+
     # file_system.cpDir(file_system.join_path(wz_json.path,'server','services','p'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
     
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
+    return (__name__,'OK')
 
 
 @builder.hookimpl
@@ -97,7 +103,67 @@ def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
             wz_json.path, 'bin', 'init-ts.sh')])
 
 @builder.hookimpl
-def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext,pre_data):
+    imports = []
+    exports = []
+    override_stubs = {}
+    before_init = ''
+    interceptors = []
+    client_options = [
+        ("grpc.keepalive_time_ms", 120000),
+        ("grpc.http2.min_time_between_pings_ms",120000),
+        ("grpc.keepalive_timeout_ms",20000),
+        ("grpc.http2.max_pings_without_data",0),
+        ("grpc.keepalive_permit_without_calls",1),
+        ("interceptors","interceptorsProviders")
+    ]
+    """Parse pre data"""
+    if pre_data:
+        _hook_name = inspect.stack()[0][3]
+        for mini_hooks in pre_data:
+            for hook in mini_hooks:
+                if __name__ == hook.split(':')[0]:
+                    if hook.split(':')[2] is not None and _hook_name == hook.split(':')[1].replace('()',''):
+                        
+                         # Append to exports
+                        if 'append_imports' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for imp in mini_hooks[hook]:
+                                    imports.append(imp)
+
+                        # Append to exports
+                        elif 'append_exports' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for exp in mini_hooks[hook]:
+                                    exports.append(exp)
+                    
+                        # Append to exports
+                        elif 'override_stubs' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for stub in mini_hooks[hook]:
+                                    override_stubs[stub] = mini_hooks[hook][stub]
+
+                        elif 'append_client_options' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for k,v in mini_hooks[hook]:
+                                    old_value = next((i for i in client_options if i[0] == k),(None,None))[1]
+                                    if k not in list(map(lambda x: x[0], client_options)):
+                                        client_options.append((k,v))
+                                    elif v != old_value:
+                                        client_options.remove((k,old_value))
+                                        client_options.append((k,v))
+                        elif 'add_before_init' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                before_init = mini_hooks[hook]
+
+                        elif 'append_interceptors' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for intrcpt in mini_hooks[hook]:
+                                    interceptors.append(intrcpt)
+                    else:
+                        pretty.print_warning(f'[{__name__}] `{hook}` missing command')
+
+
     if file_system.check_if_dir_exists(file_system.join_path(wz_json.path,'clients','typescript')):
         file_system.mkdir(file_system.join_path(wz_json.path,'clients','typescript','protos'))
     else:
@@ -112,6 +178,13 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
             file_system.cpDir(file_system.join_path(wz_json.path, 'server','services','protos','google'),file_system.join_path(wz_json.path, 'clients','typescript','protos','google'))
 
     client = helpers.WZClientTs(wz_json.project.get(
-        'packageName'), wz_json.services, wz_json.packages, wz_context)
+        'packageName'), wz_json.services, wz_json.packages, wz_context,pre_data={
+            'imports': imports,
+            'exports': exports,
+            'stubs': override_stubs,
+            'client_options': client_options,
+            'before_init':before_init,
+            'interceptors': interceptors
+        })
     file_system.wFile(file_system.join_path(
         wz_json.path, 'services', 'index.ts'), client.__str__(), overwrite=True)

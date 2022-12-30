@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Well Known Types &mdash; webezyio 0.1.8 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plugins" href="../plugins/index.html" />
+    <link rel="prev" title="What is protobuf?" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Commands</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../languages/index.html">Languages</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Protocol Buffer</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="extensions.html">Extensions in Webezy.io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html">What is <code class="docutils literal notranslate"><span class="pre">protobuf</span></code>?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Well Known Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#import-well-known-package-into-webezy-io-project-resource">Import “Well-Known” Package Into <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Project Resource</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-well-known-type">Use “Well-Known” Type</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Protocol Buffer</a></li>
+      <li class="breadcrumb-item active">Well Known Types</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/protobuf/well_known.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="well-known-types">
+<h1>Well Known Types<a class="headerlink" href="#well-known-types" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">Protobuf</span></code> introduced a set of “well-known” message types taht can be imported in any <code class="docutils literal notranslate"><span class="pre">.proto</span></code> file, those messages can save you to configure some already well structured messages that can become in handy.</p>
+<p>Some of the supported “Well-knowns” in <code class="docutils literal notranslate"><span class="pre">webezy.io</span></code> projects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">google.protobuf.Timestamp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">google.protobuf.Struct</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">google.protobuf.Value</span></code></p></li>
+</ul>
+<p>To be supported:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">google.protobuf.Any</span></code></p></li>
+</ul>
+<section id="import-well-known-package-into-webezy-io-project-resource">
+<h2>Import “Well-Known” Package Into <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Project Resource<a class="headerlink" href="#import-well-known-package-into-webezy-io-project-resource" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> CLI provide easy way to import packages into your <code class="docutils literal notranslate"><span class="pre">Services</span></code> and <code class="docutils literal notranslate"><span class="pre">Packages</span></code>, Use the CLI command <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">package</span> <span class="pre">&lt;need.to.import&gt;</span> <span class="pre">&lt;target&gt;</span></code>.</p>
+<p>The convention names are as follow consider we have a package by the full name : <code class="docutils literal notranslate"><span class="pre">domain.package.v1</span></code> we then want to use the prebuilt message <code class="docutils literal notranslate"><span class="pre">Timestamp</span></code> we need first to import it’s package to where we want tu use it (<code class="docutils literal notranslate"><span class="pre">domain.package.v1</span></code>) by running the following command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ wz package google.protobuf.Timestamp domain.package.v1
+
+<span class="o">[</span>*<span class="o">]</span> Attaching package <span class="s1">&#39;google.protobuf.Timestamp&#39;</span> -&gt; <span class="s1">&#39;domain.package.v1&#39;</span> package
+</pre></div>
+</div>
+<p>In the same way if we want later to import our <code class="docutils literal notranslate"><span class="pre">domain.package.v1</span></code> package messages to be used in our new service we just created by the name <code class="docutils literal notranslate"><span class="pre">service</span></code> we need to run the following command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>wz package domain.package.v1 service
+
+<span class="o">[</span>*<span class="o">]</span> Attaching package <span class="s1">&#39;domain.package.v1&#39;</span> -&gt; <span class="s1">&#39;service&#39;</span> service
+</pre></div>
+</div>
+</section>
+<section id="use-well-known-type">
+<h2>Use “Well-Known” Type<a class="headerlink" href="#use-well-known-type" title="Permalink to this heading"></a></h2>
+<p>Then we can use the new messages available under <code class="docutils literal notranslate"><span class="pre">google.protobuf.Timestamp</span></code> package(in this case only one message available by the name <code class="docutils literal notranslate"><span class="pre">Timestamp</span></code>), as nested field type -&gt; <code class="docutils literal notranslate"><span class="pre">TYPE_MESSAGE</span></code>.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ wz g m
+
+<span class="o">[</span>*<span class="o">]</span> Generating new resource <span class="s1">&#39;message&#39;</span>
+<span class="o">[</span>?<span class="o">]</span> Enter message name: <span class="nb">test</span>
+<span class="o">[</span>?<span class="o">]</span> Choose a package to attach the message: package <span class="o">[</span>domain.package.v1<span class="o">]</span>
+ ❯ package <span class="o">[</span>domain.package.v1<span class="o">]</span>
+
+<span class="o">[</span>?<span class="o">]</span> Enter field name: timestamp
+<span class="o">[</span>?<span class="o">]</span> Choose field type: message
+   double
+   float
+   int64
+   int32
+   bool
+   string
+ ❯ message
+   bytes
+   enum
+   oneof
+   map
+
+<span class="o">[</span>?<span class="o">]</span> Choose field label: optional
+ ❯ optional
+   repeated
+
+<span class="o">[</span>?<span class="o">]</span> Choose available messages: Timestamp
+ ❯ Timestamp
+
+<span class="o">[</span>?<span class="o">]</span> Add more fields? <span class="o">(</span>Y/n<span class="o">)</span>: n
+
+<span class="o">[</span>*<span class="o">]</span> Created Message !
+</pre></div>
+</div>
+<p>It will generate the following <code class="docutils literal notranslate"><span class="pre">proto</span></code> definition:</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="k">syntax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;proto3&quot;</span><span class="p">;</span>
+
+<span class="k">import</span><span class="w"> </span><span class="s">&quot;google/protobuf/timestamp.proto&quot;</span><span class="p">;</span>
+
+<span class="kn">package</span><span class="w"> </span><span class="nn">domain</span><span class="o">.</span><span class="n">package.v1</span><span class="p">;</span>
+
+<span class="kd">message</span><span class="w"> </span><span class="nc">test</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">google.protobuf.Timestamp</span><span class="w"> </span><span class="na">timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overview.html" class="btn btn-neutral float-left" title="What is protobuf?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../plugins/index.html" class="btn btn-neutral float-right" title="Plugins" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

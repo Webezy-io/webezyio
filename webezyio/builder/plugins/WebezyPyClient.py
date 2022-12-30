@@ -24,7 +24,7 @@ import subprocess
 import webezyio.builder as builder
 from webezyio.commons import helpers, file_system, resources,pretty
 from webezyio.builder.plugins.static import gitignore_py
-
+import inspect
 
 @builder.hookimpl
 def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
@@ -35,6 +35,7 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     # TODO add postbuild validation of generated code
     pretty.print_success("Finished webezyio build process %s plugin" % (__name__))
+    return (__name__,'OK')
 
 
 @builder.hookimpl
@@ -83,7 +84,44 @@ def compile_protos(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 
 @builder.hookimpl
-def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext,pre_data):
+    imports = []
+    exports = []
+    override_stubs = {}
+    before_init = ''
+    interceptors = []
+    client_options = [
+        ("grpc.keepalive_permit_without_calls", 1),
+        ("grpc.keepalive_time_ms",120000),
+        ("grpc.keepalive_timeout_ms",20000),
+        ("grpc.http2.min_time_between_pings_ms",120000),
+        ("grpc.http2.max_pings_without_data",1),
+    ]
+    """Parse pre data"""
+    if pre_data:
+        _hook_name = inspect.stack()[0][3]
+        for mini_hooks in pre_data:
+            for hook in mini_hooks:
+                if __name__ == hook.split(':')[0]:
+                    if hook.split(':')[2] is not None and _hook_name == hook.split(':')[1].replace('()',''):
+                        
+                         # Append to exports
+                        if 'append_imports' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for imp in mini_hooks[hook]:
+                                    imports.append(imp)
+
+    
+                        elif 'append_client_options' in hook.split(':')[2]:
+                            if mini_hooks[hook] is not None:
+                                for k,v in mini_hooks[hook]:
+                                    old_value = next((i for i in client_options if i[0] == k),(None,None))[1]
+                                    if k not in list(map(lambda x: x[0], client_options)):
+                                        client_options.append((k,v))
+                                    elif v != old_value:
+                                        client_options.remove((k,old_value))
+                                        client_options.append((k,v))
+                                        
     for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'services', 'protos')):
         if '.py' in f:
             file = file_system.rFile(file_system.join_path(
@@ -101,7 +139,10 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
             file_system.wFile(file_system.join_path(wz_json.path, 'clients', 'python', f), ''.join(file),True)
 
     client = helpers.WZClientPy(wz_json.project.get(
-        'packageName'), wz_json.services, wz_json.packages, wz_context)
+        'packageName'), wz_json.services, wz_json.packages, wz_context,pre_data={
+            'imports':imports,
+            'client_options':client_options
+        })
     file_system.wFile(file_system.join_path(
         wz_json.path, 'clients', 'python', '__init__.py'), client.__str__(), overwrite=True)
 
