@@ -380,12 +380,12 @@ expand - If expanding optional inputs</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.commands.ls.add_message_desc">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.commands.ls.</span></span><span class="sig-name descname"><span class="pre">add_message_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_desc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.commands.ls.add_message_desc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.commands.ls.</span></span><span class="sig-name descname"><span class="pre">add_message_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.commands.ls.add_message_desc" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="webezyio.cli.commands.ls.add_package_desc">
-<span class="sig-prename descclassname"><span class="pre">webezyio.cli.commands.ls.</span></span><span class="sig-name descname"><span class="pre">add_package_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_desc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.commands.ls.add_package_desc" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.commands.ls.</span></span><span class="sig-name descname"><span class="pre">add_package_desc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_desc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.commands.ls.add_package_desc" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -417,6 +417,11 @@ e.g listing package description and messages + enums child descriptions the ‘f
 <dd><p>Will print in pretty table the resource description and child descriptions from a resource type
 e.g to list all services description and all methods (RPC’s) under the services, the ‘type’ param will need to be passed with ‘service’ string</p>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="webezyio.cli.commands.ls.list_dependencies">
+<span class="sig-prename descclassname"><span class="pre">webezyio.cli.commands.ls.</span></span><span class="sig-name descname"><span class="pre">list_dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">webezy_json</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="webezyio.commons.html#webezyio.commons.helpers.WZJson" title="webezyio.commons.helpers.WZJson"><span class="pre">WZJson</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#webezyio.cli.commands.ls.list_dependencies" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-webezyio.cli.commands.migrate">

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebezyPyServer &mdash; webezyio 0.1.7 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="WebezyTsClient" href="WebezyTsClient.html" />
+    <link rel="prev" title="WebezyPyClient" href="WebezyPyClient.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> webezyio
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../commands/index.html">Commands</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Plugins</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Core Plugins</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="WebezyGoClient.html">WebezyGoClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WebezyGoServer.html">WebezyGoServer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WebezyPyClient.html">WebezyPyClient</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">WebezyPyServer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generated-files">Generated Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hooks">Hooks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mini-hooks">Mini Hooks</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="WebezyTsClient.html">WebezyTsClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="WebezyTsServer.html">WebezyTsServer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../custom_plugins.html">Writing Custom Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../custom_plugins.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../custom_plugins.html#what-plugins-should-do">What Plugins Should do</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../templating.html">Service templating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../custom_configurations.html">Project Custom Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JsonSchema.html">Webezy.io Json Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contirbuting.html">Contributing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">webezyio</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Plugins</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Core Plugins</a></li>
+      <li class="breadcrumb-item active">WebezyPyServer</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/plugins/core/WebezyPyServer.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="webezypyserver">
+<h1>WebezyPyServer<a class="headerlink" href="#webezypyserver" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">WebezyPyServer</span></code> is a core plugin for building <code class="docutils literal notranslate"><span class="pre">Python</span></code> server from <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> resources configured on <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">WebezyPyServer</span></code> will be registered on <code class="docutils literal notranslate"><span class="pre">Builder</span></code> plugin-manager once it detects that the project hold a server resource of type <code class="docutils literal notranslate"><span class="pre">Python</span></code>:</p>
+<p>Start a <code class="docutils literal notranslate"><span class="pre">webezyio</span></code> project and pass in the <code class="docutils literal notranslate"><span class="pre">Python</span></code> config:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ wz new &lt;some-project&gt;
+
+<span class="o">[</span>?<span class="o">]</span> Choose server language: Python
+ ❯ Python
+   Typescript
+   Go
+</pre></div>
+</div>
+<p>It will assign the following resource on your <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;project&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;server&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;language&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+<section id="generated-files">
+<h2>Generated Files<a class="headerlink" href="#generated-files" title="Permalink to this heading"></a></h2>
+<p>On <code class="docutils literal notranslate"><span class="pre">wz</span> <span class="pre">build</span></code> process <code class="docutils literal notranslate"><span class="pre">WebezyPyServer</span></code> plugin will build the following files:</p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Overwrite</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">server.ts</span></code></p></td>
+<td><p>The entry point for the project server <br>which registers the server configurations and all the server “Services” - <br>as 1 server can serve multiple “Micro-services”</p></td>
+<td><p><strong>X</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/&lt;service&gt;.ts</span></code></p></td>
+<td><p>For each “Service” resource on <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code><br>file it will build a <code class="docutils literal notranslate"><span class="pre">Typescript</span></code> file with the auto-generated code class<br>that implements the service RPC’s</p></td>
+<td><p><strong>X</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/protos/&lt;Service/Package&gt;.ts</span></code></p></td>
+<td><p>The auto-generated compiled <code class="docutils literal notranslate"><span class="pre">Protobuf</span></code> modules</p></td>
+<td><p><strong>V</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/protos/tsconfig.ts</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Typescript</span></code> configuration for compilation process</p></td>
+<td><p><strong>X</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/utils/error.ts</span></code></p></td>
+<td><p>Util class for handling <code class="docutils literal notranslate"><span class="pre">ServiceError</span></code></p></td>
+<td><p><strong>X</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bin/init-ts.sh</span></code></p></td>
+<td><p>Initialization <code class="docutils literal notranslate"><span class="pre">bash</span></code> script for compiling protos</p></td>
+<td><p><strong>X</strong></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="hooks">
+<h2>Hooks<a class="headerlink" href="#hooks" title="Permalink to this heading"></a></h2>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hook</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pre_build</span></code></p></td>
+<td><p><strong>-</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">post_build</span></code></p></td>
+<td><p><strong>-</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">init_project_structure</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">write_services</span></code></p></td>
+<td><p>Writing services auto-generated code at <code class="docutils literal notranslate"><span class="pre">services/&lt;service&gt;.ts</span></code> for each “Service” resource<br>described on <code class="docutils literal notranslate"><span class="pre">webezy.json</span></code> file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">compile_protos</span></code></p></td>
+<td><p>Running <code class="docutils literal notranslate"><span class="pre">bin/init-ts.sh</span></code> sub-process for compiling protos to <code class="docutils literal notranslate"><span class="pre">Typescript</span></code> modules</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init_context</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Deprecated</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rebuild_context</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Deprecated</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">write_server</span></code></p></td>
+<td><p>Writing <code class="docutils literal notranslate"><span class="pre">server.ts</span></code> file, can be injected with additional parameters incoming from<br><code class="docutils literal notranslate"><span class="pre">pre_build_server</span></code> hook implementations - See more info on <code class="docutils literal notranslate"><span class="pre">Mini</span> <span class="pre">Hooks</span></code> below</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mini-hooks">
+<h2>Mini Hooks<a class="headerlink" href="#mini-hooks" title="Permalink to this heading"></a></h2>
+<p>Mini hooks can be used on <code class="docutils literal notranslate"><span class="pre">WebezyPyServer</span></code> to inject the core plugin with additional parameters combined from different <code class="docutils literal notranslate"><span class="pre">Custom</span> <span class="pre">Plugins</span></code> that implementing:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pre_build_server</span></code>:
+Hook implemantation for injecting data into <code class="docutils literal notranslate"><span class="pre">write_server</span></code> hook execution.</p></li>
+</ul>
+<p>To write a custom plugin that uses <code class="docutils literal notranslate"><span class="pre">WebezyPyServer</span></code> see more information on <a class="reference internal" href="../custom_plugins.html"><span class="doc std std-doc">Writing Custom Plugin</span></a></p>
+<p>Main hook: <code class="docutils literal notranslate"><span class="pre">webezyio.builder.plugins.WebezyPyServer</span></code></p>
+<table class="colwidths-auto docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mini Hook</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Parameters</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">write_server():overwrite</span></code></p></td>
+<td><p>To overwrite <code class="docutils literal notranslate"><span class="pre">server.ts</span></code> generation every build</p></td>
+<td><p><strong>Boolean</strong><br>Default: <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">write_server():append_imports</span></code></p></td>
+<td><p>Add more imports to <code class="docutils literal notranslate"><span class="pre">server.ts</span></code> module</p></td>
+<td><p><strong>List[String]</strong><br>Default: []</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">write_server():add_before_init</span></code></p></td>
+<td><p>Add code block before server startup</p></td>
+<td><p><strong>String</strong><br>Default: “”</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">write_server():inject_service</span></code></p></td>
+<td><p>Inject a dependency to service class implementation.<br>Should pass a <code class="docutils literal notranslate"><span class="pre">dict</span></code> value that the service name is the <code class="docutils literal notranslate"><span class="pre">key</span></code><br>and the <code class="docutils literal notranslate"><span class="pre">value</span></code> is the injected object into <code class="docutils literal notranslate"><span class="pre">someService(SomeDependency)</span></code></p></td>
+<td><p><strong>Dict[String, String]</strong><br>Default: {}</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">write_server():append_startup_promise</span></code></p></td>
+<td><p>Add additional promise function before server startup</p></td>
+<td><p><strong>List[String]</strong><br>Default: []</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">write_server():append_server_options</span></code></p></td>
+<td><p>Append additional server channel options</p></td>
+<td><p><strong>List[Tuple[String, Any]]</strong><br>Default: []</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="WebezyPyClient.html" class="btn btn-neutral float-left" title="WebezyPyClient" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="WebezyTsClient.html" class="btn btn-neutral float-right" title="WebezyTsClient" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Webezy.io 2022, Amit Shmulevitch.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

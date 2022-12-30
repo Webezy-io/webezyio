@@ -78,3 +78,4 @@ Main hook: `webezyio.builder.plugins.WebezyTsServer`
 | `write_server():inject_service` 	| Inject a dependency to service class implementation.<br>Should pass a `dict` value that the service name is the `key`<br>and the `value` is the injected object into `someService(SomeDependency)` 	| **Dict[String, String]**<br>Default: {} 	|
 | `write_server():append_startup_promise` 	| Add additional promise function before server startup 	| **List[String]**<br>Default: [] 	|
 | `write_server():append_server_options` 	| Append additional server channel options 	| **List[Tuple[String, Any]]**<br>Default: [] 	|
+| `write_server():append_after_startup` 	| Append additional code block after server_startup completes 	| **String**<br>Default: "" 	|

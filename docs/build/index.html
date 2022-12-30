@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to webezyio’s documentation! &mdash; webezyio 0.1.7 documentation</title>
+  <title>Webezy.io API Documentation &mdash; webezyio 0.1.7 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Webezy CLI Commands" href="commands.html" /> 
+    <link rel="next" title="Commands" href="commands/index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -37,17 +37,28 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/index.html">Commands</a></li>
+</ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a></li>
-<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="toturials/index.html">Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts/index.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="production/index.html">Use In Production</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="languages/index.html">Languages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="protobuf/index.html">Protocol Buffer</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plugins/index.html">Plugins</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="JsonSchema.html">Webezy.io Json Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode_webezyio.html">Webezy.io VSCode Extension</a></li>
@@ -68,7 +79,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home"></a></li>
-      <li class="breadcrumb-item active">Welcome to webezyio’s documentation!</li>
+      <li class="breadcrumb-item active">Webezy.io API Documentation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -78,8 +89,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-webezyio-s-documentation">
-<h1>Welcome to webezyio’s documentation!<a class="headerlink" href="#welcome-to-webezyio-s-documentation" title="Permalink to this heading"></a></h1>
+  <section id="webezy-io-api-documentation">
+<h1>Webezy.io API Documentation<a class="headerlink" href="#webezy-io-api-documentation" title="Permalink to this heading"></a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
 <p>webezyio is free and open-source project that aims to be a complete framework for developing micro-services projects.
@@ -101,13 +112,32 @@ It utulize those communication protocol, message serialization / deserialization
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h2>
 <p>Write webezy.io projects with Package API or with CLI.</p>
-<section id="cli">
-<h3>CLI<a class="headerlink" href="#cli" title="Permalink to this heading"></a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="commands/index.html">Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands/commands.html">Webezy CLI Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-new">wz new</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-generate">wz generate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-ls">wz ls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-package">wz package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-edit">wz edit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-build">wz build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-template">wz template</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-call">wz call</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-run">wz run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-migrate">wz migrate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="commands/commands.html#wz-extend">wz extend</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 <section id="start-a-new-project">
-<h4>Start a new project<a class="headerlink" href="#start-a-new-project" title="Permalink to this heading"></a></h4>
+<h3>Start a new project<a class="headerlink" href="#start-a-new-project" title="Permalink to this heading"></a></h3>
 <p>Start your webezyio project structure now and run this command:</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Replace content in &lt;&gt; with your cool project name</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Replace content in &lt;&gt; with your cool project name</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wz new &lt;project-name&gt;
 </pre></div>
 </div>
@@ -116,58 +146,95 @@ It utulize those communication protocol, message serialization / deserialization
 If you want to start your project in other location run it with the <cite>–path</cite> argument</p>
 </section>
 <section id="add-resources">
-<h4>Add resources<a class="headerlink" href="#add-resources" title="Permalink to this heading"></a></h4>
+<h3>Add resources<a class="headerlink" href="#add-resources" title="Permalink to this heading"></a></h3>
 <p>Continue developing your project packages and services:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wz generate --package
 </pre></div>
 </div>
+</section>
+</section>
+</section>
+<section id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="toturials/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="toturials/new-project.html">Create <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Project</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="concepts">
+<h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts/index.html">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="concepts/webezyio_concepts.html">Understanding Webezy.io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts/soa.html">Service Oriented Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="production/index.html">Use In Production</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="production/docker.html">Dockerize <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="production/monitor.html">Monitor <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="production/overview.html">Before Releasing Your Project</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="languages">
+<h1>Languages<a class="headerlink" href="#languages" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="languages/index.html">Languages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="languages/go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="languages/typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="protobuf">
+<h1>Protobuf<a class="headerlink" href="#protobuf" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="protobuf/index.html">Protocol Buffer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="protobuf/extensions.html">Extensions in Webezy.io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protobuf/overview.html">What is <code class="docutils literal notranslate"><span class="pre">protobuf</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protobuf/well_known.html">Well Known Types</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="plugins">
+<h1>Plugins<a class="headerlink" href="#plugins" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="plugins/index.html">Plugins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins/core/index.html">Core Plugins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins/core/WebezyGoClient.html">WebezyGoClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/core/WebezyGoServer.html">WebezyGoServer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/core/WebezyPyClient.html">WebezyPyClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/core/WebezyPyServer.html">WebezyPyServer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/core/WebezyTsClient.html">WebezyTsClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plugins/core/WebezyTsServer.html">WebezyTsServer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/custom_plugins.html">Writing Custom Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/custom_plugins.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/custom_plugins.html#what-plugins-should-do">What Plugins Should do</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plugins/custom_plugins.html#extending-webezy-io-functionality">Extending <code class="docutils literal notranslate"><span class="pre">Webezy.io</span></code> Functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="commands.html">Webezy CLI Commands</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-new">wz new</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-generate">wz generate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-ls">wz ls</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-package">wz package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-edit">wz edit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-build">wz build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-template">wz template</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-call">wz call</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-run">wz run</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-migrate">wz migrate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="commands.html#wz-extend">wz extend</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="webezyio_concepts.html">Understanding Webezy.io</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="webezyio_concepts.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webezyio_concepts.html#sub-modules">Sub-modules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="webezyio_concepts.html#project-structure">Project Structure</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="go.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Go</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="go.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="go.html#project-structure">Project Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="go.html#service">Service</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="go.html#usage">Usage</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="go.html#client">Client</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="go.html#id1">Usage</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="go.html#useful-resources">Useful resources</a></li>
-<li class="toctree-l2"><a class="reference internal" href="go.html#known-issues">Known issues</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="go.html#fix">Fix:</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="typescript.html">Developing Webezy.io Projects With <code class="docutils literal notranslate"><span class="pre">Typescript</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="typescript.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="typescript.html#service-side">Service Side</a></li>
-<li class="toctree-l2"><a class="reference internal" href="typescript.html#client-side">Client Side</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="templating.html">Service templating</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="templating.html#create-a-template-from-service">Create a template from service</a></li>
 <li class="toctree-l2"><a class="reference internal" href="templating.html#load-a-template-for-blank-service">Load a template for blank service</a></li>
@@ -176,10 +243,6 @@ If you want to start your project in other location run it with the <cite>–pat
 <li class="toctree-l2"><a class="reference internal" href="templating.html#read-more">Read more</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html">Builder plugins</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#write-custom-plugin">Write Custom Plugin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-shouldn-t-do">What Plugins Shouldn’t do</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builder_api.html#what-plugins-should-do">What Plugins Should do</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_configurations.html">Project Custom Configurations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="custom_configurations.html#global-configurations">Global Configurations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="custom_configurations.html#template-configurations">Template configurations</a></li>
@@ -204,9 +267,6 @@ If you want to start your project in other location run it with the <cite>–pat
 </ul>
 </div>
 </section>
-</section>
-</section>
-</section>
 <section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
@@ -220,7 +280,7 @@ If you want to start your project in other location run it with the <cite>–pat
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="commands.html" class="btn btn-neutral float-right" title="Webezy CLI Commands" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="commands/index.html" class="btn btn-neutral float-right" title="Commands" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
