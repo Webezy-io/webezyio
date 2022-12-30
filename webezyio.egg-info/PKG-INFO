@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: webezyio
-Version: 0.1.7
+Version: 0.1.8
 Summary: Webezy.io CLI for generating gRPC micro-services
 Author-email: Amit Shmulevitch <amitsh1995@gmail.com>
 License: Copyright (c) 2022 Webezy.io.
