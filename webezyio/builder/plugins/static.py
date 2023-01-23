@@ -153,9 +153,9 @@ def bash_init_script_go(project_package, services, packages):
     services_protoc = []
     packages_protoc = []
     for s in services:
-        services_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR"/{0}"  --go-grpc_opt=paths=source_relative protos/{0}.proto'.format(s))
+        services_protoc.append('mkdir $DST_DIR"/{0}"\nprotoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR"/{0}"  --go-grpc_opt=paths=source_relative protos/{0}.proto'.format(s))
     for p in packages:
-        packages_protoc.append('protoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR"/{0}"  --go-grpc_opt=paths=source_relative protos/{0}.proto'.format(p))
+        packages_protoc.append('mkdir $DST_DIR"/{0}"\nprotoc -I=$SRC_DIR --go_out=$DST_DIR --go_opt=paths=source_relative --go-grpc_out=$DST_DIR"/{0}"  --go-grpc_opt=paths=source_relative protos/{0}.proto'.format(p))
     return '#!/bin/bash\n\n\
 echo "[WEBEZYIO] init.sh starting protoc compiler for Go"\n\
 go get -u google.golang.org/protobuf\n\

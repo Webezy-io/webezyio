@@ -215,7 +215,7 @@ def edit_rpc(resource,action,sub_actions,wz_json:helpers.WZJson,architect:Webezy
         print_error('Not supported yet !')
         exit(1)
 
-def edit_package():
+def edit_package(*args):
     print_error('Not supported yet !')
     exit(1)
 

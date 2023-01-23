@@ -42,7 +42,7 @@ License-File: LICENSE
 
 [![Python 3.7](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
-[webezyio](./docs/source/webezyio_concepts.md) is free and open-source project that aims to be a complete framework for developing micro-services projects.
+[webezyio](https://www.webezy.io) is free and open-source project that aims to be a complete framework for developing micro-services projects.
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
 It utulize those communication protocol, message serialization / deserialization and code generator with [```gRPC```](https://grpc.io) open-source project by google. 
 

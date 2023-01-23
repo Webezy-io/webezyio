@@ -137,7 +137,8 @@ class WebezyBuilder:
         # Code generators plugins
         if server_lang == 'python':
             self._pm.register(WebezyPyServer)
-        elif client_py != False:
+        
+        if client_py != False:
             self._pm.register(WebezyPyClient)
            
         if client_ts:

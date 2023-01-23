@@ -723,8 +723,12 @@ class WZProto():
                 
             for imp in self._imports:
                 if 'google.protobuf.' in imp:
-                    imp = f"{imp.replace('.','/')}.proto"
-                    temp_imports.append(f'import "{imp.lower()}";')
+                    if 'FieldMask' in imp:
+                        imp = f"google/protobuf/field_mask.proto"
+                        temp_imports.append(f'import "{imp.lower()}";')
+                    else:
+                        imp = f"{imp.replace('.','/')}.proto"
+                        temp_imports.append(f'import "{imp.lower()}";')
                 else:
                     imp = imp.split('.')[1]
                     try:
@@ -844,7 +848,7 @@ class WZProto():
                         fType = f'oneof {field_name} {_OPEN_BRCK}\n{oneof_fields}\n\t{_CLOSING_BRCK}'
                     
                     fName = f.get('name')
-                    fIndex = f.get('index')
+                    fIndex = int(f.get('index'))
                     fOptions = []
                     if f.get('extensions') is not None:
                         for ext in f.get('extensions'):
@@ -923,7 +927,7 @@ class WZProto():
                     value_number = 0 if v.get(
                         'number') is None else v.get('number')
                     v_desc = v.get('description')
-                    values.append(f'// [{enum_full_name}] - {v_desc}\n\t{value_name} = {value_number};')
+                    values.append(f'// [{enum_full_name}] - {v_desc}\n\t{value_name} = {int(value_number)};')
                 values = '\n\t'.join(values)
                 e_desc = e.get('description')
                 enums.append(
@@ -1702,8 +1706,12 @@ def parse_extension_to_proto(
     # Handle FileOptions extensions
     if extension_type == 'FileOptions':
         if label_ext == 'repeated':
-            pretty.print_error("Not supporting repeated FileOptions")
-            extension_value = ''
+            ext_values = []
+            for v in ext_value:
+                extension_value = parse_extension_value(type_ext,v,wz_json,extension_field)
+                if extension_value is not None:
+                    ext_values.append(f'option ({ext_key}) = {extension_value};')
+            extension_value = '\n'.join(ext_values)
         else:
             extension_value = parse_extension_value(type_ext,ext_value,wz_json,extension_field)
             if extension_value is not None:
@@ -1711,6 +1719,7 @@ def parse_extension_to_proto(
     
     elif extension_type == 'MessageOptions':
         if label_ext == 'repeated':
+           
             pretty.print_error("Not supporting repeated MessageOptions")
             extension_value = ''
         else:
@@ -1800,7 +1809,7 @@ def parse_extension_value(type,value,wz_json:WZJson,field=None,num_tabs=1):
     return value
 
 
-_WellKnowns = ['google.protobuf.Timestamp','google.protobuf.Value','google.protobuf.Any','google.protobuf.Struct']
+_WellKnowns = ['google.protobuf.Timestamp','google.protobuf.Value','google.protobuf.Any','google.protobuf.Struct','google.protobuf.FieldMask']
 
 # Python class for topological sorting of a DAG
 # Class to represent a graph

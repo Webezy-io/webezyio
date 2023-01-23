@@ -629,11 +629,17 @@ def parse_proto_extension(field_opt_type,field_opt_label,description,value,field
         list_values_temp = []
         for field_opt_value in value:
             if 'BOOL' in field_opt_type:
-                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(bool_value=field_opt_value))
+                if hasattr(field_opt_value,'bool_value') == False:
+                    field_opt_value = google_dot_protobuf_dot_struct__pb2.Value(bool_value=field_opt_value)
+                list_values_temp.append(field_opt_value)
             elif 'STRING' in field_opt_type:
-                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value))
+                if hasattr(field_opt_value,'string_value') == False:
+                    field_opt_value = google_dot_protobuf_dot_struct__pb2.Value(string_value=field_opt_value)
+                list_values_temp.append(field_opt_value)
             elif 'INT' in field_opt_type:
-                list_values_temp.append( google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value))
+                if hasattr(field_opt_value,'string_value') == False:
+                    field_opt_value = google_dot_protobuf_dot_struct__pb2.Value(number_value=field_opt_value)
+                list_values_temp.append(field_opt_value)
             elif 'MESSAGE' in field_opt_type:
                 struct_temp = google_dot_protobuf_dot_struct__pb2.Struct()
                 ext_package_path = 'protos/{}/{}.proto'.format(description.get('fullName').split('.')[2],description.get('fullName').split('.')[1])
@@ -647,10 +653,11 @@ def parse_proto_extension(field_opt_type,field_opt_label,description,value,field
                 ext_package_path = 'protos/{}/{}.proto'.format(description.get('fullName').split('.')[2],description.get('fullName').split('.')[1])
                 enum_type = next((e for e in wz_json.get('packages').get(ext_package_path).get('enums') if e.get('fullName') == '.'.join(description.get('fullName').split('.')[:-1])),None)
                 enum_value = next((ev for ev in enum_type.get('values') if ev.get('number') == field_opt_value),None)
+                # if hasattr(field_opt_value,'string_value') == False:
+                #     field_opt_value = google_dot_protobuf_dot_struct__pb2.Value(string_value=enum_value.get('name'))
                 list_values_temp.append(google_dot_protobuf_dot_struct__pb2.Value(string_value=enum_value.get('name')))
             else:
                 print_warning("Not supporting field type [{0}] for field extensions {1}".format(field_opt_type,description.get('fullName')))
-
         list_values = google_dot_protobuf_dot_struct__pb2.ListValue(values=list_values_temp)
         field_extensions[description.get('fullName')] = google_dot_protobuf_dot_struct__pb2.Value(list_value=list_values)
     else:
