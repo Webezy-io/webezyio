@@ -34,15 +34,15 @@ def pre_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 @builder.hookimpl
 def post_build(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
     if file_system.check_if_file_exists(file_system.join_path(wz_json.path,'server', 'services','index.js')):
-        file_system.mv(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
-        file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
-        file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
+        file_system.copyFile(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
+        file_system.copyFile(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
+        file_system.copyFile(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
     else:
         subprocess.run(['tsc', '-b'])
         if file_system.check_if_file_exists(file_system.join_path(wz_json.path,'server', 'services','index.js')):
-            file_system.mv(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
-            file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
-            file_system.mv(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
+            file_system.copyFile(file_system.join_path(wz_json.path,'server','services','index.d.ts'),file_system.join_path(wz_json.path,'clients','typescript','index.d.ts'))
+            file_system.copyFile(file_system.join_path(wz_json.path,'server','services','index.js'),file_system.join_path(wz_json.path,'clients','typescript','index.js'))
+            file_system.copyFile(file_system.join_path(wz_json.path,'server','services','index.js.map'),file_system.join_path(wz_json.path,'clients','typescript','index.js.map'))
     
     if file_system.check_if_dir_exists(file_system.join_path(wz_json.path,'clients', 'typescript','utils')) == False:
         file_system.mkdir(file_system.join_path(wz_json.path,'clients', 'typescript','utils'))

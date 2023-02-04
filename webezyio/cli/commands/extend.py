@@ -161,7 +161,7 @@ def extend_package(results,resource,extension,wz_json:helpers.WZJson,ARCHITECT:W
                     value = handle_ext_field(temp_field_ext,wz_json,resource['extensions'][temp_field_ext.get('fullName')] if resource['extensions'].get(temp_field_ext.get('fullName')) is not None else None)
                     # raise errors.WebezyValidationError('Handle Extension Editing Failed','Error occured during handling of extensions {}'.format(temp_field_ext.get('fullName')))
                 resource['extensions'][temp_field_ext.get('fullName')] = value
-
+                # print_error(value)
                 ARCHITECT.EditPackage(resource.get('name'),resource.get('dependencies'),resource.get('messages'),resource.get('enums'),resource.get('description'),resource.get('extensions'))
                 ARCHITECT.Save()
 
@@ -307,13 +307,26 @@ def handle_ext_field(ext_field,wz_json:helpers.WZJson,old_ext=None):
     # for f in temp_msg.get('fields'):
         # avail_extension_message_fields.append((f.get('name'),f.get('fullName')))
     if ext_field.get('fieldType') == 'TYPE_STRING':
-        
-        value = inquirer.prompt([inquirer.Text('string_value','Enter string value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
-        if value.get('string_value') is not None:
-            return google_dot_protobuf_dot_struct__pb2.Value(string_value=value.get('string_value'))
+        if ext_field.get('label') == 'LABEL_REPEATED':
+            keep_adding = True
+            list_of_values = []
+            tmp_list = []
+            while keep_adding:
+                tmp_value = inquirer.prompt([inquirer.Text('string_value','Enter string value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())
+                tmp_list.append(tmp_value)
+                keep_adding = inquirer.prompt([inquirer.Confirm('keep_adding',message='Kep adding values?',default=True)],theme=WebezyTheme())
+                keep_adding = keep_adding['keep_adding']
+            
+            for v in tmp_list:
+                list_of_values.append(google_dot_protobuf_dot_struct__pb2.Value(string_value=v.get('string_value')))
+            return list_of_values
         else:
-            print_error("Must enter a valid string !")
-            exit(1)
+            value = inquirer.prompt([inquirer.Text('string_value','Enter string value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
+            if value.get('string_value') is not None:
+                return google_dot_protobuf_dot_struct__pb2.Value(string_value=value.get('string_value'))
+            else:
+                print_error("Must enter a valid string !")
+                exit(1)
     elif ext_field.get('fieldType') == 'TYPE_INT32' or ext_field.get('fieldType') == 'TYPE_INT64':
         value = inquirer.prompt([inquirer.Text('num_value','Enter integer value for {}'.format(ext_field.get('fullName')))],theme=WebezyTheme())  
         

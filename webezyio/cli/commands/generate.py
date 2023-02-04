@@ -52,7 +52,7 @@ field_label = [
     WebezyFieldLabel.Name(WebezyFieldLabel.LABEL_REPEATED),
 ]
 
-well_known_type = ['google.protobuf.Timestamp', 'google.protobuf.Struct']
+well_known_type = ['google.protobuf.Timestamp', 'google.protobuf.Struct', 'google.protobuf.FieldMask']
 
 
 def package(results, webezy_json: WZJson, architect: WebezyArchitect, expand=False, verbose=False):
@@ -373,7 +373,7 @@ def message(results, webezy_json: WZJson, architect: WebezyArchitect, expand=Fal
         architect.AddMessage(package, msg_name,
                              msg_fields, description, extend)
         architect.Save()
-        print_success("Created Message !\n")
+        print_success(f"Created Message !\n\t- {msg_name}\n")
     else:
         print_error(
             f'Message "{msg_name}" already exists under "{package.package}"')

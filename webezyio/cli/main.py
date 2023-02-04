@@ -82,7 +82,7 @@ def validation(answers, current):
     return True
 
 log = logging.getLogger(__name__)
-well_known_type = ['google.protobuf.Timestamp','google.protobuf.Struct']
+well_known_type = ['google.protobuf.Timestamp','google.protobuf.Struct','google.protobuf.FieldMask']
 
 fields_opt = [
     protos.WebezyFieldType.Name(protos.TYPE_DOUBLE),
