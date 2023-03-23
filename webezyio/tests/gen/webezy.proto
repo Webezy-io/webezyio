@@ -1,7 +1,0 @@
-syntax = "proto3";
-import "gen.proto";
-
-
-message Test {
-    string str = 1;
-}

@@ -1,3 +1,41 @@
+Metadata-Version: 2.1
+Name: sylk
+Version: 0.0.1
+Summary: sylk CLI build, deploy and manage gRPC microservices.
+Author-email: Amit Shmulevitch <amitsh1995@gmail.com>
+License: Copyright (c) 2023 sylk.build
+        
+        Permission is hereby granted, free of charge, to any person obtaining
+        a copy of this software and associated documentation files (the
+        "Software"), to deal in the Software without restriction, including
+        without limitation the rights to use, copy, modify, merge, publish,
+        distribute, sublicense, and/or sell copies of the Software, and to
+        permit persons to whom the Software is furnished to do so, subject to
+        the following conditions:
+        
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Project-URL: repository, https://github.com/sylk/sylk
+Project-URL: homepage, https://www.sylk.build/
+Project-URL: documentation, https://docs.sylk.build
+Keywords: grpc,micro-services,cli,framework
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Provides-Extra: build
+Provides-Extra: dev
+License-File: LICENSE
+
 # sylk.build CLI
 
 [![Downloads](https://pepy.tech/badge/sylk)](https://pepy.tech/project/sylk)
@@ -23,9 +61,9 @@ The current supported languages are:
 
 Get full explanation and many more details on usage at [```sylk.build```](https://www.sylk.build).
 
-The `sylk CLI` is a wrapper for SylkArchitect class which does mainly the processing and execution of creating sylk.jso file.
+The `sylk CLI` is a wrapper for WebezyArchitect class which does mainly the processing and execution of creating webezy.jso file.
 
-You can interact with the SylkArchitect class with two main ways:
+You can interact with the WebezyArchitect class with two main ways:
 
 - __CLI__ - The most common and easy to get you started creating gRPC services.
 - __Python API__ - Will be useful for more compehransive project creation flows and for developers who wants to understand how sylk works.
@@ -66,20 +104,20 @@ __Tutorials:__
 
 ## Quick Start 
 
-> __Note__ Please refer to [CLI docs](https://www.sylk.build/docs/cli) for any question you got, also make sute to use the CLI help `sylk --help` should give you an additional information on every command you may possibly run
+> __Note__ Please refer to [CLI docs](https://www.sylk.build/docs/cli) for any question you got, also make sute to use the CLI help `webezy --help` should give you an additional information on every command you may possibly run
 
-To create a [new sylk.build](./docs/source/commands/commands.md#sylk-new) project run the following command:
+To create a [new sylk.build](./docs/source/commands/commands.md#wz-new) project run the following command:
 ```sh
-sylk new <YourProject>
+webezy new <YourProject>
 ```
 > __Note__ you can create a new project based on template to get started quickly
 Sample Python server (Clients are available both in TS + PY)
 ```sh
-sylk n <YourProject> --template @sylk/SamplePy
+wz n <YourProject> --template @sylk/SamplePy
 ```
 Or the same resources just for Typescript server
 ```sh
-sylk n <YourProject> --template @sylk/SampleTs
+wz n <YourProject> --template @sylk/SampleTs
 ```
  - For more information see [Project Templating](./docs/source/templating.md)
 
@@ -91,40 +129,40 @@ Then you will need to navigate into your project
 cd <YourProject>
 ```
 
-After you are under the new project directory you can go ahead and [create sylk.build resources](./docs/source/commands/commands.md#sylk-generate) with those simple commands:
+After you are under the new project directory you can go ahead and [create sylk.build resources](./docs/source/commands/commands.md#wz-generate) with those simple commands:
 
-> __Note__ Please note that every sub-command of `generate` and `new` can be shortend with the first letter e.g : `sylk g p` is equivalent to `sylk generate package`
+> __Note__ Please note that every sub-command of `generate` and `new` can be shortend with the first letter e.g : `wz g p` is equivalent to `wz generate package`
 
 ```sh
 # Generate new package to hold messages
-sylk generate package
+webezy generate package
 # Generate new service to hold RPC's (Methods)
-sylk generate service
+webezy generate service
 # Generate message under specified package
-sylk generate message
+webezy generate message
 # Generate RPC (Method) under specified service
-# Same as running `sylk g r`
-sylk generate rpc
+# Same as running `wz g r`
+webezy generate rpc
 ```
 > __Note__ Make sure before creating new RPC on service that you have imported at least 1 package to be used by the service. for more information visit -> [Package Docs](https://www.sylk.build/docs/tutorials/import-packages)
 
 
 After you had generated your resources for the project and modified the code (See the docs for more explanation on how to develop your project and make changes [Sample Project](https://www.sylk.build/docs/tutorials/sample-project)).
 
-You can now [build your project](./docs/source/commands/commands.md#sylk-build) and [run your server](./docs/source/commands/commands.md#sylk-run) with those simple commands:
+You can now [build your project](./docs/source/commands/commands.md#wz-build) and [run your server](./docs/source/commands/commands.md#wz-run) with those simple commands:
 
 ```sh
 # First build your project
-sylk build
+webezy build
 # Then run the server
-sylk run 
+webezy run 
 ```
 
-> __Note__ you can auto-build your resources if applicable straight when you are generating them with adding `--build` argument to `sylk generate` comands.
+> __Note__ you can auto-build your resources if applicable straight when you are generating them with adding `--build` argument to `webezy generate` comands.
 
 You can use now your client code that has been autogenerated in your specified language(s) on creating the project.
 
-> __Pro-Tip:__ you can always make your commands even shorter with replacing `sylk` with `sylk`
+> __Pro-Tip:__ you can always make your commands even shorter with replacing `webezy` with `wz`
 
 # CLI Usage
 
@@ -134,9 +172,9 @@ __All listed commands can be found here:__
 
 The sylk CLI module is essantially a wrapper to the `Architect API` which is just to construct a well defined resource metadata which later on can be used by the `Builder API` to build all resources files (Code files & .proto files)
 
-> __Note__ Each sylk.build CLI command can be called with the abbreviated `sylk`
+> __Note__ Each sylk.build CLI command can be called with the abbreviated `wz`
 
-> __Note__ The CLI has verbose logging system that can be changed accoriding to your needs. we do recommand to keep it to ERROR as default to not overload you with multiple lines for each command - to change the default behaviour run your commands with `sylk --loglevel DEBUG <sub-command>`
+> __Note__ The CLI has verbose logging system that can be changed accoriding to your needs. we do recommand to keep it to ERROR as default to not overload you with multiple lines for each command - to change the default behaviour run your commands with `wz --loglevel DEBUG <sub-command>`
 
 # Advanced Usage
 
@@ -148,7 +186,7 @@ Some of the features are listed below:
 
 - [Templating](./docs/source/templating.md) - Wrap your project and re-share them among team members or to your won base project templates into other future or existing sylk.build projects.
 - [Custom Configurations](./docs/source/custom_configurations.md) - Learn how to define custom configurations for a project to make your life easier.
-- [Migration](./docs/source/commands/commands.md#sylk-migrate) - You can now migrate your existing gRPC project to unified structure and resources of sylk.build projects.
+- [Migration](./docs/source/commands/commands.md#wz-migrate) - You can now migrate your existing gRPC project to unified structure and resources of sylk.build projects.
 - [Extending Protobuf Functionality](./docs/source/extensions.md) - You can configure a custom extension for your resources.
 
 # Batteries Included
@@ -156,7 +194,7 @@ sylk.build goal is to make development lifecycles quick and meaningfull while co
 
 Some built-ins features are provided so you can jump-start your development right away:
 
-- [sylk.build Official VSCode Extension](https://marketplace.visualstudio.com/items?itemName=sylk.vscode-sylk) - See [docs]()
+- [sylk.build Official VSCode Extension](https://marketplace.visualstudio.com/items?itemName=webezy.vscode-webezy) - See [docs]()
 
 # Development
 

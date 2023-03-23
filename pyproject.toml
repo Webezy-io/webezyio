@@ -3,9 +3,9 @@ requires      = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "webezyio"
-version = "0.1.9"
-description = "Webezy.io CLI for generating gRPC micro-services"
+name = "sylk"
+version = "0.0.1"
+description = "sylk CLI build, deploy and manage gRPC microservices."
 readme = "README.md"
 authors = [{ name = "Amit Shmulevitch", email = "amitsh1995@gmail.com" }]
 license = { file = "LICENSE" }
@@ -23,17 +23,16 @@ build = ["build", "twine"]
 dev   = ["bumpver"]
 
 [project.scripts]
-wz = "webezyio.cli.__main__:main"
-webezy = "webezyio.cli.__main__:main"
+sylk = "sylk.cli.__main__:main"
 
 [project.urls]
-repository    = "https://github.com/Webezy-io/webezyio"
-homepage = "https://www.webezy.io/"
-documentation = "https://www.webezy.io/docs/cli"
+repository    = "https://github.com/sylk/sylk"
+homepage = "https://www.sylk.build/"
+documentation = "https://docs.sylk.build"
 
 
 [tool.bumpver]
-current_version = "0.1.9"
+current_version = "0.0.1"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message  = "bump version {old_version} -> {new_version}"
 commit          = true
@@ -45,7 +44,7 @@ push            = false
     'current_version = "{version}"',
     'version = "{version}"',
 ]
-"webezyio/__version__.py" = ["{version}"]
+"sylk/__version__.py" = ["{version}"]
 "docs/source/conf.py" = ["{version}"]
 
 

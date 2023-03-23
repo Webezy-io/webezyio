@@ -52,7 +52,7 @@ _HOST = 'localhost'
 _PORT = 50051
 
 # Initializing WebezyArchitect class which we going to interact with
-# It is used to create all of our 'webezyio' resources
+# It is used to create all of our 'sylk' resources
 _architect = WebezyArchitect(path=_PATH,
                              domain=_DOMAIN,
                              project_name=_PROJECT_NAME)

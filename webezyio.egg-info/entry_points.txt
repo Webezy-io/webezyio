@@ -1,3 +1,0 @@
-[console_scripts]
-webezy = webezyio.cli.__main__:main
-wz = webezyio.cli.__main__:main

@@ -1,7 +1,0 @@
-syntax = "proto3";
-import "google/protobuf/descriptor.proto";
-package webezy;
-
-extend google.protobuf.MessageOptions {
-    bool WebezyResource = 50000;
-}

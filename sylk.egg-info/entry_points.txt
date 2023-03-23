@@ -1,0 +1,2 @@
+[console_scripts]
+sylk = sylk.cli.__main__:main

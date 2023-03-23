@@ -1,7 +1,7 @@
 FROM python:3.9 AS webezy-base
 # Or any preferred Python version.
-COPY ./dist/webezyio-0.1.9.tar.gz /webezyio/webezyio-0.1.9.tar.gz
-RUN pip install ./webezyio/webezyio-0.1.9.tar.gz
+COPY ./dist/sylk-0.0.1.tar.gz /sylk/sylk-0.0.1.tar.gz
+RUN pip install ./sylk/sylk-0.0.1.tar.gz
 CMD ["wz","--version"]
 
 
@@ -17,6 +17,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - &&\
     apt-get install -y nodejs
 
 
-COPY ./dist/webezyio-0.1.9.tar.gz /webezyio/webezyio-0.1.9.tar.gz
-RUN pip install ./webezyio/webezyio-0.1.9.tar.gz
+COPY ./dist/sylk-0.0.1.tar.gz /sylk/sylk-0.0.1.tar.gz
+RUN pip install ./sylk/sylk-0.0.1.tar.gz
 CMD ["wz","--version"]

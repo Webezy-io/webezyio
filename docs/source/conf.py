@@ -9,12 +9,12 @@
 import sys
 
 
-project = 'webezyio'
-copyright = 'Webezy.io 2022, Amit Shmulevitch'
+project = 'sylk'
+copyright = 'sylk 2022, Amit Shmulevitch'
 author = 'Amit Shmulevitch'
-release = '0.1.9'
+release = '0.0.1'
 
-sys.path.append('/Users/amitshmulevitch/Projects/wz/webezyio')
+sys.path.append('/Users/amitshmulevitch/Projects/sylk/sylk')
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 extensions = [
