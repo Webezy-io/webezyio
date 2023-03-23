@@ -223,7 +223,7 @@ def rebuild_context(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
 
 @builder.hookimpl
 def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
-
+    print('Overriding generated clasess')
     for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'services', 'protos')):
         name = f.split('_pb2')
         if '_grpc' not in name:

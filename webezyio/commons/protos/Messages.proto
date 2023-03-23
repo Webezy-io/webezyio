@@ -1,0 +1,17 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Messages {
+	// [webezyio] - None
+	rpc CreateMessage (webezy.WebezyApi.v1.CreateMessageRequest) returns (webezy.WebezyApi.v1.CreateMessageResponse);
+	// [webezyio] - None
+	rpc UpdateMessage (webezy.WebezyApi.v1.UpdateMessageRequest) returns (webezy.WebezyApi.v1.UpdateMessageResponse);
+	// [webezyio] - None
+	rpc DeleteMessage (webezy.WebezyApi.v1.DeleteMessageRequest) returns (webezy.WebezyApi.v1.DeleteMessageResponse);
+	// [webezyio] - None
+	rpc GetMessage (webezy.WebezyApi.v1.GetMessageRequest) returns (webezy.WebezyApi.v1.GetMessageResponse);
+}
+
+

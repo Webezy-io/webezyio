@@ -1,0 +1,15 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Repos {
+	// [webezyio] - Get a specified repo
+	rpc GetRepo (webezy.WebezyApi.v1.GetRepoRequest) returns (webezy.WebezyApi.v1.GetRepoResponse);
+	// [webezyio] - Creeate a new repo
+	rpc CreateRepo (webezy.WebezyApi.v1.CreateRepoRequest) returns (webezy.WebezyApi.v1.CreateRepoResponse);
+	// [webezyio] - List repos under specified organization
+	rpc ListRepos (webezy.WebezyApi.v1.ListReposRequest) returns (webezy.WebezyApi.v1.ListReposResponse);
+}
+
+

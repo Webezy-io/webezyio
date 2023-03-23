@@ -1,0 +1,26 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyJson.proto";
+import "google/protobuf/struct.proto";
+package webezy.WebezyRepos.v1;
+
+
+// [webezy.WebezyRepos.v1.CodeFile] - The code files object
+message CodeFile {
+	// [webezy.WebezyRepos.v1.CodeFile.path] - The code file relative path
+	string path = 1;
+	// [webezy.WebezyRepos.v1.CodeFile.content] - The file content as array of bytes
+	repeated bytes content = 2;
+}
+
+// [webezy.WebezyRepos.v1.WebezyRepository] - The repo object
+message WebezyRepository {
+	// [webezy.WebezyRepos.v1.WebezyRepository.uri] - The repo unique resource id - `<domain>/<packageName>`
+	string uri = 1;
+	// [webezy.WebezyRepos.v1.WebezyRepository.files] - The code files objects
+	repeated webezy.WebezyRepos.v1.CodeFile files = 2;
+	// [webezy.WebezyRepos.v1.WebezyRepository.resources] - The repo resources
+	webezy.WebezyJson.v1.WebezyJson resources = 3;
+}
+

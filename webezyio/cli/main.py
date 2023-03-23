@@ -36,7 +36,7 @@ from webezyio.architect import WebezyArchitect
 from webezyio.cli import theme,prompter
 from webezyio.commons import client_wrapper, helpers,file_system,errors,resources, parser, config as prj_conf, protos
 from webezyio.commons.pretty import print_info, print_note, print_version, print_success, print_warning, print_error
-from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack,run,edit,template, config as config_command
+from webezyio.cli.commands import call, extend, migrate, new,build,generate,ls,package as pack, pull,run,edit,template, config as config_command
 from pathlib import Path
 
 _TEMPLATES = config.configs.webezyio_templates
@@ -173,6 +173,8 @@ def main(args=None):
                             required=False, help='Clients language list seprated by spaces')
     parser_new.add_argument('--template', default=_TEMPLATES[0],
                             required=False, help='Create new project based on template')
+    parser_new.add_argument('-r','--remote',
+                            required=False, help='Create new project based on remote project')
   
 
     parser_n = subparsers.add_parser('n', help='A shortend for new commands')
@@ -192,6 +194,8 @@ def main(args=None):
    
     parser_n.add_argument('--template', choices=_TEMPLATES,default=_TEMPLATES[0],
                             required=False, help='Create new project based on template')
+    parser_n.add_argument('-r','--remote',
+                            required=False, help='Create new project based on remote project')
     """Generate command"""
 
     parser_generate = subparsers.add_parser(
@@ -212,6 +216,11 @@ def main(args=None):
     parser_g.add_argument('--build', action='store_true',
                             required=False, help='Auto build resources')
 
+    """Pull commands"""
+    parser_pull = subparsers.add_parser('pull', help='Pull resource from rempte project')
+    parser_pull.add_argument('-f','--force', action='store_true',required=False,help='Force pull the resources and overide any conflicts')
+    parser_pull.add_argument('-r','--remote',required=False,help='The remote project uri')
+    
     """List command"""
 
     parser_list = subparsers.add_parser('ls', help='List resources commands')
@@ -334,7 +343,7 @@ def main(args=None):
         """New command process"""
 
         # print_info(args,True)
-        new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain,template=args.template)
+        new.create_new_project(args.project,args.path,args.host,args.port,args.server_language,args.clients,args.domain,template=args.template,remote=args.remote)
         exit(0)
     else:
         if helpers.check_if_under_project():
@@ -398,7 +407,10 @@ def main(args=None):
 
                 if args.build:
                     build.build_all(webezy_json_path)
-
+            elif hasattr(args, 'force'):
+                ARCHITECT = WebezyArchitect(
+                    path=webezy_json_path,domain=WEBEZY_JSON.domain,project_name=WEBEZY_JSON.project.get('name'))
+                pull.pull_changes(ARCHITECT,WEBEZY_JSON,args.remote,force=args.force)
             elif hasattr(args, 'source') and hasattr(args, 'target'):
                 """Package command process"""
 

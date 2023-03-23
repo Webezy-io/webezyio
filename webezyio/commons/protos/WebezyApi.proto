@@ -1,0 +1,685 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyPackage.proto";
+import "WebezyService.proto";
+import "WebezyPlatform.proto";
+import "WebezyCore.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/any.proto";
+import "WebezyRepos.proto";
+package webezy.WebezyApi.v1;
+
+
+
+// [webezy.WebezyApi.v1.GetPackageRequest] - Get package by full name from the registery
+message GetPackageRequest {
+	// [webezy.WebezyApi.v1.GetPackageRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetPackageRequest.package] - The package full name constructed from : <org_domain>.<package_name>.<package_version>
+	string package = 2;
+}
+
+// [webezy.WebezyApi.v1.CreatePackageRequest] - Create a new package on specified project
+message CreatePackageRequest {
+	// [webezy.WebezyApi.v1.CreatePackageRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	webezy.WebezyPackage.v1.WebezyPackage package = 2;
+}
+
+// [webezy.WebezyApi.v1.UpdatePackageRequest] - Update package properties
+message UpdatePackageRequest {
+	// [webezy.WebezyApi.v1.UpdatePackageRequest.package] - The package unique resource name
+	string package = 1;
+	// [webezy.WebezyApi.v1.UpdatePackageRequest.update] - The updated package document
+	webezy.WebezyPackage.v1.WebezyPackage update = 2;
+	string project_id = 3;
+}
+
+// [webezy.WebezyApi.v1.DeletePackageRequest] - Delete a package from project
+message DeletePackageRequest {
+	// [webezy.WebezyApi.v1.DeletePackageRequest.package] - The package unique resource name
+	string package = 1;
+	// [webezy.WebezyApi.v1.DeletePackageRequest.delete_dependencies] - Delete all package dependencies as well
+	bool delete_dependencies = 2;
+	string project_id = 3;
+}
+
+// [webezy.WebezyApi.v1.GetPackageResponse] - Get a package response
+message GetPackageResponse {
+	// [webezy.WebezyApi.v1.GetPackageResponse.package] - The returned package resource
+	webezy.WebezyPackage.v1.WebezyPackage package = 1;
+}
+
+// [webezy.WebezyApi.v1.CreatePackageResponse] - Create package response
+message CreatePackageResponse {
+	// [webezy.WebezyApi.v1.CreatePackageResponse.project_id] - The project id of the new created package
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreatePackageResponse.package] - The created package
+	webezy.WebezyPackage.v1.WebezyPackage package = 2;
+}
+
+// [webezy.WebezyApi.v1.UpdatePackageResponse] - Update package response
+message UpdatePackageResponse {
+	// [webezy.WebezyApi.v1.UpdatePackageResponse.project_id] - The project_id which the package has been updated
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdatePackageResponse.package] - The package full resource name
+	string package = 2;
+	// [webezy.WebezyApi.v1.UpdatePackageResponse.updated] - The updated package
+	webezy.WebezyPackage.v1.WebezyPackage updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeletePackageResponse] - Delete package response
+message DeletePackageResponse {
+	// [webezy.WebezyApi.v1.DeletePackageResponse.project_id] - The project_id which the package has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeletePackageResponse.package] - The package unique resource name
+	string package = 2;
+	// [webezy.WebezyApi.v1.DeletePackageResponse.deleted] - The deleted package
+	webezy.WebezyPackage.v1.WebezyPackage deleted = 3;
+}
+
+// [webezy.WebezyApi.v1.ListPackagesRequest] - List all packages under specified query filter - by project / organization
+message ListPackagesRequest {
+	// [webezy.WebezyApi.v1.ListPackagesRequest.project] - The project `packageName` which the list will query all of it's packages
+	string project = 1;
+	// [webezy.WebezyApi.v1.ListPackagesRequest.organization] - The organization name which to query a list of all it's associated packages from all projects
+	string organization = 2;
+}
+
+// [webezy.WebezyApi.v1.ListPackagesResponse] - List of packages response
+message ListPackagesResponse {
+	// [webezy.WebezyApi.v1.ListPackagesResponse.package] - The package which returned from the query
+	webezy.WebezyPackage.v1.WebezyPackage package = 1;
+}
+
+// [webezy.WebezyApi.v1.GetServiceRequest] - Get a service by project
+message GetServiceRequest {
+	// [webezy.WebezyApi.v1.GetServiceRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetServiceRequest.service] - The service name
+	string service = 2;
+}
+
+// [webezy.WebezyApi.v1.GetServiceResponse] - Get service query response
+message GetServiceResponse {
+	// [webezy.WebezyApi.v1.GetServiceResponse.service] - The service returned from the query
+	webezy.WebezyService.v1.WebezyService service = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateServiceRequest] - Create a service on specified project
+message CreateServiceRequest {
+	// [webezy.WebezyApi.v1.CreateServiceRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateServiceRequest.service] - The service to create under the specified `project_id`
+	webezy.WebezyService.v1.WebezyService service = 2;
+}
+
+// [webezy.WebezyApi.v1.CreateServiceResponse] - Create a service response
+message CreateServiceResponse {
+	// [webezy.WebezyApi.v1.CreateServiceResponse.project_id] - The project which the service has been created on
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateServiceResponse.service] - The service created on the project
+	webezy.WebezyService.v1.WebezyService service = 2;
+}
+
+// [webezy.WebezyApi.v1.UpdateServiceRequest] - Update service properties
+message UpdateServiceRequest {
+	// [webezy.WebezyApi.v1.UpdateServiceRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateServiceRequest.service] - The service name
+	string service = 2;
+	// [webezy.WebezyApi.v1.UpdateServiceRequest.update] - The updated service object
+	webezy.WebezyService.v1.WebezyService update = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateServiceResponse] - Update service response
+message UpdateServiceResponse {
+	// [webezy.WebezyApi.v1.UpdateServiceResponse.project_id] - The project which the service has been updated
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateServiceResponse.service] - The service name
+	string service = 2;
+	// [webezy.WebezyApi.v1.UpdateServiceResponse.updated] - The updated value of the service
+	webezy.WebezyService.v1.WebezyService updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeleteServiceRequest] - Delete a service from specified project request
+message DeleteServiceRequest {
+	// [webezy.WebezyApi.v1.DeleteServiceRequest.project_id] - The project id to delete the specified package on
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteServiceRequest.service] - The service name which will be deleted
+	string service = 2;
+}
+
+// [webezy.WebezyApi.v1.DeleteServiceResponse] - The response from deletion service process
+message DeleteServiceResponse {
+	// [webezy.WebezyApi.v1.DeleteServiceResponse.project_id] - The project unique id for which the service has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteServiceResponse.deleted] - The deleted service
+	webezy.WebezyService.v1.WebezyService deleted = 2;
+}
+
+// [webezy.WebezyApi.v1.CreateMessageRequest] -  Add a specified message to specific package request
+message CreateMessageRequest {
+	// [webezy.WebezyApi.v1.CreateMessageRequest.project_id] - The project unique id
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateMessageRequest.package] - The package unique resource name
+	string package = 2;
+	// [webezy.WebezyApi.v1.CreateMessageRequest.message] - The new message resource to attach into the package specified at the query
+	webezy.WebezyPackage.v1.WebezyMessage message = 3;
+}
+
+// [webezy.WebezyApi.v1.CreateMessageResponse] - Add message to package response
+message CreateMessageResponse {
+	// [webezy.WebezyApi.v1.CreateMessageResponse.project_id] - The project unique id for which the message was added
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateMessageResponse.package] - The package unique resource name
+	string package = 2;
+	// [webezy.WebezyApi.v1.CreateMessageResponse.message] - The new created message
+	webezy.WebezyPackage.v1.WebezyMessage message = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateMessageRequest] - Update message properties
+message UpdateMessageRequest {
+	// [webezy.WebezyApi.v1.UpdateMessageRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateMessageRequest.message] - The full message name
+	string message = 2;
+	// [webezy.WebezyApi.v1.UpdateMessageRequest.update] - The updated message object
+	webezy.WebezyPackage.v1.WebezyMessage update = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateMessageResponse] - Update message response
+message UpdateMessageResponse {
+	// [webezy.WebezyApi.v1.UpdateMessageResponse.project_id] - The project which the message has been updated
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateMessageResponse.message] - The full message name which has been updated
+	string message = 2;
+	// [webezy.WebezyApi.v1.UpdateMessageResponse.updated] - The updated message object
+	webezy.WebezyPackage.v1.WebezyMessage updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeleteMessageRequest] - Delete a message object on specified package
+message DeleteMessageRequest {
+	// [webezy.WebezyApi.v1.DeleteMessageRequest.project_id] - The project id to delete the specified message
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteMessageRequest.message] - The full message resource name to be deleted
+	string message = 2;
+}
+
+// [webezy.WebezyApi.v1.DeleteMessageResponse] - The response from deletion service process
+message DeleteMessageResponse {
+	// [webezy.WebezyApi.v1.DeleteMessageResponse.project_id] - The project unique id for which the message has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteMessageResponse.deleted] - The deleted message object
+	webezy.WebezyPackage.v1.WebezyMessage deleted = 2;
+}
+
+// [webezy.WebezyApi.v1.GetMessageRequest] - Get a specific message details
+message GetMessageRequest {
+	// [webezy.WebezyApi.v1.GetMessageRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetMessageRequest.message] - The full message name
+	string message = 2;
+}
+
+// [webezy.WebezyApi.v1.GetMessageResponse] - Get message response
+message GetMessageResponse {
+	// [webezy.WebezyApi.v1.GetMessageResponse.message] - The queried message object
+	webezy.WebezyPackage.v1.WebezyMessage message = 1;
+}
+
+// [webezy.WebezyApi.v1.GetMethodRequest] - Get a specified method on project
+message GetMethodRequest {
+	// [webezy.WebezyApi.v1.GetMethodRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetMethodRequest.method] - The full resource name of the method (RPC)
+	string method = 2;
+}
+
+// [webezy.WebezyApi.v1.GetMethodResponse] - Get a method response
+message GetMethodResponse {
+	// [webezy.WebezyApi.v1.GetMethodResponse.method] - The queried method
+	webezy.WebezyService.v1.WebezyMethod method = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateMethodRequest] - Create a method request
+message CreateMethodRequest {
+	// [webezy.WebezyApi.v1.CreateMethodRequest.project_id] - The unique `project_id` to create the new method on
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateMethodRequest.method] - The new method (RPC)
+	webezy.WebezyService.v1.WebezyMethod method = 2;
+	string service = 3;
+}
+
+// [webezy.WebezyApi.v1.CreateMethodResponse] - Create method response
+message CreateMethodResponse {
+	// [webezy.WebezyApi.v1.CreateMethodResponse.project_id] - The unique `project_id` which the RPC has been attached to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateMethodResponse.service] - The full service resource name
+	string service = 2;
+	// [webezy.WebezyApi.v1.CreateMethodResponse.method] - The created method object
+	webezy.WebezyService.v1.WebezyMethod method = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateMethodRequest] - Update method request
+message UpdateMethodRequest {
+	// [webezy.WebezyApi.v1.UpdateMethodRequest.project_id] - The unique `project_id` which the updated method is under
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateMethodRequest.method] - The full reasource name of the method - `<domain>.<service>.<version>.<method>`
+	string method = 2;
+	// [webezy.WebezyApi.v1.UpdateMethodRequest.update] - The updated method object
+	webezy.WebezyService.v1.WebezyMethod update = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateMethodResponse] - Update method (RPC) response
+message UpdateMethodResponse {
+	// [webezy.WebezyApi.v1.UpdateMethodResponse.project_id] - The project which the method (RPC) has been updated
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateMethodResponse.method] - The unique resource name of the method which has been updated
+	string method = 2;
+	// [webezy.WebezyApi.v1.UpdateMethodResponse.updated] - The updated object
+	webezy.WebezyService.v1.WebezyMethod updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeleteMethodRequest] - Delete a method on specified project
+message DeleteMethodRequest {
+	// [webezy.WebezyApi.v1.DeleteMethodRequest.project_id] - The unique `project_id` whcih the method will be deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteMethodRequest.method] - The method to delete full resource name - `<domain>.<service>.<version>.<method>`
+	string method = 2;
+}
+
+// [webezy.WebezyApi.v1.DeleteMethodResponse] - Delete method (RPC) response
+message DeleteMethodResponse {
+	// [webezy.WebezyApi.v1.DeleteMethodResponse.project_id] - The unique `project_id` which the method has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteMethodResponse.deleted] - The deleted object
+	webezy.WebezyService.v1.WebezyMethod deleted = 2;
+}
+
+// [webezy.WebezyApi.v1.CreateFieldRequest] - Create a field object request
+message CreateFieldRequest {
+	// [webezy.WebezyApi.v1.CreateFieldRequest.project_id] -  The unique `project_id` which the new field will be created on
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateFieldRequest.message] - The full resource name of the parent message
+	string message = 2;
+	// [webezy.WebezyApi.v1.CreateFieldRequest.field] - The new field to attach into the message
+	webezy.WebezyPackage.v1.WebezyField field = 3;
+}
+
+// [webezy.WebezyApi.v1.CreateFieldResponse] - Create field object response
+message CreateFieldResponse {
+	// [webezy.WebezyApi.v1.CreateFieldResponse.project_id] - The unique `project_id` which the field has been attached to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateFieldResponse.message] - The full resource name of the parent message
+	string message = 2;
+	// [webezy.WebezyApi.v1.CreateFieldResponse.field] - The new created object field
+	webezy.WebezyPackage.v1.WebezyField field = 3;
+}
+
+// [webezy.WebezyApi.v1.GetFieldRequest] - Get a field object request
+message GetFieldRequest {
+	// [webezy.WebezyApi.v1.GetFieldRequest.project_id] - The project unique id constructed from : <organization_domain>.<project.package_name>
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetFieldRequest.field] - The full reasource name of the field - `<domain>.<package>.<version>.<message>.<field>`
+	string field = 2;
+}
+
+// [webezy.WebezyApi.v1.GetFieldResponse] - Get field object response
+message GetFieldResponse {
+	// [webezy.WebezyApi.v1.GetFieldResponse.project_id] - The unique `project_id` which the queried field is under
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetFieldResponse.field] - The queried field object
+	webezy.WebezyPackage.v1.WebezyField field = 2;
+}
+
+// [webezy.WebezyApi.v1.UpdateFieldRequest] - Update a field object with new properties
+message UpdateFieldRequest {
+	// [webezy.WebezyApi.v1.UpdateFieldRequest.project_id] - The unique `project_id`
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateFieldRequest.field] - The field full resource name
+	string field = 2;
+	// [webezy.WebezyApi.v1.UpdateFieldRequest.update] - The updated field
+	webezy.WebezyPackage.v1.WebezyField update = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateFieldResponse] - Update field process response
+message UpdateFieldResponse {
+	// [webezy.WebezyApi.v1.UpdateFieldResponse.project_id] - The unique `project_id`
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateFieldResponse.field] - The updated field full resource name
+	string field = 2;
+	// [webezy.WebezyApi.v1.UpdateFieldResponse.updated] - The updated field object
+	webezy.WebezyPackage.v1.WebezyField updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeleteFieldRequest] - Delete a field
+message DeleteFieldRequest {
+	// [webezy.WebezyApi.v1.DeleteFieldRequest.project_id] - The unique `project_id` which the field will be deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteFieldRequest.field] - The full field resource name
+	string field = 2;
+}
+
+// [webezy.WebezyApi.v1.DeleteFieldResponse] - Delete field response object
+message DeleteFieldResponse {
+	// [webezy.WebezyApi.v1.DeleteFieldResponse.project_id] - The unique `project_id` which the field has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteFieldResponse.deleted] - The deleted field object
+	webezy.WebezyPackage.v1.WebezyField deleted = 2;
+}
+
+// [webezy.WebezyApi.v1.GetUserRequest] - Get a user info request object
+message GetUserRequest {
+	// [webezy.WebezyApi.v1.GetUserRequest.user_id] - The user unique id
+	string user_id = 1;
+}
+
+// [webezy.WebezyApi.v1.GetUserResponse] - The user info object
+message GetUserResponse {
+	// [webezy.WebezyApi.v1.GetUserResponse.user] - `webezy.WebezyPlatform.v1.WebezyUser` object
+	webezy.WebezyPlatform.v1.WebezyUser user = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateUserRequest] - Create a new user on Webezy.io platform
+message CreateUserRequest {
+	// [webezy.WebezyApi.v1.CreateUserRequest.user] - The user details to create
+	webezy.WebezyPlatform.v1.WebezyUser user = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateUserResponse] - The response for creating new user
+message CreateUserResponse {
+	// [webezy.WebezyApi.v1.CreateUserResponse.user] - The created `webezy.WebezyPlatform.v1.WebezyUser` object
+	webezy.WebezyPlatform.v1.WebezyUser user = 1;
+	// [webezy.WebezyApi.v1.CreateUserResponse.organization] - The organization the user has been associated with
+	webezy.WebezyPlatform.v1.WebezyOrganization organization = 2;
+}
+
+// [webezy.WebezyApi.v1.GetOrganizationRequest] - Get organization info
+message GetOrganizationRequest {
+	// [webezy.WebezyApi.v1.GetOrganizationRequest.org_id] - The unique organization id
+	string org_id = 1;
+}
+
+// [webezy.WebezyApi.v1.GetOrganizationResponse] - The response for `webezy.Platform.v1.GetOrganization` which will return an exitsing organization `webezy.WebezyPlatform.v1.WebezyOrganization`
+message GetOrganizationResponse {
+	// [webezy.WebezyApi.v1.GetOrganizationResponse.organization] - The organiation response object `webezy.WebezyPlatform.v1.WebezyOrganization`
+	webezy.WebezyPlatform.v1.WebezyOrganization organization = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateOrganizationRequest] - Create a new `webezy.WebezyPlatform.v1.WebezyOrganization` object request
+message CreateOrganizationRequest {
+	// [webezy.WebezyApi.v1.CreateOrganizationRequest.organization] - The organiation info `webezy.WebezyPlatform.v1.WebezyOrganization` object
+	webezy.WebezyPlatform.v1.WebezyOrganization organization = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateOrganizationResponse] - The response for `webezy.Platform.v1.CreateOrganization` RPC which will return the `webezy.WebezyPlatform.v1.WebezyOrganization` object details
+message CreateOrganizationResponse {
+	// [webezy.WebezyApi.v1.CreateOrganizationResponse.organization] - The organization info `webezy.WebezyPlatform.v1.WebezyOrganization`
+	webezy.WebezyPlatform.v1.WebezyOrganization organization = 1;
+}
+
+// [webezy.WebezyApi.v1.GetProjectRequest] - Get a `webezy.WebezyCore.v1.WebezyProject` request object by organization id
+message GetProjectRequest {
+	// [webezy.WebezyApi.v1.GetProjectRequest.project] - The project full resource name - `<organization>.<project>`
+	string project = 1;
+}
+
+// [webezy.WebezyApi.v1.GetProjectResponse] - The project info object response for `webezy.Platform.v1.GetProject` rpc
+message GetProjectResponse {
+	// [webezy.WebezyApi.v1.GetProjectResponse.project] - The project info object `webezy.WebezyCore.v1.WebezyProject`
+	webezy.WebezyCore.v1.WebezyProject project = 1;
+	// [webezy.WebezyApi.v1.GetProjectResponse.org_id] - The organization id which the project relates to
+	string org_id = 2;
+}
+
+// [webezy.WebezyApi.v1.CreateProjectRequest] - Create a new project request object for `webezy.WebezyPlatform.v1.CreateProject` which will create a new project under specified organization
+message CreateProjectRequest {
+	// [webezy.WebezyApi.v1.CreateProjectRequest.project] - The new project object
+	webezy.WebezyCore.v1.WebezyProject project = 1;
+	// [webezy.WebezyApi.v1.CreateProjectRequest.org_id] - The organization id
+	string org_id = 2;
+}
+
+// [webezy.WebezyApi.v1.CreateProjectResponse] - Create a new project response object for `webezy.WebezyPlatform.v1.CreateProject` rpc which will retrun the new `webezy.WebezyPlatform.v1.WebezyProject` object wa created under spcified organization
+message CreateProjectResponse {
+	// [webezy.WebezyApi.v1.CreateProjectResponse.project] - The created `webezy.WebezyCore.v1.WebezyProject` object info
+	webezy.WebezyCore.v1.WebezyProject project = 1;
+	// [webezy.WebezyApi.v1.CreateProjectResponse.org_id] - The organization unique id which the project has been associated with
+	string org_id = 2;
+}
+
+// [webezy.WebezyApi.v1.ListProjectsRequest] - List all organization project
+message ListProjectsRequest {
+	// [webezy.WebezyApi.v1.ListProjectsRequest.org_id] - The organization query for all it's projects
+	string org_id = 1;
+}
+
+// [webezy.WebezyApi.v1.ListProjectsResponse] - List project response
+message ListProjectsResponse {
+	// [webezy.WebezyApi.v1.ListProjectsResponse.project] - The project response
+	webezy.WebezyCore.v1.WebezyProject project = 1;
+}
+
+// [webezy.WebezyApi.v1.ListServicesRequest] - List services under specified project
+message ListServicesRequest {
+	// [webezy.WebezyApi.v1.ListServicesRequest.project_id] - The project unique id
+	string project_id = 1;
+}
+
+// [webezy.WebezyApi.v1.ListServicesResponse] - List services under specified project response
+message ListServicesResponse {
+	// [webezy.WebezyApi.v1.ListServicesResponse.service] - The service that returned
+	webezy.WebezyService.v1.WebezyService service = 1;
+}
+
+// [webezy.WebezyApi.v1.GetEnumRequest] - Get enum object
+message GetEnumRequest {
+	// [webezy.WebezyApi.v1.GetEnumRequest.project_id] - The unique `project_id` which the enum is belong to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetEnumRequest.enum] - The full enum name
+	string enum = 2;
+}
+
+// [webezy.WebezyApi.v1.GetEnumResponse] - The returned enum object
+message GetEnumResponse {
+	// [webezy.WebezyApi.v1.GetEnumResponse.enum] - The enum object returned
+	webezy.WebezyPackage.v1.WebezyEnum enum = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateEnumRequest] - Create an enum object request
+message CreateEnumRequest {
+	// [webezy.WebezyApi.v1.CreateEnumRequest.project_id] - The project unique id for which the enum will be added to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateEnumRequest.package] - The package unique resource name
+	string package = 2;
+	// [webezy.WebezyApi.v1.CreateEnumRequest.enum] - The enum object to be created
+	webezy.WebezyPackage.v1.WebezyEnum enum = 3;
+}
+
+// [webezy.WebezyApi.v1.CreateEnumResponse] - Create a new enum response
+message CreateEnumResponse {
+	// [webezy.WebezyApi.v1.CreateEnumResponse.project_id] - The unique project id which the enum has been attached to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateEnumResponse.package] - The package which the enum is attached to
+	string package = 2;
+	// [webezy.WebezyApi.v1.CreateEnumResponse.enum] - The ceated enum object
+	webezy.WebezyPackage.v1.WebezyEnum enum = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateEnumRequest] - project_id
+message UpdateEnumRequest {
+	// [webezy.WebezyApi.v1.UpdateEnumRequest.project_id] - The unique project id for which the enum should be update
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateEnumRequest.enum] - the enum full resource name
+	string enum = 2;
+	// [webezy.WebezyApi.v1.UpdateEnumRequest.update] - The updated enum object
+	webezy.WebezyPackage.v1.WebezyEnum update = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateEnumResponse] - Update enum object response
+message UpdateEnumResponse {
+	// [webezy.WebezyApi.v1.UpdateEnumResponse.project_id] - Unique project id which the enum has been updated
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateEnumResponse.enum] - The enum full resource name which has been updated
+	string enum = 2;
+	// [webezy.WebezyApi.v1.UpdateEnumResponse.updated] - The updated object
+	webezy.WebezyPackage.v1.WebezyEnum updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeleteEnumRequest] - Delete enum object request
+message DeleteEnumRequest {
+	// [webezy.WebezyApi.v1.DeleteEnumRequest.project_id] - Unique project id which the enum will be deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteEnumRequest.enum] - The full enum resource name
+	string enum = 2;
+}
+
+// [webezy.WebezyApi.v1.DeleteEnumResponse] - Delete enum response
+message DeleteEnumResponse {
+	// [webezy.WebezyApi.v1.DeleteEnumResponse.project_id] - The unique project id which the enum has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteEnumResponse.deleted] - The deleted enum object
+	webezy.WebezyPackage.v1.WebezyEnum deleted = 2;
+}
+
+// [webezy.WebezyApi.v1.GetEnumValueRequest] - Get an enum value object request
+message GetEnumValueRequest {
+	// [webezy.WebezyApi.v1.GetEnumValueRequest.project_id] - The unique project id whcih the enum is belong to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetEnumValueRequest.enum_value] - The full enum value resource name
+	string enum_value = 2;
+}
+
+// [webezy.WebezyApi.v1.GetEnumValueResponse] - Get enum value response
+message GetEnumValueResponse {
+	// [webezy.WebezyApi.v1.GetEnumValueResponse.project_id] - The unique project id which the enum value is belong to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.GetEnumValueResponse.enum_value] - The enum value object
+	webezy.WebezyPackage.v1.WebezyEnumValue enum_value = 2;
+}
+
+// [webezy.WebezyApi.v1.CreateEnumValueRequest] - Create a new enum value under specified enum
+message CreateEnumValueRequest {
+	// [webezy.WebezyApi.v1.CreateEnumValueRequest.project_id] - The unique project id which the enum value is belong to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateEnumValueRequest.enum] - The parent enum which the `enum_value` is belong to
+	string enum = 2;
+	// [webezy.WebezyApi.v1.CreateEnumValueRequest.enum_value] - The enum value object to be created under the specified enum
+	webezy.WebezyPackage.v1.WebezyEnumValue enum_value = 3;
+}
+
+// [webezy.WebezyApi.v1.CreateEnumValueResponse] - The create enum value response
+message CreateEnumValueResponse {
+	// [webezy.WebezyApi.v1.CreateEnumValueResponse.project_id] - Unique project id which the enum value has been created
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.CreateEnumValueResponse.enum] - The full enum parent name which the `enum_value` has been attached to
+	string enum = 2;
+	// [webezy.WebezyApi.v1.CreateEnumValueResponse.enum_value] - The created enum value
+	webezy.WebezyPackage.v1.WebezyEnumValue enum_value = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateEnumValueRequest] - Update enum value request
+message UpdateEnumValueRequest {
+	// [webezy.WebezyApi.v1.UpdateEnumValueRequest.project_id] - The unique project id which the enum value to be updated is belong to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateEnumValueRequest.enum_value] - The full enum value resource name
+	string enum_value = 2;
+	// [webezy.WebezyApi.v1.UpdateEnumValueRequest.update] - The updated enum value object
+	webezy.WebezyPackage.v1.WebezyEnumValue update = 3;
+}
+
+// [webezy.WebezyApi.v1.UpdateEnumValueResponse] - Update enum value response
+message UpdateEnumValueResponse {
+	// [webezy.WebezyApi.v1.UpdateEnumValueResponse.project_id] - Unique project id of the updated enum value
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.UpdateEnumValueResponse.enum_value] - The full resource name of the enum value
+	string enum_value = 2;
+	// [webezy.WebezyApi.v1.UpdateEnumValueResponse.updated] - The updated enum value response
+	webezy.WebezyPackage.v1.WebezyEnumValue updated = 3;
+}
+
+// [webezy.WebezyApi.v1.DeleteEnumValueRequest] - Delete an enum value request
+message DeleteEnumValueRequest {
+	// [webezy.WebezyApi.v1.DeleteEnumValueRequest.project_id] - The project id which the enum value is belong to
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteEnumValueRequest.enum_value] - The full enum value resource name
+	string enum_value = 2;
+}
+
+// [webezy.WebezyApi.v1.DeleteEnumValueResponse] - The deleted enum value response
+message DeleteEnumValueResponse {
+	// [webezy.WebezyApi.v1.DeleteEnumValueResponse.project_id] - The unique project id which the enum value has been deleted from
+	string project_id = 1;
+	// [webezy.WebezyApi.v1.DeleteEnumValueResponse.deleted] - The deleted enum value object
+	webezy.WebezyPackage.v1.WebezyEnumValue deleted = 2;
+}
+
+// [webezy.WebezyApi.v1.GetRepoRequest] - Get a repo object request
+message GetRepoRequest {
+	// [webezy.WebezyApi.v1.GetRepoRequest.repo_uri] - The repo unique resource id - `<domain>/<packageName>`
+	string repo_uri = 1;
+}
+
+// [webezy.WebezyApi.v1.GetRepoResponse] - Get repo request response object
+message GetRepoResponse {
+	// [webezy.WebezyApi.v1.GetRepoResponse.repo] - The returned repo object
+	webezy.WebezyRepos.v1.WebezyRepository repo = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateRepoRequest] - Create a new repo from existing project
+message CreateRepoRequest {
+	// [webezy.WebezyApi.v1.CreateRepoRequest.repo] - The new repo object
+	webezy.WebezyRepos.v1.WebezyRepository repo = 1;
+}
+
+// [webezy.WebezyApi.v1.CreateRepoResponse] - Create repo process response
+message CreateRepoResponse {
+	// [webezy.WebezyApi.v1.CreateRepoResponse.status] - The repo creation process status
+	string status = 1;
+}
+
+// [webezy.WebezyApi.v1.ListReposRequest] - List organization repos
+message ListReposRequest {
+	// [webezy.WebezyApi.v1.ListReposRequest.domain] - The organization unique domain
+	string domain = 1;
+}
+
+// [webezy.WebezyApi.v1.ListReposResponse] - List repos response
+message ListReposResponse {
+	// [webezy.WebezyApi.v1.ListReposResponse.repo] - Array of organization repos
+	repeated webezy.WebezyRepos.v1.WebezyRepository repo = 1;
+}
+
+// [webezy.WebezyApi.v1.OpenCloudShellRequest] - Open a cloud shell request
+message OpenCloudShellRequest {
+	// [webezy.WebezyApi.v1.OpenCloudShellRequest.repo_uri] - The repo to open a cloud shell for `<domain>/<repo>`
+	string repo_uri = 1;
+}
+
+// [webezy.WebezyApi.v1.OpenCloudShellResponse] - Open cloud shell response
+message OpenCloudShellResponse {
+	string status = 1;
+}
+
+// [webezy.WebezyApi.v1.CloudShellExecRequest] - repo_uri
+message CloudShellExecRequest {
+	// [webezy.WebezyApi.v1.CloudShellExecRequest.repo_uri] -  The repo to execute a cloud shell command for `<domain>/<repo>`
+	string repo_uri = 1;
+}
+
+// [webezy.WebezyApi.v1.CloudShellExecResponse] - Response for cloud shell execute command
+message CloudShellExecResponse {
+	// [webezy.WebezyApi.v1.CloudShellExecResponse.exit_code] - The process command exit_code
+	int32 exit_code = 1;
+	// [webezy.WebezyApi.v1.CloudShellExecResponse.logs] - The process logs
+	repeated string logs = 2;
+}
+
+// [webezy.WebezyApi.v1.ListOrganizationsRequest] - List organizations under specified user id
+message ListOrganizationsRequest {
+	// [webezy.WebezyApi.v1.ListOrganizationsRequest.user_id] - The user unique id
+	string user_id = 1;
+}
+

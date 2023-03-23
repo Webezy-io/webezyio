@@ -1,0 +1,41 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyCore.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/any.proto";
+package webezy.WebezyPlatform.v1;
+
+// [webezy.WebezyPlatform.v1.WebezyUser] - The base user object
+message WebezyUser {
+	// [webezy.WebezyPlatform.v1.WebezyUser.email] - The user email addr
+	string email = 1;
+	// [webezy.WebezyPlatform.v1.WebezyUser.email_verified] - Is email has been veified by user
+	bool email_verified = 2;
+	// [webezy.WebezyPlatform.v1.WebezyUser.family_name] - The user last name
+	string family_name = 3;
+	// [webezy.WebezyPlatform.v1.WebezyUser.given_name] - The user first name
+	string given_name = 4;
+	// [webezy.WebezyPlatform.v1.WebezyUser.locale] - The user default language
+	string locale = 5;
+	// [webezy.WebezyPlatform.v1.WebezyUser.nickname] - User alternate name
+	string nickname = 6;
+	// [webezy.WebezyPlatform.v1.WebezyUser.picture] - User icon
+	string picture = 7;
+	string user_id = 8;
+	repeated string orgsIds = 9;
+}
+
+// [webezy.WebezyPlatform.v1.WebezyOrganization] - The core organization details
+message WebezyOrganization {
+	// [webezy.WebezyPlatform.v1.WebezyOrganization.org_id] - Unique id for the organization
+	string org_id = 1;
+	// [webezy.WebezyPlatform.v1.WebezyOrganization.name] - Organization human-readable identifier
+	string name = 2;
+	// [webezy.WebezyPlatform.v1.WebezyOrganization.users] - The users under the organization
+	repeated webezy.WebezyPlatform.v1.WebezyUser users = 3 ;
+	string id = 4;
+	repeated webezy.WebezyCore.v1.WebezyProject projects = 5;
+	string domain = 6;
+}
+

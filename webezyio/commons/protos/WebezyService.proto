@@ -1,9 +1,9 @@
 // Webezy.io Generated proto DO NOT EDIT
 syntax = "proto3";
 
+
 import "google/protobuf/struct.proto";
 package webezy.WebezyService.v1;
-
 
 
 // [webezy.WebezyService.v1.WebezyMethod] - The webezy service method (RPC) description
@@ -40,19 +40,12 @@ message WebezyService {
 	string name = 2;
 	// [webezy.WebezyService.v1.WebezyService.full_name] - The service full name consisting of - <domain>.<name>.<version>
 	string full_name = 3;
-	// [webezy.WebezyService.v1.WebezyService.methods] - 
 	repeated webezy.WebezyService.v1.WebezyMethod methods = 4;
-	// [webezy.WebezyService.v1.WebezyService.version] - 
 	string version = 5;
-	// [webezy.WebezyService.v1.WebezyService.dependencies] - 
 	repeated string dependencies = 6;
-	// [webezy.WebezyService.v1.WebezyService.description] - 
 	string description = 7;
-	// [webezy.WebezyService.v1.WebezyService.type] - 
 	string type = 8;
-	// [webezy.WebezyService.v1.WebezyService.kind] - 
 	string kind = 9;
-	// [webezy.WebezyService.v1.WebezyService.extensions] - 
 	map<string, google.protobuf.Value> extensions = 10;
 }
 

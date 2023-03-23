@@ -1,7 +1,6 @@
 from asyncio.log import logger
 from typing import Tuple,Iterator
 import grpc
-import sys
 from functools import partial
 from . import Analytics_pb2_grpc as AnalyticsService
 from . import WebezyAnalytics_pb2 as WebezyAnalytics

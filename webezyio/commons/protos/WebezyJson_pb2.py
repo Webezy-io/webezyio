@@ -3,8 +3,6 @@
 # source: WebezyJson.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
-
-from typing import overload, Iterator, List, Dict
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -27,35 +25,6 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10WebezyJson.pro
 _WEBEZYJSON = DESCRIPTOR.message_types_by_name['WebezyJson']
 _WEBEZYJSON_SERVICESENTRY = _WEBEZYJSON.nested_types_by_name['ServicesEntry']
 _WEBEZYJSON_PACKAGESENTRY = _WEBEZYJSON.nested_types_by_name['PackagesEntry']
-
-@overload
-class WebezyJson(_message.Message):
-	"""webezyio generated message [webezy.WebezyJson.v1.WebezyJson]
-	A class respresent a WebezyJson type
-	The webezy.json file schema
-		"""
-	domain = str # type: str
-	project = WebezyCore__pb2.WebezyProject # type: WebezyCore__pb2.WebezyProject
-	config = WebezyConfig__pb2.WebezyConfig # type: WebezyConfig__pb2.WebezyConfig
-	services = Dict[str,WebezyService__pb2.WebezyService] # type: Dict[str,WebezyService__pb2.WebezyService]
-	packages = Dict[str,WebezyPackage__pb2.WebezyPackage] # type: Dict[str,WebezyPackage__pb2.WebezyPackage]
-
-	def __init__(self, domain=str, project=WebezyCore__pb2.WebezyProject, config=WebezyConfig__pb2.WebezyConfig, services=Dict[str,WebezyService__pb2.WebezyService], packages=Dict[str,WebezyPackage__pb2.WebezyPackage]):
-		"""
-		Attributes:
-		----------
-		domain : str
-			The domain name without any prefix or suffix
-		project : WebezyCore__pb2.WebezyProject
-			The webezy project description
-		config : WebezyConfig__pb2.WebezyConfig
-			The webezy project configs
-		services : Dict[str,WebezyService__pb2.WebezyService]
-			
-		packages : Dict[str,WebezyPackage__pb2.WebezyPackage]
-			
-		"""
-		pass
 WebezyJson = _reflection.GeneratedProtocolMessageType('WebezyJson', (_message.Message,), {
 
   'ServicesEntry' : _reflection.GeneratedProtocolMessageType('ServicesEntry', (_message.Message,), {

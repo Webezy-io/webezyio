@@ -32,7 +32,8 @@ from webezyio.commons import errors, pretty
 from webezyio.commons.resources import generate_package, generate_service
 from webezyio.commons.errors import WebezyCoderError, WebezyValidationError
 from webezyio.commons.file_system import check_if_file_exists, join_path
-from webezyio.commons.protos import WebezyJson,WebezyAnalytics_pb2,webezycore
+from webezyio.commons.protos import WebezyJson,WebezyAnalytics_pb2
+from webezyio.commons.protos.client import webezycore
 from itertools import groupby
 from google.protobuf.struct_pb2 import Value
 from google.protobuf.json_format import ParseDict, MessageToDict

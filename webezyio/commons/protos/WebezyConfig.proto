@@ -8,6 +8,11 @@ import "WebezyTemplate.proto";
 package webezy.WebezyConfig.v1;
 
 
+// [webezy.WebezyConfig.v1.WebezyDocs] - Main configurations for Auto generated docs
+message WebezyDocs {
+	// [webezy.WebezyConfig.v1.WebezyDocs.file] - The main README.md file path should be placed with different path if you want to write custom README.md file 
+	string file = 1;
+}
 
 // [webezy.WebezyConfig.v1.WebezyMonitor] - WebezyMonitor configurations
 message WebezyMonitor {
@@ -33,12 +38,6 @@ message WebezyConfig {
 	repeated string webezyio_templates = 11;
 	map<string, bool> features = 12;
 	repeated string plugins = 13;
-}
-
-// [webezy.WebezyConfig.v1.WebezyDocs] - Main configurations for Auto generated docs
-message WebezyDocs {
-	// [webezy.WebezyConfig.v1.WebezyDocs.file] - The main README.md file path should be placed with different path if you want to write custom README.md file 
-	string file = 1;
 }
 
 // [webezy.WebezyConfig.v1.DeploymentType] - None

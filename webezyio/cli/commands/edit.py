@@ -588,7 +588,8 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                     else:
                         desc = ''
                     avail_msgs.append((f'{msg.name} [{msg.full_name}]'+desc, msg.full_name))
-    
+                for enum in d_package.enums:
+                    avail_enums.append((enum.name, enum.full_name))
             for m in d_package.messages:
                 if m.extension_type is not None:
                     if protos.WebezyExtension.Name(m.extension_type) == 'FieldOptions':
@@ -725,6 +726,7 @@ def add_fields(resource,wz_json:helpers.WZJson,architect=WebezyArchitect,expand=
                     elif map_types.get('valueType') == 'TYPE_ENUM':
                         if len(avail_enums) == 0:
                             print_warning("[MAP] No enums available for field")
+                            print_warning("- Make sure to import existing package which hold atleast one 'enum'")
                             exit(1)
                         else:
                             message = inquirer.prompt([

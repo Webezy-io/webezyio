@@ -3,8 +3,6 @@
 # source: WebezyPrometheus.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
-
-from typing import overload, Iterator, List, Dict
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -25,23 +23,6 @@ _STATICCONFIGLABEL = DESCRIPTOR.message_types_by_name['StaticConfigLabel']
 _STATICCONFIG = DESCRIPTOR.message_types_by_name['StaticConfig']
 _SCRAPECONFIG = DESCRIPTOR.message_types_by_name['ScrapeConfig']
 _PROMETHEUSCONFIG = DESCRIPTOR.message_types_by_name['PrometheusConfig']
-
-@overload
-class GlobalConfig(_message.Message):
-	"""webezyio generated message [webezy.WebezyPrometheus.v1.GlobalConfig]
-	A class respresent a GlobalConfig type
-	The prometheus global configs
-		"""
-	scrape_interval = int # type: int
-
-	def __init__(self, scrape_interval=int):
-		"""
-		Attributes:
-		----------
-		scrape_interval : int
-			The global scrape interval in secondes
-		"""
-		pass
 GlobalConfig = _reflection.GeneratedProtocolMessageType('GlobalConfig', (_message.Message,), {
   'DESCRIPTOR' : _GLOBALCONFIG,
   '__module__' : 'WebezyPrometheus_pb2'
@@ -49,26 +30,6 @@ GlobalConfig = _reflection.GeneratedProtocolMessageType('GlobalConfig', (_messag
   })
 _sym_db.RegisterMessage(GlobalConfig)
 
-
-@overload
-class StaticConfigLabel(_message.Message):
-	"""webezyio generated message [webezy.WebezyPrometheus.v1.StaticConfigLabel]
-	A class respresent a StaticConfigLabel type
-	The label for the static config
-		"""
-	service_name = str # type: str
-	group = str # type: str
-
-	def __init__(self, service_name=str, group=str):
-		"""
-		Attributes:
-		----------
-		service_name : str
-			The service name
-		group : str
-			the group
-		"""
-		pass
 StaticConfigLabel = _reflection.GeneratedProtocolMessageType('StaticConfigLabel', (_message.Message,), {
   'DESCRIPTOR' : _STATICCONFIGLABEL,
   '__module__' : 'WebezyPrometheus_pb2'
@@ -76,26 +37,6 @@ StaticConfigLabel = _reflection.GeneratedProtocolMessageType('StaticConfigLabel'
   })
 _sym_db.RegisterMessage(StaticConfigLabel)
 
-
-@overload
-class StaticConfig(_message.Message):
-	"""webezyio generated message [webezy.WebezyPrometheus.v1.StaticConfig]
-	A class respresent a StaticConfig type
-	The static config specified for job
-		"""
-	targets = List[str] # type: List[str]
-	labels = List[StaticConfigLabel] # type: List[StaticConfigLabel]
-
-	def __init__(self, targets=List[str], labels=List[StaticConfigLabel]):
-		"""
-		Attributes:
-		----------
-		targets : List[str]
-			The targets array consist of HOST:PORT value
-		labels : List[StaticConfigLabel]
-			
-		"""
-		pass
 StaticConfig = _reflection.GeneratedProtocolMessageType('StaticConfig', (_message.Message,), {
   'DESCRIPTOR' : _STATICCONFIG,
   '__module__' : 'WebezyPrometheus_pb2'
@@ -103,29 +44,6 @@ StaticConfig = _reflection.GeneratedProtocolMessageType('StaticConfig', (_messag
   })
 _sym_db.RegisterMessage(StaticConfig)
 
-
-@overload
-class ScrapeConfig(_message.Message):
-	"""webezyio generated message [webezy.WebezyPrometheus.v1.ScrapeConfig]
-	A class respresent a ScrapeConfig type
-	The prometheus scrape specific configs
-		"""
-	job_name = str # type: str
-	scrape_interval = int # type: int
-	static_configs = List[StaticConfig] # type: List[StaticConfig]
-
-	def __init__(self, job_name=str, scrape_interval=int, static_configs=List[StaticConfig]):
-		"""
-		Attributes:
-		----------
-		job_name : str
-			The specified job name
-		scrape_interval : int
-			The scrape interval for the specified job - in secondes
-		static_configs : List[StaticConfig]
-			
-		"""
-		pass
 ScrapeConfig = _reflection.GeneratedProtocolMessageType('ScrapeConfig', (_message.Message,), {
   'DESCRIPTOR' : _SCRAPECONFIG,
   '__module__' : 'WebezyPrometheus_pb2'
@@ -133,26 +51,6 @@ ScrapeConfig = _reflection.GeneratedProtocolMessageType('ScrapeConfig', (_messag
   })
 _sym_db.RegisterMessage(ScrapeConfig)
 
-
-@overload
-class PrometheusConfig(_message.Message):
-	"""webezyio generated message [webezy.WebezyPrometheus.v1.PrometheusConfig]
-	A class respresent a PrometheusConfig type
-	The prometheus description for configuration file
-		"""
-	global_config = GlobalConfig # type: GlobalConfig
-	scrape_configs = List[ScrapeConfig] # type: List[ScrapeConfig]
-
-	def __init__(self, global_config=GlobalConfig, scrape_configs=List[ScrapeConfig]):
-		"""
-		Attributes:
-		----------
-		global_config : GlobalConfig
-			The global configurations for prometheus
-		scrape_configs : List[ScrapeConfig]
-			The list of scrapes for prometheus
-		"""
-		pass
 PrometheusConfig = _reflection.GeneratedProtocolMessageType('PrometheusConfig', (_message.Message,), {
   'DESCRIPTOR' : _PROMETHEUSCONFIG,
   '__module__' : 'WebezyPrometheus_pb2'

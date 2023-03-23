@@ -26,12 +26,14 @@ from webezyio.cli.prompter import QCheckbox,QConfirm,QList,QText,ask_user_questi
 from webezyio.cli.theme import WebezyTheme
 from webezyio.commons import file_system,protos
 from webezyio.commons.helpers import WZEnumValue, WZField,_BUILTINS_TEMPLATES
+from webezyio.commons.platform import WebezyPlatform
 from webezyio.commons.pretty import print_info,print_warning,print_error,print_note,print_success
-from webezyio.commons.file_system import join_path,mkdir
+from webezyio.commons.file_system import join_path,mkdir, wFile
 from webezyio.architect import WebezyArchitect
 import os
 import inquirer
 from inquirer import errors
+from google.protobuf.json_format import MessageToDict
 
 _TEMPLATES = _BUILTINS_TEMPLATES
 
@@ -53,64 +55,87 @@ wz_new_q = [
     QText(name="domain", message="Enter domain name", default='domain',validate=validate_domain),
 ]
 
-def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None,server_language:str=None,clients=[],domain:str=None,template:_TEMPLATES='@webezyio/Blank'):
+def create_new_project(project_name:str,path:str=None,host:str=None,port:int=None,server_language:str=None,clients=[],domain:str=None,template:_TEMPLATES='@webezyio/Blank',remote=None):
 
     domain_name = 'domain'
+    if remote is None:
+        if server_language is None and clients == None and domain is None:
+            results = ask_user_question(questions=wz_new_q)
+        
+            if results is None:
+                print_warning("Must answer project creation questions")
+                exit(1)
+        else:
+            results = {}
+            results['server'] = server_language
+            results['clients'] = clients
+            results['domain'] = domain
 
-    if server_language is None and clients == None and domain is None:
-        results = ask_user_question(questions=wz_new_q)
-    
-        if results is None:
-            print_warning("Must answer project creation questions")
-            exit(1)
-    else:
-        results = {}
-        results['server'] = server_language
-        results['clients'] = clients
-        results['domain'] = domain
+        if path is None:
+            try:
+                root = os.getcwd()
+                result_path = inquirer.prompt([inquirer.Path('root_dir', default=join_path(
+                    root, project_name), message="Enter a root dir path", exists=False)], theme=WebezyTheme())
+                if result_path is not None:
+                    result_path = result_path['root_dir']
+            except Exception:
+                print_error(
+                    f"Error root dir exists\n[{join_path(root,project_name)}]")
+                exit(1)
+        else:
+            result_path = join_path(path, project_name)
 
-    if path is None:
-        try:
-            root = os.getcwd()
-            result_path = inquirer.prompt([inquirer.Path('root_dir', default=join_path(
-                root, project_name), message="Enter a root dir path", exists=False)], theme=WebezyTheme())
-            if result_path is not None:
-                result_path = result_path['root_dir']
-        except Exception:
-            print_error(
-                f"Error root dir exists\n[{join_path(root,project_name)}]")
-            exit(1)
-    else:
-        result_path = join_path(path, project_name)
-
-    clients = []
-    for k in results:
-        if k == 'server':
-            if type(results[k]) == str:
-                server_langugae = results[k]
-            else:
-                server_langugae = protos.WebezyLanguage.Name(results[k])
-            print_info(f'Server language: {server_langugae}')
-        if k == 'clients':
-            for c in results[k]:
-                if type(c) == str:
-                    client_lang = c
+        clients = []
+        for k in results:
+            if k == 'server':
+                if type(results[k]) == str:
+                    server_langugae = results[k]
                 else:
-                    client_lang = protos.WebezyLanguage.Name(c)
-                out_dir = join_path(
-                    result_path, 'clients', client_lang)
-                print_info(f'Adding client: {client_lang}\n\t-> {out_dir}')
-                clients.append(
-                    {'out_dir': out_dir, 'language': client_lang})
-        if k == 'domain':
-            domain_name = results[k]
+                    server_langugae = protos.WebezyLanguage.Name(results[k])
+                print_info(f'Server language: {server_langugae}')
+            if k == 'clients':
+                for c in results[k]:
+                    if type(c) == str:
+                        client_lang = c
+                    else:
+                        client_lang = protos.WebezyLanguage.Name(c)
+                    out_dir = join_path(
+                        result_path, 'clients', client_lang)
+                    print_info(f'Adding client: {client_lang}\n\t-> {out_dir}')
+                    clients.append(
+                        {'out_dir': out_dir, 'language': client_lang})
+            if k == 'domain':
+                domain_name = results[k]
 
-    out_dir = join_path(
-                    result_path, 'clients',results['server'] if type(results['server']) == str else protos.WebezyLanguage.Name(results['server']))
-    if next((c for c in clients if c.get('language') == (results['server'] if type(results['server']) == str else protos.WebezyLanguage.Name(results['server'])) ),None) is None:
-        print_warning('Auto-Adding client {} - Any project by default is assigned with client in the server specified language !'.format(protos.WebezyLanguage.Name(results['server']) if type(results['server']) != str else results['server'] ))
-        clients.append({'out_dir': out_dir, 'language': protos.WebezyLanguage.Name(results['server']) if type(results['server']) != str else results['server'] })
-    root_dir = result_path
+        out_dir = join_path(
+                        result_path, 'clients',results['server'] if type(results['server']) == str else protos.WebezyLanguage.Name(results['server']))
+        if next((c for c in clients if c.get('language') == (results['server'] if type(results['server']) == str else protos.WebezyLanguage.Name(results['server'])) ),None) is None:
+            print_warning('Auto-Adding client {} - Any project by default is assigned with client in the server specified language !'.format(protos.WebezyLanguage.Name(results['server']) if type(results['server']) != str else results['server'] ))
+            clients.append({'out_dir': out_dir, 'language': protos.WebezyLanguage.Name(results['server']) if type(results['server']) != str else results['server'] })
+        root_dir = result_path
+    
+    if remote is not None:
+        print_info('Pulling remote project "{}"...'.format(remote))
+        root = os.getcwd()
+        stub = WebezyPlatform(root)
+        prj = stub.dump_project(remote)
+        print_info('Finished pulling project')
+        domain_name = prj.domain
+        project_path = join_path(root,project_name)
+        webezy_json_path = join_path(project_path, 'webezy.json')
+        mkdir(project_path)
+        prj.project.uri = project_path
+        for c in  prj.project.clients:
+            c.out_dir = project_path + '/'+ protos.WebezyLanguage.Name(c.language)
+        wFile(webezy_json_path,MessageToDict(prj),True,True)
+        ARCHITECT = WebezyArchitect(
+            path=webezy_json_path, domain=domain_name, project_name=project_name)
+        ARCHITECT.SetConfig({'host': 'localhost', 'port': 50051, 'deployment': protos.DeploymentType.Name(protos.LOCAL) })
+        ARCHITECT.Save()
+        print_success(
+        f'Success !\n\tCreated new project "{project_name}" based on remote: "{remote}"\n\t-> cd {project_path}\n\t-> And then continue developing your awesome services !\n\t-> For more info on how to use the webezy.io CLI go to https://www.webezy.io/docs')
+        exit(0)
+
     webezy_json_path = join_path(root_dir, 'webezy.json')
     mkdir(result_path)
 

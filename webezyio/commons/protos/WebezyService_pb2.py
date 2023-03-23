@@ -3,8 +3,6 @@
 # source: WebezyService.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
-
-from typing import overload, Iterator, List, Dict
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -25,53 +23,6 @@ _WEBEZYMETHOD = DESCRIPTOR.message_types_by_name['WebezyMethod']
 _WEBEZYMETHOD_EXTENSIONSENTRY = _WEBEZYMETHOD.nested_types_by_name['ExtensionsEntry']
 _WEBEZYSERVICE = DESCRIPTOR.message_types_by_name['WebezyService']
 _WEBEZYSERVICE_EXTENSIONSENTRY = _WEBEZYSERVICE.nested_types_by_name['ExtensionsEntry']
-
-@overload
-class WebezyMethod(_message.Message):
-	"""webezyio generated message [webezy.WebezyService.v1.WebezyMethod]
-	A class respresent a WebezyMethod type
-	The webezy service method (RPC) description
-		"""
-	uri = str # type: str
-	name = str # type: str
-	full_name = str # type: str
-	type = str # type: str
-	kind = str # type: str
-	input_type = str # type: str
-	output_type = str # type: str
-	client_streaming = bool # type: bool
-	server_streaming = bool # type: bool
-	description = str # type: str
-	extensions = Dict[str,google_dot_protobuf_dot_struct__pb2.Value] # type: Dict[str,google_dot_protobuf_dot_struct__pb2.Value]
-
-	def __init__(self, uri=str, name=str, full_name=str, type=str, kind=str, input_type=str, output_type=str, client_streaming=bool, server_streaming=bool, description=str, extensions=Dict[str,google_dot_protobuf_dot_struct__pb2.Value]):
-		"""
-		Attributes:
-		----------
-		uri : str
-			The method URI
-		name : str
-			Method name
-		full_name : str
-			Method full name
-		type : str
-			The resource type
-		kind : str
-			The resource kind
-		input_type : str
-			The full resource name (message full name) for input type
-		output_type : str
-			The full resource name (message full name) for output type
-		client_streaming : bool
-			If method is client stream flag
-		server_streaming : bool
-			If method is server stream flag
-		description : str
-			The method human readable description
-		extensions : Dict[str,google_dot_protobuf_dot_struct__pb2.Value]
-			The method (RPC) pluggable extensions configurations
-		"""
-		pass
 WebezyMethod = _reflection.GeneratedProtocolMessageType('WebezyMethod', (_message.Message,), {
 
   'ExtensionsEntry' : _reflection.GeneratedProtocolMessageType('ExtensionsEntry', (_message.Message,), {
@@ -87,50 +38,6 @@ WebezyMethod = _reflection.GeneratedProtocolMessageType('WebezyMethod', (_messag
 _sym_db.RegisterMessage(WebezyMethod)
 _sym_db.RegisterMessage(WebezyMethod.ExtensionsEntry)
 
-
-@overload
-class WebezyService(_message.Message):
-	"""webezyio generated message [webezy.WebezyService.v1.WebezyService]
-	A class respresent a WebezyService type
-	The webezy service descripiton
-		"""
-	uri = str # type: str
-	name = str # type: str
-	full_name = str # type: str
-	methods = List[WebezyMethod] # type: List[WebezyMethod]
-	version = str # type: str
-	dependencies = List[str] # type: List[str]
-	description = str # type: str
-	type = str # type: str
-	kind = str # type: str
-	extensions = Dict[str,google_dot_protobuf_dot_struct__pb2.Value] # type: Dict[str,google_dot_protobuf_dot_struct__pb2.Value]
-
-	def __init__(self, uri=str, name=str, full_name=str, methods=List[WebezyMethod], version=str, dependencies=List[str], description=str, type=str, kind=str, extensions=Dict[str,google_dot_protobuf_dot_struct__pb2.Value]):
-		"""
-		Attributes:
-		----------
-		uri : str
-			The service URI for the resource
-		name : str
-			Service name - MUST not hold any blank spaces and SHOULD be Capitalized CamelCased
-		full_name : str
-			The service full name consisting of - <domain>.<name>.<version>
-		methods : List[WebezyMethod]
-			
-		version : str
-			
-		dependencies : List[str]
-			
-		description : str
-			
-		type : str
-			
-		kind : str
-			
-		extensions : Dict[str,google_dot_protobuf_dot_struct__pb2.Value]
-			
-		"""
-		pass
 WebezyService = _reflection.GeneratedProtocolMessageType('WebezyService', (_message.Message,), {
 
   'ExtensionsEntry' : _reflection.GeneratedProtocolMessageType('ExtensionsEntry', (_message.Message,), {

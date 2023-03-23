@@ -107,17 +107,24 @@ def parse_project_config(root_path:str,proto=False):
     
         merged_configs = None 
         if sys.version_info[0] >= 3 and sys.version_info[1] >= 9:
-            merged_configs = global_config | wz_json_configs
+            if wz_json_configs is not None:
+                merged_configs = global_config | wz_json_configs
+            else:
+                merged_configs = global_config
 
             if config_file:
                 merged_configs = merged_configs | config_file 
+            webezy_config = merged_configs
         else:
-
-            merged_configs = {**global_config, **wz_json_configs } 
+            if wz_json_configs is not None:
+                merged_configs = {**global_config, **wz_json_configs } 
+            else:
+                merged_configs = global_config
             # print_note(merged_configs,True,'merged_configs.py')
 
             if config_file is not None:
                 merged_configs = {**merged_configs, **config_file }
+            webezy_config = merged_configs
     # print_note(merged_configs,True,'Merged Config')
     return webezy_config
 

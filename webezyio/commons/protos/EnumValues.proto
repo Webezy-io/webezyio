@@ -1,0 +1,17 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service EnumValues {
+	// [webezyio] - Get enum value object
+	rpc GetEnumValue (webezy.WebezyApi.v1.GetEnumValueRequest) returns (webezy.WebezyApi.v1.GetEnumValueResponse);
+	// [webezyio] - Create a new enum value on specified enum
+	rpc CreateEnumValue (webezy.WebezyApi.v1.CreateEnumValueRequest) returns (webezy.WebezyApi.v1.CreateEnumValueResponse);
+	// [webezyio] - Update enum value object under specified enum
+	rpc UpdateEnumValue (webezy.WebezyApi.v1.UpdateEnumValueRequest) returns (webezy.WebezyApi.v1.UpdateEnumValueResponse);
+	// [webezyio] - Delete enum value on specific enum
+	rpc DeleteEnumValue (webezy.WebezyApi.v1.DeleteEnumValueRequest) returns (webezy.WebezyApi.v1.DeleteEnumValueResponse);
+}
+
+

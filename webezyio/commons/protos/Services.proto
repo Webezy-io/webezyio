@@ -1,0 +1,19 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Services {
+	// [webezyio] - None
+	rpc GetService (webezy.WebezyApi.v1.GetServiceRequest) returns (webezy.WebezyApi.v1.GetServiceResponse);
+	// [webezyio] - None
+	rpc CreateService (webezy.WebezyApi.v1.CreateServiceRequest) returns (webezy.WebezyApi.v1.CreateServiceResponse);
+	// [webezyio] - None
+	rpc UpdateService (webezy.WebezyApi.v1.UpdateServiceRequest) returns (webezy.WebezyApi.v1.UpdateServiceResponse);
+	// [webezyio] - None
+	rpc DeleteService (webezy.WebezyApi.v1.DeleteServiceRequest) returns (webezy.WebezyApi.v1.DeleteServiceResponse);
+	// [webezyio] - List all services under project
+	rpc ListServices (webezy.WebezyApi.v1.ListServicesRequest) returns (stream webezy.WebezyApi.v1.ListServicesResponse);
+}
+
+

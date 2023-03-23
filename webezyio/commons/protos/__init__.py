@@ -63,6 +63,3 @@ from .WebezyProxy_pb2 import ProxyAddress, ProxyCluster, ProxyConfig, ProxyEndpo
 
 """WebezyTemplate"""
 from .WebezyTemplate_pb2 import TemplateConfig, WebezyContext, WebezyFileContext, WebezyMethodContext
-
-"""Webezy core client"""
-from .client import webezycore

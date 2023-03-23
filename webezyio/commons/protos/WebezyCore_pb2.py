@@ -3,8 +3,6 @@
 # source: WebezyCore.proto
 """Generated protocol buffer code."""
 from google.protobuf.internal import enum_type_wrapper
-
-from typing import overload, Iterator, List, Dict
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
@@ -37,26 +35,6 @@ _WEBEZYSERVER = DESCRIPTOR.message_types_by_name['WebezyServer']
 _WEBEZYNPM = DESCRIPTOR.message_types_by_name['WebezyNpm']
 _WEBEZYCLIENT = DESCRIPTOR.message_types_by_name['WebezyClient']
 _WEBEZYPROJECT = DESCRIPTOR.message_types_by_name['WebezyProject']
-
-@overload
-class OkResponse(_message.Message):
-	"""webezyio generated message [webezy.WebezyCore.v1.OkResponse]
-	A class respresent a OkResponse type
-	This is OK Status response for RPC which excute a process
-		"""
-	status = str # type: str
-	context = str # type: str
-
-	def __init__(self, status=str, context=str):
-		"""
-		Attributes:
-		----------
-		status : str
-			Should be OK for succssfull process
-		context : str
-			A human readable context for the process if any message should be more then just "OK"
-		"""
-		pass
 OkResponse = _reflection.GeneratedProtocolMessageType('OkResponse', (_message.Message,), {
   'DESCRIPTOR' : _OKRESPONSE,
   '__module__' : 'WebezyCore_pb2'
@@ -64,23 +42,6 @@ OkResponse = _reflection.GeneratedProtocolMessageType('OkResponse', (_message.Me
   })
 _sym_db.RegisterMessage(OkResponse)
 
-
-@overload
-class WebezyServer(_message.Message):
-	"""webezyio generated message [webezy.WebezyCore.v1.WebezyServer]
-	A class respresent a WebezyServer type
-	The description for webezy server
-		"""
-	language = enum_type_wrapper.EnumTypeWrapper # type: enum_type_wrapper.EnumTypeWrapper
-
-	def __init__(self, language=enum_type_wrapper.EnumTypeWrapper):
-		"""
-		Attributes:
-		----------
-		language : enum_type_wrapper.EnumTypeWrapper
-			The server language
-		"""
-		pass
 WebezyServer = _reflection.GeneratedProtocolMessageType('WebezyServer', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYSERVER,
   '__module__' : 'WebezyCore_pb2'
@@ -88,29 +49,6 @@ WebezyServer = _reflection.GeneratedProtocolMessageType('WebezyServer', (_messag
   })
 _sym_db.RegisterMessage(WebezyServer)
 
-
-@overload
-class WebezyNpm(_message.Message):
-	"""webezyio generated message [webezy.WebezyCore.v1.WebezyNpm]
-	A class respresent a WebezyNpm type
-	Webezy Node Package Manager integration configurations for wrapping the Typescript / Javascript packages directly to npm with every build command
-		"""
-	scope = str # type: str
-	public = bool # type: bool
-	token = str # type: str
-
-	def __init__(self, scope=str, public=bool, token=str):
-		"""
-		Attributes:
-		----------
-		scope : str
-			The user or organization scope see: https://docs.npmjs.com/about-scopes
-		public : bool
-			If package access is public see: https://docs.npmjs.com/about-public-packages
-		token : str
-			The npm access token see: https://docs.npmjs.com/creating-and-viewing-access-tokens
-		"""
-		pass
 WebezyNpm = _reflection.GeneratedProtocolMessageType('WebezyNpm', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYNPM,
   '__module__' : 'WebezyCore_pb2'
@@ -118,29 +56,6 @@ WebezyNpm = _reflection.GeneratedProtocolMessageType('WebezyNpm', (_message.Mess
   })
 _sym_db.RegisterMessage(WebezyNpm)
 
-
-@overload
-class WebezyClient(_message.Message):
-	"""webezyio generated message [webezy.WebezyCore.v1.WebezyClient]
-	A class respresent a WebezyClient type
-	The description for webezy client
-		"""
-	language = enum_type_wrapper.EnumTypeWrapper # type: enum_type_wrapper.EnumTypeWrapper
-	out_dir = str # type: str
-	npm = WebezyNpm # type: WebezyNpm
-
-	def __init__(self, language=enum_type_wrapper.EnumTypeWrapper, out_dir=str, npm=WebezyNpm):
-		"""
-		Attributes:
-		----------
-		language : enum_type_wrapper.EnumTypeWrapper
-			The client language
-		out_dir : str
-			The output path for the client code modules
-		package : None
-			Client package configurations for 3rd parties
-		"""
-		pass
 WebezyClient = _reflection.GeneratedProtocolMessageType('WebezyClient', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYCLIENT,
   '__module__' : 'WebezyCore_pb2'
@@ -148,50 +63,6 @@ WebezyClient = _reflection.GeneratedProtocolMessageType('WebezyClient', (_messag
   })
 _sym_db.RegisterMessage(WebezyClient)
 
-
-@overload
-class WebezyProject(_message.Message):
-	"""webezyio generated message [webezy.WebezyCore.v1.WebezyProject]
-	A class respresent a WebezyProject type
-	The webezy project description
-		"""
-	uri = str # type: str
-	name = str # type: str
-	package_name = str # type: str
-	version = str # type: str
-	type = str # type: str
-	kind = str # type: str
-	properties = google_dot_protobuf_dot_struct__pb2.Struct # type: google_dot_protobuf_dot_struct__pb2.Struct
-	server = WebezyServer # type: WebezyServer
-	clients = List[WebezyClient] # type: List[WebezyClient]
-	go_package = str # type: str
-
-	def __init__(self, uri=str, name=str, package_name=str, version=str, type=str, kind=str, properties=google_dot_protobuf_dot_struct__pb2.Struct, server=WebezyServer, clients=List[WebezyClient], go_package=str):
-		"""
-		Attributes:
-		----------
-		uri : str
-			The project URI of root directory where the webezy.json file exists
-		name : str
-			Project full display name
-		package_name : str
-			project name code compatiable
-		version : str
-			The project version following SEMVER semantics
-		type : str
-			The project resource type
-		kind : str
-			The project resource kind
-		properties : google_dot_protobuf_dot_struct__pb2.Struct
-			Additional project properties
-		server : WebezyServer
-			The project attached server descriptin
-		clients : List[WebezyClient]
-			The project assigned clients array
-		go_package : str
-			The go compatiable package name
-		"""
-		pass
 WebezyProject = _reflection.GeneratedProtocolMessageType('WebezyProject', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYPROJECT,
   '__module__' : 'WebezyCore_pb2'

@@ -148,82 +148,82 @@ def write_clients(wz_json: helpers.WZJson, wz_context: helpers.WZContext,pre_dat
 
 @builder.hookimpl
 def override_generated_classes(wz_json: helpers.WZJson, wz_context: helpers.WZContext):
+    if wz_json.project.get('server').get('language') != 'python':    
+        for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'services', 'protos')):
+            name = f.split('_pb2')
+            if '_grpc' not in name:
+                file_content = file_system.rFile(
+                    file_system.join_path(wz_json.path, 'services', 'protos', f))
+                file_content.insert(
+                    5, '\nfrom typing import overload, Iterator, List, Dict\n')
+                if len(name) > 1:
+                    name = name[0]
 
-    for f in file_system.walkFiles(file_system.join_path(wz_json.path, 'services', 'protos')):
-        name = f.split('_pb2')
-        if '_grpc' not in name:
-            file_content = file_system.rFile(
-                file_system.join_path(wz_json.path, 'services', 'protos', f))
-            file_content.insert(
-                5, '\nfrom typing import overload, Iterator, List, Dict\n')
-            if len(name) > 1:
-                name = name[0]
+                    # svc_proto = next((svc for svc in wz_json.services if svc == name),None)
+                    pkg_proto = next((pkg for pkg in wz_json.packages if pkg.split(
+                        '/')[-1].split('.')[0] == name), None)
+                    if pkg_proto is not None:
+                        pkg_proto_name = pkg_proto.split('/')[-1].split('.')[0]
 
-                # svc_proto = next((svc for svc in wz_json.services if svc == name),None)
-                pkg_proto = next((pkg for pkg in wz_json.packages if pkg.split(
-                    '/')[-1].split('.')[0] == name), None)
-                if pkg_proto is not None:
-                    pkg_proto_name = pkg_proto.split('/')[-1].split('.')[0]
+                        for m in wz_json.packages[pkg_proto].get('messages'):
+                            index = 0
+                            for l in file_content:
+                                message_name = m['name']
+                                message_description = m.get('description') if m.get('description') is not None else ''
+                                if f'{message_name} = _reflection' in l[:len(message_name)+15]:
+                                    temp_fields = []
+                                    init_fields = []
+                                    docstring_fields = []
+                                    # pretty.print_info(init_fields)
+                                    for field in m['fields']:
 
-                    for m in wz_json.packages[pkg_proto].get('messages'):
-                        index = 0
-                        for l in file_content:
-                            message_name = m['name']
-                            message_description = m.get('description') if m.get('description') is not None else ''
-                            if f'{message_name} = _reflection' in l[:len(message_name)+15]:
-                                temp_fields = []
-                                init_fields = []
-                                docstring_fields = []
-                                # pretty.print_info(init_fields)
-                                for field in m['fields']:
+                                        fName = field['name']
+                                        fDescription = field.get('description') if field.get('description') is not None else ''
+                                        key_type = field.get('keyType').split('_')[-1].lower() if field.get('keyType') is not None else None
+                                        value_type = field.get('valueType').split('_')[-1].lower() if field.get('keyType') is not None else None
+                                        fType = parse_proto_type_to_py(field['fieldType'].split(
+                                                '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name,key_type=key_type,value_type=value_type)
+                                        if field['fieldType'].split(
+                                            '_')[-1].lower() == 'enum':
+                                            temp_fields.append(
+                                                f'{fName} = {fType} # type: enum_type_wrapper.EnumTypeWrapper')
+                                        elif field['fieldType'].split(
+                                            '_')[-1].lower() == 'oneof':
+                                            for f_oneof in field.get('oneofFields'):
+                                                fOneofName = f_oneof['name']
+                                                fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
+                                                    '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
+                                                if f_oneof['fieldType'].split(
+                                                    '_')[-1].lower() == 'enum':
+                                                    temp_fields.append(
+                                                        f'{fOneofName} = {fOneofType} # type: enum_type_wrapper.EnumTypeWrapper')
+                                                else:
+                                                    temp_fields.append(
+                                                        f'{fOneofName} = {fOneofType} # type: {fOneofType}')
+                                        else:
+                                            temp_fields.append(
+                                                f'{fName} = {fType} # type: {fType}')
+                                        
+                                        if field.get('fieldType') != 'TYPE_ONEOF':
+                                            init_fields.append(f'{fName}={fType}')
+                                        else:
+                                            for f_oneof in field.get('oneofFields'):
+                                                fOneofName = f_oneof['name']
+                                                fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
+                                                    '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
+                                                init_fields.append(f'{fOneofName}={fOneofType}')
+                                        docstring_fields.append(f'{fName} : {fType}\n\t\t\t{fDescription}')
 
-                                    fName = field['name']
-                                    fDescription = field.get('description') if field.get('description') is not None else ''
-                                    key_type = field.get('keyType').split('_')[-1].lower() if field.get('keyType') is not None else None
-                                    value_type = field.get('valueType').split('_')[-1].lower() if field.get('keyType') is not None else None
-                                    fType = parse_proto_type_to_py(field['fieldType'].split(
-                                            '_')[-1].lower(), field['label'].split('_')[-1].lower(), field.get('messageType'), field.get('enumType'),current_pkg=pkg_proto_name,key_type=key_type,value_type=value_type)
-                                    if field['fieldType'].split(
-                                        '_')[-1].lower() == 'enum':
-                                        temp_fields.append(
-                                            f'{fName} = {fType} # type: enum_type_wrapper.EnumTypeWrapper')
-                                    elif field['fieldType'].split(
-                                        '_')[-1].lower() == 'oneof':
-                                        for f_oneof in field.get('oneofFields'):
-                                            fOneofName = f_oneof['name']
-                                            fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
-                                                '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
-                                            if f_oneof['fieldType'].split(
-                                                '_')[-1].lower() == 'enum':
-                                                temp_fields.append(
-                                                    f'{fOneofName} = {fOneofType} # type: enum_type_wrapper.EnumTypeWrapper')
-                                            else:
-                                                temp_fields.append(
-                                                    f'{fOneofName} = {fOneofType} # type: {fOneofType}')
-                                    else:
-                                        temp_fields.append(
-                                            f'{fName} = {fType} # type: {fType}')
-                                    
-                                    if field.get('fieldType') != 'TYPE_ONEOF':
-                                        init_fields.append(f'{fName}={fType}')
-                                    else:
-                                        for f_oneof in field.get('oneofFields'):
-                                            fOneofName = f_oneof['name']
-                                            fOneofType = parse_proto_type_to_py(f_oneof['fieldType'].split(
-                                                '_')[-1].lower(), 'optional', f_oneof.get('messageType'), f_oneof.get('enumType'),current_pkg=pkg_proto_name)
-                                            init_fields.append(f'{fOneofName}={fOneofType}')
-                                    docstring_fields.append(f'{fName} : {fType}\n\t\t\t{fDescription}')
-
-                                temp_fields = '\n\t'.join(temp_fields)
-                                init_fields = ', '.join(init_fields)
-                                docstring = 'Attributes:\n\t\t----------\n\t\t{0}'.format('\n\t\t'.join(docstring_fields))
-
-                                file_content.insert(
-                                    index, f'\n@overload\nclass {message_name}(_message.Message):\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t{message_description}\n\t\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\t"""\n\t\t{docstring}\n\t\t"""\n\t\tpass\n')
-                                break
-                            index += 1
-                    file_system.wFile(file_system.join_path(
-                        wz_json.path, 'services', 'protos', f), ''.join(file_content), True)
+                                    temp_fields = '\n\t'.join(temp_fields)
+                                    init_fields = ', '.join(init_fields)
+                                    docstring = 'Attributes:\n\t\t----------\n\t\t{0}'.format('\n\t\t'.join(docstring_fields))
+                                    print(index,message_name)
+                                    file_content.insert(
+                                        index, f'\n@overload\nclass {message_name}(_message.Message):\n\t"""webezyio generated message [{wz_json.domain}.{pkg_proto_name}.v1.{message_name}]\n\tA class respresent a {message_name} type\n\t{message_description}\n\t\t"""\n\t{temp_fields}\n\n\tdef __init__(self, {init_fields}):\n\t\t"""\n\t\t{docstring}\n\t\t"""\n\t\tpass\n')
+                                    break
+                                index += 1
+                        file_system.wFile(file_system.join_path(
+                            wz_json.path, 'services', 'protos', f), ''.join(file_content), True)
 
 bash_init_script = '#!/bin/bash\n\n\
 declare -a services=("protos")\n\

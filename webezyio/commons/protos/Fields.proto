@@ -1,0 +1,17 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Fields {
+	// [webezyio] - Create a new field on specified message
+	rpc CreateField (webezy.WebezyApi.v1.CreateFieldRequest) returns (webezy.WebezyApi.v1.GetFieldResponse);
+	// [webezyio] - Get a field
+	rpc GetField (webezy.WebezyApi.v1.GetFieldRequest) returns (webezy.WebezyApi.v1.GetFieldResponse);
+	// [webezyio] - Update a field
+	rpc UpdateField (webezy.WebezyApi.v1.UpdateFieldRequest) returns (webezy.WebezyApi.v1.UpdateFieldResponse);
+	// [webezyio] - Delete a field
+	rpc DeleteField (webezy.WebezyApi.v1.DeleteFieldRequest) returns (webezy.WebezyApi.v1.DeleteFieldResponse);
+}
+
+

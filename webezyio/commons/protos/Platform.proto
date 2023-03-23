@@ -1,0 +1,25 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Platform {
+	// [webezyio] - Get a user info
+	rpc GetUser (webezy.WebezyApi.v1.GetUserRequest) returns (webezy.WebezyApi.v1.GetUserResponse);
+	// [webezyio] - Create a new user
+	rpc CreateUser (webezy.WebezyApi.v1.CreateUserRequest) returns (webezy.WebezyApi.v1.CreateUserResponse);
+	// [webezyio] - Get organization info
+	rpc GetOrganization (webezy.WebezyApi.v1.GetOrganizationRequest) returns (webezy.WebezyApi.v1.GetOrganizationResponse);
+	// [webezyio] - Create organization
+	rpc CreateOrganization (webezy.WebezyApi.v1.CreateOrganizationRequest) returns (webezy.WebezyApi.v1.CreateOrganizationResponse);
+	// [webezyio] - Get a project info
+	rpc GetProject (webezy.WebezyApi.v1.GetProjectRequest) returns (webezy.WebezyApi.v1.GetProjectResponse);
+	// [webezyio] - Create a new project under organization
+	rpc CreateProject (webezy.WebezyApi.v1.CreateProjectRequest) returns (webezy.WebezyApi.v1.CreateProjectResponse);
+	// [webezyio] - List all organization projects
+	rpc ListProjects (webezy.WebezyApi.v1.ListProjectsRequest) returns (stream webezy.WebezyApi.v1.ListProjectsResponse);
+	// [webezyio] - List organizations under user
+	rpc ListOrganizations (webezy.WebezyApi.v1.ListOrganizationsRequest) returns (stream webezy.WebezyApi.v1.GetOrganizationResponse);
+}
+
+

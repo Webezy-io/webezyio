@@ -4,12 +4,26 @@ syntax = "proto3";
 import "google/protobuf/struct.proto";
 package webezy.WebezyPackage.v1;
 
-
+// [webezy.WebezyPackage.v1.WebezyOneOfField] - None
+message WebezyOneOfField {
+	string uri = 1;
+	string name = 2;
+	string full_name = 3;
+	int32 index = 4;
+	string enum_type = 5;
+	string message_type = 6;
+	string type = 7;
+	string kind = 8;
+	string description = 9;
+	// [webezy.WebezyPackage.v1.WebezyOneOfField.extensions] - A map of pluggable extensions into field
+	map<string, google.protobuf.Value> extensions = 10;
+	webezy.WebezyPackage.v1.WebezyFieldType field_type = 11;
+}
 
 // [webezy.WebezyPackage.v1.WebezyField] - The webezy field descriptor
 message WebezyField {
 	// [webezy.WebezyPackage.v1.WebezyField.uri] - The field URI
-	string uri = 1;
+	string uri = 1 ;
 	// [webezy.WebezyPackage.v1.WebezyField.name] - The field name
 	string name = 2;
 	// [webezy.WebezyPackage.v1.WebezyField.full_name] - The field full name <domain>.<package>.<version>.<message>.<field>
@@ -36,7 +50,6 @@ message WebezyField {
 	webezy.WebezyPackage.v1.WebezyFieldType value_type = 13;
 	// [webezy.WebezyPackage.v1.WebezyField.extensions] - The field extensions
 	map<string, google.protobuf.Value> extensions = 14;
-	// [webezy.WebezyPackage.v1.WebezyField.oneof_fields] - 
 	repeated webezy.WebezyPackage.v1.WebezyOneOfField oneof_fields = 15;
 }
 
@@ -79,7 +92,7 @@ message WebezyEnum {
 // [webezy.WebezyPackage.v1.WebezyMessage] - The webezy message descriptor
 message WebezyMessage {
 	// [webezy.WebezyPackage.v1.WebezyMessage.uri] - Message URI
-	string uri = 1;
+	string uri = 1 ;
 	// [webezy.WebezyPackage.v1.WebezyMessage.name] - Message name
 	string name = 2;
 	// [webezy.WebezyPackage.v1.WebezyMessage.full_name] - Message full name <domain>.<package>.<version>.<message>
@@ -120,34 +133,7 @@ message WebezyPackage {
 	repeated webezy.WebezyPackage.v1.WebezyEnum enums = 9;
 	// [webezy.WebezyPackage.v1.WebezyPackage.extensions] - The package pluggable extensions
 	map<string, google.protobuf.Value> extensions = 10;
-	// [webezy.WebezyPackage.v1.WebezyPackage.dependencies] - 
 	repeated string dependencies = 11;
-}
-
-// [webezy.WebezyPackage.v1.WebezyOneOfField] - None
-message WebezyOneOfField {
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.uri] - 
-	string uri = 1;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.name] - 
-	string name = 2;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.full_name] - 
-	string full_name = 3;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.index] - 
-	int32 index = 4;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.enum_type] - 
-	string enum_type = 5;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.message_type] - 
-	string message_type = 6;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.type] - 
-	string type = 7;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.kind] - 
-	string kind = 8;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.description] - 
-	string description = 9;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.extensions] - A map of pluggable extensions into field
-	map<string, google.protobuf.Value> extensions = 10;
-	// [webezy.WebezyPackage.v1.WebezyOneOfField.field_type] - 
-	webezy.WebezyPackage.v1.WebezyFieldType field_type = 11;
 }
 
 // [webezy.WebezyPackage.v1.WebezyFieldLabel] - None

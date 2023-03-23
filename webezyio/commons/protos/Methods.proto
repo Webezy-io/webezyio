@@ -1,0 +1,17 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Methods {
+	// [webezyio] - Create a new method (RPC) on a project
+	rpc CreateMethod (webezy.WebezyApi.v1.CreateMethodRequest) returns (webezy.WebezyApi.v1.CreateMethodResponse);
+	// [webezyio] - Get a method (RPC) description on specified project
+	rpc GetMethod (webezy.WebezyApi.v1.GetMethodRequest) returns (webezy.WebezyApi.v1.GetMethodResponse);
+	// [webezyio] - Update a method (RPC) on specified project
+	rpc UpdateMethod (webezy.WebezyApi.v1.UpdateMethodRequest) returns (webezy.WebezyApi.v1.UpdateMethodResponse);
+	// [webezyio] - Delete a method (RPC) from a project
+	rpc DeleteMethod (webezy.WebezyApi.v1.DeleteMethodRequest) returns (webezy.WebezyApi.v1.DeleteMethodResponse);
+}
+
+

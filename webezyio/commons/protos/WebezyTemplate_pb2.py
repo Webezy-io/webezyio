@@ -3,8 +3,6 @@
 # source: WebezyTemplate.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
-
-from typing import overload, Iterator, List, Dict
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -24,44 +22,6 @@ _TEMPLATECONFIG = DESCRIPTOR.message_types_by_name['TemplateConfig']
 _WEBEZYMETHODCONTEXT = DESCRIPTOR.message_types_by_name['WebezyMethodContext']
 _WEBEZYFILECONTEXT = DESCRIPTOR.message_types_by_name['WebezyFileContext']
 _WEBEZYCONTEXT = DESCRIPTOR.message_types_by_name['WebezyContext']
-
-@overload
-class TemplateConfig(_message.Message):
-	"""webezyio generated message [webezy.WebezyTemplate.v1.TemplateConfig]
-	A class respresent a TemplateConfig type
-	The main configurations for webezy.io template
-		"""
-	name = str # type: str
-	out_path = str # type: str
-	include = List[str] # type: List[str]
-	exclude = List[str] # type: List[str]
-	tags = List[str] # type: List[str]
-	description = str # type: str
-	author = str # type: str
-	include_code = bool # type: bool
-
-	def __init__(self, name=str, out_path=str, include=List[str], exclude=List[str], tags=List[str], description=str, author=str, include_code=bool):
-		"""
-		Attributes:
-		----------
-		name : str
-			The template name
-		out_path : str
-			The output path for the template script
-		include : List[str]
-			The files to include when using 'include_code' field
-		exclude : List[str]
-			The files to exclude when using 'include_code' field
-		tags : List[str]
-			The optional tags to associate with the template
-		description : str
-			The template description
-		author : str
-			The author email or name
-		include_code : bool
-			If to include code files in the generated template script
-		"""
-		pass
 TemplateConfig = _reflection.GeneratedProtocolMessageType('TemplateConfig', (_message.Message,), {
   'DESCRIPTOR' : _TEMPLATECONFIG,
   '__module__' : 'WebezyTemplate_pb2'
@@ -69,29 +29,6 @@ TemplateConfig = _reflection.GeneratedProtocolMessageType('TemplateConfig', (_me
   })
 _sym_db.RegisterMessage(TemplateConfig)
 
-
-@overload
-class WebezyMethodContext(_message.Message):
-	"""webezyio generated message [webezy.WebezyTemplate.v1.WebezyMethodContext]
-	A class respresent a WebezyMethodContext type
-	
-		"""
-	name = str # type: str
-	code = str # type: str
-	type = str # type: str
-
-	def __init__(self, name=str, code=str, type=str):
-		"""
-		Attributes:
-		----------
-		name : str
-			
-		code : str
-			
-		type : str
-			
-		"""
-		pass
 WebezyMethodContext = _reflection.GeneratedProtocolMessageType('WebezyMethodContext', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYMETHODCONTEXT,
   '__module__' : 'WebezyTemplate_pb2'
@@ -99,29 +36,6 @@ WebezyMethodContext = _reflection.GeneratedProtocolMessageType('WebezyMethodCont
   })
 _sym_db.RegisterMessage(WebezyMethodContext)
 
-
-@overload
-class WebezyFileContext(_message.Message):
-	"""webezyio generated message [webezy.WebezyTemplate.v1.WebezyFileContext]
-	A class respresent a WebezyFileContext type
-	
-		"""
-	file = str # type: str
-	methods = List[WebezyMethodContext] # type: List[WebezyMethodContext]
-	code = None # type: None
-
-	def __init__(self, file=str, methods=List[WebezyMethodContext], code=None):
-		"""
-		Attributes:
-		----------
-		file : str
-			
-		methods : List[WebezyMethodContext]
-			
-		code : None
-			
-		"""
-		pass
 WebezyFileContext = _reflection.GeneratedProtocolMessageType('WebezyFileContext', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYFILECONTEXT,
   '__module__' : 'WebezyTemplate_pb2'
@@ -129,23 +43,6 @@ WebezyFileContext = _reflection.GeneratedProtocolMessageType('WebezyFileContext'
   })
 _sym_db.RegisterMessage(WebezyFileContext)
 
-
-@overload
-class WebezyContext(_message.Message):
-	"""webezyio generated message [webezy.WebezyTemplate.v1.WebezyContext]
-	A class respresent a WebezyContext type
-	
-		"""
-	files = List[WebezyFileContext] # type: List[WebezyFileContext]
-
-	def __init__(self, files=List[WebezyFileContext]):
-		"""
-		Attributes:
-		----------
-		files : List[WebezyFileContext]
-			
-		"""
-		pass
 WebezyContext = _reflection.GeneratedProtocolMessageType('WebezyContext', (_message.Message,), {
   'DESCRIPTOR' : _WEBEZYCONTEXT,
   '__module__' : 'WebezyTemplate_pb2'

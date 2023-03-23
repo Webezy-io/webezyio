@@ -37,9 +37,11 @@ statuscode=$?
 echo "Exit code for protoc -> "$statuscode
 cd $DESTDIR
 for FILE in *; do
-    filename=$FILE
-    search="import"
-    replace="from . import"
-    sed -i'.bak' -e "4,20s/^$search/$replace/gi" $filename
-    rm -f *.bak
+    if [[ "$FILE" == *".py" ]]; then
+        filename=$FILE
+        search="import"
+        replace="from . import"
+        sed -i'.bak' -e "4,20s/^$search/$replace/gi" $filename
+        rm -f *.bak
+    fi
 done

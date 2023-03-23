@@ -14,8 +14,8 @@ configs=WebezyConfig(
     # Analytic gathering approval
     analytics=True,
     # First run flag
-    first_run=True,
-    token="",
+    first_run=False,
+    token="webezyio-test",
     # Supported builtins templates
     webezyio_templates = [
         "@webezyio/Blank",

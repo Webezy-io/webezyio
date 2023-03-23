@@ -5,7 +5,6 @@ import "google/protobuf/timestamp.proto";
 package webezy.WebezyAnalytics.v1;
 
 
-
 // [webezy.WebezyAnalytics.v1.CLIEvent] - This is an CLI analytic event sourced from webezyio CLI
 message CLIEvent {
 	// [webezy.WebezyAnalytics.v1.CLIEvent.version] - The webezyi CLI version

@@ -3,8 +3,6 @@
 # source: WebezyAnalytics.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
-
-from typing import overload, Iterator, List, Dict
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
@@ -22,35 +20,6 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15WebezyAnalytic
 
 
 _CLIEVENT = DESCRIPTOR.message_types_by_name['CLIEvent']
-
-@overload
-class CLIEvent(_message.Message):
-	"""webezyio generated message [webezy.WebezyAnalytics.v1.CLIEvent]
-	A class respresent a CLIEvent type
-	This is an CLI analytic event sourced from webezyio CLI
-		"""
-	version = str # type: str
-	ts = google_dot_protobuf_dot_timestamp__pb2.Timestamp # type: google_dot_protobuf_dot_timestamp__pb2.Timestamp
-	args = List[str] # type: List[str]
-	user_id = str # type: str
-	os = str # type: str
-
-	def __init__(self, version=str, ts=google_dot_protobuf_dot_timestamp__pb2.Timestamp, args=List[str], user_id=str, os=str):
-		"""
-		Attributes:
-		----------
-		version : str
-			The webezyi CLI version
-		ts : google_dot_protobuf_dot_timestamp__pb2.Timestamp
-			The event trigger timestamp
-		args : List[str]
-			The arguments passed from user to CLI
-		user_id : str
-			The user id
-		os : str
-			The operating system on which the CLI has been ran
-		"""
-		pass
 CLIEvent = _reflection.GeneratedProtocolMessageType('CLIEvent', (_message.Message,), {
   'DESCRIPTOR' : _CLIEVENT,
   '__module__' : 'WebezyAnalytics_pb2'

@@ -140,7 +140,7 @@ class WebezyBuilder:
         
         if client_py != False:
             self._pm.register(WebezyPyClient)
-           
+        
         if client_ts:
             self._pm.register(WebezyTsClient)
 
@@ -154,7 +154,7 @@ class WebezyBuilder:
             self._pm.register(WebezyTsServer)
         if server_lang == 'go':
             self._pm.register(WebezyGoServer)
-        
+     
         for p in _WELL_KNOWN_PLUGINS:
             plug_name = self._pm.get_name(p)
             if plug_name is not None:

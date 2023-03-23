@@ -1,0 +1,17 @@
+// Webezy.io Generated proto DO NOT EDIT
+syntax = "proto3";
+
+import "WebezyApi.proto";
+
+service Enums {
+	// [webezyio] - Get enum request
+	rpc GetEnum (webezy.WebezyApi.v1.GetEnumRequest) returns (webezy.WebezyApi.v1.GetEnumResponse);
+	// [webezyio] - Create a new enum object
+	rpc CreateEnum (webezy.WebezyApi.v1.CreateEnumRequest) returns (webezy.WebezyApi.v1.CreateEnumResponse);
+	// [webezyio] - Update a enum object
+	rpc UpdateEnum (webezy.WebezyApi.v1.UpdateEnumRequest) returns (webezy.WebezyApi.v1.UpdateEnumResponse);
+	// [webezyio] - Delete an enum object
+	rpc DeleteEnum (webezy.WebezyApi.v1.DeleteEnumRequest) returns (webezy.WebezyApi.v1.DeleteEnumResponse);
+}
+
+
