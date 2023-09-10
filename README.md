@@ -1,8 +1,6 @@
-# sylk.build CLI
+# Webezy CLI
 
-[![Downloads](https://pepy.tech/badge/sylk)](https://pepy.tech/project/sylk)
-
-[![Python 3.7](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-370/)
+> Note: `Webezy CLI` has been moved to new repository [Sylk Build CLI](https://github.com/sylk-build/sylk)
 
 [sylk](https://www.sylk.build) is free and open-source project that aims to be a complete framework for developing micro-services projects.
 The underlying communication protocol is [```HTTP2```](https://en.wikipedia.org/wiki/HTTP/2) and for serialization and deserialization is [```protobuf```](https://developers.google.com/protocol-buffers/docs/pythontutorial).
